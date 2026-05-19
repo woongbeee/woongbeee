@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useSimulationStore } from '@/store/simulationStore'
 import { cn } from '@/lib/utils'
-import { WipBanner } from '../shared'
+import { WipBanner } from '../../shared'
 
 // ── Text ──────────────────────────────────────────────────────────────────────
 

@@ -1,0 +1,314 @@
+import { useState } from 'react'
+import { useSimulationStore } from '@/store/simulationStore'
+import {
+  PageContainer, ChapterTitle, SectionTitle, Prose, InfoBox, Divider, SqlBlock,
+} from '../../shared'
+import { IconArrowsHorizontal } from '@tabler/icons-react'
+import { ScanDiagram } from './ScanDiagram'
+import type { ScanConfig } from './ScanDiagram'
+
+// ── 고정 Leaf 데이터 ──────────────────────────────────────────────────────────
+
+const LEAVES = [
+  { id: 'L1', entries: [{ key: 100, rowid: 'AAA,1,1' }, { key: 102, rowid: 'AAA,1,2' }, { key: 105, rowid: 'AAA,1,3' }] },
+  { id: 'L2', entries: [{ key: 108, rowid: 'AAA,2,1' }, { key: 114, rowid: 'AAA,2,2' }, { key: 116, rowid: 'AAA,2,3' }] },
+  { id: 'L3', entries: [{ key: 120, rowid: 'AAA,3,1' }, { key: 124, rowid: 'AAA,3,2' }, { key: 128, rowid: 'AAA,3,3' }] },
+  { id: 'L4', entries: [{ key: 135, rowid: 'AAA,4,1' }, { key: 141, rowid: 'AAA,4,2' }, { key: 149, rowid: 'AAA,4,3' }] },
+  { id: 'L5', entries: [{ key: 155, rowid: 'AAA,5,1' }, { key: 160, rowid: 'AAA,5,2' }, { key: 166, rowid: 'AAA,5,3' }] },
+]
+
+// ── 시나리오 ──────────────────────────────────────────────────────────────────
+
+type ScenarioId = 'between' | 'gt' | 'like'
+
+interface Scenario {
+  id: ScenarioId
+  labelKo: string
+  labelEn: string
+  sql: string
+  // 조건에 맞는 key 목록
+  matched: number[]
+  // 방문한 key 목록 (matched 포함)
+  visited: number[]
+}
+
+const SCENARIOS: Scenario[] = [
+  {
+    id: 'between',
+    labelKo: 'BETWEEN 108 AND 128',
+    labelEn: 'BETWEEN 108 AND 128',
+    sql: 'WHERE employee_id BETWEEN 108 AND 128',
+    matched: [108, 114, 116, 120, 124, 128],
+    visited: [108, 114, 116, 120, 124, 128],
+  },
+  {
+    id: 'gt',
+    labelKo: '>= 135',
+    labelEn: '>= 135',
+    sql: 'WHERE employee_id >= 135',
+    matched: [135, 141, 149, 155, 160, 166],
+    visited: [135, 141, 149, 155, 160, 166],
+  },
+  {
+    id: 'like',
+    labelKo: 'LIKE 1__  (100~199)',
+    labelEn: 'LIKE 1__  (100~199)',
+    sql: "WHERE last_name LIKE '1%'",
+    matched: [100, 102, 105, 108, 114, 116, 120, 124, 128, 135, 141, 149, 155, 160, 166],
+    visited: [100, 102, 105, 108, 114, 116, 120, 124, 128, 135, 141, 149, 155, 160, 166],
+  },
+]
+
+function buildConfig(scenario: Scenario | null, isKo: boolean): ScanConfig {
+  const entryStates: ScanConfig['entryStates'] = {}
+  const blockStates: ScanConfig['blockStates'] = {}
+
+  for (const leaf of LEAVES) {
+    entryStates[leaf.id] = {}
+    let hasMatch = false
+    let hasVisit = false
+    for (const e of leaf.entries) {
+      if (!scenario) {
+        entryStates[leaf.id][e.key] = 'idle'
+        continue
+      }
+      if (scenario.matched.includes(e.key)) {
+        entryStates[leaf.id][e.key] = 'matched'
+        hasMatch = true
+        hasVisit = true
+      } else if (scenario.visited.includes(e.key)) {
+        entryStates[leaf.id][e.key] = 'visited'
+        hasVisit = true
+      } else {
+        entryStates[leaf.id][e.key] = 'idle'
+      }
+    }
+    blockStates[leaf.id] = !scenario ? 'idle' : hasMatch ? 'matched' : hasVisit ? 'active' : 'idle'
+  }
+
+  return {
+    leaves: LEAVES,
+    entryStates,
+    blockStates,
+    scanArrows: [],
+    keyLabel: 'EMP_ID',
+    legend: scenario ? [
+      { color: 'bg-emerald-400', label: isKo ? '조건 충족 (반환)' : 'Matched (returned)' },
+      { color: 'bg-slate-300',   label: isKo ? '범위 외 (건너뜀)' : 'Out of range (skipped)' },
+    ] : [],
+  }
+}
+
+// ── 텍스트 ────────────────────────────────────────────────────────────────────
+
+const T = {
+  ko: {
+    title: 'Index Range Scan',
+    subtitle: '가장 일반적인 인덱스 스캔 방식입니다. B-Tree에서 범위의 시작점을 찾은 뒤, Leaf 블록의 연결 리스트를 따라 끝점까지 순서대로 읽습니다.',
+    whatTitle: '언제 사용되나요?',
+    whatDesc: 'BETWEEN, >, >=, <, <= 조건이나 LIKE \'A%\' 처럼 범위를 나타내는 조건에서 옵티마이저가 선택합니다. 인덱스 키가 정렬되어 있기 때문에 시작점을 한 번 찾으면 끝점까지 Leaf를 순서대로 훑기만 하면 됩니다.',
+    howTitle: '작동 방식',
+    diagramTitle: 'Range Scan 시각화',
+    scenarioLabel: '시나리오 선택',
+    traitTitle: '특징',
+    traits: [
+      { icon: '✅', title: '결과가 정렬됨', desc: 'Leaf를 순서대로 읽으므로 별도 ORDER BY 정렬 없이 결과가 정렬되어 반환됩니다.' },
+      { icon: '📌', title: '선택도가 낮을수록 유리', desc: '범위가 좁을수록 적은 블록만 읽습니다. 범위가 너무 넓으면 Full Table Scan이 더 빠를 수 있습니다.' },
+      { icon: '🔗', title: 'Leaf 연결 리스트 활용', desc: '각 Leaf 블록은 앞뒤로 연결되어 있어 다음 블록을 포인터 하나로 바로 이동합니다.' },
+    ],
+    noteMultiBlock: 'Range Scan은 조건에 따라 여러 Leaf 블록을 읽을 수 있습니다. 각 Leaf에서 ROWID를 꺼낸 뒤 테이블 블록을 별도로 방문하므로, 결과 건수가 많을수록 랜덤 I/O도 많아집니다.',
+    stepVerticalTitle: '① 수직 탐색 — Root → Branch → Leaf',
+    stepVerticalDesc: '검색은 항상 Root에서 시작합니다. 범위 조건의 시작값과 Branch 키를 비교하며 트리를 내려가, 조건을 만족하는 첫 번째 키가 있는 Leaf 블록에 도달합니다. 이 과정은 트리 깊이만큼(보통 3~4번) 블록을 읽으면 됩니다.',
+    stepHorizontalTitle: '② 수평 탐색 — Leaf 체인 순방향',
+    stepHorizontalDesc: 'Leaf 블록에 도달한 뒤에는 각 블록의 오른쪽 포인터를 따라 다음 Leaf로 이동하며 범위 끝까지 키를 수집합니다. Leaf 블록은 이중 연결 리스트로 연결되어 있어 추가 트리 탐색 없이 순서대로 읽을 수 있습니다.',
+    diagramAnnotation: '다이어그램 범례',
+    annotationVertical: '수직 탐색: 트리를 내려가 시작점 탐색',
+    annotationHorizontal: 'Leaf 블록 간 양방향 연결 포인터',
+    annotationMatched: '조건 충족 키값 (반환)',
+    hintTitle: 'Index Range Scan이 쓰이는 때',
+    hintNote: '범위 조건이 있고 해당 컬럼에 인덱스가 존재하면 옵티마이저가 자동으로 Range Scan을 선택합니다. 강제로 지정하려면 INDEX 힌트를 사용하세요.',
+    bindPeekNote: 'Bind Variable Peeking — 바인드 변수(:val)를 사용하면 옵티마이저는 쿼리가 처음 파싱될 때의 값만 보고 실행 계획을 확정합니다. 이후 다른 값이 들어와도 계획은 재사용됩니다. 예를 들어 처음 :salary = 100(소수)으로 파싱되어 Range Scan으로 최적화됐다면, 나중에 :salary = 1(대다수)이 들어와도 같은 Range Scan 계획이 그대로 쓰입니다. Oracle 11g부터는 Adaptive Cursor Sharing으로 이 문제를 완화하지만, 통계가 오래되거나 바인드 값 분포가 극단적일 때는 여전히 잘못된 플랜이 선택될 수 있어 INDEX 힌트로 강제하는 경우가 생깁니다.',
+    examples: [
+      { badge: 'BETWEEN', badgeColor: 'violet' as const,
+        desc: 'BETWEEN은 시작값과 끝값 모두 포함하는 범위 조건입니다. 인덱스가 salary 순으로 정렬되어 있으므로 5000이 있는 Leaf까지 트리를 내려간 뒤, 8000을 초과하는 키를 만날 때까지 오른쪽 Leaf를 순서대로 읽습니다.',
+        sql: `SELECT * FROM employees\nWHERE salary BETWEEN 5000 AND 8000;\n-- ① IDX_EMP_SALARY에서 5000 위치로 내려감\n-- ② Leaf 오른쪽으로 이동하며 8000까지 수집\n-- ③ 각 ROWID로 테이블 블록에 랜덤 접근` },
+      { badge: '>=', badgeColor: 'violet' as const,
+        desc: '>= 조건은 시작점만 있고 끝이 열려 있는 범위입니다. 인덱스에서 시작점을 찾은 뒤 마지막 Leaf까지 전부 읽습니다. 결과 건수가 많으면 Full Table Scan보다 느릴 수 있어 선택도를 확인해야 합니다.',
+        sql: `SELECT * FROM employees\nWHERE hire_date >= DATE '2020-01-01';\n-- IDX_EMP_HIRE_DATE에서 2020-01-01 위치 탐색\n-- 이후 모든 Leaf를 끝까지 순방향 스캔\n-- 결과가 전체의 20% 이상이면 Full Scan이 유리할 수 있음` },
+      { badge: 'LIKE', badgeColor: 'violet' as const,
+        desc: "전방 LIKE('K%')는 'K' 이상 'L' 미만인 범위로 변환되어 Range Scan이 가능합니다. 반면 후방 LIKE('%K')는 시작점을 특정할 수 없어 인덱스를 탈 수 없고 Full Table Scan이 발생합니다.",
+        sql: `SELECT * FROM employees\nWHERE last_name LIKE 'K%';\n-- 'K%' → 'K' 이상 'L' 미만 범위로 변환\n-- IDX_EMP_LAST_NAME으로 Range Scan 가능\n\n-- ⚠️ 아래는 인덱스 사용 불가\nSELECT * FROM employees\nWHERE last_name LIKE '%ing'; -- Full Table Scan` },
+      { badge: 'INDEX 힌트', badgeColor: 'blue' as const,
+        desc: '옵티마이저가 Full Table Scan을 선택했지만 특정 인덱스를 쓰도록 강제하고 싶을 때 사용합니다. 통계가 오래됐거나 바인드 변수 peeking 문제로 잘못된 플랜이 나올 때 유용합니다.',
+        sql: `SELECT /*+ INDEX(e IDX_EMP_SALARY) */ *\nFROM employees e\nWHERE salary >= 6000;\n-- 옵티마이저가 Full Scan을 선택하더라도\n-- IDX_EMP_SALARY로 Range Scan을 강제함` },
+    ],
+  },
+  en: {
+    title: 'Index Range Scan',
+    subtitle: 'The most common index scan method. Oracle finds the start of the range in the B-Tree, then follows the Leaf linked list forward until the end of the range.',
+    whatTitle: 'When is it used?',
+    whatDesc: "The optimizer chooses Range Scan for range predicates: BETWEEN, >, >=, <, <=, and LIKE 'A%'. Because the index is sorted, once the start point is found Oracle just walks the Leaf blocks in order to the end point.",
+    howTitle: 'How it works',
+    diagramTitle: 'Range Scan Visualization',
+    scenarioLabel: 'Select scenario',
+    traitTitle: 'Characteristics',
+    traits: [
+      { icon: '✅', title: 'Results are sorted', desc: 'Reading Leaf blocks in order means results come back sorted — no extra ORDER BY sort step needed.' },
+      { icon: '📌', title: 'Better with low selectivity', desc: 'A narrow range means fewer blocks read. A very wide range can make a Full Table Scan faster.' },
+      { icon: '🔗', title: 'Uses Leaf linked list', desc: 'Each Leaf block has a forward pointer to the next, so moving between blocks costs a single pointer follow.' },
+    ],
+    noteMultiBlock: 'Range Scan may visit multiple Leaf blocks. After retrieving each ROWID, Oracle visits the table block separately — so more result rows means more random I/Os.',
+    stepVerticalTitle: '① Vertical Traversal — Root → Branch → Leaf',
+    stepVerticalDesc: 'Every search starts at the Root. Oracle compares the range start value against Branch keys and descends the tree, landing on the Leaf block that contains the first qualifying key. This takes exactly tree-depth block reads — typically 3 to 4.',
+    stepHorizontalTitle: '② Horizontal Traversal — Forward along the Leaf Chain',
+    stepHorizontalDesc: 'Once the start Leaf is reached, Oracle follows the right pointer from each Leaf block to the next, collecting matching keys until the range end is found. Because Leaf blocks are doubly linked, no additional tree traversal is needed — just sequential pointer follows.',
+    diagramAnnotation: 'Diagram legend',
+    annotationVertical: 'Vertical: descend tree to locate range start',
+    annotationHorizontal: 'Doubly-linked pointers between Leaf blocks',
+    annotationMatched: 'Matched key (returned to caller)',
+    hintTitle: 'When Index Range Scan Is Chosen',
+    hintNote: 'Range Scan is selected automatically when a range predicate matches an indexed column. Use the INDEX hint to force a specific index.',
+    bindPeekNote: "Bind Variable Peeking — when a bind variable (:val) is used, the optimizer inspects its value only at first parse time and locks in an execution plan. That plan is reused for all subsequent executions regardless of the actual value passed in. For example, if :salary = 100 (very selective) is seen first and a Range Scan plan is chosen, later executions with :salary = 1 (matching most rows) still use the same Range Scan — even though a Full Table Scan would be cheaper. Oracle 11g introduced Adaptive Cursor Sharing to mitigate this, but stale statistics or extreme value skew can still produce wrong plans, which is why the INDEX hint is sometimes needed as a workaround.",
+    examples: [
+      { badge: 'BETWEEN', badgeColor: 'violet' as const,
+        desc: 'BETWEEN defines a closed range with both start and end values. Oracle descends to the Leaf containing 5000, then walks right through the linked list until it sees a key above 8000. Because both bounds are known, the scan stops cleanly.',
+        sql: `SELECT * FROM employees\nWHERE salary BETWEEN 5000 AND 8000;\n-- ① Descend IDX_EMP_SALARY to key 5000\n-- ② Walk Leaf chain right until key > 8000\n-- ③ Random table I/O for each ROWID collected` },
+      { badge: '>=', badgeColor: 'violet' as const,
+        desc: '>= is an open-ended range — the start is known but there is no upper bound. Oracle finds the start key and reads all remaining Leaf blocks to the right. If the result set is very large (>~20% of rows), a Full Table Scan may be cheaper.',
+        sql: `SELECT * FROM employees\nWHERE hire_date >= DATE '2020-01-01';\n-- Descend IDX_EMP_HIRE_DATE to 2020-01-01\n-- Read every Leaf to the right (no upper bound)\n-- High row count → consider Full Table Scan` },
+      { badge: 'LIKE', badgeColor: 'violet' as const,
+        desc: "A leading wildcard LIKE 'K%' is rewritten as a range (≥ 'K' and < 'L'), so the index start point is known and Range Scan applies. A trailing wildcard LIKE '%K' has no fixed start point, so Oracle cannot use the index and falls back to Full Table Scan.",
+        sql: `SELECT * FROM employees\nWHERE last_name LIKE 'K%';\n-- Rewritten: last_name >= 'K' AND last_name < 'L'\n-- Range Scan on IDX_EMP_LAST_NAME\n\n-- ⚠️ Cannot use index:\nSELECT * FROM employees\nWHERE last_name LIKE '%ing'; -- Full Table Scan` },
+      { badge: 'INDEX hint', badgeColor: 'blue' as const,
+        desc: 'When the optimizer picks a Full Table Scan despite an available index — often due to stale statistics or bind variable peeking — the INDEX hint forces the specified index. Use it as a short-term workaround while the root cause is fixed.',
+        sql: `SELECT /*+ INDEX(e IDX_EMP_SALARY) */ *\nFROM employees e\nWHERE salary >= 6000;\n-- Forces Range Scan on IDX_EMP_SALARY\n-- even if optimizer chose Full Table Scan` },
+    ],
+  },
+}
+
+// ── 컴포넌트 ──────────────────────────────────────────────────────────────────
+
+export function RangeScanSection() {
+  const lang = useSimulationStore((s) => s.lang)
+  const t = T[lang]
+  const isKo = lang === 'ko'
+
+  const [selectedScenario, setSelectedScenario] = useState<ScenarioId | null>(null)
+  const scenario = SCENARIOS.find((s) => s.id === selectedScenario) ?? null
+  const config = buildConfig(scenario, isKo)
+
+  return (
+    <PageContainer className="max-w-5xl">
+      <ChapterTitle
+        icon={<IconArrowsHorizontal size={36} color="#7c3aed" stroke={1.5} />}
+        title={t.title}
+        subtitle={t.subtitle}
+      />
+
+      <SectionTitle>{t.whatTitle}</SectionTitle>
+      <Prose>{t.whatDesc}</Prose>
+
+      <Divider />
+
+      <SectionTitle>{t.howTitle}</SectionTitle>
+
+      {/* 수직 탐색 설명 */}
+      <div className="mb-4 flex items-stretch gap-3">
+        <div className="flex flex-col items-center">
+          <div className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber-400 font-mono text-[11px] font-bold text-white">1</div>
+          <div className="mt-1 flex-1 border-l-2 border-dashed border-amber-300" />
+        </div>
+        <div className="pb-2">
+          <p className="mb-0.5 font-mono text-[11px] font-bold text-amber-700">{t.stepVerticalTitle}</p>
+          <p className="text-[11px] leading-relaxed text-muted-foreground">{t.stepVerticalDesc}</p>
+        </div>
+      </div>
+
+      <div className="mb-5 flex items-start gap-3">
+        <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-400 font-mono text-[11px] font-bold text-white">2</div>
+        <div>
+          <p className="mb-0.5 font-mono text-[11px] font-bold text-emerald-700">{t.stepHorizontalTitle}</p>
+          <p className="text-[11px] leading-relaxed text-muted-foreground">{t.stepHorizontalDesc}</p>
+        </div>
+      </div>
+
+      {/* 시나리오 선택 */}
+      <div className="mb-4">
+        <p className="mb-2 font-mono text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
+          {t.scenarioLabel}
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {SCENARIOS.map((s) => (
+            <button
+              key={s.id}
+              onClick={() => setSelectedScenario(selectedScenario === s.id ? null : s.id)}
+              className={[
+                'rounded-lg border px-3 py-1.5 font-mono text-[11px] transition-all',
+                selectedScenario === s.id
+                  ? 'border-violet-400 bg-violet-100 font-bold text-violet-800 shadow-sm'
+                  : 'border-border text-muted-foreground hover:border-violet-300 hover:text-foreground',
+              ].join(' ')}
+            >
+              {isKo ? s.labelKo : s.labelEn}
+            </button>
+          ))}
+        </div>
+        {scenario && (
+          <div className="mt-3 rounded-lg border bg-slate-900 px-3 py-2">
+            <span className="font-mono text-[11px] text-slate-300">{scenario.sql}</span>
+          </div>
+        )}
+      </div>
+
+      <ScanDiagram config={config} title={isKo ? 'Leaf 블록 탐색 경로' : 'Leaf Block Traversal'} />
+
+      {/* 다이어그램 보충 설명 */}
+      <div className="mt-3 rounded-xl border border-dashed border-slate-200 bg-slate-50/60 px-4 py-3">
+        <p className="font-mono text-[10px] font-bold uppercase tracking-widest text-slate-400">{t.diagramAnnotation}</p>
+        <div className="mt-2 flex flex-wrap gap-x-6 gap-y-1.5">
+          <span className="flex items-center gap-1.5 font-mono text-[11px] text-slate-500">
+            <span className="rounded bg-amber-100 px-1.5 py-0.5 font-bold text-amber-700">ROOT → BRANCH</span>
+            {t.annotationVertical}
+          </span>
+          <span className="flex items-center gap-1.5 font-mono text-[11px] text-slate-500">
+            <span className="rounded bg-slate-200 px-1.5 py-0.5 font-bold text-slate-600">← →</span>
+            {t.annotationHorizontal}
+          </span>
+          <span className="flex items-center gap-1.5 font-mono text-[11px] text-slate-500">
+            <span className="h-2.5 w-2.5 rounded-full bg-emerald-400 inline-block" />
+            {t.annotationMatched}
+          </span>
+        </div>
+      </div>
+
+      <Divider />
+
+      {/* 특징 */}
+      <SectionTitle>{t.traitTitle}</SectionTitle>
+      <div className="mb-4 grid gap-3 sm:grid-cols-3">
+        {t.traits.map((tr, i) => (
+          <div key={i} className="rounded-xl border bg-card p-4">
+            <div className="mb-2 text-lg">{tr.icon}</div>
+            <div className="mb-1 text-xs font-bold">{tr.title}</div>
+            <p className="text-[11px] leading-snug text-muted-foreground">{tr.desc}</p>
+          </div>
+        ))}
+      </div>
+      <InfoBox variant="note">{t.noteMultiBlock}</InfoBox>
+
+      <Divider />
+
+      <SectionTitle>{t.hintTitle}</SectionTitle>
+      <Prose>{t.hintNote}</Prose>
+      <div className="mt-4 grid gap-3">
+        {t.examples.map((ex, i) => (
+          <SqlBlock key={i} badge={ex.badge} badgeColor={ex.badgeColor} desc={ex.desc} sql={ex.sql} />
+        ))}
+      </div>
+
+      <Divider />
+
+      <InfoBox variant="note">{t.bindPeekNote}</InfoBox>
+    </PageContainer>
+  )
+}

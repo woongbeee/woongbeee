@@ -200,15 +200,19 @@ export const BOOK_CHAPTERS: BookChapter[] = [
       {
         id: 'index-btree',
         title: { ko: 'B-Tree 인덱스', en: 'B-Tree Index' },
+      },
+      {
+        id: 'index-bitmap',
+        title: { ko: 'Bitmap 인덱스', en: 'Bitmap Index' },
+      },
+      {
+        id: 'index-composite',
+        title: { ko: '복합 & 기타 인덱스', en: 'Composite & Other Indexes' },
+      },
+      {
+        id: 'index-scan',
+        title: { ko: '인덱스를 읽는 방법', en: 'Index Scan Methods' },
         children: [
-          {
-            id: 'index-btree-rowid',
-            title: { ko: 'ROWID 구조', en: 'ROWID Structure' },
-          },
-          {
-            id: 'index-unusable',
-            title: { ko: '인덱스를 못 쓰는 케이스', en: 'When Indexes Are Not Used' },
-          },
           {
             id: 'index-scan-range',
             title: { ko: 'Index Range Scan', en: 'Index Range Scan' },
@@ -232,12 +236,22 @@ export const BOOK_CHAPTERS: BookChapter[] = [
         ],
       },
       {
-        id: 'index-bitmap',
-        title: { ko: 'Bitmap 인덱스', en: 'Bitmap Index' },
+        id: 'index-unusable',
+        title: { ko: '인덱스를 못 쓰는 케이스', en: 'When Indexes Are Not Used' },
       },
       {
-        id: 'index-composite',
-        title: { ko: '복합 & 기타 인덱스', en: 'Composite & Other Indexes' },
+        id: 'index-table-access',
+        title: { ko: '인덱스에서 테이블로 가는 법', en: 'From Index to Table' },
+        children: [
+          {
+            id: 'index-table-access-rowid',
+            title: { ko: 'ROWID 구조', en: 'ROWID Structure' },
+          },
+          {
+            id: 'index-table-access-buffer',
+            title: { ko: 'Buffer Cache 탐색', en: 'Buffer Cache Lookup' },
+          },
+        ],
       },
       {
         id: 'index-simulator',

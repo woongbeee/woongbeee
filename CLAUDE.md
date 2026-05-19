@@ -223,22 +223,25 @@ const T = {
 
 나머지 챕터(join, optimizer, sort, partition, parallel, query-transform, index-chapter)는 `index.tsx` 단일 파일로 구성된다.
 
-- `index-chapter/` — B-Tree 섹션 하위 페이지들이 `children`으로 분리되어 있다:
+- `index-chapter/` — 섹션이 독립 파일로 분리되어 있다:
 
   **`index-chapter` TOC 구조 (현재):**
   ```
   3. 인덱스 원리와 활용, 스캔 방식
      3.1 인덱스란?
      3.2 B-Tree 인덱스
-         3.2.1 ROWID 구조              → RowidSection.tsx
-         3.2.2 인덱스를 못 쓰는 케이스 → IndexUnusableSection.tsx
-         3.2.3 Index Range Scan        → RangeScanSection.tsx
-         3.2.4 Index Unique Scan       → UniqueScanSection.tsx
-         3.2.5 Index Full Scan         → FullScanSection.tsx
-         3.2.6 Index Fast Full Scan    → FastFullScanSection.tsx
-         3.2.7 Index Skip Scan         → SkipScanSection.tsx
      3.3 Bitmap 인덱스                 (WipBanner 표시 중)
-     3.4 복합 인덱스                   (WipBanner 표시 중)
+     3.4 복합 & 기타 인덱스            (WipBanner 표시 중)
+     3.5 인덱스를 읽는 방법
+         3.5.1 Index Range Scan        → RangeScanSection.tsx
+         3.5.2 Index Unique Scan       → UniqueScanSection.tsx
+         3.5.3 Index Full Scan         → FullScanSection.tsx
+         3.5.4 Index Fast Full Scan    → FastFullScanSection.tsx
+         3.5.5 Index Skip Scan         → SkipScanSection.tsx
+     3.6 인덱스를 못 쓰는 케이스       → IndexUnusableSection.tsx
+     3.7 인덱스에서 테이블로 가는 법
+         3.7.1 ROWID 구조              → RowidSection.tsx
+         3.7.2 Buffer Cache 탐색       → TableAccessSection.tsx
   ```
 
   **공유 다이어그램 컴포넌트 (`ScanDiagram.tsx`):**
@@ -246,8 +249,24 @@ const T = {
   - `ScanConfig` 타입: `{ leaves, entryStates, blockStates, scanArrows, keyLabel, legend }`
   - `EntryState`: `'idle' | 'visited' | 'matched' | 'skipped'` — 엔트리별 색상 결정
   - `ScanDiagram` — Root/Branch 요약 바 + Leaf 블록 행 + 범례 렌더링
-  - `ScanStepList` — 번호 붙은 단계 카드 목록
+  - `ScanStepList` export도 존재하지만 **현재 scan 섹션들에서 사용하지 않음** — 대신 아래의 numbered 블록 패턴 사용
   - 각 Scan 페이지는 `ScanConfig`만 계산해서 넘기면 됨 (다이어그램 로직 중복 없음)
+
+  **Scan 섹션 공통 레이아웃 패턴 (`RangeScanSection.tsx` 기준):**
+  모든 scan 섹션은 동일한 구조를 따른다:
+  1. `ChapterTitle` (icon + title + subtitle)
+  2. "언제 사용되나요?" — `SectionTitle` + `Prose`
+  3. `Divider`
+  4. "작동 방식" — `SectionTitle` + numbered 블록 2개 + 인터랙티브 시각화(`ScanDiagram`) 연속 배치
+     - numbered 블록: amber `bg-amber-400` 원형 badge `1` → dashed 세로선 연결 → emerald/blue/violet `2`
+     - 시나리오 선택 버튼(있을 경우) → `ScanDiagram` → 다이어그램 범례 박스
+  5. `Divider`
+  6. "특징" — `SectionTitle` + `sm:grid-cols-3` 카드 + `InfoBox`
+  7. `Divider`
+  8. "스캔 방법이 쓰이는 때" — `SectionTitle` + `Prose` + 예시 쿼리 (`gap-3` 단일 컬럼 `SqlBlock` 목록)
+  9. 필요시 끝에 추가 `Divider` + `InfoBox` (예: Bind Variable Peeking 설명)
+
+  예시 쿼리 카드는 **`sm:grid-cols-2` 없이 단일 컬럼**으로 세로 나열한다. `FastFullScanSection`만 비교 `Table`이 추가됨.
 
   **`IndexUnusableSection.tsx` 구성 패턴:**
   - 8가지 인덱스 미사용 케이스를 아코디언으로 구성
@@ -255,9 +274,9 @@ const T = {
   - `SqlBlock`은 `sql` prop 사용 (`code` 아님)
   - 마지막에 핵심 원칙 요약(`InfoBox variant="warning"`) + EXPLAIN PLAN 확인 방법
 
-#### Index 챕터 우측 패널 (`HRSchemaPanel`)
+#### Index 챕터 레이아웃 (`IndexLayout`)
 
-`IndexChapterPage.tsx`의 `IndexLayout`은 좌측 스크롤 영역 + 우측 고정 `HRSchemaPanel`로 구성된다. `HRSchemaPanel`은 **스키마 탭**(HR 전체 7개 테이블 구조)과 **데이터 탭**(테이블 선택 버튼 + 해당 테이블 행 데이터)을 제공한다. `DataPanel.tsx`의 `SchemaView`·`TableView`를 재사용하며, `HR_SCHEMA` 배열 전체를 데이터 소스로 사용한다. `index-simulator` 섹션만 `IndexLayout` 외부(`PageContainer`)로 렌더링된다.
+`IndexChapterPage.tsx`의 `IndexLayout`은 현재 단순 스크롤 컨테이너(`h-full overflow-y-auto`)로 구성되어 있다. `index-simulator` 섹션은 `IndexLayout` 없이 `PageContainer`로 직접 렌더링된다.
 
 ### TOC 활성화 상태 (`TableOfContents.tsx`)
 
@@ -289,6 +308,12 @@ const T = {
 - named export만 사용 (`App.tsx`의 `export default App`은 Vite entry 요구사항 예외)
 - CSS: Tailwind 유틸리티 클래스만 사용, 커스텀 CSS 파일 금지 (`index.css` 테마 변수 제외)
 - Path alias: `@/` → `src/`
+
+### SVG 렌더링 주의사항
+
+SVG는 DOM 순서 = z-order다. 나중에 그려진 요소가 위에 표시된다. 인터랙티브 다이어그램에서 특정 요소(Latch 태그, 하이라이트 오버레이 등)가 다른 요소 위에 항상 표시되어야 하면 **루프 바깥으로 꺼내 마지막에 렌더**한다. `{(() => { ... })()}` IIFE 패턴으로 루프 외부에서 계산이 필요한 요소를 렌더할 수 있다.
+
+SVG 레이아웃 상수는 **의존 관계 순서대로** 선언한다 — 예: 버킷 행 위치를 먼저 계산한 뒤 외곽 박스 높이를 역산(`BC_H = (BUCK_ROWS[3] - BC_Y) + BUCK_R + padding`). 고정값으로 크기를 지정하면 내부 요소가 박스를 삐져나오는 버그가 생기기 쉽다.
 
 ### TypeScript 엄격 플래그 주의사항
 

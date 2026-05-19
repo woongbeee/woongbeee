@@ -1,16 +1,17 @@
 import { useSimulationStore } from '@/store/simulationStore'
 import { PageContainer, ChapterTitle, SimulatorPlaceholder } from '../shared'
-import { IndexTypesOverview } from './IndexTypesOverview'
-import { BTreeSection } from './BTreeSection'
-import { RowidSection } from './RowidSection'
-import { RangeScanSection } from './RangeScanSection'
-import { UniqueScanSection } from './UniqueScanSection'
-import { FullScanSection } from './FullScanSection'
-import { FastFullScanSection } from './FastFullScanSection'
-import { SkipScanSection } from './SkipScanSection'
-import { IndexUnusableSection } from './IndexUnusableSection'
-import { BitmapSection } from './BitmapSection'
-import { CompositeSection } from './CompositeSection'
+import { IndexTypesOverview } from './composite/IndexTypesOverview'
+import { BTreeSection } from './btree/BTreeSection'
+import { RowidSection } from './table-access/RowidSection'
+import { TableAccessSection } from './table-access/TableAccessSection'
+import { RangeScanSection } from './scan/RangeScanSection'
+import { UniqueScanSection } from './scan/UniqueScanSection'
+import { FullScanSection } from './scan/FullScanSection'
+import { FastFullScanSection } from './scan/FastFullScanSection'
+import { SkipScanSection } from './scan/SkipScanSection'
+import { IndexUnusableSection } from './unusable/IndexUnusableSection'
+import { BitmapSection } from './bitmap/BitmapSection'
+import { CompositeSection } from './composite/CompositeSection'
 
 const T = {
   ko: {
@@ -57,21 +58,18 @@ export function IndexChapterPage({ sectionId }: { sectionId: string }) {
     )
   }
 
-  if (sectionId === 'index-btree-rowid') {
-    return (
-      <IndexLayout>
-        <RowidSection />
-      </IndexLayout>
-    )
-  }
-
-  if (sectionId === 'index-unusable')       return <IndexLayout><IndexUnusableSection /></IndexLayout>
-
+  if (sectionId === 'index-scan')           return <IndexLayout><RangeScanSection /></IndexLayout>
   if (sectionId === 'index-scan-range')     return <IndexLayout><RangeScanSection /></IndexLayout>
   if (sectionId === 'index-scan-unique')    return <IndexLayout><UniqueScanSection /></IndexLayout>
   if (sectionId === 'index-scan-full')      return <IndexLayout><FullScanSection /></IndexLayout>
   if (sectionId === 'index-scan-fast-full') return <IndexLayout><FastFullScanSection /></IndexLayout>
   if (sectionId === 'index-scan-skip')      return <IndexLayout><SkipScanSection /></IndexLayout>
+
+  if (sectionId === 'index-unusable')         return <IndexLayout><IndexUnusableSection /></IndexLayout>
+
+  if (sectionId === 'index-table-access')        return <IndexLayout><RowidSection /></IndexLayout>
+  if (sectionId === 'index-table-access-rowid')  return <IndexLayout><RowidSection /></IndexLayout>
+  if (sectionId === 'index-table-access-buffer') return <IndexLayout><TableAccessSection /></IndexLayout>
 
   if (sectionId === 'index-bitmap') {
     return (

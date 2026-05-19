@@ -12,7 +12,15 @@
       "Bash(grep:*)",
       "PowerShell(claude doctor *)",
       "PowerShell(claude *)",
-      "Bash(curl -s http://localhost:5173)"
+      "Bash(curl -s http://localhost:5173)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\woong\\\\OneDrive\\\\Desktop\\\\oracleDataBaseSystem\\\\src\" -Recurse -Name)",
+      "Bash(node -e \"const icons = require\\('@tabler/icons-react'\\); const names = Object.keys\\(icons\\).filter\\(k => k.startsWith\\('Icon'\\)\\); console.log\\(names.filter\\(n => /bolt|flash|lightning|spark|zap|electric/i.test\\(n\\)\\).join\\(', '\\)\\)\")",
+      "Bash(mv BTreeSection.tsx btree/)",
+      "Bash(mv BitmapSection.tsx bitmap/)",
+      "Bash(mv CompositeSection.tsx composite/)",
+      "Bash(mv IndexTypesOverview.tsx composite/)",
+      "Bash(mv ScanDiagram.tsx scan/)",
+      "Bash(xargs sed -i \"s|from '../shared'|from '../../shared'|g\")"
     ]
   }
 }

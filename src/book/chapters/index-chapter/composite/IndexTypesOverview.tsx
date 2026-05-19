@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion'
 import { useSimulationStore } from '@/store/simulationStore'
 import { cn } from '@/lib/utils'
-import { SectionTitle, SubTitle, Prose, InfoBox } from '../shared'
+import { SectionTitle, SubTitle, Prose, InfoBox } from '../../shared'
 
 function Divider() {
   return <div className="my-12 border-t" />

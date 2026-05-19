@@ -8,7 +8,7 @@ import {
   Prose,
   InfoBox,
   Divider,
-} from '../shared'
+} from '../../shared'
 import { IconFingerprintScan } from '@tabler/icons-react'
 
 // ── 텍스트 ────────────────────────────────────────────────────────────────────

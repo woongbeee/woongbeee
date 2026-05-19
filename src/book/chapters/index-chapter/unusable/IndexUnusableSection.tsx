@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useSimulationStore } from '@/store/simulationStore'
 import {
   PageContainer, ChapterTitle, SectionTitle, Prose, InfoBox, Divider, SqlBlock,
-} from '../shared'
+} from '../../shared'
 import { IconAlertTriangle } from '@tabler/icons-react'
 
 interface CaseItem {

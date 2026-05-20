@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 import type { InstanceComponentId } from './OracleInstanceMap'
-import { SubTitle } from '../shared'
+import { SubTitle } from '../../shared'
 import { cn } from '@/lib/utils'
 import { OracleInstanceMap } from './OracleInstanceMap'
 import { useSimulationStore } from '@/store/simulationStore'

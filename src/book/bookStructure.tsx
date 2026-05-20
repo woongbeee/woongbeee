@@ -168,18 +168,36 @@ export const BOOK_CHAPTERS: BookChapter[] = [
         title: { ko: '오라클의 내부 구조', en: 'Oracle Internal Structure' },
         children: [
           {
-            id: 'internals-overview-buffer',
-            title: { ko: 'Buffer Cache 원리', en: 'Buffer Cache Internals' },
-          },
-          {
-            id: 'internals-overview-flow',
-            title: { ko: 'UPDATE 실행 흐름', en: 'UPDATE Execution Flow' },
+            id: 'internals-sga',
+            title: { ko: 'SGA', en: 'SGA' },
+            children: [
+              {
+                id: 'internals-sga-buffer-cache',
+                title: { ko: 'Buffer Cache', en: 'Buffer Cache' },
+              },
+              {
+                id: 'internals-sga-redo-log-buffer',
+                title: { ko: 'Redo Log Buffer', en: 'Redo Log Buffer' },
+              },
+              {
+                id: 'internals-sga-shared-pool',
+                title: { ko: 'Shared Pool', en: 'Shared Pool' },
+              },
+            ],
           },
         ],
       },
       {
         id: 'internals-storage',
         title: { ko: '데이터 저장 구조', en: 'Data Storage Structure' },
+      },
+      {
+        id: 'internals-buffer-cache-page',
+        title: { ko: 'Buffer Cache 원리', en: 'Buffer Cache Internals' },
+      },
+      {
+        id: 'internals-update-flow',
+        title: { ko: 'UPDATE 실행 흐름', en: 'UPDATE Execution Flow' },
       },
     ],
   },
@@ -473,13 +491,16 @@ export function getChapterById(id: string): BookChapter | undefined {
 
 function flattenSections(chapter: BookChapter): Array<{ chapter: BookChapter; section: BookSection }> {
   const result: Array<{ chapter: BookChapter; section: BookSection }> = []
-  for (const section of chapter.sections) {
+  function walk(section: BookSection) {
     result.push({ chapter, section })
     if (section.children) {
       for (const child of section.children) {
-        result.push({ chapter, section: child })
+        walk(child)
       }
     }
+  }
+  for (const section of chapter.sections) {
+    walk(section)
   }
   return result
 }

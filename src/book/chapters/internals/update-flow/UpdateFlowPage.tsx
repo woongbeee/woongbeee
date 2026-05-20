@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useSimulationStore } from '@/store/simulationStore'
-import { ChapterTitle, Prose } from '../shared'
-import type { Lang } from '../shared'
-import { OracleInstanceMap } from './OracleInstanceMap'
-import type { InstanceComponentId } from './OracleInstanceMap'
+import { ChapterTitle, Prose } from '../../shared'
+import type { Lang } from '../../shared'
+import { OracleInstanceMap } from '../shared/OracleInstanceMap'
+import type { InstanceComponentId } from '../shared/OracleInstanceMap'
 import { cn } from '@/lib/utils'
 
 type FlowStep = {

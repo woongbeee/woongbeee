@@ -20,7 +20,8 @@
       "Bash(mv CompositeSection.tsx composite/)",
       "Bash(mv IndexTypesOverview.tsx composite/)",
       "Bash(mv ScanDiagram.tsx scan/)",
-      "Bash(xargs sed -i \"s|from '../shared'|from '../../shared'|g\")"
+      "Bash(xargs sed -i \"s|from '../shared'|from '../../shared'|g\")",
+      "Bash(python *)"
     ]
   }
 }

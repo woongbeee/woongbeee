@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { LandingPage } from '@/components/LandingPage'
 import { BookLayout } from '@/book/BookLayout'
-import { InternalsSimulatorSection } from '@/book/chapters/internals/SimulatorSection'
+import { InternalsSimulatorSection } from '@/book/chapters/internals/shared/SimulatorSection'
 
 type AppView = 'landing' | 'book'
 

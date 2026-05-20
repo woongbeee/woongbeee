@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useSimulationStore } from '@/store/simulationStore'
-import { ChapterTitle, Prose } from '../shared'
-import type { Lang } from '../shared'
+import { ChapterTitle, Prose } from '../../shared'
+import type { Lang } from '../../shared'
 import { cn } from '@/lib/utils'
 
 type BufferState = {

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { BOOK_CHAPTERS } from './bookStructure.tsx'
+import type { BookSection } from './bookStructure.tsx'
 import { useSimulationStore } from '@/store/simulationStore'
 import { cn } from '@/lib/utils'
 import { IconChevronRight, IconChevronsLeft, IconExternalLink } from '@tabler/icons-react'
@@ -11,14 +12,111 @@ interface Props {
   onToggle: () => void
 }
 
+function sectionContainsActive(section: BookSection, activeId: string): boolean {
+  if (section.id === activeId) return true
+  if (!section.children) return false
+  return section.children.some((c) => sectionContainsActive(c, activeId))
+}
+
+function SectionItem({
+  section,
+  depth,
+  parentNumbers,
+  sectionIndex,
+  activeSectionId,
+  isReady,
+  lang,
+  onSelect,
+  onExpand,
+}: {
+  section: BookSection
+  depth: number
+  parentNumbers: number[]
+  sectionIndex: number
+  activeSectionId: string
+  isReady: boolean
+  lang: 'ko' | 'en'
+  onSelect: (id: string) => void
+  onExpand: () => void
+}) {
+  const isActive = section.id === activeSectionId
+  const hasChildren = !!section.children?.length
+  const childActive = hasChildren && section.children!.some((c) => sectionContainsActive(c, activeSectionId))
+  const numLabel = [...parentNumbers, sectionIndex + 1].join('.')
+
+  return (
+    <div>
+      <button
+        onClick={() => {
+          onSelect(section.id)
+          onExpand()
+        }}
+        className={cn(
+          'group flex w-full items-center gap-2 py-1.5 text-left transition-colors rounded-r-md',
+          depth === 0 ? 'px-3' : depth === 1 ? 'px-3' : 'px-3',
+          isActive
+            ? 'bg-ios-orange-light text-ios-orange-dark'
+            : isReady
+              ? 'text-muted-foreground hover:bg-ios-orange-light/40 hover:text-ios-orange-dark'
+              : 'text-muted-foreground/30 cursor-pointer',
+        )}
+      >
+        <span className={cn(
+          'shrink-0 font-mono',
+          depth === 0 ? 'text-[9px]' : depth === 1 ? 'text-[8px]' : 'text-[8px]',
+          isActive ? 'text-ios-orange-dark/60' : isReady ? 'text-muted-foreground/40' : 'text-muted-foreground/20',
+        )}>
+          {numLabel}
+        </span>
+        <span className={cn(
+          'min-w-0 flex-1 truncate font-mono leading-tight',
+          depth === 0 ? 'text-[11px]' : 'text-[10px]',
+          isActive ? 'font-bold' : isReady ? 'font-medium' : 'font-normal',
+        )}>
+          {section.title[lang]}
+        </span>
+        {section.hasSimulator && (
+          <span className={cn(
+            'shrink-0 rounded-full px-1.5 py-0.5 font-mono text-[8px] font-bold uppercase',
+            isActive ? 'bg-ios-orange/20 text-ios-orange-dark' : isReady ? 'bg-muted text-muted-foreground' : 'bg-muted/40 text-muted-foreground/30',
+          )}>
+            SIM
+          </span>
+        )}
+        {isActive && (
+          <motion.span
+            layoutId="toc-active"
+            className="h-1.5 w-1.5 shrink-0 rounded-full bg-ios-orange"
+          />
+        )}
+      </button>
+
+      {hasChildren && (isActive || childActive) && (
+        <div className="ml-[1.1rem] border-l border-border/30">
+          {section.children!.map((child, cidx) => (
+            <SectionItem
+              key={child.id}
+              section={child}
+              depth={depth + 1}
+              parentNumbers={[...parentNumbers, sectionIndex + 1]}
+              sectionIndex={cidx}
+              activeSectionId={activeSectionId}
+              isReady={isReady}
+              lang={lang}
+              onSelect={onSelect}
+              onExpand={onExpand}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
 
 export function TableOfContents({ activeSectionId, onSelect, onToggle }: Props) {
   const lang = useSimulationStore((s) => s.lang)
-  // Find which chapter contains the active section — expand it by default
   const defaultOpen = BOOK_CHAPTERS.reduce<Record<string, boolean>>((acc, ch) => {
-    acc[ch.id] = ch.sections.some(
-      (s) => s.id === activeSectionId || s.children?.some((c) => c.id === activeSectionId)
-    )
+    acc[ch.id] = ch.sections.some((s) => sectionContainsActive(s, activeSectionId))
     return acc
   }, {})
 
@@ -47,11 +145,9 @@ export function TableOfContents({ activeSectionId, onSelect, onToggle }: Props) 
       {/* Chapters */}
       <div className="flex flex-col py-3">
       {BOOK_CHAPTERS.map((chapter) => {
-        const isOpen      = !!openChapters[chapter.id]
-        const hasActive   = chapter.sections.some(
-          (s) => s.id === activeSectionId || s.children?.some((c) => c.id === activeSectionId)
-        )
-        const isReady  = chapter.num <= 3
+        const isOpen    = !!openChapters[chapter.id]
+        const hasActive = chapter.sections.some((s) => sectionContainsActive(s, activeSectionId))
+        const isReady   = chapter.num <= 3
 
         return (
           <div key={chapter.id} className="flex flex-col">
@@ -64,7 +160,6 @@ export function TableOfContents({ activeSectionId, onSelect, onToggle }: Props) 
                 hasActive && isReady && 'bg-muted/40',
               )}
             >
-              {/* Collapse arrow */}
               <motion.span
                 animate={{ rotate: isOpen ? 90 : 0 }}
                 transition={{ duration: 0.18 }}
@@ -72,16 +167,12 @@ export function TableOfContents({ activeSectionId, onSelect, onToggle }: Props) 
               >
                 <IconChevronRight size={12} />
               </motion.span>
-
-              {/* Chapter icon + number */}
               <span className={cn('shrink-0 flex items-center', isReady ? '' : 'opacity-30')}>{chapter.icon}</span>
               {chapter.num > 0 && (
                 <span className={cn('font-mono text-[10px] font-bold shrink-0', isReady ? 'text-muted-foreground/50' : 'text-muted-foreground/25')}>
                   {String(chapter.num).padStart(2, '0')}
                 </span>
               )}
-
-              {/* Chapter title */}
               <span
                 className={cn(
                   'min-w-0 flex-1 truncate font-mono text-[11px] leading-tight transition-colors',
@@ -92,8 +183,6 @@ export function TableOfContents({ activeSectionId, onSelect, onToggle }: Props) 
               >
                 {chapter.title[lang]}
               </span>
-
-              {/* Active dot */}
               {hasActive && isReady && <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-ios-orange" />}
             </button>
 
@@ -109,113 +198,20 @@ export function TableOfContents({ activeSectionId, onSelect, onToggle }: Props) 
                   className="overflow-hidden"
                 >
                   <div className="ml-[1.1rem] border-l border-border/50 pb-1">
-                    {chapter.sections.map((section, idx) => {
-                      const isActive    = section.id === activeSectionId
-                      const isSimulator = section.hasSimulator
-                      const isReady  = chapter.num <= 3
-                      const hasChildren = !!section.children?.length
-                      const childActive = section.children?.some((c) => c.id === activeSectionId) ?? false
-
-                      return (
-                        <div key={section.id}>
-                          <button
-                            onClick={() => {
-                              onSelect(section.id)
-                              setOpenChapters((prev) => ({ ...prev, [chapter.id]: true }))
-                            }}
-                            className={cn(
-                              'group flex w-full items-center gap-2 px-3 py-1.5 text-left transition-colors rounded-r-md',
-                              isActive
-                                ? 'bg-ios-orange-light text-ios-orange-dark'
-                                : isReady
-                                  ? 'text-muted-foreground hover:bg-ios-orange-light/40 hover:text-ios-orange-dark'
-                                  : 'text-muted-foreground/30 cursor-pointer',
-                            )}
-                          >
-                            {/* Section number */}
-                            <span className={cn(
-                              'shrink-0 font-mono text-[9px]',
-                              isActive ? 'text-ios-orange-dark/60' : isReady ? 'text-muted-foreground/40' : 'text-muted-foreground/20'
-                            )}>
-                              {idx + 1}
-                            </span>
-
-                            {/* Section title */}
-                            <span
-                              className={cn(
-                                'min-w-0 flex-1 truncate font-mono text-[11px] leading-tight',
-                                isActive ? 'font-bold' : isReady ? 'font-medium' : 'font-normal'
-                              )}
-                            >
-                              {section.title[lang]}
-                            </span>
-
-                            {/* Simulator badge */}
-                            {isSimulator && (
-                              <span className={cn(
-                                'shrink-0 rounded-full px-1.5 py-0.5 font-mono text-[8px] font-bold uppercase',
-                                isActive ? 'bg-ios-orange/20 text-ios-orange-dark' : isReady ? 'bg-muted text-muted-foreground' : 'bg-muted/40 text-muted-foreground/30'
-                              )}>
-                                SIM
-                              </span>
-                            )}
-
-                            {/* Active indicator */}
-                            {isActive && (
-                              <motion.span
-                                layoutId="toc-active"
-                                className="h-1.5 w-1.5 shrink-0 rounded-full bg-ios-orange"
-                              />
-                            )}
-                          </button>
-
-                          {/* Children — shown when parent or a child is active */}
-                          {hasChildren && (isActive || childActive) && (
-                            <div className="ml-[1.1rem] border-l border-border/30">
-                              {section.children!.map((child, cidx) => {
-                                const isChildActive = child.id === activeSectionId
-                                return (
-                                  <button
-                                    key={child.id}
-                                    onClick={() => {
-                                      onSelect(child.id)
-                                      setOpenChapters((prev) => ({ ...prev, [chapter.id]: true }))
-                                    }}
-                                    className={cn(
-                                      'group flex w-full items-center gap-2 px-3 py-1.5 text-left transition-colors rounded-r-md',
-                                      isChildActive
-                                        ? 'bg-ios-orange-light text-ios-orange-dark'
-                                        : isReady
-                                          ? 'text-muted-foreground hover:bg-ios-orange-light/40 hover:text-ios-orange-dark'
-                                          : 'text-muted-foreground/30 cursor-pointer',
-                                    )}
-                                  >
-                                    <span className={cn(
-                                      'shrink-0 font-mono text-[9px]',
-                                      isChildActive ? 'text-ios-orange-dark/60' : isReady ? 'text-muted-foreground/40' : 'text-muted-foreground/20'
-                                    )}>
-                                      {idx + 1}.{cidx + 1}
-                                    </span>
-                                    <span className={cn(
-                                      'min-w-0 flex-1 truncate font-mono text-[11px] leading-tight',
-                                      isChildActive ? 'font-bold' : isReady ? 'font-medium' : 'font-normal'
-                                    )}>
-                                      {child.title[lang]}
-                                    </span>
-                                    {isChildActive && (
-                                      <motion.span
-                                        layoutId="toc-active"
-                                        className="h-1.5 w-1.5 shrink-0 rounded-full bg-ios-orange"
-                                      />
-                                    )}
-                                  </button>
-                                )
-                              })}
-                            </div>
-                          )}
-                        </div>
-                      )
-                    })}
+                    {chapter.sections.map((section, idx) => (
+                      <SectionItem
+                        key={section.id}
+                        section={section}
+                        depth={0}
+                        parentNumbers={[]}
+                        sectionIndex={idx}
+                        activeSectionId={activeSectionId}
+                        isReady={isReady}
+                        lang={lang}
+                        onSelect={onSelect}
+                        onExpand={() => setOpenChapters((prev) => ({ ...prev, [chapter.id]: true }))}
+                      />
+                    ))}
                   </div>
                 </motion.div>
               )}

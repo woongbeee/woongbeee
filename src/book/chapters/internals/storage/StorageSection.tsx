@@ -3,7 +3,7 @@ import { useSimulationStore } from '@/store/simulationStore'
 import {
   PageContainer, ChapterTitle, Prose, SubTitle,
   InfoBox, Table, ConceptGrid, AccordionSection,
-} from '../shared'
+} from '../../shared'
 import { cn } from '@/lib/utils'
 import { IconCube, IconArrowDown, IconArrowUp } from '@tabler/icons-react'
 

@@ -2,10 +2,9 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import {
-  PageContainer, ChapterTitle, SectionTitle, SubTitle, Prose, InfoBox, Divider,
+  PageContainer, ChapterTitle, SectionTitle, SubTitle, Prose, InfoBox, Divider, SqlBlock,
 } from '../../shared'
 import { IconChartTreemap } from '@tabler/icons-react'
-import { SqlHighlight } from './SqlHighlight'
 import { useSimulationStore } from '@/store/simulationStore'
 import { EMPLOYEES } from './shared'
 
@@ -1082,19 +1081,6 @@ function GroupingFnAnimator({ lang }: { lang: 'ko' | 'en' }) {
 
 // ── Sub-components ─────────────────────────────────────────────────────────
 
-function SqlBlock({ sql }: { sql: string }) {
-  return (
-    <div className="mb-5 rounded-xl border overflow-hidden">
-      <div className="border-b px-4 py-2">
-        <span className="font-mono text-[10px] text-zinc-400 uppercase tracking-widest">SQL</span>
-      </div>
-      <div className="p-4">
-        <SqlHighlight sql={sql} />
-      </div>
-    </div>
-  )
-}
-
 function NullCell() {
   return <span className="text-muted-foreground/50 italic">NULL</span>
 }
@@ -1143,7 +1129,7 @@ export function RollupSection() {
           <InfoBox variant="summary">
             {t.rollupInfo}
           </InfoBox>
-          <SqlBlock sql={ROLLUP_SQL} />
+          <SqlBlock sql={ROLLUP_SQL} className="mb-5" />
           <RollupAnimator lang={lang} />
           <InfoBox variant="note">
             {t.nullMeaning}
@@ -1218,7 +1204,7 @@ export function RollupSection() {
             </table>
           </div>
 
-          <SqlBlock sql={CUBE_SQL} />
+          <SqlBlock sql={CUBE_SQL} className="mb-5" />
           <CubeAnimator lang={lang} />
           <InfoBox variant="note">
             {t.nullMeaning}
@@ -1234,14 +1220,14 @@ export function RollupSection() {
           <InfoBox variant="summary">
             {t.groupingSetsInfo}
           </InfoBox>
-          <SqlBlock sql={GROUPING_SETS_SQL} />
+          <SqlBlock sql={GROUPING_SETS_SQL} className="mb-5" />
           <GroupingSetsAnimator lang={lang} />
 
           <Divider />
 
           <SubTitle>{t.groupingSetsEqTitle}</SubTitle>
           <Prose>{t.groupingSetsEqDesc}</Prose>
-          <SqlBlock sql={GROUPING_SETS_EQ_SQL} />
+          <SqlBlock sql={GROUPING_SETS_EQ_SQL} className="mb-5" />
 
           <InfoBox variant="note">
             {t.nullMeaning}
@@ -1257,14 +1243,14 @@ export function RollupSection() {
           <InfoBox variant="summary">
             {t.groupingInfo}
           </InfoBox>
-          <SqlBlock sql={GROUPING_FN_SQL} />
+          <SqlBlock sql={GROUPING_FN_SQL} className="mb-5" />
           <GroupingFnAnimator lang={lang} />
 
           <Divider />
 
           <SubTitle>{t.groupingCaseTitle}</SubTitle>
           <Prose>{t.groupingCaseDesc}</Prose>
-          <SqlBlock sql={GROUPING_CASE_SQL} />
+          <SqlBlock sql={GROUPING_CASE_SQL} className="mb-5" />
         </>
       )}
     </PageContainer>

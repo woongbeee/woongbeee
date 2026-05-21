@@ -193,13 +193,19 @@ const T = {
   3. SQL은 어떤 순서로 실행될까?
   ```
 
-- `internals/` — `StorageSection.tsx`, `OverviewSection.tsx`, `BufferCachePage.tsx`, `UpdateFlowPage.tsx`, `SimulatorSection.tsx`, `OracleInstanceMap.tsx` + `shared.tsx`(TwoColLayout, MapPanel, TourPanel)
+- `internals/` — `shared/` 폴더에 `OracleInstanceMap.tsx`, `SimulatorSection.tsx`, `shared.tsx`(TwoColLayout, MapPanel, TourPanel) 위치. 섹션별 파일은 `overview/`, `storage/`, `update-flow/` 하위에 분리.
 
-  `OverviewSection.tsx`는 `BufferCachePage`·`UpdateFlowPage`를 re-export한다. `internals/index.tsx`는 4개 섹션으로 라우팅:
+  `OverviewSection.tsx`는 `UpdateFlowPage`를 re-export한다. `internals/index.tsx` 라우팅:
   - `internals-overview` → `OverviewSection`
-  - `internals-overview-buffer` → `BufferCachePage` (Buffer Cache 상태 머신 인터랙션)
-  - `internals-overview-flow` → `UpdateFlowPage` (UPDATE 실행 흐름 스텝 투어)
+  - `internals-sga` → `SgaSection`
+  - `internals-sga-buffer-cache` → `SgaBufferCacheSection`
+  - `internals-sga-shared-pool` → `SharedPoolSection`
+  - `internals-sga-redo-log-buffer` → `RedoLogBufferSection`
+  - `internals-sga-undo-segment` → `UndoSegmentSection`
   - `internals-storage` → `StorageSection`
+  - `internals-update-flow` → `UpdateFlowPage`
+
+  SGA 하위 4개 페이지는 `overview/sga/shared/SgaPositionDiagram.tsx`의 `SgaPositionDiagram` 공통 컴포넌트를 사용한다(`activeId: SgaComponentId` prop으로 현재 페이지의 컴포넌트를 하이라이트).
 
   **`StorageSection.tsx` 구성 패턴:**
   - 파일 상단에 `B` / `Hi` 인라인 헬퍼 컴포넌트 정의 (bold·color 강조용)
@@ -216,9 +222,13 @@ const T = {
 ```
 2. 오라클 내부 구조와 프로세스
    2.1 오라클의 내부 구조
-       2.1.1 Buffer Cache 원리
-       2.1.2 UPDATE 실행 흐름
-   2.2 데이터 저장 구조
+       2.1.1 SGA (System Global Area)
+           2.1.1.1 Buffer Cache
+           2.1.1.2 Shared Pool      (WipBanner)
+           2.1.1.3 Redo Log Buffer  (WipBanner)
+           2.1.1.4 Undo Segment     (WipBanner)
+   2.2 UPDATE 실행 흐름
+   2.3 데이터 저장 구조
 ```
 
 나머지 챕터(join, optimizer, sort, partition, parallel, query-transform, index-chapter)는 `index.tsx` 단일 파일로 구성된다.
@@ -300,7 +310,7 @@ const T = {
 - `SqlHighlight` (`sql-basics/dml-more/SqlHighlight.tsx`) — `--` 이후를 회색 이탤릭 주석으로 처리. `shared.tsx`가 이 파일을 직접 import함 (`from './sql-basics/dml-more/SqlHighlight'`)
 - `WipBanner` — 아직 작성 중인 챕터 최상단에 표시하는 경고 배너
 
-`OracleInstanceMap` (`src/book/chapters/internals/OracleInstanceMap.tsx`) — Internals 챕터 전용 인터랙티브 인스턴스 다이어그램. `InstanceComponentId` 타입으로 강조할 컴포넌트 ID를 받는다.
+`OracleInstanceMap` (`src/book/chapters/internals/shared/OracleInstanceMap.tsx`) — Internals 챕터 전용 인터랙티브 인스턴스 다이어그램. props: `highlightIds: InstanceComponentId[]`, `hideClient?: boolean`(Server Process 레이어 숨김), `horizontal?: boolean`, `callout?: string`.
 
 ## 코드 스타일
 

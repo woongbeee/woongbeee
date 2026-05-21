@@ -27,6 +27,7 @@ interface Props {
   highlightIds: InstanceComponentId[]
   callout?: string
   horizontal?: boolean
+  hideClient?: boolean
 }
 
 const COMPONENT_COLORS: Record<string, {
@@ -216,7 +217,7 @@ function SectionLabel({ children, dimmed }: { children: React.ReactNode; dimmed?
 }
 
 
-export function OracleInstanceMap({ highlightIds, callout, horizontal = false }: Props) {
+export function OracleInstanceMap({ highlightIds, callout, horizontal = false, hideClient = false }: Props) {
   const lang = useSimulationStore((s) => s.lang)
   const hasHighlights = highlightIds.length > 0
 
@@ -387,7 +388,7 @@ export function OracleInstanceMap({ highlightIds, callout, horizontal = false }:
   return (
     <div className="flex flex-col gap-2">
       {legend}
-      {layerClient}
+      {!hideClient && layerClient}
       {layerSga}
       {layerBg}
       {layerDisk}

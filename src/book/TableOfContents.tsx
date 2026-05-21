@@ -25,7 +25,6 @@ function SectionItem({
   sectionIndex,
   activeSectionId,
   isReady,
-  lang,
   onSelect,
   onExpand,
 }: {
@@ -35,10 +34,10 @@ function SectionItem({
   sectionIndex: number
   activeSectionId: string
   isReady: boolean
-  lang: 'ko' | 'en'
   onSelect: (id: string) => void
   onExpand: () => void
 }) {
+  const lang = useSimulationStore((s) => s.lang)
   const isActive = section.id === activeSectionId
   const hasChildren = !!section.children?.length
   const childActive = hasChildren && section.children!.some((c) => sectionContainsActive(c, activeSectionId))
@@ -102,7 +101,6 @@ function SectionItem({
               sectionIndex={cidx}
               activeSectionId={activeSectionId}
               isReady={isReady}
-              lang={lang}
               onSelect={onSelect}
               onExpand={onExpand}
             />
@@ -207,7 +205,6 @@ export function TableOfContents({ activeSectionId, onSelect, onToggle }: Props) 
                         sectionIndex={idx}
                         activeSectionId={activeSectionId}
                         isReady={isReady}
-                        lang={lang}
                         onSelect={onSelect}
                         onExpand={() => setOpenChapters((prev) => ({ ...prev, [chapter.id]: true }))}
                       />

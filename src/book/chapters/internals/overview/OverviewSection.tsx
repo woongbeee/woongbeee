@@ -6,7 +6,6 @@ import { OracleInstanceMap } from '../shared/OracleInstanceMap'
 import type { InstanceComponentId } from '../shared/OracleInstanceMap'
 import { cn } from '@/lib/utils'
 
-export { BufferCachePage } from '../buffer-cache-page/BufferCachePage'
 export { UpdateFlowPage } from '../update-flow/UpdateFlowPage'
 
 // ── Tour items ─────────────────────────────────────────────────────────────

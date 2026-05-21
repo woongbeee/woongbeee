@@ -1,4 +1,4 @@
-import { memo, useMemo } from 'react'
+import { memo } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useSimulationStore } from '@/store/simulationStore'
 import { getAdjacentSections, getSectionById } from './bookStructure.tsx'
@@ -40,8 +40,8 @@ const COLOR_MAP: Record<string, { text: string; border: string; bg: string; dot:
 
 export const BookContent = memo(function BookContent({ sectionId, onNavigate }: Props) {
   const lang = useSimulationStore((s) => s.lang)
-  const info = useMemo(() => getSectionById(sectionId), [sectionId])
-  const adjacent = useMemo(() => getAdjacentSections(sectionId), [sectionId])
+  const info = getSectionById(sectionId)
+  const adjacent = getAdjacentSections(sectionId)
 
   if (!info) return null
 

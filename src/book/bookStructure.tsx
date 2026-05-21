@@ -176,12 +176,16 @@ export const BOOK_CHAPTERS: BookChapter[] = [
                 title: { ko: 'Buffer Cache', en: 'Buffer Cache' },
               },
               {
+                id: 'internals-sga-shared-pool',
+                title: { ko: 'Shared Pool', en: 'Shared Pool' },
+              },
+              {
                 id: 'internals-sga-redo-log-buffer',
                 title: { ko: 'Redo Log Buffer', en: 'Redo Log Buffer' },
               },
               {
-                id: 'internals-sga-shared-pool',
-                title: { ko: 'Shared Pool', en: 'Shared Pool' },
+                id: 'internals-sga-undo-segment',
+                title: { ko: 'Undo Segment', en: 'Undo Segment' },
               },
             ],
           },
@@ -190,10 +194,6 @@ export const BOOK_CHAPTERS: BookChapter[] = [
       {
         id: 'internals-storage',
         title: { ko: '데이터 저장 구조', en: 'Data Storage Structure' },
-      },
-      {
-        id: 'internals-buffer-cache-page',
-        title: { ko: 'Buffer Cache 원리', en: 'Buffer Cache Internals' },
       },
       {
         id: 'internals-update-flow',

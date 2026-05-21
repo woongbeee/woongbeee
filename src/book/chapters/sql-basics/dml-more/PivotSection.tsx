@@ -1,10 +1,9 @@
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import {
-  PageContainer, ChapterTitle, SectionTitle, SubTitle, Prose, InfoBox, Divider,
+  PageContainer, ChapterTitle, SectionTitle, SubTitle, Prose, InfoBox, Divider, SqlBlock,
 } from '../../shared'
 import { IconLayoutColumns } from '@tabler/icons-react'
-import { SqlHighlight } from './SqlHighlight'
 import { useSimulationStore } from '@/store/simulationStore'
 import { EMPLOYEES } from './shared'
 
@@ -147,19 +146,6 @@ const T = {
 
 // ── Sub-components ─────────────────────────────────────────────────────────
 
-function SqlBlock({ sql }: { sql: string }) {
-  return (
-    <div className="mb-5 rounded-xl border overflow-hidden">
-      <div className="border-b px-4 py-2">
-        <span className="font-mono text-[10px] text-zinc-400 uppercase tracking-widest">SQL</span>
-      </div>
-      <div className="p-4">
-        <SqlHighlight sql={sql} />
-      </div>
-    </div>
-  )
-}
-
 function PivotTable() {
   const rows = computePivot()
   const pivotCols: PivotJob[] = ['IT Prog', 'Sales Rep', 'Accountant', 'Finance Mgr']
@@ -286,7 +272,7 @@ export function PivotSection() {
           </div>
 
           <SubTitle>{t.afterTitle}</SubTitle>
-          <SqlBlock sql={PIVOT_SQL} />
+          <SqlBlock sql={PIVOT_SQL} className="mb-5" />
           <div className="mb-4">
             <PivotTable />
           </div>
@@ -313,7 +299,7 @@ export function PivotSection() {
           </div>
 
           <SubTitle>{t.unpivotAfterTitle}</SubTitle>
-          <SqlBlock sql={UNPIVOT_SQL} />
+          <SqlBlock sql={UNPIVOT_SQL} className="mb-5" />
           <div className="mb-4">
             <UnpivotTable />
           </div>

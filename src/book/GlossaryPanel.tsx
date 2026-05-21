@@ -1,4 +1,4 @@
-import { memo, useState, useMemo, useRef, useEffect, useCallback } from 'react'
+import { memo, useState, useMemo, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useSimulationStore } from '@/store/simulationStore'
 import { GLOSSARY, getTermsForSection, sortTerms, type GlossaryTerm } from '@/data/glossary'
@@ -121,26 +121,27 @@ function GlossaryBody({ sectionId }: { sectionId: string }) {
     [pageTermNames]
   )
 
-  const filterTerms = useCallback(
-    (terms: GlossaryTerm[]) => {
-      if (!query.trim()) return terms
-      const q = query.trim().toLowerCase()
-      return terms.filter(
-        (term) =>
-          term.term.toLowerCase().includes(q) ||
-          term.definition[lang].toLowerCase().includes(q)
-      )
-    },
-    [query, lang]
-  )
+  const filteredPage = useMemo(() => {
+    if (!query.trim()) return pageTerms
+    const q = query.trim().toLowerCase()
+    return pageTerms.filter(
+      (term) => term.term.toLowerCase().includes(q) || term.definition[lang].toLowerCase().includes(q)
+    )
+  }, [query, lang, pageTerms])
 
-  const filteredPage = useMemo(() => filterTerms(pageTerms), [filterTerms, pageTerms])
-  const filteredOther = useMemo(() => filterTerms(otherTerms), [filterTerms, otherTerms])
+  const filteredOther = useMemo(() => {
+    if (!query.trim()) return otherTerms
+    const q = query.trim().toLowerCase()
+    return otherTerms.filter(
+      (term) => term.term.toLowerCase().includes(q) || term.definition[lang].toLowerCase().includes(q)
+    )
+  }, [query, lang, otherTerms])
+
   const totalCount = filteredPage.length + filteredOther.length
 
-  const handleTermToggle = useCallback((termName: string) => {
+  function handleTermToggle(termName: string) {
     setExpandedTerm((prev) => (prev === termName ? null : termName))
-  }, [])
+  }
 
   const handleQueryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setQuery(e.target.value)

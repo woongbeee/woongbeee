@@ -1,5 +1,5 @@
 import { memo, useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 import { useSimulationStore } from '@/store/simulationStore'
 import { useInternalsStore } from '@/store/internalsStore'
 import { TableOfContents } from './TableOfContents'
@@ -47,12 +47,7 @@ const TocTab = memo(function TocTab({ onToggle }: { onToggle: () => void }) {
       title={t.openTitle}
       className="flex w-7 shrink-0 flex-col items-center justify-center gap-1.5 border-r bg-card text-muted-foreground transition-colors duration-150 hover:bg-muted/60 hover:text-foreground"
     >
-      <motion.span
-        animate={{ rotate: 0 }}
-        className="leading-none"
-      >
-        <IconChevronRight size={13} />
-      </motion.span>
+      <IconChevronRight size={13} />
       <span
         className="select-none font-mono text-[9px] font-bold uppercase tracking-widest"
         style={{ writingMode: 'vertical-rl', textOrientation: 'mixed' }}

@@ -1,16 +1,47 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useSimulationStore } from '@/store/simulationStore'
-import { ChapterTitle, SectionTitle, Prose, Divider } from '../../../../shared'
+import { ChapterTitle, SectionTitle, SubTitle, Prose, InfoBox, Divider } from '../../../../shared'
 import { cn } from '@/lib/utils'
 import { SgaPositionDiagram } from '../shared/SgaPositionDiagram'
+
+// ── Translation strings ────────────────────────────────────────────────────
 
 type IoMode = 'random' | 'append'
 
 const T = {
   ko: {
     title: 'Redo Log Buffer',
+    subtitle: '모든 변경 이력을 먼저 기록하는 SGA의 원형 버퍼',
 
+    // ── What is ──
+    whatTitle: 'Redo Log Buffer란?',
+    whatP1: 'Redo Log Buffer는 SGA 안에 있는 원형 버퍼(Circular Buffer)입니다. INSERT·UPDATE·DELETE·DDL 등 데이터베이스 변경이 일어날 때마다 "무엇을, 어디서, 어떻게 바꿨는지"를 기록하는 Redo Entry가 이 버퍼에 먼저 쌓입니다.',
+    whatP2: 'LGWR(Log Writer) 프로세스는 이 버퍼의 내용을 디스크의 Online Redo Log 파일에 순차적으로 기록합니다. 버퍼가 꽉 차면 LGWR가 오래된 항목을 디스크에 기록한 뒤 그 자리를 재사용합니다 — 이것이 "원형" 버퍼인 이유입니다.',
+    whatP3: '이 Redo 기록이 Oracle 복구의 핵심입니다. 서버가 갑자기 꺼지더라도 Redo Log에 기록된 변경 이력을 다시 재실행(Redo)하면 인스턴스 시작 시점까지 데이터를 복원할 수 있습니다.',
+
+    // ── Redo Entry ──
+    entryTitle: 'Redo Entry 구조',
+    entryDesc: '하나의 Redo Entry는 한 번의 데이터 변경을 설명하는 레코드입니다. Oracle은 Redo Entry를 생성할 때 다음 정보를 포함시킵니다.',
+    entryFields: [
+      { label: 'SCN (System Change Number)', desc: '이 변경이 일어난 시점의 논리 타임스탬프. 복구 순서와 읽기 일관성 판단에 사용됩니다.' },
+      { label: 'Operation', desc: '어떤 작업인지 — INSERT·UPDATE·DELETE·DDL 등의 작업 코드.' },
+      { label: 'Before Image', desc: '변경 전의 블록/행 데이터. Undo를 통해 롤백하거나 Consistent Read 시 이전 버전을 재구성할 때 사용됩니다.' },
+      { label: 'After Image', desc: '변경 후의 블록/행 데이터. 장애 복구 시 이 값으로 데이터를 다시 씁니다(Redo).' },
+      { label: 'Object ID / Block Address', desc: '어느 세그먼트의 몇 번 블록인지를 나타내는 위치 정보.' },
+    ],
+    entryNote: 'Redo Entry는 커밋 여부와 무관하게 즉시 버퍼에 기록됩니다. 커밋 전 변경사항도 Redo Log Buffer에 들어가 있으며, 커밋 시 LGWR가 이를 디스크에 플러시합니다.',
+
+    // ── Circular buffer visual ──
+    circularTitle: '원형 버퍼 구조',
+    circularDesc: 'Redo Log Buffer는 고정 크기의 원형 버퍼입니다. 서버 프로세스들이 Redo Entry를 버퍼에 추가하고, LGWR는 지속적으로 버퍼 내용을 디스크에 기록한 뒤 해당 슬롯을 비워 재사용 가능 상태로 만듭니다.',
+    circularFull: '버퍼가 가득 차면 서버 프로세스들은 LGWR가 공간을 만들어 줄 때까지 잠시 대기합니다(log buffer space 대기 이벤트). LOG_BUFFER 크기를 적절히 설정하면 이 대기를 줄일 수 있습니다.',
+    slotWritten: '디스크에 기록 완료',
+    slotPending: '기록 대기 중',
+    slotFree: '빈 슬롯 (재사용 가능)',
+    lgwrHead: 'LGWR 현재 위치',
+
+    // ── WAL ──
     walTitle: 'Write-Ahead Logging — 로그 먼저, 데이터 나중',
     walDesc: 'Buffer Cache가 데이터를 수정할 때 Oracle은 반드시 정해진 순서를 지킵니다.',
     walStep1: 'Redo Log Buffer에 먼저 기록',
@@ -23,6 +54,38 @@ const T = {
     walLgwr: 'LGWR · COMMIT 즉시',
     walDbwn: 'DBWn · 나중에 일괄',
 
+    // ── LGWR flush triggers ──
+    flushTitle: 'LGWR는 언제 플러시하나?',
+    flushDesc: 'LGWR가 Redo Log Buffer를 디스크에 기록하는 조건은 다섯 가지입니다. 이 중 하나라도 충족되면 즉시 플러시가 시작됩니다.',
+    flushTriggers: [
+      {
+        label: '① COMMIT',
+        desc: '가장 중요한 트리거. 사용자가 COMMIT을 실행하면 LGWR는 해당 트랜잭션의 모든 Redo Entry를 반드시 디스크에 기록한 뒤 완료 신호를 반환합니다. COMMIT이 느린 가장 큰 이유입니다.',
+        color: 'rose' as const,
+      },
+      {
+        label: '② 버퍼 1/3 이상 사용',
+        desc: 'Redo Log Buffer 용량의 약 1/3이 채워지면 LGWR가 자동으로 플러시를 시작합니다. 버퍼가 꽉 차서 서버 프로세스가 대기하는 상황을 예방합니다.',
+        color: 'amber' as const,
+      },
+      {
+        label: '③ 3초 타임아웃',
+        desc: '위 조건이 충족되지 않더라도 LGWR는 3초마다 주기적으로 버퍼에 남아 있는 Redo Entry를 디스크에 기록합니다.',
+        color: 'amber' as const,
+      },
+      {
+        label: '④ DBWn 쓰기 요청 전',
+        desc: 'DBWn이 Dirty 버퍼를 Data File에 쓰기 전, 해당 블록과 관련된 Redo가 먼저 Online Redo Log에 기록되어야 합니다(WAL 원칙). DBWn은 LGWR 플러시가 완료된 것을 확인한 뒤에야 Data File 쓰기를 시작합니다.',
+        color: 'blue' as const,
+      },
+      {
+        label: '⑤ Checkpoint 발생',
+        desc: 'Log Switch나 수동 Checkpoint 시 LGWR는 현재 버퍼의 모든 내용을 디스크에 기록합니다.',
+        color: 'slate' as const,
+      },
+    ],
+
+    // ── I/O comparison ──
     ioTitle: '왜 Redo Log 쓰기가 Data File 쓰기보다 빠를까?',
     ioSubTitle: '두 가지 I/O 방식의 차이에 있습니다.',
     ioRandomLabel: 'Random I/O',
@@ -36,9 +99,53 @@ const T = {
     ioRandomVisualLabel: '순서 없이 블록 A → F → C 이동',
     ioAppendVisualLabel: '1 → 2 → 3 → 4 → 5 → 다음 칸에 이어 쓰기',
     ioFootnote: 'Random I/O는 인덱스·조인·파티셔닝 챕터에서 계속 등장합니다. 지금은 "임의 위치 쓰기는 비싸다"는 개념만 기억하세요.',
+
+    // ── Parameters ──
+    paramsTitle: '주요 파라미터',
+    params: [
+      { name: 'LOG_BUFFER', desc: 'Redo Log Buffer 크기(바이트). 플랫폼과 CPU 수에 따라 자동 결정됩니다. 대형 트랜잭션이 많다면 늘려 log buffer space 대기를 줄일 수 있습니다.' },
+      { name: 'LOG_ARCHIVE_DEST_n', desc: 'ARCHIVELOG 모드에서 아카이브 로그를 저장할 경로. 가용성을 위해 둘 이상의 위치를 지정하는 것을 권장합니다.' },
+      { name: 'ARCHIVE_LAG_TARGET', desc: 'Data Guard 환경에서 아카이브 간격(초)을 강제. 이 시간이 지나면 강제 Log Switch가 발생합니다.' },
+    ],
+
+    // ── Summary ──
+    summaryTitle: 'Redo Log Buffer 핵심 정리',
+    summaryItems: [
+      'SGA 내 원형 버퍼 — 모든 변경 이력(Redo Entry)이 디스크 쓰기 전 이곳에 먼저 쌓임',
+      'LGWR가 COMMIT·1/3 차거나·3초 타임아웃·DBWn 요청·Checkpoint 발생 시 디스크에 기록',
+      'WAL 원칙: Redo Log 먼저, Data File 나중 — 장애 복구의 기반',
+      'Append(Sequential) I/O → Random I/O보다 훨씬 빠름 → COMMIT 지연 최소화',
+      'Redo Entry = SCN + 작업 코드 + Before/After Image + 블록 주소',
+    ],
   },
+
   en: {
     title: 'Redo Log Buffer',
+    subtitle: 'The circular SGA buffer that records every change before it hits disk',
+
+    whatTitle: 'What is the Redo Log Buffer?',
+    whatP1: 'The Redo Log Buffer is a circular buffer inside the SGA. Every time a data change occurs — INSERT, UPDATE, DELETE, or DDL — a Redo Entry describing "what changed, where, and how" is written into this buffer first.',
+    whatP2: 'The LGWR (Log Writer) background process continuously reads entries from this buffer and writes them sequentially to the Online Redo Log files on disk. When the buffer is full, LGWR writes the oldest entries to disk and frees those slots for reuse — which is why it is a circular buffer.',
+    whatP3: 'These Redo records are the foundation of Oracle recovery. Even if the server crashes unexpectedly, re-applying (replaying) the change history stored in the Redo Log restores the database to its state at the time of failure.',
+
+    entryTitle: 'Redo Entry Structure',
+    entryDesc: 'A single Redo Entry is a record that fully describes one data change. Oracle includes the following information in each entry.',
+    entryFields: [
+      { label: 'SCN (System Change Number)', desc: 'A logical timestamp marking when this change occurred. Used to determine recovery order and read consistency.' },
+      { label: 'Operation', desc: 'The type of operation performed — INSERT, UPDATE, DELETE, DDL, etc.' },
+      { label: 'Before Image', desc: 'The pre-change state of the block/row. Used for ROLLBACK and to reconstruct earlier row versions during Consistent Read.' },
+      { label: 'After Image', desc: 'The post-change state. During recovery, this value is re-applied (redone) to restore data.' },
+      { label: 'Object ID / Block Address', desc: 'Location information: which segment and which block number was modified.' },
+    ],
+    entryNote: 'Redo Entries are written to the buffer immediately — regardless of commit status. Uncommitted changes already exist in the Redo Log Buffer; they are flushed to disk by LGWR at commit time.',
+
+    circularTitle: 'Circular Buffer Structure',
+    circularDesc: 'The Redo Log Buffer is a fixed-size circular buffer. Server processes append Redo Entries into the buffer, while LGWR continuously writes entries to disk and marks those slots free for reuse.',
+    circularFull: 'When the buffer is completely full, server processes briefly wait until LGWR frees space (wait event: log buffer space). Sizing LOG_BUFFER appropriately eliminates this wait.',
+    slotWritten: 'Written to disk',
+    slotPending: 'Pending write',
+    slotFree: 'Free slot (reusable)',
+    lgwrHead: 'LGWR current position',
 
     walTitle: 'Write-Ahead Logging — Log first, data second',
     walDesc: 'When Oracle modifies data in the Buffer Cache, it always follows a strict order.',
@@ -51,6 +158,36 @@ const T = {
     walDiskOrder: 'Disk write order (at COMMIT)',
     walLgwr: 'LGWR · at COMMIT',
     walDbwn: 'DBWn · batched later',
+
+    flushTitle: 'When does LGWR flush?',
+    flushDesc: 'LGWR writes the Redo Log Buffer to disk when any of these five conditions is met.',
+    flushTriggers: [
+      {
+        label: '① COMMIT',
+        desc: 'The most important trigger. When a user issues COMMIT, LGWR must write all Redo Entries for that transaction to disk before returning confirmation. This synchronous write is the main reason COMMITs take measurable time.',
+        color: 'rose' as const,
+      },
+      {
+        label: '② Buffer ≥ 1/3 full',
+        desc: 'When the Redo Log Buffer is approximately one-third full, LGWR starts an automatic flush. This prevents server processes from having to wait for space (log buffer space wait event).',
+        color: 'amber' as const,
+      },
+      {
+        label: '③ 3-second timeout',
+        desc: 'Even if neither of the above conditions is met, LGWR flushes any remaining entries in the buffer every 3 seconds.',
+        color: 'amber' as const,
+      },
+      {
+        label: '④ Before DBWn writes',
+        desc: "Before DBWn writes a dirty buffer to the Data File, the Redo for that block must already be on disk (WAL principle). DBWn waits for LGWR's flush confirmation before starting its own write.",
+        color: 'blue' as const,
+      },
+      {
+        label: '⑤ Checkpoint',
+        desc: 'On a Log Switch or manual Checkpoint, LGWR flushes all current buffer contents to disk.',
+        color: 'slate' as const,
+      },
+    ],
 
     ioTitle: 'Why is writing to the Redo Log faster than writing to the Data File?',
     ioSubTitle: 'The answer lies in the two different I/O patterns.',
@@ -65,8 +202,26 @@ const T = {
     ioRandomVisualLabel: 'Seeks A → F → C out of order',
     ioAppendVisualLabel: 'Written 1 → 2 → 3 → 4 → 5, next appended here',
     ioFootnote: 'Random I/O will reappear throughout the indexes, joins, and partitioning chapters. For now, just remember: writing to arbitrary locations is expensive.',
+
+    paramsTitle: 'Key Parameters',
+    params: [
+      { name: 'LOG_BUFFER', desc: 'Redo Log Buffer size in bytes. Determined automatically based on platform and CPU count. Increase it to reduce log buffer space waits for workloads with large transactions.' },
+      { name: 'LOG_ARCHIVE_DEST_n', desc: 'Archive log destination paths in ARCHIVELOG mode. Specifying two or more locations is recommended for availability.' },
+      { name: 'ARCHIVE_LAG_TARGET', desc: 'Forces a Log Switch after this many seconds in Data Guard environments, ensuring timely log shipping to standby.' },
+    ],
+
+    summaryTitle: 'Redo Log Buffer — Key Takeaways',
+    summaryItems: [
+      'Circular SGA buffer — all change history (Redo Entries) accumulates here before any disk write',
+      'LGWR flushes on: COMMIT · buffer 1/3 full · 3-second timeout · DBWn request · Checkpoint',
+      'WAL principle: Redo Log first, Data File second — the foundation of Oracle crash recovery',
+      'Append (Sequential) I/O is far faster than Random I/O — keeps COMMIT latency minimal',
+      'Redo Entry = SCN + operation code + Before/After Image + block address',
+    ],
   },
 }
+
+// ── Sub-components ─────────────────────────────────────────────────────────
 
 function WalSection({ lang }: { lang: 'ko' | 'en' }) {
   const t = T[lang]
@@ -134,6 +289,159 @@ function WalSection({ lang }: { lang: 'ko' | 'en' }) {
   )
 }
 
+// Circular buffer SVG diagram
+function CircularBufferDiagram({ lang }: { lang: 'ko' | 'en' }) {
+  const t = T[lang]
+  const TOTAL = 12
+  const WRITTEN = 4   // orange filled (written to disk)
+  const PENDING = 3   // amber (waiting for LGWR)
+  const HEAD_IDX = WRITTEN  // LGWR is here
+
+  const CX = 100
+  const CY = 100
+  const R = 72
+  const SLOT_W = 18
+  const SLOT_H = 14
+
+  const slots = Array.from({ length: TOTAL }).map((_, i) => {
+    const angle = (2 * Math.PI * i) / TOTAL - Math.PI / 2
+    const x = CX + R * Math.cos(angle)
+    const y = CY + R * Math.sin(angle)
+    let state: 'written' | 'pending' | 'free' = 'free'
+    if (i < WRITTEN) state = 'written'
+    else if (i < WRITTEN + PENDING) state = 'pending'
+    return { x, y, state, angle }
+  })
+
+  const headSlot = slots[HEAD_IDX]
+
+  return (
+    <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-start sm:gap-8">
+      <svg viewBox="0 0 200 200" className="w-52 shrink-0">
+        {/* Center label */}
+        <text x={CX} y={CY - 6} textAnchor="middle" fontSize={8} fontFamily="monospace" fontWeight="bold" fill="#64748b">
+          Redo Log
+        </text>
+        <text x={CX} y={CY + 6} textAnchor="middle" fontSize={8} fontFamily="monospace" fontWeight="bold" fill="#64748b">
+          Buffer
+        </text>
+
+        {/* Slots */}
+        {slots.map((s, i) => {
+          const fill = s.state === 'written' ? '#fdba74' : s.state === 'pending' ? '#fcd34d' : '#f1f5f9'
+          const stroke = s.state === 'written' ? '#f97316' : s.state === 'pending' ? '#f59e0b' : '#cbd5e1'
+          return (
+            <rect
+              key={i}
+              x={s.x - SLOT_W / 2}
+              y={s.y - SLOT_H / 2}
+              width={SLOT_W}
+              height={SLOT_H}
+              rx={3}
+              fill={fill}
+              stroke={stroke}
+              strokeWidth={1.2}
+            />
+          )
+        })}
+
+        {/* LGWR head indicator */}
+        <circle
+          cx={headSlot.x}
+          cy={headSlot.y}
+          r={SLOT_W / 2 + 4}
+          fill="none"
+          stroke="#f97316"
+          strokeWidth={1.5}
+          strokeDasharray="3 2"
+        />
+        <motion.circle
+          cx={headSlot.x}
+          cy={headSlot.y}
+          r={SLOT_W / 2 + 4}
+          fill="none"
+          stroke="#f97316"
+          strokeWidth={1.5}
+          strokeDasharray="3 2"
+          animate={{ opacity: [1, 0.3, 1] }}
+          transition={{ repeat: Infinity, duration: 1.4 }}
+        />
+        <text
+          x={headSlot.x}
+          y={headSlot.y - SLOT_H / 2 - 6}
+          textAnchor="middle"
+          fontSize={7}
+          fontFamily="monospace"
+          fontWeight="bold"
+          fill="#ea580c"
+        >
+          LGWR
+        </text>
+
+        {/* Arrow showing direction */}
+        <path
+          d={`M ${CX + 18} ${CY - 6} A 18 18 0 0 1 ${CX + 18} ${CY + 6}`}
+          fill="none"
+          stroke="#94a3b8"
+          strokeWidth={1}
+          markerEnd="url(#arrowGray)"
+        />
+        <defs>
+          <marker id="arrowGray" markerWidth="5" markerHeight="5" refX="2.5" refY="2.5" orient="auto">
+            <path d="M0,0 L5,2.5 L0,5 Z" fill="#94a3b8" />
+          </marker>
+        </defs>
+      </svg>
+
+      {/* Legend */}
+      <div className="flex flex-col gap-2 text-xs text-muted-foreground">
+        <div className="flex items-center gap-2">
+          <div className="h-3 w-5 shrink-0 rounded-sm border border-orange-400 bg-orange-200" />
+          <span>{t.slotWritten}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="h-3 w-5 shrink-0 rounded-sm border border-amber-400 bg-amber-200" />
+          <span>{t.slotPending}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="h-3 w-5 shrink-0 rounded-sm border border-slate-300 bg-slate-100" />
+          <span>{t.slotFree}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="h-3 w-5 shrink-0 rounded-sm border border-dashed border-orange-400 bg-transparent" />
+          <span>{t.lgwrHead}</span>
+        </div>
+        <p className="mt-2 max-w-[220px] text-[11px] leading-relaxed">{t.circularFull}</p>
+      </div>
+    </div>
+  )
+}
+
+function FlushSection({ lang }: { lang: 'ko' | 'en' }) {
+  const t = T[lang]
+  const colorMap = {
+    rose:   { bg: 'bg-rose-50',   border: 'border-rose-200',   badge: 'bg-rose-500'   },
+    amber:  { bg: 'bg-amber-50',  border: 'border-amber-200',  badge: 'bg-amber-500'  },
+    blue:   { bg: 'bg-blue-50',   border: 'border-blue-200',   badge: 'bg-blue-500'   },
+    slate:  { bg: 'bg-slate-50',  border: 'border-slate-200',  badge: 'bg-slate-400'  },
+  }
+  return (
+    <div className="space-y-2">
+      {t.flushTriggers.map((trigger) => {
+        const c = colorMap[trigger.color]
+        return (
+          <div key={trigger.label} className={cn('flex items-start gap-3 rounded-xl border px-4 py-3', c.bg, c.border)}>
+            <span className={cn('mt-0.5 shrink-0 rounded px-2 py-0.5 font-mono text-[10px] font-bold text-white whitespace-nowrap', c.badge)}>
+              {trigger.label}
+            </span>
+            <p className="text-xs leading-relaxed text-muted-foreground">{trigger.desc}</p>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
 function IoComparisonSection({ lang }: { lang: 'ko' | 'en' }) {
   const t = T[lang]
   const [activeIo, setActiveIo] = useState<IoMode>('random')
@@ -168,12 +476,12 @@ function IoComparisonSection({ lang }: { lang: 'ko' | 'en' }) {
           </div>
           <svg className="pointer-events-none absolute inset-0 h-full w-full" viewBox="0 0 320 112">
             <defs>
-              <marker id="arrowAmber" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+              <marker id="arrowAmber2" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
                 <path d="M0,0 L6,3 L0,6 Z" fill="#f59e0b" />
               </marker>
             </defs>
-            <path d="M20 56 C 20 20, 200 20, 200 56" stroke="#f59e0b" strokeWidth="1.5" fill="none" strokeDasharray="4 2" markerEnd="url(#arrowAmber)" />
-            <path d="M200 56 C 200 90, 100 90, 100 56" stroke="#f59e0b" strokeWidth="1.5" fill="none" strokeDasharray="4 2" markerEnd="url(#arrowAmber)" />
+            <path d="M20 56 C 20 20, 200 20, 200 56" stroke="#f59e0b" strokeWidth="1.5" fill="none" strokeDasharray="4 2" markerEnd="url(#arrowAmber2)" />
+            <path d="M200 56 C 200 90, 100 90, 100 56" stroke="#f59e0b" strokeWidth="1.5" fill="none" strokeDasharray="4 2" markerEnd="url(#arrowAmber2)" />
           </svg>
           <div className="absolute bottom-2 left-0 right-0 text-center text-[10px] text-slate-400">
             {t.ioRandomVisualLabel}
@@ -261,22 +569,97 @@ function IoComparisonSection({ lang }: { lang: 'ko' | 'en' }) {
   )
 }
 
+// ── Main component ──────────────────────────────────────────────────────────
+
 export function RedoLogBufferSection() {
   const lang = useSimulationStore((s) => s.lang)
   const t = T[lang]
 
   return (
     <div className="mx-auto max-w-screen-2xl px-10 py-10">
-      <ChapterTitle title={t.title} />
+      <ChapterTitle title={t.title} subtitle={t.subtitle} />
 
       <SgaPositionDiagram activeId="redo-log-buffer" />
 
-      <SectionTitle>{t.walTitle}</SectionTitle>
-      <WalSection lang={lang} />
+      {/* ── What is ── */}
+      <SectionTitle>{t.whatTitle}</SectionTitle>
+      <div className="space-y-2 mb-6">
+        <Prose>{t.whatP1}</Prose>
+        <Prose>{t.whatP2}</Prose>
+        <Prose>{t.whatP3}</Prose>
+      </div>
 
       <Divider />
 
+      {/* ── Redo Entry structure ── */}
+      <SectionTitle>{t.entryTitle}</SectionTitle>
+      <Prose className="mb-4">{t.entryDesc}</Prose>
+      <div className="mb-4 overflow-hidden rounded-xl border bg-card">
+        {t.entryFields.map((f, i) => (
+          <div key={f.label} className={cn('flex items-start gap-4 px-5 py-3', i > 0 && 'border-t')}>
+            <code className="mt-0.5 shrink-0 rounded bg-orange-100 px-2 py-0.5 font-mono text-[11px] font-bold text-orange-700 whitespace-nowrap">
+              {f.label}
+            </code>
+            <p className="text-xs leading-relaxed text-muted-foreground">{f.desc}</p>
+          </div>
+        ))}
+      </div>
+      <InfoBox variant="note">{t.entryNote}</InfoBox>
+
+      <Divider />
+
+      {/* ── Circular buffer ── */}
+      <SectionTitle>{t.circularTitle}</SectionTitle>
+      <Prose className="mb-5">{t.circularDesc}</Prose>
+      <CircularBufferDiagram lang={lang} />
+
+      <Divider />
+
+      {/* ── WAL ── */}
+      <SectionTitle>{t.walTitle}</SectionTitle>
+      <div className="mb-6">
+        <WalSection lang={lang} />
+      </div>
+
+      <Divider />
+
+      {/* ── LGWR flush triggers ── */}
+      <SectionTitle>{t.flushTitle}</SectionTitle>
+      <Prose className="mb-4">{t.flushDesc}</Prose>
+      <FlushSection lang={lang} />
+
+      <Divider />
+
+      {/* ── I/O comparison ── */}
       <IoComparisonSection lang={lang} />
+
+      <Divider />
+
+      {/* ── Parameters ── */}
+      <SectionTitle>{t.paramsTitle}</SectionTitle>
+      <div className="mb-6 overflow-hidden rounded-xl border bg-card">
+        {t.params.map((p, i) => (
+          <div key={p.name} className={cn('flex items-start gap-4 px-5 py-3', i > 0 && 'border-t')}>
+            <code className="mt-0.5 shrink-0 rounded bg-orange-100 px-2 py-0.5 font-mono text-[11px] font-bold text-orange-700">
+              {p.name}
+            </code>
+            <p className="text-xs leading-relaxed text-muted-foreground">{p.desc}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* ── Summary ── */}
+      <div className="rounded-2xl border bg-gradient-to-br from-slate-50 to-orange-50/30 px-6 py-5">
+        <div className="mb-3"><SubTitle>{t.summaryTitle}</SubTitle></div>
+        <ul className="space-y-1.5">
+          {t.summaryItems.map((item, i) => (
+            <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
+              <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-orange-400" />
+              {item}
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   )
 }

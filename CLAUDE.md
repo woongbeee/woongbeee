@@ -47,7 +47,7 @@ interface Props {
 
 `bookStructure.ts`의 `BOOK_CHAPTERS`가 단일 진실 공급원(TOC 데이터). 새 섹션 추가 시 여기만 수정하면 TOC·breadcrumb·Prev/Next가 자동 반영된다.
 
-`BookSection`은 `children?: BookSection[]`을 가질 수 있어 2단계 계층 구조를 지원한다. `flattenSections()`가 children을 포함해 평탄화하므로 `getSectionById()`·`getAdjacentSections()`·Prev/Next 모두 children까지 올바르게 동작한다. **현재 최대 2단계(부모-자식)까지만 지원**하며, 자식 섹션이 다시 children을 가지는 3단계 구조는 `flattenSections()`가 처리하지 않는다.
+`BookSection`은 `children?: BookSection[]`을 가질 수 있어 계층 구조를 지원한다. `flattenSections()`가 재귀적 `walk()`로 children을 포함해 평탄화하므로 `getSectionById()`·`getAdjacentSections()`·Prev/Next 모두 children까지 올바르게 동작한다. **임의 깊이(n단계) 지원** — SGA 하위 섹션들(깊이 4: chapter→overview→sga→buffer-cache)과 process 하위 섹션들(깊이 4)이 실제로 동작 중이다.
 
 앱 첫 진입 시 활성 섹션은 `intro-overview` (Chapter 0 첫 섹션, `BookLayout.tsx`의 `useState` 초기값).
 
@@ -201,11 +201,17 @@ const T = {
   - `internals-sga-buffer-cache` → `SgaBufferCacheSection`
   - `internals-sga-shared-pool` → `SharedPoolSection`
   - `internals-sga-redo-log-buffer` → `RedoLogBufferSection`
-  - `internals-sga-undo-segment` → `UndoSegmentSection`
+  - `internals-sga-large-pool` → `LargePoolSection`
+  - `internals-pga` → `PgaSection`
+  - `internals-uga` → `UgaSection`
+  - `internals-process` → `ProcessOverviewSection` (부모 섹션 클릭 시 개요로)
+  - `internals-process-overview` → `ProcessOverviewSection`
+  - `internals-process-server` → `ServerProcessSection`
+  - `internals-process-background` → `BackgroundProcessSection`
   - `internals-storage` → `StorageSection`
   - `internals-update-flow` → `UpdateFlowPage`
 
-  SGA 하위 4개 페이지는 `overview/sga/shared/SgaPositionDiagram.tsx`의 `SgaPositionDiagram` 공통 컴포넌트를 사용한다(`activeId: SgaComponentId` prop으로 현재 페이지의 컴포넌트를 하이라이트).
+  SGA 하위 4개 페이지는 `overview/sga/shared/SgaPositionDiagram.tsx`의 `SgaPositionDiagram` 공통 컴포넌트를 사용한다(`activeId: SgaComponentId` prop으로 현재 페이지의 컴포넌트를 하이라이트). `SgaComponentId` 타입에 `'large-pool'`이 포함되어 있음 (`'undo-segment'`는 제거됨).
 
   **`StorageSection.tsx` 구성 패턴:**
   - 파일 상단에 `B` / `Hi` 인라인 헬퍼 컴포넌트 정의 (bold·color 강조용)
@@ -226,10 +232,26 @@ const T = {
            2.1.1.1 Buffer Cache
            2.1.1.2 Shared Pool      (WipBanner)
            2.1.1.3 Redo Log Buffer  (WipBanner)
-           2.1.1.4 Undo Segment     (WipBanner)
+           2.1.1.4 Large Pool
+       2.1.2 PGA (Program Global Area)
+       2.1.3 UGA (User Global Area)
+       2.1.4 프로세스
+           2.1.4.1 프로세스 개요    → ProcessOverviewSection.tsx
+           2.1.4.2 서버 프로세스    → ServerProcessSection.tsx
+           2.1.4.3 백그라운드 프로세스 → BackgroundProcessSection.tsx
    2.2 UPDATE 실행 흐름
    2.3 데이터 저장 구조
 ```
+
+**internals 프로세스 섹션 파일 구조:**
+```
+src/book/chapters/internals/overview/process/
+  ProcessOverviewSection.tsx   — 3가지 프로세스 타입 카드 + ProcessArchDiagram SVG + 연결 방식 + BG 프로세스 표
+  ServerProcessSection.tsx     — Dedicated/Shared 개념 + DedicatedDiagram SVG + SharedDiagram SVG + 비교 표
+  BackgroundProcessSection.tsx — 인터랙티브 프로세스 선택기(7개) + CommitFlowDiagram SVG + COMMIT 단계 설명
+```
+
+**참고 문서:** Oracle 26 공식 문서 — [Process Architecture](https://docs.oracle.com/en/database/oracle/oracle-database/26/cncpt/process-architecture.html)
 
 나머지 챕터(join, optimizer, sort, partition, parallel, query-transform, index-chapter)는 `index.tsx` 단일 파일로 구성된다.
 
@@ -324,6 +346,31 @@ const T = {
 SVG는 DOM 순서 = z-order다. 나중에 그려진 요소가 위에 표시된다. 인터랙티브 다이어그램에서 특정 요소(Latch 태그, 하이라이트 오버레이 등)가 다른 요소 위에 항상 표시되어야 하면 **루프 바깥으로 꺼내 마지막에 렌더**한다. `{(() => { ... })()}` IIFE 패턴으로 루프 외부에서 계산이 필요한 요소를 렌더할 수 있다.
 
 SVG 레이아웃 상수는 **의존 관계 순서대로** 선언한다 — 예: 버킷 행 위치를 먼저 계산한 뒤 외곽 박스 높이를 역산(`BC_H = (BUCK_ROWS[3] - BC_Y) + BUCK_R + padding`). 고정값으로 크기를 지정하면 내부 요소가 박스를 삐져나오는 버그가 생기기 쉽다.
+
+**internals 다이어그램 설계 규칙 (프로세스 섹션에서 확립):**
+
+- **ROW_GAP ≥ 26px**: 행 간격이 26px 미만이면 화살표(8px) + 레이블 텍스트(8~9px 줄높이) = 16px 이상이 겹친다. 최소 26px 확보.
+- **박스 내 텍스트 y 간격**: 타이틀 `y + 17~19`, 서브타이틀 `y + 30~35`, 노트 `y + 44~52` (박스 높이 ~56px 기준). 줄마다 ~14~16px 간격.
+- **레이블이 있는 화살표 — L자형 polyline 사용**: 대각선 화살표에 레이블을 붙이면 선과 텍스트가 겹친다. 중간점(midX 또는 midY)을 거치는 꺾인 선(`<polyline points="x1,y1 midX,y1 midX,y2 x2,y2">`)으로 변환하고 레이블을 꺾임 모서리 위/아래에 배치한다.
+- **SGA/영역 레이블 z-order**: SGA 같은 큰 영역 레이블은 내부 요소(서버 프로세스 박스 등)가 위에 렌더링되어 가려진다. 반드시 SVG 마지막에 흰 배경 `<rect>`와 함께 렌더한다:
+  ```tsx
+  <rect x={SGA_X + 4} y={SGA_Y - 8} width={32} height={14} rx={3} fill="#f0fdf4" />
+  <text x={SGA_X + 8} y={SGA_Y + 2} ...>SGA</text>
+  ```
+- **PGA 레이블 간격**: `PGA_GAP` (서버 프로세스 박스 하단 ~ PGA 박스 상단)을 28px 이상으로 설정하고, 레이블 y는 그 중간값 + 4px에 배치한다.
+
+**internals 내부 구조 섹션 페이지 콘텐츠 패턴:**
+
+각 `overview/` 하위 섹션 (SGA, PGA, UGA, Process 등)은 아래 순서를 따른다:
+1. `ChapterTitle` (Tabler 아이콘 `size={36}` + 한/영 제목·부제목)
+2. `SectionTitle` + `ConceptGrid` 또는 개요 카드 (3~4개 핵심 개념)
+3. `Divider`
+4. 아키텍처 다이어그램: 인라인 `<svg>` 컴포넌트. 가로폭 `w-full max-w-2xl mx-auto` 컨테이너 안에 배치
+5. `Divider`
+6. 세부 설명 섹션들 (`AccordionSection` 또는 `SectionTitle` + `Prose` + `Table`)
+7. 필요 시 `InfoBox`로 핵심 요약
+
+비교가 필요한 경우(Dedicated vs Shared 등) — 탭 토글이 아니라 **전체 3컬럼 표** (항목 | A | B) 사용. 한눈에 비교 가능해야 한다.
 
 ### TypeScript 엄격 플래그 주의사항
 

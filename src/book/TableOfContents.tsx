@@ -146,12 +146,21 @@ export function TableOfContents({ activeSectionId, onSelect, onToggle }: Props) 
         const isOpen    = !!openChapters[chapter.id]
         const hasActive = chapter.sections.some((s) => sectionContainsActive(s, activeSectionId))
         const isReady   = chapter.num <= 3
+        const allHidden = chapter.sections.every((s) => s.hiddenInToc)
+        const hiddenSection = allHidden ? chapter.sections[0] : undefined
 
         return (
           <div key={chapter.id} className="flex flex-col">
             {/* Chapter header row */}
             <button
-              onClick={() => toggleChapter(chapter.id)}
+              onClick={() => {
+                if (hiddenSection) {
+                  onSelect(hiddenSection.id)
+                  setOpenChapters((prev) => ({ ...prev, [chapter.id]: true }))
+                } else {
+                  toggleChapter(chapter.id)
+                }
+              }}
               className={cn(
                 'group flex w-full items-center gap-2 px-3 py-2 text-left transition-colors',
                 isReady ? 'hover:bg-muted/60' : 'hover:bg-muted/30',
@@ -184,9 +193,9 @@ export function TableOfContents({ activeSectionId, onSelect, onToggle }: Props) 
               {hasActive && isReady && <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-ios-orange" />}
             </button>
 
-            {/* Sections */}
+            {/* Sections — not rendered when all sections are hidden in TOC */}
             <AnimatePresence initial={false}>
-              {isOpen && (
+              {isOpen && !allHidden && (
                 <motion.div
                   key="sections"
                   initial={{ height: 0, opacity: 0 }}
@@ -196,7 +205,7 @@ export function TableOfContents({ activeSectionId, onSelect, onToggle }: Props) 
                   className="overflow-hidden"
                 >
                   <div className="ml-[1.1rem] border-l border-border/50 pb-1">
-                    {chapter.sections.map((section, idx) => (
+                    {chapter.sections.filter((s) => !s.hiddenInToc).map((section, idx) => (
                       <SectionItem
                         key={section.id}
                         section={section}

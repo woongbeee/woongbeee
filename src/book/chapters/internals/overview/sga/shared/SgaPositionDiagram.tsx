@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
 
-export type SgaComponentId = 'buffer-cache' | 'shared-pool' | 'redo-log-buffer' | 'undo-segment'
+export type SgaComponentId = 'buffer-cache' | 'shared-pool' | 'redo-log-buffer' | 'large-pool'
 
 // Sub-diagrams for each non-highlighted component
 function BufferCacheMini() {
@@ -81,12 +81,12 @@ function RedoLogBufferMini() {
   )
 }
 
-function UndoSegmentMini() {
+function LargePoolMini() {
   return (
     <div className="mt-3 flex flex-1 flex-col gap-1.5">
-      {[0, 1, 2].map((i) => (
-        <div key={i} className="flex flex-1 items-center rounded-md border border-rose-200 bg-rose-50 px-2 py-1">
-          <div className="font-mono text-[9px] font-bold text-rose-500">before-image</div>
+      {['RMAN', 'Parallel', 'UGA'].map((label) => (
+        <div key={label} className="flex flex-1 items-center rounded-md border border-teal-200 bg-teal-50 px-2 py-1">
+          <div className="font-mono text-[9px] font-bold text-teal-600">{label}</div>
         </div>
       ))}
     </div>
@@ -122,10 +122,10 @@ const COMPONENTS: {
     dim: 'border-border/30 bg-muted/20 text-muted-foreground/40',
   },
   {
-    id: 'undo-segment',
-    label: 'Undo Segment',
+    id: 'large-pool',
+    label: 'Large Pool',
     flex: 'flex-[2]',
-    highlight: { border: 'border-rose-500', bg: 'bg-rose-100', ring: 'ring-2 ring-rose-300', text: 'text-rose-800' },
+    highlight: { border: 'border-teal-500', bg: 'bg-teal-100', ring: 'ring-2 ring-teal-300', text: 'text-teal-800' },
     dim: 'border-border/30 bg-muted/20 text-muted-foreground/40',
   },
 ]
@@ -157,7 +157,7 @@ export function SgaPositionDiagram({ activeId }: Props) {
               {c.id === 'buffer-cache' && <BufferCacheMini />}
               {c.id === 'shared-pool' && <SharedPoolMini />}
               {c.id === 'redo-log-buffer' && <RedoLogBufferMini />}
-              {c.id === 'undo-segment' && <UndoSegmentMini />}
+              {c.id === 'large-pool' && <LargePoolMini />}
             </motion.div>
           )
         })}

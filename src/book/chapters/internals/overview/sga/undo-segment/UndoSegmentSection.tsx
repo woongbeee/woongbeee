@@ -9,7 +9,7 @@ export function UndoSegmentSection() {
       <ChapterTitle
         title={lang === 'ko' ? 'Undo Segment' : 'Undo Segment'}
       />
-      <SgaPositionDiagram activeId="undo-segment" />
+      <SgaPositionDiagram activeId="large-pool" />
       <WipBanner />
     </div>
   )

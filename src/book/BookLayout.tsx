@@ -8,10 +8,6 @@ import { GlossaryPanel } from './GlossaryPanel'
 import { Badge } from '@/components/ui/badge'
 import { IconLanguage, IconSettings, IconChevronRight } from '@tabler/icons-react'
 
-interface Props {
-  onHome: () => void
-}
-
 const T: Record<'ko' | 'en', { title: string; subtitle: string; langToggle: string; tocLabel: string; openTitle: string; closeTitle: string; simulator: string }> = {
   ko: {
     title: 'Oracle DB',
@@ -58,7 +54,7 @@ const TocTab = memo(function TocTab({ onToggle }: { onToggle: () => void }) {
   )
 })
 
-export function BookLayout({ onHome }: Props) {
+export function BookLayout() {
   const lang = useSimulationStore((s) => s.lang)
   const setLang = useSimulationStore((s) => s.setLang)
   const t = T[lang]
@@ -101,15 +97,6 @@ export function BookLayout({ onHome }: Props) {
           <div className="h-3 w-3 rounded-full bg-yellow-400" />
           <div className="h-3 w-3 rounded-full bg-green-400" />
         </div>
-
-        <div className="h-4 w-px bg-border" />
-
-        <button
-          onClick={onHome}
-          className="font-mono text-xs text-muted-foreground transition-colors hover:text-foreground"
-        >
-          ← Home
-        </button>
 
         <div className="h-4 w-px bg-border" />
 

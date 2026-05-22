@@ -22,6 +22,8 @@ export interface BookSection {
   simulatorLabel?: { ko: string; en: string }
   /** Subsections rendered indented under this section in the TOC */
   children?: BookSection[]
+  /** If true, this section is not shown as a separate item in the TOC */
+  hiddenInToc?: boolean
 }
 
 export interface BookChapter {
@@ -43,7 +45,8 @@ export const BOOK_CHAPTERS: BookChapter[] = [
     sections: [
       {
         id: 'intro-overview',
-        title: { ko: '오라클 소개', en: 'Introduction to Oracle' },
+        title: { ko: '오라클이란?', en: 'What is Oracle?' },
+        hiddenInToc: true,
       },
     ],
   },
@@ -164,6 +167,10 @@ export const BOOK_CHAPTERS: BookChapter[] = [
     },
     sections: [
       {
+        id: 'internals-storage',
+        title: { ko: '데이터 저장 구조', en: 'Data Storage Structure' },
+      },
+      {
         id: 'internals-overview',
         title: { ko: '오라클의 내부 구조', en: 'Oracle Internal Structure' },
         children: [
@@ -184,16 +191,38 @@ export const BOOK_CHAPTERS: BookChapter[] = [
                 title: { ko: 'Redo Log Buffer', en: 'Redo Log Buffer' },
               },
               {
-                id: 'internals-sga-undo-segment',
-                title: { ko: 'Undo Segment', en: 'Undo Segment' },
+                id: 'internals-sga-large-pool',
+                title: { ko: 'Large Pool', en: 'Large Pool' },
+              },
+            ],
+          },
+          {
+            id: 'internals-pga',
+            title: { ko: 'PGA', en: 'PGA' },
+          },
+          {
+            id: 'internals-uga',
+            title: { ko: 'UGA', en: 'UGA' },
+          },
+          {
+            id: 'internals-process',
+            title: { ko: '프로세스', en: 'Processes' },
+            children: [
+              {
+                id: 'internals-process-overview',
+                title: { ko: '프로세스 개요', en: 'Process Overview' },
+              },
+              {
+                id: 'internals-process-server',
+                title: { ko: '서버 프로세스', en: 'Server Processes' },
+              },
+              {
+                id: 'internals-process-background',
+                title: { ko: '백그라운드 프로세스', en: 'Background Processes' },
               },
             ],
           },
         ],
-      },
-      {
-        id: 'internals-storage',
-        title: { ko: '데이터 저장 구조', en: 'Data Storage Structure' },
       },
       {
         id: 'internals-update-flow',

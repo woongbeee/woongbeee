@@ -1,4 +1,4 @@
-import { OverviewSection, UpdateFlowPage } from './overview/OverviewSection'
+import { OverviewSection } from './overview/OverviewSection'
 import { StorageSection } from './storage/StorageSection'
 import { SgaSection } from './overview/sga/SgaSection'
 import { SgaBufferCacheSection } from './overview/sga/buffer-cache/BufferCacheSection'
@@ -10,6 +10,16 @@ import { UgaSection } from './overview/uga/UgaSection'
 import { ProcessOverviewSection } from './overview/process/ProcessOverviewSection'
 import { ServerProcessSection } from './overview/process/ServerProcessSection'
 import { BackgroundProcessSection } from './overview/process/BackgroundProcessSection'
+// import {
+//   ConcurrencySection
+// } from './concurrency/ConcurrencySection'
+import {
+  TransactionSection,
+  TransactionOverviewSection,
+  TransactionAcidSection,
+  TransactionCommitRollbackSection,
+  TransactionSavepointSection,
+} from './transaction/TransactionSection'
 
 export function InternalsPage({ sectionId }: { sectionId: string }) {
   if (sectionId === 'internals-overview')             return <OverviewSection />
@@ -25,6 +35,15 @@ export function InternalsPage({ sectionId }: { sectionId: string }) {
   if (sectionId === 'internals-process-server')       return <ServerProcessSection />
   if (sectionId === 'internals-process-background')   return <BackgroundProcessSection />
   if (sectionId === 'internals-storage')              return <StorageSection />
-  if (sectionId === 'internals-update-flow')          return <UpdateFlowPage />
+  // if (sectionId === 'internals-concurrency')          return <ConcurrencySection />
+  // if (sectionId === 'internals-concurrency-mvcc')     return <MvccSection />
+  // if (sectionId === 'internals-concurrency-isolation') return <IsolationSection />
+  // if (sectionId === 'internals-concurrency-locks')    return <LocksSection />
+  // if (sectionId === 'internals-concurrency-deadlock') return <DeadlockSection />
+  if (sectionId === 'internals-transaction')               return <TransactionSection />
+  if (sectionId === 'internals-transaction-overview')      return <TransactionOverviewSection />
+  if (sectionId === 'internals-transaction-acid')          return <TransactionAcidSection />
+  if (sectionId === 'internals-transaction-commit-rollback') return <TransactionCommitRollbackSection />
+  if (sectionId === 'internals-transaction-savepoint')     return <TransactionSavepointSection />
   return null
 }

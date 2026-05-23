@@ -608,6 +608,7 @@ export function SgaSection() {
         </AnimatePresence>
       </div>
 
+      <div className="mt-8">
       <InfoBox variant="summary">
         {lang === 'ko' ? (
           <>
@@ -631,6 +632,7 @@ export function SgaSection() {
           </>
         )}
       </InfoBox>
+      </div>
     </div>
   )
 }

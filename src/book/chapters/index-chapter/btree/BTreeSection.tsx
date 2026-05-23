@@ -8,6 +8,7 @@ import {
   Prose,
   InfoBox,
   Divider,
+  Table,
 } from '../../shared'
 import { IconBinaryTree } from '@tabler/icons-react'
 
@@ -67,6 +68,24 @@ const T = {
     stepLeaf: (l: string) => `Leaf ${l} 읽기 — 키값 비교 후 ROWID 획득`,
     found: (key: number, rowid: string) => `EMPLOYEE_ID = ${key} 발견 → ROWID: ${rowid}`,
     compositeNote: '복합 인덱스에서 첫 번째 컬럼(선두 컬럼)은 항상 비교에 사용됩니다. 두 번째 컬럼은 첫 번째가 같을 때만 추가로 비교합니다. WHERE 절에 선두 컬럼 없이 두 번째 컬럼만 쓰면 이 인덱스를 탈 수 없습니다.',
+
+    cfTitle: 'Clustering Factor(클러스터링 팩터)',
+    cfDesc: 'Clustering Factor는 테이블의 물리적 행 저장 순서가 인덱스 순서와 얼마나 일치하는지를 나타내는 지표입니다. 값이 낮을수록 좋으며, 인접한 인덱스 엔트리들이 같은(또는 가까운) 테이블 블록을 가리켜 범위 스캔의 I/O가 줄어듭니다.',
+    cfHowTitle: '계산 방법',
+    cfHowDesc: 'Oracle이 인덱스 Leaf 블록을 순서대로 읽으면서 각 ROWID가 가리키는 테이블 블록 번호가 이전 엔트리와 달라질 때마다 카운터를 1씩 증가시킵니다. 같은 블록이면 카운터는 그대로입니다. 최종 카운터 값이 Clustering Factor입니다.',
+    cfRangeTitle: '값의 범위',
+    cfRangeLow: '블록 수에 가까울수록 좋음 → 행이 인덱스 순서대로 저장됨 → 범위 스캔 시 적은 I/O',
+    cfRangeHigh: '행 수에 가까울수록 나쁨 → 행이 무작위로 흩어짐 → 범위 스캔 시 많은 I/O',
+    cfExampleTitle: '예시 — EMPLOYEES 테이블',
+    cfExampleDesc: '19개 행이 2개 블록에 걸쳐 성(last_name) 알파벳 순으로 저장되어 있습니다.',
+    cfTableHeaders: ['인덱스', '인덱스 컬럼', 'Clustering Factor', '이유'],
+    cfTableRows: [
+      ['EMP_NAME_IX', 'LAST_NAME', '2', '테이블이 이름 알파벳 순 저장 → 인접 엔트리가 같은 블록 가리킴'],
+      ['EMP_EMP_ID_PK', 'EMPLOYEE_ID', '19', 'ID가 무작위 배정 → 각 엔트리가 서로 다른 블록을 가리킴'],
+    ],
+    cfImpactTitle: '실행 계획에 미치는 영향',
+    cfImpactDesc: 'CBO는 Clustering Factor × 범위 선택도로 인덱스 범위 스캔의 I/O 비용을 추정합니다. Clustering Factor가 높으면 넓은 범위 스캔 비용이 크게 계산되어 옵티마이저가 Full Table Scan을 선택할 수 있습니다. 낮으면 중간 폭의 범위에서도 인덱스 스캔이 유리하게 유지됩니다.',
+    cfTipQuery: 'Clustering Factor 확인:',
   },
   en: {
     introTitle: 'What is a B-Tree Index?',
@@ -121,6 +140,24 @@ const T = {
     stepLeaf: (l: string) => `Read Leaf ${l} — compare keys and retrieve ROWID`,
     found: (key: number, rowid: string) => `EMPLOYEE_ID = ${key} found → ROWID: ${rowid}`,
     compositeNote: 'In a composite index the leading column is always compared first. The second column is only used when the first column values are equal. Queries that omit the leading column cannot use this index.',
+
+    cfTitle: 'Clustering Factor',
+    cfDesc: 'Clustering Factor measures how well a table\'s physical row order matches the index order. The lower the value, the better — adjacent index entries point to the same (or nearby) table blocks, minimizing I/O for range scans.',
+    cfHowTitle: 'How it is calculated',
+    cfHowDesc: 'Oracle counts how many times the table block number changes as it walks the index leaf blocks in order. If block X and the next entry also point to block X, the counter stays. If it points to a different block, the counter increments. The final count is the Clustering Factor.',
+    cfRangeTitle: 'Value range',
+    cfRangeLow: 'Near num_blocks → rows stored in index order → few I/Os per range scan',
+    cfRangeHigh: 'Near num_rows → rows randomly scattered → many I/Os per range scan',
+    cfExampleTitle: 'Example — EMPLOYEES table',
+    cfExampleDesc: 'The table has 19 rows spread across 2 blocks, alphabetically sorted by last_name.',
+    cfTableHeaders: ['Index', 'Indexed Column', 'Clustering Factor', 'Why'],
+    cfTableRows: [
+      ['EMP_NAME_IX', 'LAST_NAME', '2', 'Rows stored alphabetically → adjacent entries stay in same block'],
+      ['EMP_EMP_ID_PK', 'EMPLOYEE_ID', '19', 'IDs assigned randomly → each entry often points to a different block'],
+    ],
+    cfImpactTitle: 'Impact on execution plan',
+    cfImpactDesc: 'The CBO multiplies Clustering Factor by the selectivity of a range predicate to estimate the I/O cost of an index range scan. A high Clustering Factor makes large range scans look expensive, nudging the optimizer toward a Full Table Scan. A low Clustering Factor keeps range scans competitive even for moderately wide ranges.',
+    cfTipQuery: 'Check Clustering Factor:',
   },
 }
 
@@ -488,6 +525,53 @@ export function BTreeSection() {
               <p className="text-[11px] leading-snug text-muted-foreground">{r.desc}</p>
             </motion.div>
           ))}
+        </div>
+      </section>
+
+      <Divider />
+
+      {/* Clustering Factor */}
+      <section>
+        <SectionTitle>{t.cfTitle}</SectionTitle>
+        <Prose>{t.cfDesc}</Prose>
+
+        <ClusteringFactorDiagram lang={lang} />
+
+        <div className="mt-6 grid gap-3 sm:grid-cols-2">
+          <div className="rounded-xl border border-emerald-200 bg-emerald-50/50 p-4">
+            <p className="mb-1 font-mono text-[11px] font-bold text-emerald-700">{lang === 'ko' ? '낮은 CF — 좋음' : 'Low CF — Good'}</p>
+            <p className="text-[11px] leading-relaxed text-muted-foreground">{t.cfRangeLow}</p>
+          </div>
+          <div className="rounded-xl border border-rose-200 bg-rose-50/50 p-4">
+            <p className="mb-1 font-mono text-[11px] font-bold text-rose-700">{lang === 'ko' ? '높은 CF — 나쁨' : 'High CF — Bad'}</p>
+            <p className="text-[11px] leading-relaxed text-muted-foreground">{t.cfRangeHigh}</p>
+          </div>
+        </div>
+
+        <div className="mt-6">
+          <p className="mb-2 font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{t.cfHowTitle}</p>
+          <Prose>{t.cfHowDesc}</Prose>
+        </div>
+
+        <div className="mt-4">
+          <p className="mb-3 font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{t.cfExampleTitle}</p>
+          <Prose>{t.cfExampleDesc}</Prose>
+          <Table headers={t.cfTableHeaders} rows={t.cfTableRows} />
+        </div>
+
+        <div className="mt-5">
+          <InfoBox variant="note">
+            <strong>{t.cfImpactTitle}</strong>
+            <br />
+            {t.cfImpactDesc}
+          </InfoBox>
+        </div>
+
+        <div className="mt-4">
+          <p className="mb-1 font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{t.cfTipQuery}</p>
+          <div className="rounded-xl border bg-slate-900 px-4 py-3">
+            <pre className="font-mono text-[11px] leading-relaxed text-slate-200">{`SELECT index_name, clustering_factor, num_rows, blocks\nFROM   all_indexes\nWHERE  table_name = 'EMPLOYEES';`}</pre>
+          </div>
         </div>
       </section>
     </PageContainer>
@@ -1189,6 +1273,187 @@ function CompositeSearchStepPanel({ lang, path, visibleStep }: {
           <p className="text-[11px] leading-relaxed text-muted-foreground">{s.detail}</p>
         </motion.div>
       ))}
+    </div>
+  )
+}
+
+// ── Clustering Factor Diagram ─────────────────────────────────────────────────
+
+function ClusteringFactorDiagram({ lang }: { lang: 'ko' | 'en' }) {
+  const isKo = lang === 'ko'
+
+  // SVG 레이아웃 상수 — 의존 관계 순서대로 선언
+  const W = 580
+  const ENTRY_H = 20      // 엔트리 한 행 높이
+  const HEADER_H = 24     // Leaf 블록 헤더 높이
+  const N = 7             // 엔트리 수
+  const LEAF_H = HEADER_H + N * ENTRY_H + 8
+  const LEAF_W = 115
+  const LEAF_Y = 40
+
+  const LEFT_LEAF_X = 20
+  const RIGHT_LEAF_X = 310
+
+  const TBL_W = 82
+  const TBL_H = 38
+  const TBL_Y = LEAF_Y + LEAF_H + 40   // Leaf 아래 여백 40px
+  const H = TBL_Y + TBL_H + 30         // 하단 여백 30px
+
+  // 인덱스 엔트리
+  const lowCfEntries  = ['Abel','Ande','Atkinson','Austin','Baer','Bissot','Bloom']
+  const lowCfBlocks   = [1, 1, 1, 1, 1, 2, 2]
+  const highCfEntries = ['100','101','102','103','104','105','106']
+  const highCfBlocks  = [2, 1, 2, 1, 2, 1, 2]
+
+  const GOOD = '#10b981'
+  const BAD  = '#ef4444'
+  const B1F  = '#dbeafe'; const B1S = '#93c5fd'
+  const B2F  = '#fce7f3'; const B2S = '#f9a8d4'
+
+  function rowY(i: number, leafY: number) {
+    return leafY + HEADER_H + i * ENTRY_H + ENTRY_H / 2 + 2
+  }
+
+  function renderSide(
+    leafX: number,
+    entries: string[],
+    blocks: number[],
+    cf: number,
+    titleLabel: string,
+    arrowColor: string,
+  ) {
+    // 테이블 블록 — 두 블록을 leaf 아래 나란히 배치, gap 10px
+    const tbl1X = leafX
+    const tbl2X = leafX + TBL_W + 10
+    const b1cx  = tbl1X + TBL_W / 2
+    const b2cx  = tbl2X + TBL_W / 2
+    const leafRight = leafX + LEAF_W
+
+    return (
+      <g>
+        {/* 제목 */}
+        <text x={leafX + (TBL_W * 2 + 10) / 2} y={LEAF_Y - 22}
+          textAnchor="middle" fontSize={11} fontWeight="bold"
+          fill={arrowColor === GOOD ? '#047857' : '#b91c1c'}>
+          {titleLabel}
+        </text>
+        <text x={leafX + (TBL_W * 2 + 10) / 2} y={LEAF_Y - 8}
+          textAnchor="middle" fontSize={10} fill="#94a3b8">
+          CF = {cf}
+        </text>
+
+        {/* Leaf 블록 배경 */}
+        <rect x={leafX} y={LEAF_Y} width={LEAF_W} height={LEAF_H}
+          rx={6} fill="#f8fafc" stroke="#cbd5e1" strokeWidth={1.5} />
+        {/* Leaf 헤더 */}
+        <rect x={leafX} y={LEAF_Y} width={LEAF_W} height={HEADER_H}
+          rx={6} fill="#e2e8f0" />
+        <rect x={leafX} y={LEAF_Y + HEADER_H / 2} width={LEAF_W} height={HEADER_H / 2} fill="#e2e8f0" />
+        <text x={leafX + LEAF_W / 2} y={LEAF_Y + 16}
+          textAnchor="middle" fontSize={9} fontWeight="bold" fill="#475569">
+          {isKo ? 'Index Leaf' : 'Index Leaf'}
+        </text>
+        {/* 헤더 구분선 */}
+        <line x1={leafX} y1={LEAF_Y + HEADER_H}
+          x2={leafX + LEAF_W} y2={LEAF_Y + HEADER_H} stroke="#cbd5e1" strokeWidth={1} />
+
+        {/* 엔트리 행 */}
+        {entries.map((key, i) => {
+          const y = rowY(i, LEAF_Y)
+          const blockFill = blocks[i] === 1 ? B1F : B2F
+          return (
+            <g key={i}>
+              <text x={leafX + 8} y={y + 4} fontSize={9} fill="#334155">{key}</text>
+              <rect x={leafRight - 30} y={y - 8} width={24} height={15} rx={3} fill={blockFill} />
+              <text x={leafRight - 18} y={y + 3}
+                textAnchor="middle" fontSize={8} fontWeight="bold"
+                fill={blocks[i] === 1 ? '#1d4ed8' : '#9d174d'}>
+                B{blocks[i]}
+              </text>
+            </g>
+          )
+        })}
+
+        {/* 테이블 블록 1 */}
+        <rect x={tbl1X} y={TBL_Y} width={TBL_W} height={TBL_H}
+          rx={6} fill={B1F} stroke={B1S} strokeWidth={1.5} />
+        <text x={b1cx} y={TBL_Y + 15}
+          textAnchor="middle" fontSize={9} fontWeight="bold" fill="#1d4ed8">
+          {isKo ? '블록 1' : 'Block 1'}
+        </text>
+        <text x={b1cx} y={TBL_Y + 28}
+          textAnchor="middle" fontSize={8} fill="#3b82f6">
+          (Abel~Baer)
+        </text>
+
+        {/* 테이블 블록 2 */}
+        <rect x={tbl2X} y={TBL_Y} width={TBL_W} height={TBL_H}
+          rx={6} fill={B2F} stroke={B2S} strokeWidth={1.5} />
+        <text x={b2cx} y={TBL_Y + 15}
+          textAnchor="middle" fontSize={9} fontWeight="bold" fill="#9d174d">
+          {isKo ? '블록 2' : 'Block 2'}
+        </text>
+        <text x={b2cx} y={TBL_Y + 28}
+          textAnchor="middle" fontSize={8} fill="#db2777">
+          (Bissot~)
+        </text>
+
+        {/* 화살표: 엔트리 → 테이블 블록 */}
+        {entries.map((_, i) => {
+          const startY = rowY(i, LEAF_Y) - 2
+          const targetX = blocks[i] === 1 ? b1cx : b2cx
+          return (
+            <line key={i}
+              x1={leafRight} y1={startY}
+              x2={targetX} y2={TBL_Y}
+              stroke={arrowColor} strokeWidth={1.1} strokeDasharray="3,2"
+              markerEnd={`url(#cf-arr-${arrowColor === GOOD ? 'g' : 'b'})`}
+            />
+          )
+        })}
+      </g>
+    )
+  }
+
+  return (
+    <div className="my-4 overflow-x-auto rounded-xl border bg-slate-50 p-2">
+      <svg viewBox={`0 0 ${W} ${H}`} className="w-full max-w-2xl mx-auto"
+        aria-label={isKo ? 'Clustering Factor 비교 다이어그램' : 'Clustering Factor comparison diagram'}>
+        <defs>
+          <marker id="cf-arr-g" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto">
+            <path d="M0,0 L0,5 L5,2.5 z" fill={GOOD} />
+          </marker>
+          <marker id="cf-arr-b" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto">
+            <path d="M0,0 L0,5 L5,2.5 z" fill={BAD} />
+          </marker>
+        </defs>
+
+        {/* 세로 구분선 */}
+        <line x1={W / 2} y1={8} x2={W / 2} y2={H - 18}
+          stroke="#e2e8f0" strokeWidth={1.5} strokeDasharray="5,3" />
+
+        {renderSide(
+          LEFT_LEAF_X, lowCfEntries, lowCfBlocks, 2,
+          isKo ? 'EMP_NAME_IX (낮은 CF — 좋음)' : 'EMP_NAME_IX (Low CF — Good)',
+          GOOD,
+        )}
+
+        {renderSide(
+          RIGHT_LEAF_X, highCfEntries, highCfBlocks, 19,
+          isKo ? 'EMP_EMP_ID_PK (높은 CF — 나쁨)' : 'EMP_EMP_ID_PK (High CF — Bad)',
+          BAD,
+        )}
+
+        {/* 범례 */}
+        <rect x={40} y={H - 18} width={9} height={9} rx={2} fill={B1F} stroke={B1S} strokeWidth={1} />
+        <text x={53} y={H - 11} fontSize={9} fill="#64748b">{isKo ? '블록 1' : 'Block 1'}</text>
+        <rect x={105} y={H - 18} width={9} height={9} rx={2} fill={B2F} stroke={B2S} strokeWidth={1} />
+        <text x={118} y={H - 11} fontSize={9} fill="#64748b">{isKo ? '블록 2' : 'Block 2'}</text>
+        <line x1={175} y1={H - 14} x2={190} y2={H - 14} stroke={GOOD} strokeWidth={1.5} strokeDasharray="3,2" />
+        <text x={194} y={H - 11} fontSize={9} fill="#059669">{isKo ? '집중 I/O (낮은 CF)' : 'Clustered I/O'}</text>
+        <line x1={330} y1={H - 14} x2={345} y2={H - 14} stroke={BAD} strokeWidth={1.5} strokeDasharray="3,2" />
+        <text x={349} y={H - 11} fontSize={9} fill="#dc2626">{isKo ? '분산 I/O (높은 CF)' : 'Scattered I/O'}</text>
+      </svg>
     </div>
   )
 }

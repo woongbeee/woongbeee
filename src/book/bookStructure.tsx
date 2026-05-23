@@ -225,8 +225,48 @@ export const BOOK_CHAPTERS: BookChapter[] = [
         ],
       },
       {
-        id: 'internals-update-flow',
-        title: { ko: 'UPDATE 실행 흐름', en: 'UPDATE Execution Flow' },
+        id: 'internals-concurrency',
+        title: { ko: '데이터 동시성과 정합성', en: 'Data Concurrency & Consistency' },
+        children: [
+          {
+            id: 'internals-concurrency-mvcc',
+            title: { ko: 'MVCC — 다중 버전 읽기 일관성', en: 'MVCC — Multiversion Read Consistency' },
+          },
+          {
+            id: 'internals-concurrency-isolation',
+            title: { ko: '트랜잭션 격리 수준', en: 'Transaction Isolation Levels' },
+          },
+          {
+            id: 'internals-concurrency-locks',
+            title: { ko: '락(Lock) 메커니즘', en: 'Lock Mechanisms' },
+          },
+          {
+            id: 'internals-concurrency-deadlock',
+            title: { ko: '교착상태(Deadlock)', en: 'Deadlocks' },
+          },
+        ],
+      },
+      {
+        id: 'internals-transaction',
+        title: { ko: '트랜잭션(Transaction)', en: 'Transactions' },
+        children: [
+          {
+            id: 'internals-transaction-overview',
+            title: { ko: '트랜잭션이란?', en: 'What is a Transaction?' },
+          },
+          {
+            id: 'internals-transaction-acid',
+            title: { ko: 'ACID 속성', en: 'ACID Properties' },
+          },
+          {
+            id: 'internals-transaction-commit-rollback',
+            title: { ko: 'COMMIT과 ROLLBACK', en: 'COMMIT & ROLLBACK' },
+          },
+          {
+            id: 'internals-transaction-savepoint',
+            title: { ko: 'SAVEPOINT', en: 'SAVEPOINT' },
+          },
+        ],
       },
     ],
   },

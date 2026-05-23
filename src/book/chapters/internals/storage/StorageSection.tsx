@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useSimulationStore } from '@/store/simulationStore'
 import {
   PageContainer, ChapterTitle, Prose, SubTitle,
-  InfoBox, Table, ConceptGrid, AccordionSection,
+  InfoBox, Table, ConceptGrid, AccordionSection, Divider,
 } from '../../shared'
 import { cn } from '@/lib/utils'
 import { IconCube, IconArrowDown, IconArrowUp } from '@tabler/icons-react'
@@ -76,9 +76,19 @@ const STORAGE_T = {
 
     blockTitle: 'Block — 최소 I/O 단위',
 
+    rowidTitle: 'ROWID — 행의 물리적 주소',
+    rowidDesc: 'ROWID는 Oracle이 테이블의 각 행에 부여하는 고유한 물리적 주소입니다. 실제로 컬럼 값으로 저장되지 않고, 파일·블록·슬롯 위치로부터 즉석에서 계산됩니다.\n\nExtended ROWID는 Base64로 인코딩된 18자리 문자열로, 4개 구성 요소로 이루어집니다.',
+    rowidFormat: [
+      ['OOOOOO (6자)', '데이터 오브젝트 번호 — 이 행이 속한 Segment(테이블/인덱스) 식별자', '예: AAAPec'],
+      ['FFF (3자)', 'Tablespace 상대 파일 번호 — 데이터베이스 내 파일 식별자', '예: AAF'],
+      ['BBBBBB (6자)', '파일 내 블록 번호 — 파일 기준 블록 위치', '예: AAAABS'],
+      ['RRR (3자)', '블록 내 Row Directory 슬롯 번호 — O(1) 접근의 핵심', '예: AAA'],
+    ],
+    rowidNote: 'ROWID는 행이 블록 내에서 이동해도 변하지 않습니다(Row Directory 포인터가 갱신됨). 단, 파티션 키 업데이트·Flashback Table·Shrink 작업 시에는 변경될 수 있습니다.',
+
     extentTitle: 'Extent — 연속 블록의 묶음',
-    extentDesc: 'Block들이 모여 만들어지는 첫 번째 묶음 단위입니다. Oracle은 테이블이나 인덱스에 공간이 필요할 때 행 하나씩이 아니라 Extent 단위로 한꺼번에 할당합니다. Extent 안의 블록들은 디스크에서 물리적으로 연속된 주소에 놓이기 때문에 순차 읽기(Sequential I/O) 성능이 높아집니다.\n\nOracle의 기본 Extent 크기는 8개 블록(64 KB)입니다. 이는 너무 작으면 공간 할당을 자주 반복해 오버헤드가 커지고, 너무 크면 작은 테이블도 불필요하게 큰 공간을 차지하는 문제 사이의 절충점으로 Oracle이 설계한 값입니다.\n\nLMT(Locally Managed Tablespace)의 AUTOALLOCATE 모드에서는 Segment가 커질수록 Extent 크기를 자동으로 늘립니다. 처음 16개 Extent는 64 KB, 그 다음 63개는 1 MB, 이후 126개는 8 MB, 그 이상부터는 64 MB로 커집니다. 이렇게 단계적으로 키우는 이유는 작은 테이블은 공간 낭비 없이 시작하고, 대형 테이블은 Extent 수가 너무 많아지지 않도록 하기 위해서입니다.',
-    extentSizeDesc: 'Extent 하나에 들어있는 블록 수와 크기는 Tablespace 관리 방식에 따라 달라집니다. Locally Managed Tablespace(현재 표준)에서 AUTOALLOCATE를 쓰면 Oracle이 Segment 크기에 맞게 자동으로 64 KB → 1 MB → 8 MB → 64 MB 순으로 Extent를 키워나갑니다. UNIFORM SIZE를 지정하면 처음부터 끝까지 같은 크기(예: 1 MB)로 고정됩니다.',
+    extentDesc: 'Block들이 모여 만들어지는 첫 번째 묶음 단위입니다. Oracle은 테이블이나 인덱스에 공간이 필요할 때 행 하나씩이 아니라 Extent 단위로 한꺼번에 할당합니다. Extent 안의 블록들은 논리적으로 연속된 주소에 놓이지만, RAID 스트라이핑 등으로 물리적으로는 분산될 수 있습니다.\n\n중요한 제약: Extent는 반드시 하나의 데이터 파일 안에만 존재합니다. 여러 파일에 걸쳐질 수 없습니다. 반면 한 Segment의 Extent들은 같은 Tablespace 안 여러 파일에 분산될 수 있습니다.\n\nOracle의 기본 Extent 크기는 8개 블록(64 KB)입니다. 이는 너무 작으면 공간 할당을 자주 반복해 오버헤드가 커지고, 너무 크면 작은 테이블도 불필요하게 큰 공간을 차지하는 문제 사이의 절충점으로 Oracle이 설계한 값입니다.\n\nLMT(Locally Managed Tablespace, 로컬 관리 테이블스페이스)의 AUTOALLOCATE 모드에서는 Segment가 커질수록 Extent 크기를 자동으로 늘립니다. 이렇게 단계적으로 키우는 이유는 작은 테이블은 공간 낭비 없이 시작하고, 대형 테이블은 Extent 수가 너무 많아지지 않도록 하기 위해서입니다.',
+    extentSizeDesc: 'Extent 하나에 들어있는 블록 수와 크기는 Tablespace 관리 방식에 따라 달라집니다. LMT(Locally Managed Tablespace)에서 AUTOALLOCATE를 쓰면 Oracle이 Segment 크기에 맞게 자동으로 64 KB → 1 MB → 8 MB → 64 MB 순으로 Extent를 키워나갑니다. UNIFORM SIZE를 지정하면 처음부터 끝까지 같은 크기(예: 1 MB)로 고정됩니다.',
     extentSizeTable: [
       ['첫 번째 Extent', '64 KB (블록 8KB 기준 → 8개 블록)', 'AUTOALLOCATE 초기값'],
       ['두 번째~넷째', '64 KB 유지', '1 MB 미만 Segment'],
@@ -89,25 +99,33 @@ const STORAGE_T = {
     extentParamDesc: 'Extent 동작을 제어하는 주요 스토리지 파라미터입니다. CREATE TABLE / CREATE TABLESPACE 구문에서 지정하거나, Locally Managed 방식이면 대부분 Oracle이 자동으로 관리합니다.',
     extentParams: [
       ['INITIAL', 'Segment가 처음 생성될 때 할당되는 첫 번째 Extent 크기. 기본값은 Tablespace 설정에 따라 64 KB ~ 1 MB.'],
-      ['NEXT', '두 번째 이후 Extent 크기. Dictionary Managed 방식에서만 의미 있음. Locally Managed에서는 Oracle이 무시.'],
+      ['NEXT', '두 번째 이후 Extent 크기. DMT(Dictionary Managed Tablespace) 방식에서만 의미 있음. LMT(Locally Managed)에서는 Oracle이 무시.'],
       ['MINEXTENTS', 'Segment 생성 시 미리 확보할 최소 Extent 수. 기본값 1. 큰 테이블을 만들 때 미리 늘려두면 점진적 확장 오버헤드를 줄일 수 있음.'],
       ['MAXEXTENTS', 'Segment가 가질 수 있는 최대 Extent 수. UNLIMITED 권장. 너무 작게 지정하면 "ORA-01628: max # extents reached" 오류 발생.'],
-      ['PCTINCREASE', '매 Extent 할당 시 크기를 몇 % 씩 키울지. Dictionary Managed 전용. Locally Managed에서는 무시되며 0으로 고정.'],
+      ['PCTINCREASE', '매 Extent 할당 시 크기를 몇 % 씩 키울지. DMT(Dictionary Managed Tablespace) 전용. LMT(Locally Managed)에서는 무시되며 0으로 고정.'],
       ['UNIFORM SIZE', 'CREATE TABLESPACE 시 지정. 해당 Tablespace의 모든 Extent를 동일 크기로 강제. 예: EXTENT MANAGEMENT LOCAL UNIFORM SIZE 1M.'],
     ],
 
     segmentTitle: 'Segment — 오브젝트 저장 공간',
-    segmentDesc: 'Extent들이 모여 하나의 Segment가 됩니다. Segment는 테이블·인덱스처럼 데이터베이스 오브젝트 하나와 1:1로 대응합니다. EMPLOYEES 테이블을 만들면 Oracle은 그 테이블 전용 Segment를 하나 만들고, 거기에 Extent를 할당해 줍니다.\n\n처음엔 작은 Extent 하나로 시작하지만, 데이터가 쌓여서 꽉 차면 Oracle이 자동으로 새 Extent를 붙여 Segment를 늘립니다. 파티션 테이블은 파티션 하나당 Segment 하나가 생깁니다.',
+    segmentDesc: 'Extent들이 모여 하나의 Segment가 됩니다. Segment는 테이블·인덱스처럼 데이터베이스 오브젝트 하나와 1:1로 대응합니다. EMPLOYEES 테이블을 만들면 Oracle은 그 테이블 전용 Segment를 하나 만들고, 거기에 Extent를 할당해 줍니다.\n\n처음엔 작은 Extent 하나로 시작하지만, 데이터가 쌓여서 꽉 차면 Oracle이 자동으로 새 Extent를 붙여 Segment를 늘립니다. 파티션 테이블은 파티션 하나당 Segment 하나가 생깁니다.\n\nOracle 11g 이후 기본적으로 지연 Segment 생성(Deferred Segment Creation)이 적용됩니다. CREATE TABLE 시점엔 메타데이터만 만들고, 첫 번째 INSERT가 일어날 때 실제 Segment(디스크 공간)가 할당됩니다. 수천 개의 테이블을 생성하는 설치 스크립트가 불필요한 공간을 차지하지 않도록 설계된 동작입니다.',
     segmentGrowthDesc: 'Segment는 데이터가 늘어날수록 자동으로 Extent를 추가해 성장합니다. 아래는 EMPLOYEES 테이블의 Segment가 커지는 과정입니다.',
+    hwmTitle: 'HWM — High Water Mark',
+    hwmDesc: 'HWM(High Water Mark, 최고 수위 표시)은 Segment 안에서 "한 번이라도 데이터가 쓰인 적 있는 마지막 블록"의 경계선입니다. HWM 위쪽은 한 번도 사용된 적 없는 미포맷 블록이고, HWM 아래쪽은 현재 데이터가 있거나 DELETE로 비워진 블록입니다.\n\nHWM의 핵심 특성은 한 번 올라가면 내려오지 않는다는 것입니다. 테이블에서 모든 행을 DELETE해도 HWM은 그대로입니다. Full Table Scan(전체 테이블 스캔)은 HWM까지의 모든 블록을 읽기 때문에, 대량 삭제 후에도 스캔 비용이 줄지 않습니다.\n\nHWM을 실제로 낮추려면 TRUNCATE TABLE, ALTER TABLE ... SHRINK SPACE, 또는 테이블을 재생성(MOVE)해야 합니다.\n\nASSM(Automatic Segment Space Management, 자동 세그먼트 공간 관리)에서는 HWM와 Low HWM 두 개의 경계가 있습니다. Low HWM 아래는 포맷이 확실히 완료된 블록, Low HWM~HWM 사이는 할당은 됐지만 일부만 포맷된 구간입니다. Full Table Scan은 이 구조를 이용해 Low HWM까지는 연속으로 읽고, 그 위는 포맷된 블록만 선별해 읽습니다.',
     segmentTypes: [
-      { icon: '🗄', title: 'Table Segment', desc: '일반 테이블의 행 데이터 저장. CREATE TABLE 시 자동 생성.', color: 'blue' },
-      { icon: '🔍', title: 'Index Segment', desc: 'B-Tree·Bitmap 인덱스 구조 저장. CREATE INDEX 시 자동 생성.', color: 'violet' },
-      { icon: '↩', title: 'Undo Segment', desc: 'ROLLBACK과 Read Consistency를 위한 변경 전 이미지(before-image) 보관.', color: 'orange' },
-      { icon: '📦', title: 'Temp Segment', desc: '정렬·해시 조인 등 임시 작업 공간. 쿼리가 끝나면 자동 반환.', color: 'emerald' },
+      { icon: '🗄', title: 'Table Segment', desc: '일반 테이블의 행 데이터 저장. CREATE TABLE 시 자동 생성. LOB 컬럼이 있으면 LOB 데이터·인덱스 Segment가 별도로 추가됨.', color: 'blue' },
+      { icon: '🔍', title: 'Index Segment', desc: 'B-Tree·Bitmap 인덱스 구조 저장. CREATE INDEX 시 자동 생성. 인덱스 생성 중 임시로 Temp Segment가 사용되다 완성 후 영구 Segment로 전환됨.', color: 'violet' },
+      { icon: '↩', title: 'Undo Segment', desc: 'ROLLBACK과 Read Consistency를 위한 변경 전 이미지(before-image) 보관. Ring 구조로 Extent를 순환 재사용. Undo Tablespace가 자동 관리.', color: 'orange' },
+      { icon: '📦', title: 'Temp Segment', desc: '정렬·해시 조인·비트맵 병합 등 임시 작업 공간. 쿼리가 끝나면 자동 반환. Temporary Tablespace에 할당되며 Redo 로그를 생성하지 않음.', color: 'emerald' },
     ],
 
     tablespaceTitle: 'Tablespace — 논리적 저장 컨테이너',
     tablespaceDesc: 'Segment들을 담는 논리적 그릇입니다. 물리적으로는 한 개 이상의 .dbf 데이터 파일로 이루어져 있지만, DBA는 파일 경로 대신 Tablespace 이름만으로 공간을 관리합니다.\n\n예를 들어 EMPLOYEES 테이블을 USERS Tablespace에 만들면, Oracle은 USERS Tablespace에 속한 .dbf 파일 안 어딘가에 EMPLOYEES Segment를 배치합니다. DBA는 users01.dbf가 어디 있는지 몰라도 되고, 공간이 부족하면 파일을 추가하거나 Autoextend를 켜서 늘리기만 하면 됩니다.',
+    tablespaceTypeTitle: 'Tablespace의 세 가지 유형',
+    tablespaceTypes: [
+      { icon: '💾', title: 'Permanent', desc: '테이블·인덱스·LOB 등 영구 스키마 오브젝트 저장. SYSTEM·SYSAUX·USERS가 대표 예시.', color: 'blue' },
+      { icon: '⏱', title: 'Temporary', desc: '정렬·해시·비트맵 병합 임시 데이터 저장. Redo 로그 미생성. 쿼리 종료 시 자동 해제. Tempfile 사용.', color: 'teal' },
+      { icon: '↩', title: 'Undo', desc: 'Undo Segment 전용. 시스템이 자동 관리. UNDO_TABLESPACE 파라미터로 지정. AUTOEXTEND ON 권장.', color: 'orange' },
+    ],
     tablespaceFileDesc: 'Tablespace마다 용도가 다릅니다. Oracle이 기본으로 만드는 주요 Tablespace는 아래와 같습니다.',
     tablespaceTable: [
       ['SYSTEM', '데이터 딕셔너리 저장 (테이블·인덱스 메타데이터). 항상 온라인. 사용자 오브젝트 저장 금지.'],
@@ -116,19 +134,49 @@ const STORAGE_T = {
       ['TEMP', '정렬·해시 조인 임시 데이터. 트랜잭션이 끝나면 공간이 자동 해제됨.'],
       ['USERS', 'DBA가 만드는 사용자 데이터용 공간. 대부분의 애플리케이션 테이블이 여기에 들어감.'],
     ],
+    lmtTitle: 'LMT vs DMT — Tablespace 관리 방식 비교',
+    lmtDesc: 'Tablespace가 여유 공간을 추적하는 방식에는 두 가지가 있습니다. LMT(Locally Managed Tablespace, 로컬 관리 테이블스페이스)와 DMT(Dictionary Managed Tablespace, 딕셔너리 관리 테이블스페이스)입니다. Oracle 10g 이후에는 LMT가 기본이자 표준입니다.',
+    lmtTable: [
+      ['관리 방식', 'LMT (Locally Managed)', 'DMT (Dictionary Managed)'],
+      ['여유 공간 추적', '데이터 파일 헤더의 비트맵', '데이터 딕셔너리 테이블'],
+      ['Extent 할당', '비트맵 업데이트 (빠름)', '딕셔너리 SQL 실행 (느림)'],
+      ['재귀 SQL', '없음', '있음 (직렬화 병목)'],
+      ['인접 공간 병합', '자동 (비트맵 기반)', '수동 COALESCE 필요'],
+      ['권장 여부', '✅ 현재 표준', '⚠️ Deprecated — 사용 금지'],
+    ],
+    assmTitle: 'ASSM vs MSSM — Segment 공간 관리 방식',
+    assmDesc: 'Tablespace 안에서 각 블록의 여유 공간을 추적하는 방법도 두 가지입니다. ASSM(Automatic Segment Space Management, 자동 세그먼트 공간 관리)과 MSSM(Manual Segment Space Management, 수동 세그먼트 공간 관리)이며, 현대 Oracle에서는 ASSM이 기본입니다.',
+    assmTable: [
+      ['관리 방식', 'ASSM (Automatic)', 'MSSM (Manual, Legacy)'],
+      ['여유 공간 추적', '비트맵 (블록별)', 'Freelist (연결 리스트)'],
+      ['필요 파라미터', 'PCTFREE만 설정', 'PCTFREE + PCTUSED + FREELISTS + FREELIST GROUPS'],
+      ['동시성', '높음 (별도 Freelist 검색)', '낮음 (공유 Freelist 경합)'],
+      ['RAC 지원', '동적 인스턴스 친화성', '수동 FREELIST GROUPS 설정'],
+      ['권장 여부', '✅ 기본값·권장', '⚠️ Legacy — 신규 사용 금지'],
+    ],
     tablespaceNote: 'DBA는 Tablespace에 파일을 추가(ALTER TABLESPACE ... ADD DATAFILE)하거나 AUTOEXTEND ON을 설정해 공간이 자동으로 늘어나게 할 수 있습니다. 여러 .dbf 파일에 걸쳐 있어도 Oracle이 하나의 논리적 공간으로 합쳐서 관리합니다.',
 
     infoTitle: '핵심 정리',
-    infoBody: 'Block이 I/O의 기본 단위이고, Extent가 할당의 기본 단위이며, Segment가 오브젝트와 1:1 대응하고, Tablespace가 DBA 관리의 논리 단위입니다.',
+    infoBody: 'Block이 I/O의 기본 단위이고, Extent가 할당의 기본 단위이며, Segment가 오브젝트와 1:1 대응하고, Tablespace가 DBA 관리의 논리 단위입니다. ROWID = 오브젝트#+파일#+블록#+슬롯# 4요소로 행 위치를 O(1)에 특정합니다.',
   },
   en: {
     sectionTitle: 'Data Storage Structure',
 
     blockTitle: 'Block — Smallest I/O Unit',
 
+    rowidTitle: 'ROWID — Physical Address of a Row',
+    rowidDesc: 'A ROWID is the unique physical address Oracle assigns to every row in a table. It is not stored as a column value — Oracle derives it on-the-fly from the file, block, and slot position of the row.\n\nThe Extended ROWID is an 18-character Base64-encoded string made up of four components.',
+    rowidFormat: [
+      ['OOOOOO (6 chars)', 'Data object number — identifies the Segment (table/index) that owns this row', 'e.g. AAAPec'],
+      ['FFF (3 chars)', 'Tablespace-relative file number — identifies the data file within the database', 'e.g. AAF'],
+      ['BBBBBB (6 chars)', 'Block number within the file — relative to the data file, not the tablespace', 'e.g. AAAABS'],
+      ['RRR (3 chars)', 'Row Directory slot number within the block — the key to O(1) access', 'e.g. AAA'],
+    ],
+    rowidNote: 'A ROWID stays constant when a row moves within a block (the Row Directory pointer is updated instead). It can change during partition key updates, Flashback Table operations, or segment shrink.',
+
     extentTitle: 'Extent — Group of Contiguous Blocks',
-    extentDesc: 'An Extent is the first grouping above individual Blocks. When a table or index needs more space, Oracle allocates an entire Extent at once — not row by row. Because the blocks within an Extent occupy physically contiguous disk addresses, sequential reads are fast.\n\nOracle\'s default Extent size is 8 blocks (64 KB). This is a deliberate design choice: too small and allocation overhead compounds quickly; too large and even tiny tables waste disk. 64 KB is Oracle\'s practical balance point.\n\nUnder LMT (Locally Managed Tablespace) AUTOALLOCATE, Oracle scales Extent sizes automatically as a Segment grows — the first 16 Extents are 64 KB, the next 63 are 1 MB, the next 126 are 8 MB, and beyond that 64 MB. The progressive sizing ensures small tables start lean while large tables don\'t accumulate an unmanageable number of tiny Extents.',
-    extentSizeDesc: 'The number of blocks and the size of each Extent depend on how the Tablespace is managed. With AUTOALLOCATE (the default for Locally Managed Tablespaces), Oracle automatically scales Extent sizes from 64 KB → 1 MB → 8 MB → 64 MB as the Segment grows. With UNIFORM SIZE, every Extent in the tablespace stays the same size (e.g. 1 MB) from creation to the end.',
+    extentDesc: 'An Extent is the first grouping above individual Blocks. When a table or index needs more space, Oracle allocates an entire Extent at once — not row by row. Blocks within an Extent are logically contiguous, though RAID striping may scatter them physically.\n\nOne important constraint: an Extent always resides within a single data file — it cannot span files. A Segment\'s Extents, however, can be spread across multiple data files within the same Tablespace.\n\nOracle\'s default Extent size is 8 blocks (64 KB). This is a deliberate design choice: too small and allocation overhead compounds quickly; too large and even tiny tables waste disk. 64 KB is Oracle\'s practical balance point.\n\nUnder LMT (Locally Managed Tablespace) AUTOALLOCATE, Oracle scales Extent sizes automatically as a Segment grows. The progressive sizing ensures small tables start lean while large tables don\'t accumulate an unmanageable number of tiny Extents.',
+    extentSizeDesc: 'The number of blocks and the size of each Extent depend on how the Tablespace is managed. With AUTOALLOCATE (the default for LMT — Locally Managed Tablespaces), Oracle automatically scales Extent sizes from 64 KB → 1 MB → 8 MB → 64 MB as the Segment grows. With UNIFORM SIZE, every Extent in the tablespace stays the same size (e.g. 1 MB) from creation to the end.',
     extentSizeTable: [
       ['1st Extent', '64 KB (8 blocks at 8 KB each)', 'AUTOALLOCATE default'],
       ['2nd–4th Extents', 'Stay at 64 KB', 'Segment under 1 MB'],
@@ -139,25 +187,33 @@ const STORAGE_T = {
     extentParamDesc: 'Key storage parameters that control Extent behaviour. Set them in CREATE TABLE / CREATE TABLESPACE, or leave them to Oracle when using Locally Managed Tablespaces.',
     extentParams: [
       ['INITIAL', 'Size of the very first Extent when a Segment is created. Defaults to 64 KB – 1 MB depending on the tablespace setting.'],
-      ['NEXT', 'Size of subsequent Extents. Only meaningful for Dictionary Managed tablespaces; ignored (overridden by Oracle) in Locally Managed.'],
+      ['NEXT', 'Size of subsequent Extents. Only meaningful for DMT (Dictionary Managed Tablespace); ignored (overridden by Oracle) in LMT (Locally Managed).'],
       ['MINEXTENTS', 'Minimum number of Extents to pre-allocate at Segment creation. Default 1. Setting it higher avoids incremental growth overhead for large tables.'],
       ['MAXEXTENTS', 'Maximum Extents a Segment may hold. UNLIMITED is recommended. Too small a value causes "ORA-01628: max # extents reached".'],
-      ['PCTINCREASE', 'Percentage to grow each successive Extent. Dictionary Managed only. Ignored and fixed at 0 in Locally Managed tablespaces.'],
+      ['PCTINCREASE', 'Percentage to grow each successive Extent. DMT (Dictionary Managed Tablespace) only. Ignored and fixed at 0 in LMT (Locally Managed) tablespaces.'],
       ['UNIFORM SIZE', 'Specified at CREATE TABLESPACE level. Forces every Extent in the tablespace to the same size. E.g. EXTENT MANAGEMENT LOCAL UNIFORM SIZE 1M.'],
     ],
 
     segmentTitle: 'Segment — Object Storage Space',
-    segmentDesc: 'Extents group together to form a Segment. Each Segment maps one-to-one to a database object — one table, one index, one Segment. When you create an EMPLOYEES table, Oracle allocates a dedicated Segment for it and assigns Extents to hold the rows.\n\nIt starts with a single small Extent. As data fills up, Oracle automatically adds new Extents to grow the Segment. Partitioned tables get one Segment per partition.',
+    segmentDesc: 'Extents group together to form a Segment. Each Segment maps one-to-one to a database object — one table, one index, one Segment. When you create an EMPLOYEES table, Oracle allocates a dedicated Segment for it and assigns Extents to hold the rows.\n\nIt starts with a single small Extent. As data fills up, Oracle automatically adds new Extents to grow the Segment. Partitioned tables get one Segment per partition.\n\nSince Oracle 11g, Deferred Segment Creation is enabled by default. CREATE TABLE only creates metadata; the actual Segment (disk space) is allocated on the very first INSERT. This prevents installation scripts that create thousands of tables from wasting disk space.',
     segmentGrowthDesc: 'A Segment grows automatically by adding Extents as data accumulates. Here is how an EMPLOYEES table Segment expands over time.',
+    hwmTitle: 'HWM — High Water Mark',
+    hwmDesc: 'The HWM (High Water Mark) is the boundary in a Segment beyond which blocks have never been written to. Blocks above the HWM are unformatted and never used; blocks below it are either holding data or are empty from DELETE operations.\n\nThe critical characteristic: the HWM only moves up, never down. Even if you DELETE every row in a table, the HWM stays where it was. A Full Table Scan (FTS) reads every block up to the HWM, so scan cost does not decrease after mass deletes.\n\nTo actually lower the HWM you need TRUNCATE TABLE, ALTER TABLE ... SHRINK SPACE, or a table rebuild (MOVE).\n\nUnder ASSM (Automatic Segment Space Management) there are two boundaries: HWM and Low HWM. Everything below Low HWM is guaranteed formatted; the zone between Low HWM and HWM is allocated but partially formatted. Full Table Scans use this to read contiguously up to Low HWM, then selectively read only formatted blocks up to HWM.',
     segmentTypes: [
-      { icon: '🗄', title: 'Table Segment', desc: 'Holds row data for a regular table. Created automatically with CREATE TABLE.', color: 'blue' },
-      { icon: '🔍', title: 'Index Segment', desc: 'Holds B-Tree or Bitmap index structures. Created automatically with CREATE INDEX.', color: 'violet' },
-      { icon: '↩', title: 'Undo Segment', desc: 'Stores before-images for ROLLBACK and Read Consistency. Managed automatically by Oracle.', color: 'orange' },
-      { icon: '📦', title: 'Temp Segment', desc: 'Scratch space for sort and hash-join operations. Automatically released when the query ends.', color: 'emerald' },
+      { icon: '🗄', title: 'Table Segment', desc: 'Holds row data for a regular table. Created automatically with CREATE TABLE. LOB columns get their own separate LOB data and LOB index Segments.', color: 'blue' },
+      { icon: '🔍', title: 'Index Segment', desc: 'Holds B-Tree or Bitmap index structures. Created automatically with CREATE INDEX. A Temp Segment is used during index build, then converted to a permanent Segment on completion.', color: 'violet' },
+      { icon: '↩', title: 'Undo Segment', desc: 'Stores before-images for ROLLBACK and Read Consistency. Uses a ring structure of Extents that are reused cyclically. Managed automatically by the Undo Tablespace.', color: 'orange' },
+      { icon: '📦', title: 'Temp Segment', desc: 'Scratch space for sort, hash-join, and bitmap-merge operations. Automatically released when the query ends. Allocated in the Temporary Tablespace; generates no Redo.', color: 'emerald' },
     ],
 
     tablespaceTitle: 'Tablespace — Logical Storage Container',
     tablespaceDesc: 'A Tablespace is the logical container that holds Segments. Physically it is made up of one or more .dbf data files, but DBAs work entirely with the tablespace name — not the file path.\n\nFor example, if you create the EMPLOYEES table in the USERS Tablespace, Oracle places the EMPLOYEES Segment somewhere inside a .dbf file that belongs to USERS. The DBA never needs to know which file or offset — if space runs low, they just add a datafile or enable Autoextend.',
+    tablespaceTypeTitle: 'Three Types of Tablespace',
+    tablespaceTypes: [
+      { icon: '💾', title: 'Permanent', desc: 'Stores persistent schema objects: tables, indexes, LOBs. SYSTEM, SYSAUX, and USERS are the canonical examples.', color: 'blue' },
+      { icon: '⏱', title: 'Temporary', desc: 'Stores temporary data for sorts, hashes, and bitmap merges. No Redo generated. Space released when query ends. Uses Tempfiles.', color: 'teal' },
+      { icon: '↩', title: 'Undo', desc: 'Dedicated to Undo Segments. System-managed. Active instance set by UNDO_TABLESPACE parameter. AUTOEXTEND ON strongly recommended.', color: 'orange' },
+    ],
     tablespaceFileDesc: 'Each Tablespace has a specific purpose. The major ones Oracle creates by default are:',
     tablespaceTable: [
       ['SYSTEM', 'Stores the data dictionary (table and index metadata). Always online. Never store user objects here.'],
@@ -166,11 +222,85 @@ const STORAGE_T = {
       ['TEMP', 'Temporary data for sorts and hash-joins. Space is automatically released when a transaction ends.'],
       ['USERS', 'The default user tablespace. Most application tables and indexes live here.'],
     ],
+    lmtTitle: 'LMT vs DMT — Tablespace Management Modes',
+    lmtDesc: 'Oracle tracks free space inside a Tablespace in two ways: LMT (Locally Managed Tablespace) and DMT (Dictionary Managed Tablespace). Since Oracle 10g, LMT is the default and the only recommended approach.',
+    lmtTable: [
+      ['Mode', 'LMT (Locally Managed)', 'DMT (Dictionary Managed)'],
+      ['Free space tracking', 'Bitmap in data file header', 'Data dictionary tables'],
+      ['Extent allocation', 'Bitmap update (fast)', 'Dictionary SQL (slow)'],
+      ['Recursive SQL', 'None', 'Yes (serialization bottleneck)'],
+      ['Adjacent space merge', 'Automatic (bitmap-based)', 'Manual COALESCE required'],
+      ['Status', '✅ Current standard', '⚠️ Deprecated — do not use'],
+    ],
+    assmTitle: 'ASSM vs MSSM — Segment Space Management',
+    assmDesc: 'How free space within each block is tracked is also configurable per Tablespace. ASSM (Automatic Segment Space Management) and MSSM (Manual Segment Space Management) are the two options. ASSM is the modern default.',
+    assmTable: [
+      ['Mode', 'ASSM (Automatic)', 'MSSM (Manual, Legacy)'],
+      ['Free block tracking', 'Per-block bitmap', 'Freelist (linked list)'],
+      ['Parameters needed', 'PCTFREE only', 'PCTFREE + PCTUSED + FREELISTS + FREELIST GROUPS'],
+      ['Concurrency', 'High (separate Freelists per TX)', 'Low (shared Freelist contention)'],
+      ['Oracle RAC', 'Dynamic instance affinity', 'Manual FREELIST GROUPS required'],
+      ['Status', '✅ Default · recommended', '⚠️ Legacy — do not use in new code'],
+    ],
     tablespaceNote: 'A DBA grows a Tablespace by adding a datafile (ALTER TABLESPACE ... ADD DATAFILE) or enabling AUTOEXTEND ON so it expands automatically. Even if a Tablespace spans multiple .dbf files, Oracle presents them as a single logical space.',
 
     infoTitle: 'Key Takeaway',
-    infoBody: 'Block is the I/O unit. Extent is the allocation unit. Segment maps 1:1 to a database object. Tablespace is the DBA\'s logical management unit.',
+    infoBody: 'Block is the I/O unit. Extent is the allocation unit (always within one file). Segment maps 1:1 to a database object and grows via HWM. Tablespace is the DBA\'s logical management unit. ROWID = object# + file# + block# + slot# pinpoints any row in O(1).',
   },
+}
+
+// ── RowidDiagram ───────────────────────────────────────────────────────────
+
+function RowidDiagram() {
+  const lang = useSimulationStore((s) => s.lang)
+  const isKo = lang === 'ko'
+
+  const parts = [
+    { chars: 'AAAPec', label: isKo ? '오브젝트 번호' : 'Object #', sublabel: 'OOOOOO', color: 'bg-violet-500', light: 'bg-violet-50 border-violet-300 text-violet-700' },
+    { chars: 'AAF',    label: isKo ? '파일 번호' : 'File #',   sublabel: 'FFF',    color: 'bg-blue-500',   light: 'bg-blue-50 border-blue-300 text-blue-700'   },
+    { chars: 'AAAABS', label: isKo ? '블록 번호' : 'Block #',  sublabel: 'BBBBBB', color: 'bg-emerald-500',light: 'bg-emerald-50 border-emerald-300 text-emerald-700'},
+    { chars: 'AAA',    label: isKo ? '슬롯 번호' : 'Slot #',   sublabel: 'RRR',    color: 'bg-orange-500', light: 'bg-orange-50 border-orange-300 text-orange-700' },
+  ]
+
+  return (
+    <div className="my-4 rounded-xl border border-slate-200 bg-slate-50 p-4 shadow-sm">
+      <div className="mb-3 flex items-center gap-2">
+        <span className="rounded bg-slate-600 px-2 py-0.5 font-mono text-[10px] font-bold text-white">ROWID</span>
+        <span className="font-mono text-[11px] text-slate-600">
+          {isKo ? 'Extended ROWID — 18자리 Base64 인코딩' : 'Extended ROWID — 18-character Base64 encoding'}
+        </span>
+      </div>
+
+      {/* ROWID 문자열 시각화 */}
+      <div className="mb-4 flex items-stretch overflow-hidden rounded-lg border border-slate-300 shadow-sm">
+        {parts.map((p) => (
+          <div key={p.sublabel} className={cn('flex flex-col items-center justify-center px-2 py-2 flex-1 border-r last:border-r-0 border-slate-200', p.light.replace('border-', 'bg-').split(' ')[0])}>
+            <span className="font-mono text-sm font-bold tracking-widest text-slate-800">{p.chars}</span>
+            <span className={cn('mt-0.5 font-mono text-[9px] font-bold', p.light.split(' ')[2])}>{p.sublabel}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* 설명 행 */}
+      <div className="flex flex-col sm:flex-row gap-2">
+        {parts.map((p) => (
+          <div key={p.sublabel} className={cn('flex-1 rounded-lg border px-3 py-2', p.light)}>
+            <div className="flex items-center gap-1.5 mb-1">
+              <span className={cn('rounded px-1.5 py-0.5 font-mono text-[9px] font-bold text-white', p.color)}>{p.sublabel}</span>
+              <span className="font-mono text-[10px] font-bold">{p.label}</span>
+            </div>
+            <span className="font-mono text-[10px] text-slate-600">{p.chars}</span>
+          </div>
+        ))}
+      </div>
+
+      <p className="mt-3 font-mono text-[10px] text-slate-500 leading-relaxed">
+        {isKo
+          ? '→ Oracle은 ROWID 하나로 "어느 Segment의 어느 파일의 몇 번 블록의 몇 번 슬롯"을 즉시 계산해 해당 행으로 점프합니다.'
+          : '→ From one ROWID, Oracle instantly computes "which Segment → which file → which block → which slot" and jumps directly to the row.'}
+      </p>
+    </div>
+  )
 }
 
 // ── BlockDiagram ───────────────────────────────────────────────────────────
@@ -689,6 +819,109 @@ function SegmentDiagram() {
   )
 }
 
+// ── HwmDiagram ─────────────────────────────────────────────────────────────
+
+function HwmDiagram() {
+  const lang = useSimulationStore((s) => s.lang)
+  const isKo = lang === 'ko'
+
+  const BLOCK_COUNT = 10
+  // 0~4: 데이터, 5~6: 삭제된 빈 블록, 7: Low HWM 위 미포맷, 8~9: HWM 위 미사용
+  const LOW_HWM = 7
+  const HWM = 8
+
+  const blockState = (i: number): 'data' | 'empty' | 'partial' | 'unused' => {
+    if (i < 5) return 'data'
+    if (i < LOW_HWM) return 'empty'
+    if (i < HWM) return 'partial'
+    return 'unused'
+  }
+
+  const stateStyle = {
+    data:    { bg: 'bg-orange-100 border-orange-300', label: isKo ? '데이터' : 'data', text: 'text-orange-600' },
+    empty:   { bg: 'bg-slate-100 border-slate-300',  label: isKo ? '빈 블록' : 'empty', text: 'text-slate-400' },
+    partial: { bg: 'bg-amber-50 border-amber-200',   label: isKo ? '미포맷' : 'partial', text: 'text-amber-400' },
+    unused:  { bg: 'bg-white border-dashed border-slate-200', label: isKo ? '미사용' : 'unused', text: 'text-slate-300' },
+  }
+
+  return (
+    <div className="my-4 rounded-xl border-2 border-violet-200 bg-violet-50 p-4 shadow-sm">
+      <div className="mb-3 flex items-center gap-2">
+        <span className="rounded bg-violet-500 px-2 py-0.5 font-mono text-[10px] font-bold text-white">HWM</span>
+        <span className="font-mono text-[11px] text-violet-700">
+          {isKo ? 'High Water Mark — Segment 성장 경계' : 'High Water Mark — Segment growth boundary'}
+        </span>
+      </div>
+
+      {/* 블록 행 */}
+      <div className="relative flex items-stretch gap-1">
+        {Array.from({ length: BLOCK_COUNT }).map((_, i) => {
+          const s = blockState(i)
+          const style = stateStyle[s]
+          return (
+            <div
+              key={i}
+              className={cn('relative flex flex-1 flex-col items-center justify-center rounded-lg border py-3 gap-0.5', style.bg)}
+            >
+              <span className={cn('font-mono text-[8px] font-bold', style.text)}>{i + 1}</span>
+              <span className={cn('font-mono text-[7px]', style.text)}>{style.label}</span>
+            </div>
+          )
+        })}
+
+        {/* Low HWM 표시 선 */}
+        <div
+          className="absolute top-0 bottom-0 w-0.5 bg-blue-400"
+          style={{ left: `${(LOW_HWM / BLOCK_COUNT) * 100}%` }}
+        />
+        {/* HWM 표시 선 */}
+        <div
+          className="absolute top-0 bottom-0 w-0.5 bg-rose-500"
+          style={{ left: `${(HWM / BLOCK_COUNT) * 100}%` }}
+        />
+      </div>
+
+      {/* 레이블 */}
+      <div className="relative mt-1" style={{ height: 32 }}>
+        <div
+          className="absolute flex flex-col items-center"
+          style={{ left: `${(LOW_HWM / BLOCK_COUNT) * 100}%`, transform: 'translateX(-50%)' }}
+        >
+          <span className="font-mono text-[9px] font-bold text-blue-500 whitespace-nowrap">Low HWM</span>
+          <span className="font-mono text-[8px] text-blue-400 whitespace-nowrap">
+            {isKo ? '포맷 완료 경계' : 'formatted boundary'}
+          </span>
+        </div>
+        <div
+          className="absolute flex flex-col items-center"
+          style={{ left: `${(HWM / BLOCK_COUNT) * 100}%`, transform: 'translateX(-50%)' }}
+        >
+          <span className="font-mono text-[9px] font-bold text-rose-500 whitespace-nowrap">HWM</span>
+          <span className="font-mono text-[8px] text-rose-400 whitespace-nowrap">
+            {isKo ? '할당 경계' : 'allocation boundary'}
+          </span>
+        </div>
+      </div>
+
+      {/* 범례 */}
+      <div className="mt-3 flex flex-wrap gap-3">
+        {(Object.keys(stateStyle) as (keyof typeof stateStyle)[]).map((k) => (
+          <div key={k} className="flex items-center gap-1.5">
+            <div className={cn('h-3 w-6 rounded border', stateStyle[k].bg)} />
+            <span className="font-mono text-[9px] text-slate-500">{stateStyle[k].label}</span>
+          </div>
+        ))}
+      </div>
+
+      <p className="mt-3 font-mono text-[10px] text-slate-500 leading-relaxed">
+        {isKo
+          ? 'Full Table Scan은 Low HWM까지 연속으로, Low HWM~HWM 사이는 포맷된 블록만 선별해 읽습니다. DELETE로 모든 행을 지워도 HWM은 내려가지 않으므로 스캔 범위는 그대로입니다.'
+          : 'A Full Table Scan reads all blocks up to Low HWM contiguously, then picks only formatted blocks between Low HWM and HWM. Deleting all rows does NOT lower the HWM — scan range stays the same.'}
+      </p>
+    </div>
+  )
+}
+
 // ── TablespaceDiagram ──────────────────────────────────────────────────────
 
 function TablespaceDiagram() {
@@ -800,16 +1033,38 @@ export function StorageSection() {
       {/* Block */}
       <AccordionSection title={`${io.before}I/O${io.after}`}>
         <Prose>{lang === 'ko'
-          ? 'Block은 Oracle이 디스크에서 데이터를 읽고 쓰는 최소 단위입니다. 행(Row) 하나가 아닌 Block 전체를 한 번에 읽어 메모리(Buffer Cache)에 올립니다.\n\nI/O(Input/Output)란 데이터를 읽거나 쓰는 작업입니다. 디스크에서 데이터를 읽는 것은 메모리에서 읽는 것보다 수백~수만 배 느리기 때문에, Oracle은 Block 단위로 한꺼번에 읽어 재사용함으로써 불필요한 I/O를 줄입니다. Block 크기를 크게 하면 한 번에 더 많은 행을 읽을 수 있지만, 필요한 행이 적을 때는 쓸모없는 데이터를 함께 읽는 낭비가 생깁니다. 기본값 8 KB는 이 두 가지를 절충한 크기입니다.'
-          : 'A Block is the smallest unit Oracle uses to read and write data on disk. Instead of fetching a single row, Oracle always reads an entire Block into memory (the Buffer Cache) at once.\n\nI/O (Input/Output) is any operation that reads or writes data. Disk I/O is hundreds to thousands of times slower than CPU work, so Oracle minimizes unnecessary I/O by loading data in Block-sized chunks and reusing what is already in memory. A larger Block size means more rows per read, but wastes I/O when only a few rows are needed. The default 8 KB is a practical balance between these two.'
+          ? 'Block은 Oracle이 디스크에서 데이터를 읽고 쓰는 최소 단위입니다. 행(Row) 하나가 아닌 Block 전체를 한 번에 읽어 메모리(Buffer Cache)에 올립니다.\n\nI/O(Input/Output)란 데이터를 읽거나 쓰는 작업입니다. 디스크에서 데이터를 읽는 것은 메모리에서 읽는 것보다 수백~수만 배 느리기 때문에, Oracle은 Block 단위로 한꺼번에 읽어 재사용함으로써 불필요한 I/O를 줄입니다. Block 크기를 크게 하면 한 번에 더 많은 행을 읽을 수 있지만, 필요한 행이 적을 때는 쓸모없는 데이터를 함께 읽는 낭비가 생깁니다. 기본값 8 KB는 이 두 가지를 절충한 크기입니다.\n\nBlock 크기는 DB_BLOCK_SIZE 초기화 파라미터로 설정하며, 데이터베이스를 재생성하지 않는 한 변경할 수 없습니다. 반드시 OS 블록 크기의 배수여야 합니다. Block 하나의 오버헤드는 Header + ITL(Interested Transaction List) + Directory를 합쳐 평균 84~107 bytes입니다.'
+          : 'A Block is the smallest unit Oracle uses to read and write data on disk. Instead of fetching a single row, Oracle always reads an entire Block into memory (the Buffer Cache) at once.\n\nI/O (Input/Output) is any operation that reads or writes data. Disk I/O is hundreds to thousands of times slower than CPU work, so Oracle minimizes unnecessary I/O by loading data in Block-sized chunks and reusing what is already in memory. A larger Block size means more rows per read, but wastes I/O when only a few rows are needed. The default 8 KB is a practical balance between these two.\n\nBlock size is set by the DB_BLOCK_SIZE initialization parameter and cannot be changed without recreating the database. It must be a multiple of the OS block size. Total block overhead (Header + ITL — Interested Transaction List + Directory) averages 84–107 bytes per block.'
         }</Prose>
         <BlockDiagram />
-        <PctDiagram />
-        <InfoBox variant="note">
-          {lang === 'ko'
-            ? '슬롯(Slot)이란 블록 안에 미리 잘라 놓은 고정 크기의 자리입니다. ITL 슬롯은 트랜잭션 1개가 들어갈 칸, Row Directory 슬롯은 행 1개의 위치 포인터가 들어갈 칸입니다. 배열의 인덱스처럼 번호로 관리되어, Oracle은 슬롯 번호만 알면 해당 데이터를 바로 찾아갑니다.'
-            : 'A slot is a pre-carved, fixed-size entry inside the block. An ITL slot holds one transaction\'s tracking data; a Row Directory slot holds the byte-offset pointer for one row. Slots are numbered like array indices — Oracle can locate any entry in O(1) given just the slot number.'}
-        </InfoBox>
+
+        <div className="mt-8">
+          <PctDiagram />
+        </div>
+
+        <div className="mt-6">
+          <InfoBox variant="note">
+            {lang === 'ko'
+              ? '슬롯(Slot)이란 블록 안에 미리 잘라 놓은 고정 크기의 자리입니다. ITL(Interested Transaction List) 슬롯은 트랜잭션 1개가 들어갈 칸(~23 bytes), Row Directory 슬롯은 행 1개의 위치 포인터가 들어갈 칸입니다. 배열의 인덱스처럼 번호로 관리되어, Oracle은 슬롯 번호만 알면 해당 데이터를 바로 찾아갑니다. Row Directory 슬롯은 행이 DELETE된 뒤에도 새 INSERT가 그 자리를 재사용할 때까지 해제되지 않습니다.'
+              : 'A slot is a pre-carved, fixed-size entry inside the block. An ITL (Interested Transaction List) slot holds one transaction\'s tracking data (~23 bytes each); a Row Directory slot holds the byte-offset pointer for one row. Slots are numbered like array indices — Oracle can locate any entry in O(1) given just the slot number. Row Directory slots are not reclaimed after DELETE; they persist until a new INSERT reuses that position.'}
+          </InfoBox>
+        </div>
+
+        <Divider />
+        <SubTitle>{t.rowidTitle}</SubTitle>
+        <Prose>{t.rowidDesc}</Prose>
+        <RowidDiagram />
+        <div className="mt-4">
+          <Table
+            headers={lang === 'ko'
+              ? ['구성 요소', '의미', '예시']
+              : ['Component', 'Meaning', 'Example']}
+            rows={t.rowidFormat}
+          />
+        </div>
+        <div className="mt-4">
+          <InfoBox variant="note">{t.rowidNote}</InfoBox>
+        </div>
       </AccordionSection>
 
       {/* Extent */}
@@ -817,49 +1072,107 @@ export function StorageSection() {
         <Prose>{t.extentDesc}</Prose>
         <ExtentDiagram />
 
-        <SubTitle>{lang === 'ko' ? 'Extent 크기 — 블록이 몇 개나 들어갈까?' : 'Extent Size — how many blocks?'}</SubTitle>
-        <Prose>{t.extentSizeDesc}</Prose>
-        <Table
-          headers={lang === 'ko'
-            ? ['Extent', '크기 / 블록 수', '조건']
-            : ['Extent', 'Size / Block Count', 'Condition']}
-          rows={t.extentSizeTable}
-        />
+        <div className="mt-8">
+          <SubTitle>{lang === 'ko' ? 'Extent 크기 — 블록이 몇 개나 들어갈까?' : 'Extent Size — how many blocks?'}</SubTitle>
+          <Prose>{t.extentSizeDesc}</Prose>
+          <Table
+            headers={lang === 'ko'
+              ? ['Extent', '크기 / 블록 수', '조건']
+              : ['Extent', 'Size / Block Count', 'Condition']}
+            rows={t.extentSizeTable}
+          />
+        </div>
 
-        <SubTitle>{lang === 'ko' ? 'Extent 관련 스토리지 파라미터' : 'Extent Storage Parameters'}</SubTitle>
-        <Prose>{t.extentParamDesc}</Prose>
-        <Table
-          headers={lang === 'ko'
-            ? ['파라미터', '설명']
-            : ['Parameter', 'Description']}
-          rows={t.extentParams}
-        />
-        <InfoBox variant="note">
-          {lang === 'ko'
-            ? 'Oracle 10g 이후 Locally Managed Tablespace가 기본값입니다. INITIAL·NEXT·PCTINCREASE는 기존 코드 호환성을 위해 문법상 허용되지만 실제로는 Oracle이 무시하고 AUTOALLOCATE 규칙을 따릅니다. 신규 테이블스페이스는 별도 이유가 없다면 AUTOALLOCATE를 그대로 쓰는 게 권장됩니다.'
-            : 'Since Oracle 10g, Locally Managed Tablespaces are the default. INITIAL, NEXT, and PCTINCREASE are still accepted syntactically for backward compatibility, but Oracle ignores them and follows AUTOALLOCATE rules. For new tablespaces, sticking with AUTOALLOCATE is recommended unless you have a specific reason to use UNIFORM SIZE.'}
-        </InfoBox>
+        <div className="mt-8">
+          <SubTitle>{lang === 'ko' ? 'Extent 관련 스토리지 파라미터' : 'Extent Storage Parameters'}</SubTitle>
+          <Prose>{t.extentParamDesc}</Prose>
+          <Table
+            headers={lang === 'ko'
+              ? ['파라미터', '설명']
+              : ['Parameter', 'Description']}
+            rows={t.extentParams}
+          />
+          <div className="mt-4">
+            <InfoBox variant="note">
+              {lang === 'ko'
+                ? 'Oracle 10g 이후 LMT(Locally Managed Tablespace)가 기본값입니다. INITIAL·NEXT·PCTINCREASE는 기존 코드 호환성을 위해 문법상 허용되지만 실제로는 Oracle이 무시하고 AUTOALLOCATE 규칙을 따릅니다. 신규 테이블스페이스는 별도 이유가 없다면 AUTOALLOCATE를 그대로 쓰는 게 권장됩니다.'
+                : 'Since Oracle 10g, LMT (Locally Managed Tablespaces) are the default. INITIAL, NEXT, and PCTINCREASE are still accepted syntactically for backward compatibility, but Oracle ignores them and follows AUTOALLOCATE rules. For new tablespaces, sticking with AUTOALLOCATE is recommended unless you have a specific reason to use UNIFORM SIZE.'}
+            </InfoBox>
+          </div>
+        </div>
       </AccordionSection>
 
       {/* Segment */}
       <AccordionSection title={t.segmentTitle}>
         <Prose>{t.segmentDesc}</Prose>
         <SegmentDiagram />
-        <SubTitle>{lang === 'ko' ? 'Segment의 종류' : 'Types of Segment'}</SubTitle>
-        <ConceptGrid items={t.segmentTypes} />
+
+        <div className="mt-8">
+          <SubTitle>{t.hwmTitle}</SubTitle>
+          <Prose>{t.hwmDesc}</Prose>
+          <HwmDiagram />
+        </div>
+
+        <Divider />
+        <div className="mt-2">
+          <SubTitle>{lang === 'ko' ? 'Segment의 종류' : 'Types of Segment'}</SubTitle>
+          <ConceptGrid items={t.segmentTypes} />
+          <div className="mt-4">
+            <InfoBox variant="note">
+              {lang === 'ko'
+                ? 'LOB 컬럼이 있는 테이블을 만들면 오브젝트 하나에 Segment가 4개까지 생깁니다: 테이블 데이터 Segment, PRIMARY KEY 인덱스 Segment, CLOB 데이터 Segment, CLOB 인덱스 Segment. "테이블 = Segment 1개"는 단순 테이블에만 해당합니다.'
+                : 'A table with a LOB column can create up to 4 Segments for one object: table data, primary key index, LOB data, and LOB index Segments. The "one table = one Segment" rule applies only to simple heap-organized tables.'}
+            </InfoBox>
+          </div>
+        </div>
       </AccordionSection>
 
       {/* Tablespace */}
       <AccordionSection title={t.tablespaceTitle}>
         <Prose>{t.tablespaceDesc}</Prose>
+
+        <div className="mt-6">
+          <SubTitle>{t.tablespaceTypeTitle}</SubTitle>
+          <ConceptGrid items={t.tablespaceTypes} />
+        </div>
+
         <TablespaceDiagram />
-        <SubTitle>{lang === 'ko' ? 'Oracle 기본 Tablespace 목록' : 'Built-in Oracle Tablespaces'}</SubTitle>
-        <Prose>{t.tablespaceFileDesc}</Prose>
-        <Table
-          headers={[lang === 'ko' ? 'Tablespace' : 'Tablespace', lang === 'ko' ? '용도' : 'Purpose']}
-          rows={t.tablespaceTable}
-        />
-        <InfoBox variant="tip">{t.tablespaceNote}</InfoBox>
+
+        <div className="mt-8">
+          <SubTitle>{lang === 'ko' ? 'Oracle 기본 Tablespace 목록' : 'Built-in Oracle Tablespaces'}</SubTitle>
+          <Prose>{t.tablespaceFileDesc}</Prose>
+          <Table
+            headers={[lang === 'ko' ? 'Tablespace' : 'Tablespace', lang === 'ko' ? '용도' : 'Purpose']}
+            rows={t.tablespaceTable}
+          />
+        </div>
+
+        <Divider />
+        <div className="mt-2">
+          <SubTitle>{t.lmtTitle}</SubTitle>
+          <Prose>{t.lmtDesc}</Prose>
+          <Table
+            headers={lang === 'ko'
+              ? ['항목', 'LMT (Locally Managed)', 'DMT (Dictionary Managed)']
+              : ['Item', 'LMT (Locally Managed)', 'DMT (Dictionary Managed)']}
+            rows={t.lmtTable.slice(1)}
+          />
+        </div>
+
+        <div className="mt-8">
+          <SubTitle>{t.assmTitle}</SubTitle>
+          <Prose>{t.assmDesc}</Prose>
+          <Table
+            headers={lang === 'ko'
+              ? ['항목', 'ASSM (Automatic)', 'MSSM (Manual)']
+              : ['Item', 'ASSM (Automatic)', 'MSSM (Manual)']}
+            rows={t.assmTable.slice(1)}
+          />
+        </div>
+
+        <div className="mt-6">
+          <InfoBox variant="tip">{t.tablespaceNote}</InfoBox>
+        </div>
       </AccordionSection>
 
       <InfoBox variant="summary">{t.infoBody}</InfoBox>

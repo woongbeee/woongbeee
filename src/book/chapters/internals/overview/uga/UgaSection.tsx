@@ -338,7 +338,7 @@ export function UgaSection() {
       </div>
 
       {/* ── Summary ── */}
-      <div className="rounded-2xl border bg-gradient-to-br from-slate-50 to-teal-50/30 px-6 py-5">
+      <div className="mt-8 rounded-2xl border bg-gradient-to-br from-slate-50 to-teal-50/30 px-6 py-5">
         <div className="mb-3"><SubTitle>{t.summaryTitle}</SubTitle></div>
         <ul className="space-y-1.5">
           {t.summaryItems.map((item, i) => (

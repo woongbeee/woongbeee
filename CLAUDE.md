@@ -195,7 +195,7 @@ const T = {
 
 - `internals/` — `shared/` 폴더에 `OracleInstanceMap.tsx`, `SimulatorSection.tsx`, `shared.tsx`(TwoColLayout, MapPanel, TourPanel) 위치. 섹션별 파일은 `overview/`, `storage/`, `update-flow/` 하위에 분리.
 
-  `OverviewSection.tsx`는 `UpdateFlowPage`를 re-export한다. `internals/index.tsx` 라우팅:
+  `internals/index.tsx` 라우팅:
   - `internals-overview` → `OverviewSection`
   - `internals-sga` → `SgaSection`
   - `internals-sga-buffer-cache` → `SgaBufferCacheSection`
@@ -209,7 +209,16 @@ const T = {
   - `internals-process-server` → `ServerProcessSection`
   - `internals-process-background` → `BackgroundProcessSection`
   - `internals-storage` → `StorageSection`
-  - `internals-update-flow` → `UpdateFlowPage`
+  - `internals-concurrency` → `ConcurrencySection`
+  - `internals-concurrency-mvcc` → `MvccSection`
+  - `internals-concurrency-isolation` → `IsolationSection`
+  - `internals-concurrency-locks` → `LocksSection`
+  - `internals-concurrency-deadlock` → `DeadlockSection`
+  - `internals-transaction` → `TransactionSection`
+  - `internals-transaction-overview` → `TransactionOverviewSection`
+  - `internals-transaction-acid` → `TransactionAcidSection`
+  - `internals-transaction-commit-rollback` → `TransactionCommitRollbackSection`
+  - `internals-transaction-savepoint` → `TransactionSavepointSection`
 
   SGA 하위 4개 페이지는 `overview/sga/shared/SgaPositionDiagram.tsx`의 `SgaPositionDiagram` 공통 컴포넌트를 사용한다(`activeId: SgaComponentId` prop으로 현재 페이지의 컴포넌트를 하이라이트). `SgaComponentId` 타입에 `'large-pool'`이 포함되어 있음 (`'undo-segment'`는 제거됨).
 
@@ -239,8 +248,17 @@ const T = {
            2.1.4.1 프로세스 개요    → ProcessOverviewSection.tsx
            2.1.4.2 서버 프로세스    → ServerProcessSection.tsx
            2.1.4.3 백그라운드 프로세스 → BackgroundProcessSection.tsx
-   2.2 UPDATE 실행 흐름
-   2.3 데이터 저장 구조
+   2.2 데이터 저장 구조        → StorageSection.tsx
+   2.3 데이터 동시성과 정합성  → ConcurrencySection.tsx
+       2.3.1 MVCC              → MvccSection
+       2.3.2 트랜잭션 격리 수준 → IsolationSection
+       2.3.3 락(Lock) 메커니즘 → LocksSection
+       2.3.4 교착상태(Deadlock) → DeadlockSection
+   2.4 트랜잭션(Transaction)   → TransactionSection.tsx
+       2.4.1 트랜잭션이란?      → TransactionOverviewSection
+       2.4.2 ACID 속성         → TransactionAcidSection
+       2.4.3 COMMIT과 ROLLBACK → TransactionCommitRollbackSection
+       2.4.4 SAVEPOINT         → TransactionSavepointSection
 ```
 
 **internals 프로세스 섹션 파일 구조:**
@@ -333,6 +351,61 @@ src/book/chapters/internals/overview/process/
 - `WipBanner` — 아직 작성 중인 챕터 최상단에 표시하는 경고 배너
 
 `OracleInstanceMap` (`src/book/chapters/internals/shared/OracleInstanceMap.tsx`) — Internals 챕터 전용 인터랙티브 인스턴스 다이어그램. props: `highlightIds: InstanceComponentId[]`, `hideClient?: boolean`(Server Process 레이어 숨김), `horizontal?: boolean`, `callout?: string`.
+
+### 챕터 페이지 레이아웃 규칙
+
+모든 챕터 페이지는 아래 구조와 간격 규칙을 따른다. 페이지마다 레이아웃이 달라지면 안 된다.
+
+#### 페이지 기본 구조 (순서 고정)
+
+```
+<PageContainer>
+  <ChapterTitle icon={...} title={...} subtitle={...} />   ← 항상 최상단, Divider 없음
+
+  <SectionTitle>첫 번째 섹션 제목</SectionTitle>
+  <Prose>설명</Prose>
+  <ConceptGrid items={...} />   ← 있을 경우
+
+  <Divider />   ← 섹션 사이에만, ChapterTitle 직후에는 넣지 않음
+
+  <SectionTitle>두 번째 섹션 제목</SectionTitle>
+  <Prose>설명</Prose>
+  <Table headers={...} rows={...} />
+
+  <Divider />
+
+  <SectionTitle>세 번째 섹션 제목</SectionTitle>
+  ...
+
+  <div className="mt-8">
+    <InfoBox variant="summary">...</InfoBox>   ← 마지막 요약은 mt-8 wrapper
+  </div>
+</PageContainer>
+```
+
+#### 컴포넌트별 내장 마진 (추가 wrapper 불필요)
+
+| 컴포넌트 | 내장 마진 | 비고 |
+|----------|-----------|------|
+| `ChapterTitle` | `mb-5` | 제목 하단 |
+| `SectionTitle` | `mt-8 mb-4` | 섹션 위아래 |
+| `SubTitle` | `mb-2` | 소제목 하단 |
+| `Prose` | `mb-4` | 단락 하단 |
+| `Divider` | `my-8` | 섹션 경계선 |
+| `ConceptGrid` | `mb-6` | 그리드 하단 |
+| `Table` | `mb-6` | 표 하단 |
+| `InfoBox` | `mt-4 mb-4` | 박스 위아래 |
+
+#### 규칙 요약
+
+- **`<Divider />`는 섹션과 섹션 사이에만** 넣는다. `ChapterTitle` 직후, 마지막 섹션 뒤에는 넣지 않는다.
+- **`<Divider />` 바로 뒤에 `<div className="mt-N">` wrapper를 추가하지 않는다.** `SectionTitle`의 `mt-8`이 이미 충분한 간격을 만든다.
+- **`SectionTitle` 위에 추가 `mt-N`을 붙이지 않는다.** 내장 `mt-8`로 통일.
+- **`SubTitle`은 `SectionTitle`보다 작은 소제목**에만 사용. 섹션 구분이 필요하면 `SectionTitle`을 쓴다.
+- **마지막 요약/정리 `InfoBox`**는 `<div className="mt-8">` wrapper 안에 넣어 페이지 하단 여백을 확보한다.
+- **`AccordionSection`으로 묶은 내용**은 내부에 `Prose`, `Table`, `SqlBlock`을 그냥 쌓으면 된다. 추가 Divider 불필요.
+- **`SqlBlock` 앞**에는 `<div className="mt-4">` wrapper를 씌워 Prose와 코드블록 사이 간격을 확보한다.
+- **`ConceptGrid` 다음 바로 `Divider`** 가 오는 경우, ConceptGrid의 `mb-6`과 Divider의 `my-8`이 겹치지 않으므로 그대로 둔다.
 
 ## 코드 스타일
 

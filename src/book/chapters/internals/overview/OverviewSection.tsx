@@ -6,8 +6,6 @@ import { OracleInstanceMap } from '../shared/OracleInstanceMap'
 import type { InstanceComponentId } from '../shared/OracleInstanceMap'
 import { cn } from '@/lib/utils'
 
-export { UpdateFlowPage } from '../update-flow/UpdateFlowPage'
-
 // ── Tour items ─────────────────────────────────────────────────────────────
 
 type DetailRow = { termKo: string; termEn: string; descKo: string; descEn: string }

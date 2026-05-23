@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useSimulationStore } from '@/store/simulationStore'
 import { cn } from '@/lib/utils'
-import { WipBanner } from '../../shared'
+import { Divider, InfoBox, SqlBlock } from '../../shared'
 
 // ── Text ──────────────────────────────────────────────────────────────────────
 
@@ -51,6 +51,12 @@ const T = {
       { state: 'Unusable', desc: 'CBO 무시 / DML 유지 안 함 / 공간 소비 없음 — 대량 로드 성능 향상용', color: 'rose' },
       { state: 'Invisible', desc: 'CBO 무시 / DML 유지 함 / 공간 소비 — 삭제 전 테스트용', color: 'amber' },
     ],
+    keyCompressTitle: '인덱스 키 압축 (Key / Prefix Compression)',
+    keyCompressDesc: '복합 인덱스에서 중복되는 선두 컬럼 값을 한 번만 저장하는 방식입니다. Leaf 블록 안에서 같은 선두 값이 반복되는 경우 공간을 크게 절약하고, 블록 당 더 많은 엔트리를 저장할 수 있어 I/O 효율이 높아집니다.',
+    keyCompressHowTitle: '압축 전/후 비교',
+    keyCompressNote: '압축은 Leaf 블록에만 적용됩니다. Branch 블록은 이미 분기 최소 키만 저장하므로 별도 압축이 필요 없습니다. 단일 컬럼 UNIQUE 인덱스에는 적용할 수 없습니다.',
+    keyCompressAdvancedTitle: 'Advanced Index Compression (Oracle 12c+)',
+    keyCompressAdvancedDesc: '기존 Prefix Compression이 고정된 N개 선두 컬럼을 지정하는 방식이라면, Advanced Compression은 블록별로 최적의 압축 방식을 자동으로 선택합니다. Unique/Non-unique 인덱스 모두 지원하며, 별도 설정 없이 COMPRESS ADVANCED 한 줄로 활성화됩니다.',
   },
   en: {
     compositeTitle: 'Composite (Concatenated) Index',
@@ -96,6 +102,12 @@ const T = {
       { state: 'Unusable', desc: 'Ignored by CBO / NOT maintained on DML / no space — use for bulk loads', color: 'rose' },
       { state: 'Invisible', desc: 'Ignored by CBO / maintained on DML / consumes space — use to test before dropping', color: 'amber' },
     ],
+    keyCompressTitle: 'Index Key Compression (Prefix Compression)',
+    keyCompressDesc: 'Stores repeated leading column values only once per group in a Leaf block. When many index entries share the same leading value(s), key compression reduces space significantly and packs more entries per block — improving I/O efficiency.',
+    keyCompressHowTitle: 'Before vs After compression',
+    keyCompressNote: 'Compression applies to Leaf blocks only. Branch blocks already store only the minimum key prefix needed for routing, so no further compression is needed. Cannot be applied to single-column UNIQUE indexes.',
+    keyCompressAdvancedTitle: 'Advanced Index Compression (Oracle 12c+)',
+    keyCompressAdvancedDesc: 'While Prefix Compression requires you to specify a fixed number of leading columns to compress, Advanced Compression automatically selects the best compression method per block. Works on both unique and non-unique indexes — just add COMPRESS ADVANCED.',
   },
 }
 
@@ -119,7 +131,6 @@ export function CompositeSection() {
 
   return (
     <div className="mx-auto max-w-6xl space-y-8 px-8 py-8">
-      <WipBanner />
 
       {/* Composite index */}
       <section>
@@ -291,6 +302,181 @@ export function CompositeSection() {
           })}
         </div>
       </section>
+
+      <Divider />
+
+      {/* Key Compression */}
+      <section>
+        <h2 className="mb-1 text-lg font-bold">{t.keyCompressTitle}</h2>
+        <p className="mb-5 max-w-3xl text-sm leading-relaxed text-muted-foreground">{t.keyCompressDesc}</p>
+
+        <h3 className="mb-3 text-sm font-bold uppercase tracking-widest text-muted-foreground">{t.keyCompressHowTitle}</h3>
+        <KeyCompressionVisual lang={lang} />
+
+        <div className="mt-4">
+          <InfoBox variant="note">{t.keyCompressNote}</InfoBox>
+        </div>
+
+        <div className="mt-6">
+          <h3 className="mb-1 text-sm font-bold">{t.keyCompressAdvancedTitle}</h3>
+          <p className="mb-4 text-sm leading-relaxed text-muted-foreground">{t.keyCompressAdvancedDesc}</p>
+          <div className="grid gap-3 md:grid-cols-2">
+            <SqlBlock
+              badge={lang === 'ko' ? 'Prefix Compression' : 'Prefix Compression'}
+              badgeColor="violet"
+              desc={lang === 'ko'
+                ? '선두 N개 컬럼을 압축 키로 지정합니다. COMPRESS만 쓰면 기본값(모든 비고유 컬럼)이 적용됩니다.'
+                : 'Specify N leading columns as the prefix key. COMPRESS alone uses the default (all non-unique columns).'}
+              sql={`-- 기본값: 모든 선두 컬럼 압축\nCREATE INDEX ord_mode_stat_ix\n  ON orders(order_mode, order_status)\n  COMPRESS;\n\n-- 첫 번째 컬럼만 압축\nCREATE INDEX ord_mode_stat_ix\n  ON orders(order_mode, order_status)\n  COMPRESS 1;`}
+            />
+            <SqlBlock
+              badge={lang === 'ko' ? 'Advanced Compression' : 'Advanced Compression'}
+              badgeColor="blue"
+              desc={lang === 'ko'
+                ? 'Oracle이 블록별로 최적 압축을 자동 선택합니다. Unique 인덱스에도 사용 가능합니다.'
+                : 'Oracle selects optimal compression per block automatically. Works on unique indexes too.'}
+              sql={`-- Advanced High (Oracle 12.2+, 기본값)\nCREATE INDEX hr_emp_mgr_dept_ix\n  ON hr.employees(manager_id, department_id)\n  COMPRESS ADVANCED;\n\n-- 압축 상태 확인\nSELECT compression\nFROM   dba_indexes\nWHERE  index_name = 'HR_EMP_MGR_DEPT_IX';\n-- Result: ADVANCED HIGH`}
+            />
+          </div>
+        </div>
+      </section>
+    </div>
+  )
+}
+
+// ── Key Compression Visual ────────────────────────────────────────────────────
+
+function KeyCompressionVisual({ lang }: { lang: 'ko' | 'en' }) {
+  // Uncompressed leaf block entries: (order_mode, order_status, rowid)
+  const uncompressed = [
+    { mode: 'online', status: '0', rowid: 'AAAPvCAAFAAAAFaAAa' },
+    { mode: 'online', status: '0', rowid: 'AAAPvCAAFAAAAFaAAg' },
+    { mode: 'online', status: '0', rowid: 'AAAPvCAAFAAAAFaAAl' },
+    { mode: 'online', status: '2', rowid: 'AAAPvCAAFAAAAFaAAm' },
+    { mode: 'online', status: '2', rowid: 'AAAPvCAAFAAAAFaAAr' },
+    { mode: 'direct', status: '0', rowid: 'AAAPvCAAFAAAAFaAAs' },
+    { mode: 'direct', status: '1', rowid: 'AAAPvCAAFAAAAFaAAv' },
+  ]
+
+  // Groups for compressed view
+  const compressedGroups = [
+    {
+      prefix: 'online, 0',
+      color: 'blue' as const,
+      rowids: ['AAAPvCAAFAAAAFaAAa', 'AAAPvCAAFAAAAFaAAg', 'AAAPvCAAFAAAAFaAAl'],
+    },
+    {
+      prefix: 'online, 2',
+      color: 'violet' as const,
+      rowids: ['AAAPvCAAFAAAAFaAAm', 'AAAPvCAAFAAAAFaAAr'],
+    },
+    {
+      prefix: 'direct, 0',
+      color: 'orange' as const,
+      rowids: ['AAAPvCAAFAAAAFaAAs'],
+    },
+    {
+      prefix: 'direct, 1',
+      color: 'rose' as const,
+      rowids: ['AAAPvCAAFAAAAFaAAv'],
+    },
+  ]
+
+  const colorMap = {
+    blue:   { bg: 'bg-blue-100',   border: 'border-blue-300',   text: 'text-blue-800',   badge: 'bg-blue-200 text-blue-900' },
+    violet: { bg: 'bg-violet-100', border: 'border-violet-300', text: 'text-violet-800', badge: 'bg-violet-200 text-violet-900' },
+    orange: { bg: 'bg-orange-100', border: 'border-orange-300', text: 'text-orange-800', badge: 'bg-orange-200 text-orange-900' },
+    rose:   { bg: 'bg-rose-100',   border: 'border-rose-300',   text: 'text-rose-800',   badge: 'bg-rose-200 text-rose-900' },
+  }
+
+  const rowColors = [
+    'bg-blue-50',   // online,0
+    'bg-blue-50',
+    'bg-blue-50',
+    'bg-violet-50', // online,2
+    'bg-violet-50',
+    'bg-orange-50', // direct,0
+    'bg-rose-50',   // direct,1
+  ]
+
+  return (
+    <div className="grid gap-6 md:grid-cols-2">
+      {/* Left: Uncompressed */}
+      <div className="rounded-xl border overflow-hidden">
+        <div className="bg-muted/40 border-b px-4 py-2 flex items-center gap-2">
+          <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+            {lang === 'ko' ? '압축 전 (Leaf Block)' : 'Before Compression (Leaf Block)'}
+          </span>
+          <span className="ml-auto rounded bg-rose-100 px-2 py-0.5 font-mono text-[9px] font-bold text-rose-700">
+            7 × (mode + status + rowid)
+          </span>
+        </div>
+        {/* header row */}
+        <div className="grid grid-cols-[72px_56px_1fr] divide-x border-b bg-muted/20 font-mono text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">
+          <div className="px-3 py-1.5">order_mode</div>
+          <div className="px-3 py-1.5">status</div>
+          <div className="px-3 py-1.5">ROWID</div>
+        </div>
+        {uncompressed.map((row, i) => (
+          <div
+            key={i}
+            className={cn('grid grid-cols-[72px_56px_1fr] divide-x border-b last:border-b-0 font-mono text-[10px]', rowColors[i])}
+          >
+            <div className="px-3 py-1.5 font-semibold">{row.mode}</div>
+            <div className="px-3 py-1.5">{row.status}</div>
+            <div className="px-3 py-1.5 text-muted-foreground">{row.rowid}</div>
+          </div>
+        ))}
+        <div className="border-t bg-muted/20 px-4 py-2 font-mono text-[9px] text-muted-foreground">
+          {lang === 'ko'
+            ? '중복 저장: "online" 5회, "direct" 2회, "0" 4회 …'
+            : 'Duplicated: "online" ×5, "direct" ×2, "0" ×4 …'}
+        </div>
+      </div>
+
+      {/* Right: Compressed */}
+      <div className="rounded-xl border overflow-hidden">
+        <div className="bg-muted/40 border-b px-4 py-2 flex items-center gap-2">
+          <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+            {lang === 'ko' ? '압축 후 (Leaf Block)' : 'After Compression (Leaf Block)'}
+          </span>
+          <span className="ml-auto rounded bg-emerald-100 px-2 py-0.5 font-mono text-[9px] font-bold text-emerald-700">
+            {lang === 'ko' ? '선두 컬럼 1회 저장' : 'prefix stored once'}
+          </span>
+        </div>
+        <div className="divide-y">
+          {compressedGroups.map((grp, gi) => {
+            const c = colorMap[grp.color]
+            return (
+              <div key={gi} className={cn('px-3 py-2', c.bg)}>
+                {/* Prefix row */}
+                <div className={cn('mb-1.5 flex items-center gap-2 rounded px-2 py-1 border', c.border)}>
+                  <span className={cn('font-mono text-[9px] font-bold uppercase tracking-wider', c.text)}>
+                    {lang === 'ko' ? '공통 접두사' : 'prefix'}
+                  </span>
+                  <span className={cn('rounded px-1.5 py-0.5 font-mono text-[10px] font-bold', c.badge)}>
+                    {grp.prefix}
+                  </span>
+                </div>
+                {/* ROWID entries */}
+                <div className="space-y-0.5 pl-4">
+                  {grp.rowids.map((rid, ri) => (
+                    <div key={ri} className="flex items-center gap-2">
+                      <span className={cn('h-1 w-1 rounded-full shrink-0', c.text.replace('text-', 'bg-'))} />
+                      <span className="font-mono text-[10px] text-muted-foreground">{rid}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )
+          })}
+        </div>
+        <div className="border-t bg-muted/20 px-4 py-2 font-mono text-[9px] text-muted-foreground">
+          {lang === 'ko'
+            ? '선두 컬럼값 중복 제거 → 블록당 더 많은 엔트리 저장'
+            : 'Leading column deduplication → more entries per block'}
+        </div>
+      </div>
     </div>
   )
 }

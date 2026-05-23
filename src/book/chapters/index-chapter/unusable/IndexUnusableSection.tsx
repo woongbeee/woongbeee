@@ -241,7 +241,9 @@ export function IndexUnusableSection() {
 
       <SectionTitle>{t.hintsTitle}</SectionTitle>
       <Prose>{t.hintsDesc}</Prose>
-      <SqlBlock sql={t.explainSql} />
+      <div className="mt-4">
+        <SqlBlock sql={t.explainSql} />
+      </div>
     </PageContainer>
   )
 }

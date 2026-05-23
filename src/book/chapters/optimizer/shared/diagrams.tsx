@@ -50,90 +50,137 @@ function opColor(op: string): string {
   return '#64748b'
 }
 
+// pad a string to fixed width (right-pad with spaces)
+function rpad(s: string, n: number) { return s.padEnd(n) }
+function lpad(s: string, n: number) { return s.padStart(n) }
+
 export function ExplainPlanTable({
   rows,
   showStats = false,
   caption,
 }: {
   rows: PlanRow[]
-  showStats?: boolean  // A-Rows, CR, PR, PW, Elapsed 컬럼 표시 여부
+  showStats?: boolean
   caption?: string
 }) {
-  const [activeId, setActiveId] = useState<number | null>(null)
+  // ── 컬럼 너비 계산 ──────────────────────────────────────────────
+  const opW   = Math.max(9, ...rows.map(r => r.depth * 2 + r.operation.length))
+  const nameW = Math.max(4, ...rows.map(r => (r.name ?? '').length))
+  const rowsW = Math.max(4, ...rows.map(r => String(r.rows ?? '').length))
+  const costW = Math.max(4, ...rows.map(r => String(r.cost ?? '').length))
+  const timeW = Math.max(8, ...rows.map(r => (r.time ?? '').length))
 
-  const baseHeaders = ['Id', 'Operation', 'Name', 'Rows', 'Cost']
-  const statHeaders = ['A-Rows', 'CR', 'PR', 'PW', 'Time']
-  const headers = showStats ? [...baseHeaders, ...statHeaders] : baseHeaders
+  const statCols = showStats ? [
+    { key: 'actualRows' as const, hdr: 'A-Rows', w: 6 },
+    { key: 'cr'         as const, hdr: 'CR',     w: 4 },
+    { key: 'pr'         as const, hdr: 'PR',     w: 4 },
+    { key: 'pw'         as const, hdr: 'PW',     w: 4 },
+    { key: 'elapsed'    as const, hdr: 'A-Time', w: 12 },
+  ] : []
+
+  // ── 구분선 너비 ─────────────────────────────────────────────────
+  const statW = statCols.reduce((s, c) => s + c.w + 3, 0)
+  const totalW = 4 + 3 + opW + 3 + nameW + 3 + rowsW + 3 + costW + 3 + timeW + statW + 1
+  const sep = '-'.repeat(totalW)
+
+  // ── 헤더 행 ────────────────────────────────────────────────────
+  const hdrId   = rpad('Id',        4)
+  const hdrOp   = rpad('Operation', opW)
+  const hdrName = rpad('Name',      nameW)
+  const hdrRows = lpad('Rows',      rowsW)
+  const hdrCost = lpad('Cost',      costW)
+  const hdrTime = rpad('Time',      timeW)
+  const hdrStats = statCols.map(c => lpad(c.hdr, c.w)).join(' | ')
+  const headerLine = `| ${hdrId} | ${hdrOp} | ${hdrName} | ${hdrRows} | ${hdrCost} | ${hdrTime}${statCols.length ? ' | ' + hdrStats : ''} |`
+
+  // ── 데이터 행 렌더링 ────────────────────────────────────────────
+  function renderRow(row: PlanRow) {
+    const hasPred = row.note !== undefined   // note 있는 행 = * 표시
+    const idStr   = hasPred ? `* ${lpad(String(row.id), 2)}` : `  ${lpad(String(row.id), 2)}`
+    const indent  = ' '.repeat(row.depth * 2)
+    const opStr   = rpad(indent + row.operation, opW)
+    const nameStr = rpad(row.name ?? '', nameW)
+    const rowsStr = lpad(String(row.rows ?? ''), rowsW)
+    const costStr = lpad(String(row.cost ?? ''), costW)
+    const timeStr = rpad(row.time ?? '', timeW)
+
+    const color = opColor(row.operation)
+    const idColor   = hasPred ? '#f59e0b' : '#94a3b8'
+    const pipeColor = '#475569'
+
+    // 각 셀을 span으로 개별 컬러링
+    return (
+      <span key={row.id} className="block">
+        <span style={{ color: pipeColor }}>| </span>
+        <span style={{ color: idColor }}>{idStr}</span>
+        <span style={{ color: pipeColor }}> | </span>
+        <span style={{ color }} className="font-bold">{opStr}</span>
+        <span style={{ color: pipeColor }}> | </span>
+        <span style={{ color: '#94a3b8' }}>{nameStr}</span>
+        <span style={{ color: pipeColor }}> | </span>
+        <span style={{ color: '#fbbf24' }}>{rowsStr}</span>
+        <span style={{ color: pipeColor }}> | </span>
+        <span style={{ color: '#94a3b8' }}>{costStr}</span>
+        <span style={{ color: pipeColor }}> | </span>
+        <span style={{ color: '#94a3b8' }}>{timeStr}</span>
+        {statCols.length > 0 && (
+          <>
+            {statCols.map((c) => {
+              const val = row[c.key]
+              const s = lpad(val !== undefined && val !== null ? String(val) : '', c.w)
+              const statColor = c.key === 'actualRows' ? '#6ee7b7'
+                : c.key === 'cr' ? '#7dd3fc'
+                : c.key === 'pr' ? '#fca5a5'
+                : c.key === 'elapsed' ? '#94a3b8'
+                : '#64748b'
+              return (
+                <span key={c.key}>
+                  <span style={{ color: pipeColor }}> | </span>
+                  <span style={{ color: statColor }}>{s}</span>
+                </span>
+              )
+            })}
+          </>
+        )}
+        <span style={{ color: pipeColor }}> |</span>
+      </span>
+    )
+  }
+
+  const hasNotes = rows.some(r => r.note)
 
   return (
     <div className="my-4">
       {caption && (
         <p className="mb-1.5 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-400">{caption}</p>
       )}
-      <div className="overflow-x-auto rounded-xl border border-slate-200 bg-slate-900">
-        <table className="w-full text-left font-mono text-[11px]">
-          <thead>
-            <tr className="border-b border-slate-700">
-              {headers.map(h => (
-                <th key={h} className="px-3 py-2 text-slate-400 font-bold">{h}</th>
-              ))}
-              <th className="px-3 py-2 text-slate-400 font-bold">Note</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map(row => {
-              const color = opColor(row.operation)
-              const isActive = activeId === row.id
-              return (
-                <>
-                  <tr
-                    key={row.id}
-                    onClick={() => setActiveId(isActive ? null : row.id)}
-                    className={cn(
-                      'cursor-pointer border-b border-slate-800 transition-colors',
-                      isActive ? 'bg-slate-700' : 'hover:bg-slate-800',
-                    )}
-                  >
-                    {/* Id */}
-                    <td className="px-3 py-1.5 text-slate-400">{row.id}</td>
-                    {/* Operation — 들여쓰기 */}
-                    <td className="px-3 py-1.5" style={{ paddingLeft: `${12 + row.depth * 16}px` }}>
-                      <span className="font-bold" style={{ color }}>{row.operation}</span>
-                    </td>
-                    {/* Name */}
-                    <td className="px-3 py-1.5 text-slate-300">{row.name ?? ''}</td>
-                    {/* Rows (E-Rows) */}
-                    <td className="px-3 py-1.5 text-amber-300">{row.rows?.toLocaleString() ?? ''}</td>
-                    {/* Cost */}
-                    <td className="px-3 py-1.5 text-slate-300">{row.cost ?? ''}</td>
-                    {showStats && (
-                      <>
-                        <td className="px-3 py-1.5 text-emerald-300">{row.actualRows?.toLocaleString() ?? ''}</td>
-                        <td className="px-3 py-1.5 text-sky-300">{row.cr?.toLocaleString() ?? ''}</td>
-                        <td className="px-3 py-1.5 text-rose-300">{row.pr?.toLocaleString() ?? ''}</td>
-                        <td className="px-3 py-1.5 text-slate-400">{row.pw?.toLocaleString() ?? ''}</td>
-                        <td className="px-3 py-1.5 text-slate-300">{row.elapsed ?? ''}</td>
-                      </>
-                    )}
-                    {/* Note */}
-                    <td className="px-3 py-1.5 text-slate-500 text-[10px]">{row.note ?? ''}</td>
-                  </tr>
-                  {isActive && row.note && (
-                    <tr key={`${row.id}-desc`} className="bg-slate-800">
-                      <td colSpan={headers.length + 1} className="px-4 py-2 text-[11px] text-slate-300 leading-relaxed">
-                        <span className="font-bold" style={{ color }}>▶ {row.operation}</span>
-                        {row.name && <span className="text-slate-400"> ({row.name})</span>}
-                        <span className="ml-2">{row.note}</span>
-                      </td>
-                    </tr>
-                  )}
-                </>
-              )
-            })}
-          </tbody>
-        </table>
+      <div className="overflow-x-auto rounded-xl border border-slate-200 bg-slate-900 px-4 py-3">
+        <pre className="font-mono text-[11px] leading-relaxed">
+          <span className="block" style={{ color: '#475569' }}>{sep}</span>
+          <span className="block" style={{ color: '#64748b' }}>{headerLine}</span>
+          <span className="block" style={{ color: '#475569' }}>{sep}</span>
+          {rows.map(row => renderRow(row))}
+          <span className="block" style={{ color: '#475569' }}>{sep}</span>
+        </pre>
       </div>
-      <p className="mt-1 text-[10px] text-slate-400">클릭하면 해당 오퍼레이션 설명을 볼 수 있습니다.</p>
+      {hasNotes && (
+        <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 dark:border-amber-900/40 dark:bg-amber-950/20">
+          <div className="flex items-center gap-2 border-b border-amber-200 px-4 py-2 dark:border-amber-900/40">
+            <span className="text-xs font-bold text-amber-600 dark:text-amber-400">오퍼레이션별 설명</span>
+            <span className="rounded bg-amber-100 px-1.5 py-0.5 text-[10px] text-amber-500 dark:bg-amber-900/40 dark:text-amber-400">
+              조건절 있는 행 (* 표시)
+            </span>
+          </div>
+          <div className="divide-y divide-amber-100 dark:divide-amber-900/30">
+            {rows.filter(r => r.note).map(row => (
+              <div key={row.id} className="flex gap-3 px-4 py-2.5">
+                <span className="mt-0.5 shrink-0 font-mono text-xs font-bold text-amber-500">{row.id} -</span>
+                <span className="text-xs leading-relaxed text-foreground/70">{row.note}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -561,6 +608,422 @@ export function PlanTreeDiagram({ lang }: { lang: 'ko' | 'en' }) {
           {isKo ? '트리 하단 자식 → 상단 부모 순으로 실행됨' : 'Execution: leaf nodes first → root last'}
         </text>
       </svg>
+    </div>
+  )
+}
+
+// ── SqlTraceDisplay (TKPROF Call Statistics) ──────────────────────────────────
+
+interface CallRow {
+  call: string
+  count: number
+  cpu: string
+  elapsed: string
+  disk: number
+  query: number
+  current: number
+  rows: number
+  isTotal?: boolean
+  noteKo?: string
+  noteEn?: string
+}
+
+const CALL_ROWS: CallRow[] = [
+  {
+    call: 'Parse', count: 1, cpu: '0.00', elapsed: '0.01', disk: 0, query: 0, current: 0, rows: 0,
+    noteKo: 'Parse 단계가 1번 실행되어 0.01초가 걸렸습니다. CPU 시간은 0.00초인데 경과 시간이 0.01초이므로, 실제 파싱 외에 대기가 있었음을 알 수 있습니다. Misses=1이므로 Hard Parse가 발생했습니다 — Library Cache에 기존 실행 계획이 없어 SQL을 처음부터 파싱하고 최적화한 것입니다. 바인드 변수를 사용했다면 이후 실행부터 Soft Parse로 처리되어 Parse 비용이 거의 0에 가까워집니다.',
+    noteEn: 'Parse ran once and took 0.01s elapsed. Since CPU time is 0.00s but elapsed is 0.01s, there was a wait beyond the parse work itself. Misses=1 confirms a Hard Parse — no existing plan was found in the Library Cache, so Oracle had to parse and optimize the SQL from scratch. Using bind variables would allow subsequent executions to Soft Parse at near-zero cost.',
+  },
+  {
+    call: 'Execute', count: 1, cpu: '0.00', elapsed: '0.00', disk: 0, query: 0, current: 0, rows: 0,
+    noteKo: 'Execute 단계가 1번 실행되어 CPU·경과 시간 모두 0.00초입니다. SELECT 문이므로 실제 데이터 변경은 없고, 실행 엔진을 가동시켜 Fetch 단계로 제어를 넘기는 것만으로 즉시 완료됐습니다. DML이었다면 이 단계에서 실제 데이터 처리가 일어나고 cpu·elapsed 값이 높아집니다.',
+    noteEn: 'Execute ran once with 0.00s for both CPU and elapsed time. Since this is a SELECT, no data modification occurred — Oracle simply started the execution engine and handed control to the Fetch phase. For DML statements, this is the stage where actual data processing happens and you would see meaningful cpu and elapsed values here.',
+  },
+  {
+    call: 'Fetch', count: 2, cpu: '0.01', elapsed: '0.03', disk: 3, query: 14, current: 0, rows: 10,
+    noteKo: 'Fetch 단계가 2번 호출되어 총 10행을 클라이언트에 반환했습니다. 논리 블록 14개(query=14)를 읽었고, 그 중 3블록(disk=3)은 Buffer Cache에 없어 디스크에서 직접 읽었습니다. 경과 시간 0.03초 중 상당 부분이 이 물리 I/O 대기입니다. disk 값이 0에 가까울수록 Buffer Cache 활용이 잘 되고 있는 것입니다.',
+    noteEn: 'Fetch was called twice and returned 10 rows to the client in total. 14 logical blocks were read (query=14), of which 3 (disk=3) were not in the Buffer Cache and required physical disk reads. Most of the 0.03s elapsed time is attributable to that physical I/O wait. The closer disk is to 0, the better the Buffer Cache utilization.',
+  },
+  {
+    call: 'total', count: 4, cpu: '0.01', elapsed: '0.04', disk: 3, query: 14, current: 0, rows: 10, isTotal: true,
+  },
+]
+
+const CALL_EXTRA_KO = [
+  'Misses in library cache during parse: 1',
+  'Optimizer mode: ALL_ROWS',
+  'Parsing user id: 84  (SYS)',
+]
+
+const CALL_EXTRA_EN = [
+  'Misses in library cache during parse: 1',
+  'Optimizer mode: ALL_ROWS',
+  'Parsing user id: 84  (SYS)',
+]
+
+export function SqlTraceDisplay({ lang }: { lang: 'ko' | 'en' }) {
+  const caption = lang === 'ko'
+    ? 'TKPROF Call Statistics 출력 예시'
+    : 'TKPROF Call Statistics output example'
+
+  const header  = 'call     count       cpu    elapsed       disk      query    current       rows'
+  const divider = '------- ------  -------- ---------- ---------- ---------- ---------- ----------'
+
+  function fmtRow(r: CallRow) {
+    // 갭 포함 구조: call(7) 1 count(6) 2 cpu(8) 1 elapsed(10) 1 disk(10) 1 query(10) 1 current(10) 1 rows(10)
+    const callStr    = r.call.padEnd(7)
+    const countStr   = String(r.count).padStart(6)
+    const cpuStr     = r.cpu.padStart(8)
+    const elapsedStr = r.elapsed.padStart(10)
+    const diskStr    = String(r.disk).padStart(10)
+    const queryStr   = String(r.query).padStart(10)
+    const currentStr = String(r.current).padStart(10)
+    const rowsStr    = String(r.rows).padStart(10)
+    return { callStr, countStr, cpuStr, elapsedStr, diskStr, queryStr, currentStr, rowsStr }
+  }
+
+  const pipeColor = '#475569'
+  const labelColor = '#94a3b8'
+  const totalColor = '#fbbf24'
+  const phaseColors: Record<string, string> = {
+    Parse:   '#818cf8',
+    Execute: '#34d399',
+    Fetch:   '#60a5fa',
+  }
+  const extraLines = lang === 'ko' ? CALL_EXTRA_KO : CALL_EXTRA_EN
+
+  return (
+    <div className="my-4">
+      {caption && (
+        <p className="mb-1 text-xs font-semibold text-muted-foreground">{caption}</p>
+      )}
+      <pre className="overflow-x-auto rounded-lg bg-[#0f172a] px-5 py-4 font-mono text-xs leading-relaxed text-slate-300">
+        <span style={{ color: labelColor }}>{header}</span>{'\n'}
+        <span style={{ color: pipeColor }}>{divider}</span>{'\n'}
+        {CALL_ROWS.map((r, i) => {
+          const isTotal = r.isTotal ?? false
+          const f = fmtRow(r)
+          const nameColor = isTotal ? totalColor : (phaseColors[f.callStr.trim()] ?? labelColor)
+          return (
+            <span key={i} className="block">
+              {isTotal && <span style={{ color: pipeColor }} className="block">{divider}</span>}
+              <span style={{ color: nameColor }} className={isTotal ? 'font-bold' : ''}>{f.callStr}</span>
+              <span style={{ color: pipeColor }}>{' '}</span>
+              <span style={{ color: '#cbd5e1' }}>{f.countStr}</span>
+              <span style={{ color: pipeColor }}>{'  '}</span>
+              <span style={{ color: '#fde68a' }}>{f.cpuStr}</span>
+              <span style={{ color: pipeColor }}>{' '}</span>
+              <span style={{ color: '#6ee7b7' }}>{f.elapsedStr}</span>
+              <span style={{ color: pipeColor }}>{' '}</span>
+              <span style={{ color: '#fca5a5' }}>{f.diskStr}</span>
+              <span style={{ color: pipeColor }}>{' '}</span>
+              <span style={{ color: '#7dd3fc' }}>{f.queryStr}</span>
+              <span style={{ color: pipeColor }}>{' '}</span>
+              <span style={{ color: '#94a3b8' }}>{f.currentStr}</span>
+              <span style={{ color: pipeColor }}>{' '}</span>
+              <span style={{ color: '#cbd5e1' }}>{f.rowsStr}</span>
+            </span>
+          )
+        })}
+        {'\n'}
+        {extraLines.map((line, i) => (
+          <span key={i} style={{ color: '#64748b' }} className="block">{line}</span>
+        ))}
+      </pre>
+      {/* 단계별 설명 패널 */}
+      <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 dark:border-amber-900/40 dark:bg-amber-950/20">
+        <div className="flex items-center gap-2 border-b border-amber-200 px-4 py-2 dark:border-amber-900/40">
+          <span className="text-xs font-bold text-amber-600 dark:text-amber-400">단계별 설명</span>
+        </div>
+        <div className="divide-y divide-amber-100 dark:divide-amber-900/30">
+          {CALL_ROWS.filter(r => !r.isTotal).map(r => {
+            const note = lang === 'ko' ? r.noteKo : r.noteEn
+            const phaseColor: Record<string, string> = { Parse: '#818cf8', Execute: '#34d399', Fetch: '#60a5fa' }
+            return (
+              <div key={r.call} className="flex gap-3 px-4 py-2.5">
+                <span className="mt-0.5 shrink-0 font-mono text-xs font-bold" style={{ color: phaseColor[r.call] ?? '#94a3b8' }}>{r.call}</span>
+                <span className="text-xs leading-relaxed text-foreground/70">{note}</span>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ── RowSourceOperationDisplay ─────────────────────────────────────────────────
+// Row Source Operation 섹션 예시: ALLSTATS LAST 출력 (A-Rows, CR, PR, PW 포함)
+
+const RSO_ROWS_KO: PlanRow[] = [
+  { id: 0, depth: 0, operation: 'SELECT STATEMENT', rows: 50, cost: 12, actualRows: 50, cr: 18, pr: 0, pw: 0, elapsed: '00:00:00.02', note: '쿼리 전체가 0.02초 만에 완료되어 최종 50행을 반환했습니다. CR=18은 이 쿼리가 발생시킨 전체 논리 읽기 횟수로, 자식 오퍼레이션(1·2·3)의 읽기가 모두 누적된 값입니다.' },
+  { id: 1, depth: 1, operation: 'HASH JOIN', rows: 50, cost: 12, actualRows: 50, cr: 18, pr: 0, pw: 0, elapsed: '00:00:00.02', note: 'DEPARTMENTS(27행)를 Build Input으로 해시 테이블을 만들고, EMPLOYEES 인덱스 스캔 결과(107행)를 Probe해 50행을 조인했습니다. 해시 조인은 PGA 메모리에서 수행되며, PR=0이므로 디스크 유출(spill)은 없었습니다.' },
+  { id: 2, depth: 2, operation: 'TABLE ACCESS FULL', name: 'DEPARTMENTS', rows: 27, cost: 3, actualRows: 27, cr: 7, pr: 0, pw: 0, elapsed: '00:00:00.01', note: 'DEPARTMENTS 테이블을 Full Scan하여 27행을 읽었습니다. CBO 추정(E-Rows=27)과 실제(A-Rows=27)가 일치해 통계가 정확한 상태입니다. 논리 블록 7개(CR=7)를 읽었으며, 물리 읽기(PR=0)는 없어 모두 Buffer Cache에서 처리됐습니다.' },
+  { id: 3, depth: 2, operation: 'INDEX RANGE SCAN', name: 'EMP_DEPT_IX', rows: 107, cost: 2, actualRows: 107, cr: 3, pr: 0, pw: 0, elapsed: '00:00:00.01', note: 'EMP_DEPT_IX 인덱스를 Range Scan하여 DEPARTMENT_ID > 50 조건에 맞는 107개의 ROWID를 수집했습니다. 루트→브랜치→리프 순으로 3블록(CR=3)만 읽었으며, 물리 읽기(PR=0)는 없어 매우 효율적인 인덱스 탐색입니다.' },
+]
+
+const RSO_ROWS_EN: PlanRow[] = [
+  { id: 0, depth: 0, operation: 'SELECT STATEMENT', rows: 50, cost: 12, actualRows: 50, cr: 18, pr: 0, pw: 0, elapsed: '00:00:00.02', note: 'The entire query completed in 0.02s and returned 50 rows. CR=18 is the total logical reads for the whole query — it accumulates all reads from child operations (1, 2, 3).' },
+  { id: 1, depth: 1, operation: 'HASH JOIN', rows: 50, cost: 12, actualRows: 50, cr: 18, pr: 0, pw: 0, elapsed: '00:00:00.02', note: 'Built a hash table from DEPARTMENTS (27 rows) as the Build Input, then probed it with the 107 ROWIDs from the index scan, producing 50 joined rows. The hash join ran in PGA memory — PR=0 confirms there was no spill to disk.' },
+  { id: 2, depth: 2, operation: 'TABLE ACCESS FULL', name: 'DEPARTMENTS', rows: 27, cost: 3, actualRows: 27, cr: 7, pr: 0, pw: 0, elapsed: '00:00:00.01', note: 'Scanned the entire DEPARTMENTS table and read 27 rows. The CBO estimate (E-Rows=27) matches the actual (A-Rows=27), confirming statistics are accurate. 7 logical blocks were read (CR=7), all from Buffer Cache — no physical reads (PR=0).' },
+  { id: 3, depth: 2, operation: 'INDEX RANGE SCAN', name: 'EMP_DEPT_IX', rows: 107, cost: 2, actualRows: 107, cr: 3, pr: 0, pw: 0, elapsed: '00:00:00.01', note: 'Performed a range scan on EMP_DEPT_IX to collect 107 ROWIDs matching DEPARTMENT_ID > 50. Only 3 blocks were read (CR=3) traversing root → branch → leaf. No physical reads (PR=0) — a highly efficient index access.' },
+]
+
+export function RowSourceOperationDisplay({ lang }: { lang: 'ko' | 'en' }) {
+  const isKo = lang === 'ko'
+  const caption = isKo
+    ? 'DBMS_XPLAN.DISPLAY_CURSOR(format => \'ALLSTATS LAST\') 출력 예시'
+    : "DBMS_XPLAN.DISPLAY_CURSOR(format => 'ALLSTATS LAST') output example"
+  return <ExplainPlanTable rows={isKo ? RSO_ROWS_KO : RSO_ROWS_EN} showStats caption={caption} />
+}
+
+// ── PredicateInfoDisplay ──────────────────────────────────────────────────────
+// Predicate Information 섹션 예시: 조건절 정보 출력 형태 재현
+
+export function PredicateInfoDisplay({ lang }: { lang: 'ko' | 'en' }) {
+  const isKo = lang === 'ko'
+
+  const lines = isKo ? [
+    { label: 'Plan hash value: 1234567890', color: '#94a3b8' },
+    { label: '', color: '' },
+    { label: '-----------------------------------------------------', color: '#475569' },
+    { label: '| Id  | Operation             | Name        | Rows |', color: '#94a3b8' },
+    { label: '-----------------------------------------------------', color: '#475569' },
+    { label: '|   0 | SELECT STATEMENT      |             |   50 |', color: '#3b82f6' },
+    { label: '|*  1 |  HASH JOIN            |             |   50 |', color: '#7c3aed' },
+    { label: '|   2 |   TABLE ACCESS FULL   | DEPARTMENTS |   27 |', color: '#ea580c' },
+    { label: '|*  3 |   INDEX RANGE SCAN    | EMP_DEPT_IX |  107 |', color: '#16a34a' },
+    { label: '-----------------------------------------------------', color: '#475569' },
+    { label: '', color: '' },
+    { label: 'Predicate Information (identified by operation id):', color: '#f59e0b' },
+    { label: '---------------------------------------------------', color: '#475569' },
+    { label: '   1 - access("E"."DEPARTMENT_ID"="D"."DEPARTMENT_ID")', color: '#fbbf24' },
+    { label: '   3 - access("E"."DEPARTMENT_ID">50)', color: '#fbbf24' },
+  ] : [
+    { label: 'Plan hash value: 1234567890', color: '#94a3b8' },
+    { label: '', color: '' },
+    { label: '-----------------------------------------------------', color: '#475569' },
+    { label: '| Id  | Operation             | Name        | Rows |', color: '#94a3b8' },
+    { label: '-----------------------------------------------------', color: '#475569' },
+    { label: '|   0 | SELECT STATEMENT      |             |   50 |', color: '#3b82f6' },
+    { label: '|*  1 |  HASH JOIN            |             |   50 |', color: '#7c3aed' },
+    { label: '|   2 |   TABLE ACCESS FULL   | DEPARTMENTS |   27 |', color: '#ea580c' },
+    { label: '|*  3 |   INDEX RANGE SCAN    | EMP_DEPT_IX |  107 |', color: '#16a34a' },
+    { label: '-----------------------------------------------------', color: '#475569' },
+    { label: '', color: '' },
+    { label: 'Predicate Information (identified by operation id):', color: '#f59e0b' },
+    { label: '---------------------------------------------------', color: '#475569' },
+    { label: '   1 - access("E"."DEPARTMENT_ID"="D"."DEPARTMENT_ID")', color: '#fbbf24' },
+    { label: '   3 - access("E"."DEPARTMENT_ID">50)', color: '#fbbf24' },
+  ]
+
+  const caption = isKo
+    ? 'Predicate Information 출력 예시 (* 표시 = 조건절 있음)'
+    : 'Predicate Information output (* = has predicate)'
+
+  return (
+    <div className="my-4">
+      <p className="mb-1.5 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-400">{caption}</p>
+      <div className="overflow-x-auto rounded-xl border border-slate-200 bg-slate-900 px-4 py-3">
+        <pre className="font-mono text-[11px] leading-relaxed">
+          {lines.map((line, i) =>
+            line.label === '' ? (
+              <span key={i} className="block">&nbsp;</span>
+            ) : (
+              <span key={i} className="block" style={{ color: line.color || '#94a3b8' }}>{line.label}</span>
+            )
+          )}
+        </pre>
+      </div>
+    </div>
+  )
+}
+
+// ── ColumnProjectionDisplay ───────────────────────────────────────────────────
+// Column Projection 섹션 예시: +PROJECTION 포맷 출력 형태 재현
+
+export function ColumnProjectionDisplay({ lang }: { lang: 'ko' | 'en' }) {
+  const isKo = lang === 'ko'
+
+  const lines = isKo ? [
+    { label: 'Column Projection Information (identified by operation id):', color: '#f59e0b' },
+    { label: '-----------------------------------------------------------', color: '#475569' },
+    { label: '   1 - (#keys=1) "E"."EMPLOYEE_ID"[NUMBER,22], "D"."DEPARTMENT_NAME"[VARCHAR2,30]', color: '#86efac' },
+    { label: '   2 - "D"."DEPARTMENT_ID"[NUMBER,22], "D"."DEPARTMENT_NAME"[VARCHAR2,30]', color: '#86efac' },
+    { label: '   3 - "E"."ROWID"[ROWID,10], "E"."EMPLOYEE_ID"[NUMBER,22]', color: '#86efac' },
+    { label: '', color: '' },
+    { label: '-- #keys=1: 조인 키 컬럼 수', color: '#64748b' },
+    { label: '-- [NUMBER,22]: 데이터 타입과 길이', color: '#64748b' },
+  ] : [
+    { label: 'Column Projection Information (identified by operation id):', color: '#f59e0b' },
+    { label: '-----------------------------------------------------------', color: '#475569' },
+    { label: '   1 - (#keys=1) "E"."EMPLOYEE_ID"[NUMBER,22], "D"."DEPARTMENT_NAME"[VARCHAR2,30]', color: '#86efac' },
+    { label: '   2 - "D"."DEPARTMENT_ID"[NUMBER,22], "D"."DEPARTMENT_NAME"[VARCHAR2,30]', color: '#86efac' },
+    { label: '   3 - "E"."ROWID"[ROWID,10], "E"."EMPLOYEE_ID"[NUMBER,22]', color: '#86efac' },
+    { label: '', color: '' },
+    { label: '-- #keys=1: number of join key columns', color: '#64748b' },
+    { label: '-- [NUMBER,22]: data type and length', color: '#64748b' },
+  ]
+
+  const caption = isKo
+    ? 'Column Projection Information 출력 예시 (+PROJECTION 포맷)'
+    : 'Column Projection Information output (+PROJECTION format)'
+
+  return (
+    <div className="my-4">
+      <p className="mb-1.5 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-400">{caption}</p>
+      <div className="overflow-x-auto rounded-xl border border-slate-200 bg-slate-900 px-4 py-3">
+        <pre className="font-mono text-[11px] leading-relaxed">
+          {lines.map((line, i) =>
+            line.label === '' ? (
+              <span key={i} className="block">&nbsp;</span>
+            ) : (
+              <span key={i} className="block" style={{ color: line.color || '#94a3b8' }}>{line.label}</span>
+            )
+          )}
+        </pre>
+      </div>
+    </div>
+  )
+}
+
+// ── StatisticsDisplay ─────────────────────────────────────────────────────────
+// Statistics 섹션 예시: SET AUTOTRACE TRACEONLY 통계 출력 형태 재현
+
+export function StatisticsDisplay({ lang }: { lang: 'ko' | 'en' }) {
+  const isKo = lang === 'ko'
+
+  const stats = [
+    { name: 'recursive calls',  value: 0,    note: isKo ? '-- 내부 재귀 SQL 없음' : '-- no internal recursive SQL' },
+    { name: 'db block gets',    value: 0,    note: isKo ? '-- DML Current Read 없음 (SELECT만)' : '-- no DML current reads (SELECT only)' },
+    { name: 'consistent gets',  value: 18,   note: isKo ? '-- 논리 읽기 총 18블록 (CR)' : '-- 18 logical block reads (CR)' },
+    { name: 'physical reads',   value: 0,    note: isKo ? '-- 디스크 읽기 없음 (Buffer Cache 히트)' : '-- no disk reads (full Buffer Cache hit)' },
+    { name: 'redo size',        value: 0,    note: isKo ? '-- SELECT이므로 Redo 없음' : '-- no redo (SELECT only)' },
+    { name: 'sorts (memory)',   value: 0,    note: '' },
+    { name: 'sorts (disk)',     value: 0,    note: '' },
+    { name: 'rows processed',   value: 50,   note: isKo ? '-- 최종 반환 행 수' : '-- total rows returned' },
+  ]
+
+  const caption = isKo
+    ? 'SET AUTOTRACE TRACEONLY STATISTICS 출력 예시'
+    : 'SET AUTOTRACE TRACEONLY STATISTICS output example'
+
+  return (
+    <div className="my-4">
+      <p className="mb-1.5 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-400">{caption}</p>
+      <div className="overflow-x-auto rounded-xl border border-slate-200 bg-slate-900 px-4 py-3">
+        <table className="w-full font-mono text-[11px]">
+          <tbody>
+            {stats.map((s, i) => (
+              <tr key={i}>
+                <td className="pr-6 py-0.5 text-right text-amber-300 w-12">{s.value}</td>
+                <td className="pr-4 py-0.5 text-slate-200">{s.name}</td>
+                <td className="py-0.5 text-slate-500 italic text-[10px]">{s.note}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  )
+}
+
+// ── FullPlanDisplay ───────────────────────────────────────────────────────────
+// ① ~ ⑤ 전체 출력 예시: 각 영역에 컬러 레이블을 붙여 한 화면에 표시
+
+export function FullPlanDisplay({ lang }: { lang: 'ko' | 'en' }) {
+  const isKo = lang === 'ko'
+  const pip = '#475569'
+  const dim = '#64748b'
+
+  type Block = { label: string; color: string; lines: { text: string; color: string }[] }
+
+  const blocks: Block[] = [
+    {
+      label: isKo ? '① Call Statistics  (TKPROF 출력)' : '① Call Statistics  (TKPROF output)',
+      color: '#818cf8',
+      lines: [
+        { text: 'call     count       cpu    elapsed       disk      query    current       rows', color: '#94a3b8' },
+        { text: '------- ------  -------- ---------- ---------- ---------- ---------- ----------', color: pip },
+        { text: 'Parse        1      0.00       0.01          0          0          0          0', color: '#818cf8' },
+        { text: 'Execute      1      0.00       0.00          0          0          0          0', color: '#34d399' },
+        { text: 'Fetch        2      0.01       0.03          3         14          0         10', color: '#60a5fa' },
+        { text: '------- ------  -------- ---------- ---------- ---------- ---------- ----------', color: pip },
+        { text: 'total        4      0.01       0.04          3         14          0         10', color: '#fbbf24' },
+        { text: '', color: '' },
+        { text: 'Misses in library cache during parse: 1', color: dim },
+        { text: 'Optimizer mode: ALL_ROWS', color: dim },
+        { text: 'Parsing user id: 84  (SYS)', color: dim },
+      ],
+    },
+    {
+      label: isKo ? '② Row Source Operation  (ALLSTATS LAST)' : '② Row Source Operation  (ALLSTATS LAST)',
+      color: '#34d399',
+      lines: [
+        { text: '| Id | Operation          | Name        | Starts | E-Rows | A-Rows |   A-Time   |  CR |  PR |', color: '#94a3b8' },
+        { text: '----+--------------------+-------------+--------+--------+--------+------------+-----+-----+', color: pip },
+        { text: '|  0 | SELECT STATEMENT   |             |      1 |     50 |     50 | 00:00:00.02|  18 |   0 |', color: '#3b82f6' },
+        { text: '|  1 |  HASH JOIN         |             |      1 |     50 |     50 | 00:00:00.02|  18 |   0 |', color: '#7c3aed' },
+        { text: '|  2 |   TABLE ACCESS FULL| DEPARTMENTS |      1 |     27 |     27 | 00:00:00.01|   7 |   0 |', color: '#ea580c' },
+        { text: '|  3 |   INDEX RANGE SCAN | EMP_DEPT_IX |      1 |    107 |    107 | 00:00:00.01|   3 |   0 |', color: '#16a34a' },
+        { text: '----+--------------------+-------------+--------+--------+--------+------------+-----+-----+', color: pip },
+      ],
+    },
+    {
+      label: isKo ? '③ Predicate Information' : '③ Predicate Information',
+      color: '#f59e0b',
+      lines: [
+        { text: 'Predicate Information (identified by operation id):', color: '#f59e0b' },
+        { text: '---------------------------------------------------', color: pip },
+        { text: '   1 - access("E"."DEPARTMENT_ID"="D"."DEPARTMENT_ID")', color: '#fbbf24' },
+        { text: '   3 - access("E"."DEPARTMENT_ID">50)', color: '#fbbf24' },
+      ],
+    },
+    {
+      label: isKo ? '④ Column Projection' : '④ Column Projection',
+      color: '#a78bfa',
+      lines: [
+        { text: 'Column Projection Information (identified by operation id):', color: '#a78bfa' },
+        { text: '----------------------------------------------------------', color: pip },
+        { text: '   1 - (#keys=1) "D"."DEPARTMENT_NAME"[VARCHAR2,30],', color: '#c4b5fd' },
+        { text: '       "E"."EMPLOYEE_ID"[NUMBER,22]', color: '#c4b5fd' },
+        { text: '   2 - "D"."DEPARTMENT_ID"[NUMBER,22], "D"."DEPARTMENT_NAME"[VARCHAR2,30]', color: '#c4b5fd' },
+        { text: '   3 - "E"."DEPARTMENT_ID"[NUMBER,22], "E"."EMPLOYEE_ID"[NUMBER,22]', color: '#c4b5fd' },
+      ],
+    },
+    {
+      label: isKo ? '⑤ Statistics  (SET AUTOTRACE)' : '⑤ Statistics  (SET AUTOTRACE)',
+      color: '#f87171',
+      lines: [
+        { text: '         0  recursive calls', color: '#fca5a5' },
+        { text: '         0  db block gets', color: '#fca5a5' },
+        { text: '        18  consistent gets', color: '#fca5a5' },
+        { text: '         0  physical reads', color: '#fca5a5' },
+        { text: '         0  redo size', color: '#fca5a5' },
+        { text: '        50  rows processed', color: '#fca5a5' },
+      ],
+    },
+  ]
+
+  return (
+    <div className="my-4 overflow-x-auto rounded-xl bg-[#0f172a] px-5 py-4 font-mono text-xs leading-relaxed">
+      {blocks.map((block, bi) => (
+        <div key={bi} className={bi > 0 ? 'mt-5' : ''}>
+          {/* 영역 레이블 */}
+          <div className="mb-1.5 flex items-center gap-2">
+            <span className="inline-block h-2 w-2 rounded-full" style={{ backgroundColor: block.color }} />
+            <span className="text-[11px] font-bold" style={{ color: block.color }}>{block.label}</span>
+          </div>
+          {/* 출력 내용 */}
+          <div>
+            {block.lines.map((line, li) => (
+              <div key={li} style={{ color: line.color || 'transparent' }} className="whitespace-pre">
+                {line.text || ' '}
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
     </div>
   )
 }

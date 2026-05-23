@@ -13,7 +13,9 @@ import { cn } from '@/lib/utils'
 
 const T = {
   ko: {
-    title: 'MVCC — 다중 버전 읽기 일관성',
+    title: 'MVCC',
+    titleSub: 'Multi-Version Concurrency Control',
+    titleDesc: '— 다중 버전 읽기 일관성',
     subtitle: 'Oracle은 데이터 블록의 여러 버전을 동시에 유지해, 읽기와 쓰기가 서로를 막지 않도록 합니다.',
     howTitle: 'MVCC는 어떻게 동작하나요?',
     howDesc:
@@ -28,7 +30,9 @@ const T = {
     undoDesc: 'Undo 데이터가 덮어쓰여지기 전에 오래된 트랜잭션의 CR Clone이 필요하면 ORA-01555: snapshot too old 오류가 발생합니다. UNDO_RETENTION 파라미터로 보관 기간을 늘려 방지할 수 있습니다.',
   },
   en: {
-    title: 'MVCC — Multiversion Read Consistency',
+    title: 'MVCC',
+    titleSub: 'Multi-Version Concurrency Control',
+    titleDesc: '— Multiversion Read Consistency',
     subtitle: 'Oracle maintains multiple simultaneous versions of data blocks so reads and writes never block each other.',
     howTitle: 'How does MVCC work?',
     howDesc:
@@ -122,7 +126,15 @@ export function MvccSection() {
     <PageContainer>
       <ChapterTitle
         icon={<IconHistory size={36} stroke={1.5} className="text-blue-500" />}
-        title={t.title}
+        title={
+          <span className="flex items-baseline gap-2 flex-wrap">
+            {t.title}
+            <span className="text-base font-normal text-muted-foreground tracking-normal whitespace-nowrap">
+              {t.titleSub}
+            </span>
+            <span className="text-2xl whitespace-nowrap">{t.titleDesc}</span>
+          </span>
+        }
         subtitle={t.subtitle}
       />
 

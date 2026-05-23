@@ -182,7 +182,7 @@ export const GLOSSARY: GlossaryTerm[] = [
       ko: '현재 트랜잭션의 모든 변경사항을 영구적으로 저장하는 TCL 명령어. COMMIT 이후에는 ROLLBACK 불가. LGWR가 Redo Log를 디스크에 기록한 뒤 완료 신호를 반환.',
       en: 'TCL command that permanently saves all changes in the current transaction. Irreversible after COMMIT. Completes only after LGWR writes the Redo Log to disk.',
     },
-    sectionIds: ['sql-basics-tcl', 'internals-update-flow'],
+    sectionIds: ['sql-basics-tcl'],
   },
   {
     term: 'CREATE TABLE',
@@ -592,7 +592,7 @@ export const GLOSSARY: GlossaryTerm[] = [
       ko: '읽기 작업이 쓰기 작업을 블로킹하지 않도록 Undo 세그먼트에 저장된 이전 이미지(CR 블록)를 제공하는 동시성 제어 방식. Oracle의 읽기 일관성(Read Consistency)의 핵심 원리.',
       en: 'Concurrency control method where read operations never block write operations by serving before-images (CR blocks) from the Undo segment. The core principle behind Oracle\'s Read Consistency.',
     },
-    sectionIds: ['internals-update-flow', 'internals-overview'],
+    sectionIds: ['internals-overview'],
   },
   {
     term: 'MAXTRANS',
@@ -802,7 +802,7 @@ export const GLOSSARY: GlossaryTerm[] = [
       ko: '현재 트랜잭션의 모든 미확정 변경사항을 취소하고 이전 상태로 되돌리는 TCL 명령어. Undo 세그먼트의 이전 이미지를 사용해 변경사항을 역순으로 적용.',
       en: 'TCL command that cancels all uncommitted changes in the current transaction and reverts to the previous state. Uses before-images from the Undo segment to reverse changes in reverse order.',
     },
-    sectionIds: ['sql-basics-tcl', 'internals-update-flow'],
+    sectionIds: ['sql-basics-tcl'],
   },
   {
     term: 'Row Chaining',
@@ -1024,7 +1024,7 @@ export const GLOSSARY: GlossaryTerm[] = [
       ko: '테이블에서 조건을 만족하는 행의 컬럼 값을 변경하는 DML 명령어. WHERE 절 없이 실행하면 전체 행이 업데이트됨. 변경 전 값은 Undo 세그먼트에, 변경 이력은 Redo Log에 기록.',
       en: 'DML command that modifies column values for rows matching a WHERE condition. Without WHERE, all rows are updated. Before-images are stored in the Undo segment; changes are recorded in the Redo Log.',
     },
-    sectionIds: ['sql-basics-dml', 'internals-update-flow'],
+    sectionIds: ['sql-basics-dml'],
   },
   {
     term: 'UNDO',

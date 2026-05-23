@@ -173,8 +173,6 @@ export function LocksSection() {
         />
       </AccordionSection>
 
-      <Divider />
-
       <InfoBox variant="warning">
         <strong>{t.fkTitle}</strong>
         <br />

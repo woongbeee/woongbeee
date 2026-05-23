@@ -1175,7 +1175,9 @@ export function StorageSection() {
         </div>
       </AccordionSection>
 
-      <InfoBox variant="summary">{t.infoBody}</InfoBox>
+      <div className="mt-8">
+        <InfoBox variant="summary">{t.infoBody}</InfoBox>
+      </div>
     </PageContainer>
   )
 }

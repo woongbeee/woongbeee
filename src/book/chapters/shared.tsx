@@ -44,7 +44,7 @@ export function PageContainer({ children, className }: { children: ReactNode; cl
 
 export type Lang = 'ko' | 'en'
 
-export function ChapterTitle({ icon, title, subtitle }: { icon?: ReactNode; title: string; subtitle?: ReactNode }) {
+export function ChapterTitle({ icon, title, subtitle }: { icon?: ReactNode; title: ReactNode; subtitle?: ReactNode }) {
   return (
     <div className="mb-5">
       <div className="flex items-center gap-3">
@@ -239,7 +239,7 @@ export function AccordionSection({
   const [open, setOpen] = useState(defaultOpen)
   const [hovered, setHovered] = useState(false)
   return (
-    <div className="bg-card">
+    <div className="bg-card border-t">
       <button
         onClick={() => setOpen((v) => !v)}
         onMouseEnter={() => setHovered(true)}

@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils'
 
 // keyword → color category
-type KwCategory = 'ddl' | 'dml' | 'dcl' | 'tcl' | 'clause' | 'func' | 'logic'
+type KwCategory = 'ddl' | 'dml' | 'dcl' | 'tcl' | 'clause' | 'func' | 'logic' | 'plan'
 
 interface KwDef {
   words: string[]
@@ -55,6 +55,20 @@ const KW_GROUPS: KwDef[] = [
     ],
   },
   {
+    category: 'plan',
+    words: [
+      'EXPLAIN PLAN FOR', 'EXPLAIN PLAN',
+      'DBMS_XPLAN.DISPLAY_CURSOR', 'DBMS_XPLAN.DISPLAY',
+      'DBMS_XPLAN.DISPLAY_AWR',
+      'SET AUTOTRACE',
+      'AUTOTRACE TRACEONLY STATISTICS', 'AUTOTRACE TRACEONLY', 'AUTOTRACE ON', 'AUTOTRACE OFF',
+      'GATHER_PLAN_STATISTICS',
+      'ALLSTATS LAST', 'ALLSTATS',
+      'STATISTICS_LEVEL',
+      'V$SQL_PLAN', 'PLAN_TABLE',
+    ],
+  },
+  {
     category: 'func',
     words: [
       'COUNT', 'SUM', 'AVG', 'MAX', 'MIN',
@@ -76,6 +90,7 @@ const CATEGORY_CLASS: Record<KwCategory, string> = {
   clause: 'text-ios-blue dark:text-ios-blue',
   func:   'text-cyan-600 dark:text-cyan-400',
   logic:  'text-ios-blue dark:text-ios-blue',
+  plan:   'text-rose-500 dark:text-rose-400',
 }
 
 const ACTIVE_CLASS = 'bg-ios-orange-light text-ios-orange-dark ring-1 ring-ios-orange/40'
@@ -86,9 +101,13 @@ const ALL_KEYWORDS = KW_GROUPS.flatMap(({ words, category }) =>
 ).sort((a, b) => b.word.length - a.word.length)
 
 const PATTERN = new RegExp(
-  '\\b(' +
-    ALL_KEYWORDS.map((k) => k.word.replace(/\s+/g, '\\s+')).join('|') +
-  ')\\b',
+  '(?<![\\w.])(' +
+    ALL_KEYWORDS.map((k) =>
+      k.word
+        .replace(/\./g, '\\.')
+        .replace(/\s+/g, '\\s+')
+    ).join('|') +
+  ')(?![\\w.])',
   'gi',
 )
 

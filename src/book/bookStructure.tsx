@@ -406,7 +406,13 @@ export const BOOK_CHAPTERS: BookChapter[] = [
       },
       {
         id: 'optimizer-plan',
-        title: { ko: '실행 계획 생성', en: 'Execution Plan Generation' },
+        title: { ko: '실행 계획', en: 'Execution Plan' },
+        children: [
+          {
+            id: 'optimizer-plan-reading',
+            title: { ko: '실행 계획 읽는 연습하기', en: 'Practice Reading Execution Plans' },
+          },
+        ],
       },
       {
         id: 'optimizer-simulator',
@@ -501,24 +507,42 @@ export const BOOK_CHAPTERS: BookChapter[] = [
         title: { ko: '파티셔닝 개요', en: 'Partitioning Overview' },
       },
       {
-        id: 'partition-range',
-        title: {
-          ko: 'Range / List / Hash 파티션',
-          en: 'Range / List / Hash Partition',
-        },
+        id: 'partition-strategies',
+        title: { ko: '파티셔닝 전략', en: 'Partitioning Strategies' },
+        children: [
+          {
+            id: 'partition-range',
+            title: { ko: 'Range / Interval 파티션', en: 'Range / Interval Partition' },
+          },
+          {
+            id: 'partition-list',
+            title: { ko: 'List 파티션', en: 'List Partition' },
+          },
+          {
+            id: 'partition-hash',
+            title: { ko: 'Hash 파티션', en: 'Hash Partition' },
+          },
+          {
+            id: 'partition-composite',
+            title: { ko: 'Composite 파티션', en: 'Composite Partition' },
+          },
+          {
+            id: 'partition-reference',
+            title: { ko: 'Reference 파티션', en: 'Reference Partition' },
+          },
+        ],
+      },
+      {
+        id: 'partition-indexes',
+        title: { ko: '파티셔닝된 인덱스', en: 'Partitioned Indexes' },
       },
       {
         id: 'partition-pruning',
         title: { ko: 'Partition Pruning', en: 'Partition Pruning' },
       },
       {
-        id: 'partition-simulator',
-        title: { ko: 'Partition Simulator', en: 'Partition Simulator' },
-        hasSimulator: true,
-        simulatorLabel: {
-          ko: '파티션 시뮬레이터 실행',
-          en: 'Launch Partition Simulator',
-        },
+        id: 'partition-wise-join',
+        title: { ko: 'Partition-Wise Join', en: 'Partition-Wise Join' },
       },
     ],
   },

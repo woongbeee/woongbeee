@@ -8,7 +8,6 @@ import {
   InfoBox,
   Divider,
   Table,
-  AccordionSection,
   SqlBlock,
 } from '../../shared'
 
@@ -93,24 +92,25 @@ export function IsolationSection() {
 
       <SectionTitle>{t.levelsTitle}</SectionTitle>
 
-      <AccordionSection title={t.readCommittedTitle} defaultOpen>
-        <Prose>{t.readCommittedDesc}</Prose>
-        <div className="mt-4">
-          <SqlBlock
-            sql={lang === 'ko' ? `-- 기본값 — 별도 설정 필요 없음
+      <SectionTitle>{t.readCommittedTitle}</SectionTitle>
+      <Prose>{t.readCommittedDesc}</Prose>
+      <div className="mt-4">
+        <SqlBlock
+          sql={lang === 'ko' ? `-- 기본값 — 별도 설정 필요 없음
 -- 세션 수준으로 변경 시:
 ALTER SESSION SET ISOLATION_LEVEL = READ COMMITTED;` : `-- Default — no extra setup needed
 -- To set at session level:
 ALTER SESSION SET ISOLATION_LEVEL = READ COMMITTED;`}
-          />
-        </div>
-      </AccordionSection>
+        />
+      </div>
 
-      <AccordionSection title={t.serializableTitle}>
-        <Prose>{t.serializableDesc}</Prose>
-        <div className="mt-4">
-          <SqlBlock
-            sql={lang === 'ko' ? `ALTER SESSION SET ISOLATION_LEVEL = SERIALIZABLE;
+      <Divider />
+
+      <SectionTitle>{t.serializableTitle}</SectionTitle>
+      <Prose>{t.serializableDesc}</Prose>
+      <div className="mt-4">
+        <SqlBlock
+          sql={lang === 'ko' ? `ALTER SESSION SET ISOLATION_LEVEL = SERIALIZABLE;
 
 -- 다른 트랜잭션이 같은 행을 수정·커밋한 뒤 이 트랜잭션이
 -- 같은 행을 수정하려 하면:
@@ -119,16 +119,16 @@ ALTER SESSION SET ISOLATION_LEVEL = READ COMMITTED;`}
 -- If another transaction modifies and commits the same row
 -- and this transaction then tries to modify it:
 -- ORA-08177: cannot serialize access for this transaction`}
-          />
-        </div>
-      </AccordionSection>
+        />
+      </div>
 
-      <AccordionSection title={t.readOnlyTitle}>
-        <Prose>{t.readOnlyDesc}</Prose>
-        <div className="mt-4">
-          <SqlBlock sql="SET TRANSACTION READ ONLY;" />
-        </div>
-      </AccordionSection>
+      <Divider />
+
+      <SectionTitle>{t.readOnlyTitle}</SectionTitle>
+      <Prose>{t.readOnlyDesc}</Prose>
+      <div className="mt-4">
+        <SqlBlock sql="SET TRANSACTION READ ONLY;" />
+      </div>
 
       <Divider />
 

@@ -5,6 +5,7 @@ import { OptimizerOverviewPage } from './overview/OverviewSection'
 import { OptimizerStatsPage } from './stats/StatsSection'
 import { OptimizerAccessPathPage } from './access-path/AccessPathSection'
 import { OptimizerPlanPage } from './plan/PlanSection'
+import { PlanReadingSection } from './plan/PlanReadingSection'
 
 const LANDING_ITEMS = {
   ko: [
@@ -42,6 +43,7 @@ export function OptimizerChapterPage({ sectionId }: { sectionId: string }) {
   if (sectionId === 'optimizer-stats')        return <OptimizerStatsPage />
   if (sectionId === 'optimizer-access-path')  return <OptimizerAccessPathPage />
   if (sectionId === 'optimizer-plan')         return <OptimizerPlanPage />
+  if (sectionId === 'optimizer-plan-reading') return <PlanReadingSection />
 
   return (
     <PageContainer>

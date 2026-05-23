@@ -10,9 +10,11 @@ import { UgaSection } from './overview/uga/UgaSection'
 import { ProcessOverviewSection } from './overview/process/ProcessOverviewSection'
 import { ServerProcessSection } from './overview/process/ServerProcessSection'
 import { BackgroundProcessSection } from './overview/process/BackgroundProcessSection'
-// import {
-//   ConcurrencySection
-// } from './concurrency/ConcurrencySection'
+import { ConcurrencySection } from './concurrency/ConcurrencySection'
+import { MvccSection } from './concurrency/MvccSection'
+import { IsolationSection } from './concurrency/IsolationSection'
+import { LocksSection } from './concurrency/LocksSection'
+import { DeadlockSection } from './concurrency/DeadlockSection'
 import {
   TransactionSection,
   TransactionOverviewSection,
@@ -35,11 +37,11 @@ export function InternalsPage({ sectionId }: { sectionId: string }) {
   if (sectionId === 'internals-process-server')       return <ServerProcessSection />
   if (sectionId === 'internals-process-background')   return <BackgroundProcessSection />
   if (sectionId === 'internals-storage')              return <StorageSection />
-  // if (sectionId === 'internals-concurrency')          return <ConcurrencySection />
-  // if (sectionId === 'internals-concurrency-mvcc')     return <MvccSection />
-  // if (sectionId === 'internals-concurrency-isolation') return <IsolationSection />
-  // if (sectionId === 'internals-concurrency-locks')    return <LocksSection />
-  // if (sectionId === 'internals-concurrency-deadlock') return <DeadlockSection />
+  if (sectionId === 'internals-concurrency')          return <ConcurrencySection />
+  if (sectionId === 'internals-concurrency-mvcc')     return <MvccSection />
+  if (sectionId === 'internals-concurrency-isolation') return <IsolationSection />
+  if (sectionId === 'internals-concurrency-locks')    return <LocksSection />
+  if (sectionId === 'internals-concurrency-deadlock') return <DeadlockSection />
   if (sectionId === 'internals-transaction')               return <TransactionSection />
   if (sectionId === 'internals-transaction-overview')      return <TransactionOverviewSection />
   if (sectionId === 'internals-transaction-acid')          return <TransactionAcidSection />

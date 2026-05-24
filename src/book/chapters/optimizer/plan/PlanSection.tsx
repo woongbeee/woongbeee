@@ -82,20 +82,20 @@ ALTER SESSION SET sql_trace = FALSE;
 -- 4단계: OS에서 TKPROF로 .trc 파일 포맷팅
 -- tkprof <trace_file>.trc output.txt sys=no`,
     sqlTraceCols: [
-      ['call', 'SQL 실행 단계. Parse(파싱·최적화), Execute(실제 실행), Fetch(결과 인출) 세 단계로 분리됨.'],
-      ['count', '해당 단계가 호출된 횟수. Soft Parse가 반복되면 Parse count가 높아짐.'],
-      ['cpu', '해당 단계에서 사용한 CPU 시간(초). Parse cpu가 높으면 Hard Parse가 자주 발생하는 것.'],
-      ['elapsed', '해당 단계의 실제 경과 시간(초). cpu와의 차이가 크면 대기 이벤트가 존재함.'],
-      ['disk', '디스크에서 직접 읽은 블록 수(Physical Reads). Buffer Cache Miss 횟수.'],
-      ['query', 'Consistent Read(CR). 읽기 일관성을 위해 읽은 논리 블록 수.'],
-      ['current', 'Current Read. DML이 최신 블록을 직접 읽은 횟수. SELECT에서는 보통 0.'],
-      ['rows', '해당 단계에서 처리한 행 수. Fetch rows가 실제로 반환된 결과 행 수.'],
+      ['call', 'SQL 실행의 세 단계를 나타냅니다.\n\nParse — SQL을 파싱하고 CBO가 실행 계획을 수립하는 단계\nExecute — 계획대로 데이터를 실제로 처리하는 단계\nFetch — 처리 결과를 클라이언트로 인출하는 단계'],
+      ['count', '해당 단계가 몇 번 호출되었는지를 나타냅니다.\n\nSoft Parse는 Library Cache에서 기존 계획을 재사용하므로 비용이 낮습니다. Hard Parse(Misses in library cache ≥ 1)는 계획을 새로 수립하므로 비용이 크며, 반복되면 성능에 큰 영향을 줍니다.'],
+      ['cpu', '해당 단계에서 실제 CPU를 점유한 시간(초)입니다.\n\nParse cpu가 높다면 바인드 변수를 사용하지 않아 Hard Parse가 반복되고 있을 가능성이 큽니다.'],
+      ['elapsed', '해당 단계의 실제 경과 시간(초)입니다.\n\ncpu보다 elapsed가 훨씬 크다면 CPU를 쓰지 않고 무언가를 기다리고 있다는 뜻입니다. Lock 경합·디스크 I/O 대기 등 Wait Event를 확인하세요.'],
+      ['disk', 'Buffer Cache에 없어 디스크(데이터 파일)에서 직접 읽어야 했던 블록 수입니다(Physical Reads).\n\n첫 실행 후에도 disk가 높게 유지된다면 Buffer Cache 적중률이 낮거나 인덱스 활용이 부족한 것입니다.'],
+      ['query', 'Consistent Read(CR) 수입니다.\n\nOracle은 쿼리 시작 시점의 스냅샷 기준으로 데이터를 읽어 읽기 일관성을 보장합니다. 다른 트랜잭션이 해당 블록을 변경 중이라면 Undo 세그먼트에서 변경 이전 버전을 재구성해 읽으므로, 논리적으로 읽은 블록 수가 더 많아질 수 있습니다.'],
+      ['current', 'Current Read 수입니다.\n\n블록의 가장 최신 버전을 직접 읽는 방식으로, INSERT·UPDATE·DELETE 같은 DML이 데이터를 변경할 때 사용합니다. 순수 SELECT에서는 일반적으로 0입니다.'],
+      ['rows', '해당 단계에서 처리한 행 수입니다.\n\nFetch rows — 클라이언트에 실제로 반환된 결과 행 수\nExecute rows — DML이 처리한 행 수'],
     ],
     sqlTraceExtraTitle: '부가 정보 항목',
     sqlTraceExtraCols: [
-      ['Misses in library cache during parse', 'Parse 단계에서 Library Cache에서 실행 계획을 찾지 못한 횟수. 1 이상이면 Hard Parse가 발생했음을 의미. 바인드 변수 미사용이 주원인.'],
-      ['Optimizer mode', 'SQL 실행에 사용된 옵티마이저 모드. ALL_ROWS(처리량 최적화, 기본값)·FIRST_ROWS(응답속도 최적화) 중 하나.'],
-      ['Parsing user id', 'SQL을 파싱한 사용자의 내부 ID. 어떤 계정이 이 SQL을 실행했는지 추적할 때 사용.'],
+      ['Misses in library cache\nduring parse', 'Parse 단계에서 Library Cache에 실행 계획이 없어 Hard Parse가 발생한 횟수입니다.\n\n1 이상이면 Hard Parse가 발생했음을 의미하며, 바인드 변수 미사용이 주원인입니다.'],
+      ['Optimizer mode', 'SQL 실행에 사용된 옵티마이저 모드입니다.\n\nALL_ROWS — 전체 처리량 최적화 (기본값)\nFIRST_ROWS — 첫 번째 결과의 응답속도 최적화'],
+      ['Parsing user id', 'SQL을 파싱한 사용자의 내부 ID입니다.\n\n어떤 계정이 이 SQL을 실행했는지 추적할 때 사용합니다.'],
     ],
     sqlTraceAnalysis: 'Call Statistics로 성능 분석하기',
     sqlTraceAnalysisDesc:
@@ -119,14 +119,19 @@ SELECT * FROM TABLE(
     format => 'ALLSTATS LAST'
   )
 );`,
+    rsoColHeaders: ['컬럼', '설명'],
     rsoCols: [
-      ['Starts', '이 오퍼레이션이 실행된 횟수. Nested Loop 내부 오퍼레이션은 드라이빙 행 수만큼 반복됨.'],
-      ['E-Rows', 'Estimated Rows — CBO가 추정한 반환 행 수.'],
-      ['A-Rows', 'Actual Rows — 실제로 이 오퍼레이션이 반환한 행 수. E-Rows와 크게 다르면 통계 문제 신호.'],
-      ['A-Time', '이 오퍼레이션의 실제 경과 시간 (누적). 시간이 몰리는 오퍼레이션이 병목.'],
+      ['Id', '오퍼레이션 고유 번호. * 표시가 붙은 Id는 조건절(Predicate Information)이 있음을 의미.'],
+      ['Operation', '실제 수행된 오퍼레이션 이름.\n\n읽는 순서: 들여쓰기가 깊을수록 먼저 실행되어 결과를 부모 오퍼레이션에 전달합니다. 같은 깊이의 형제는 위에서 아래 순서로 실행됩니다. 아래 예시에서는 ④ → ③ → ② → ① → ⓪ 순으로 실행됩니다.'],
+      ['Name', '오퍼레이션이 대상으로 한 테이블 또는 인덱스 이름.'],
+      ['Rows', 'E-Rows — CBO가 반환될 것으로 추정한 행 수.'],
+      ['Cost', 'CBO가 계산한 이 오퍼레이션의 상대적 비용.'],
+      ['Time', 'CBO가 추정한 수행 시간 (HH:MM:SS).'],
+      ['A-Rows', 'Actual Rows — 실제로 반환된 행 수. Rows(E-Rows)와 크게 차이나면 통계 문제 신호.'],
       ['CR', 'Consistent Reads — 읽기 일관성을 위해 읽은 논리 블록 수 (누적, 자식 포함).'],
       ['PR', 'Physical Reads — 디스크에서 직접 읽은 블록 수. 0이면 Buffer Cache에서 모두 처리.'],
-      ['PW', 'Physical Writes — Direct Path나 정렬 임시 기록 등으로 쓴 블록 수.'],
+      ['PW', 'Physical Writes — Direct Path나 정렬 임시 기록 등으로 디스크에 쓴 블록 수.'],
+      ['A-Time', '이 오퍼레이션의 실제 경과 시간 (누적). 값이 가장 큰 오퍼레이션이 병목.'],
     ],
     rsoAnalysis: 'Row Source Operation으로 성능 분석하기',
     rsoAnalysisTable: [
@@ -285,14 +290,14 @@ ALTER SESSION SET sql_trace = FALSE;
 -- Step 4: Format the .trc file with TKPROF (OS command)
 -- tkprof <trace_file>.trc output.txt sys=no`,
     sqlTraceCols: [
-      ['call', 'Execution phase: Parse (parse + optimize), Execute (actual execution), Fetch (result retrieval).'],
-      ['count', 'Number of times this phase was called. High Parse count indicates repeated Soft or Hard Parses.'],
-      ['cpu', 'CPU time consumed in this phase (seconds). High Parse cpu = frequent Hard Parse.'],
-      ['elapsed', 'Wall-clock time for this phase (seconds). A large gap between elapsed and cpu means wait events are present.'],
-      ['disk', 'Physical Reads — blocks read from disk (Buffer Cache miss).'],
-      ['query', 'Consistent Reads (CR) — logical block reads for read consistency.'],
-      ['current', 'Current Reads — blocks read for the latest version, typically by DML. Usually 0 for SELECT.'],
-      ['rows', 'Rows processed in this phase. Fetch rows = actual result rows returned to the client.'],
+      ['call', 'The three phases of SQL execution.\n\nParse — SQL parsing and CBO plan selection\nExecute — the plan is carried out against the data\nFetch — resulting rows are sent back to the client'],
+      ['count', 'How many times this phase was invoked.\n\nSoft Parses reuse a cached plan and are cheap. Hard Parses (Misses in library cache ≥ 1) rebuild the plan from scratch and are expensive — repeated Hard Parses usually mean bind variables are not being used.'],
+      ['cpu', 'CPU time actively consumed in this phase (seconds).\n\nHigh Parse cpu typically means Hard Parses are happening repeatedly — usually because bind variables are not being used.'],
+      ['elapsed', 'Wall-clock time for this phase (seconds).\n\nWhen elapsed is significantly larger than cpu, the session is waiting rather than working. Common culprits are lock contention and disk I/O waits.'],
+      ['disk', 'Physical Reads — blocks read directly from datafiles because they were not in the Buffer Cache.\n\nIf disk remains high after the first execution, Buffer Cache hit rate is low or index usage is insufficient.'],
+      ['query', 'Consistent Reads (CR) — logical block reads Oracle performed to guarantee read consistency.\n\nOracle reads data as of the snapshot taken at query start time. If another transaction has since modified a block, Oracle reconstructs the prior version from the Undo segment — so logical reads can exceed the actual data volume.\n\nA high CR count relative to rows returned usually points to a Full Table Scan or poor index efficiency.'],
+      ['current', 'Current Reads — blocks read in their most up-to-date form.\n\nUsed by DML (INSERT, UPDATE, DELETE) that needs the latest version of a block. Nearly always 0 for plain SELECT statements.'],
+      ['rows', 'Rows processed in this phase.\n\nFetch rows — actual result rows returned to the client\nExecute rows — rows processed by a DML statement'],
     ],
     sqlTraceExtraTitle: 'Supplementary Fields',
     sqlTraceExtraCols: [
@@ -321,14 +326,19 @@ SELECT * FROM TABLE(
     format => 'ALLSTATS LAST'
   )
 );`,
+    rsoColHeaders: ['Column', 'Description'],
     rsoCols: [
-      ['Starts', 'Number of times this operation was executed. Nested Loop inner nodes repeat once per driving row.'],
-      ['E-Rows', 'Estimated Rows — CBO\'s predicted row count before execution.'],
-      ['A-Rows', 'Actual Rows — real row count from this operation. Large gap vs E-Rows signals a statistics problem.'],
-      ['A-Time', 'Actual elapsed time for this operation (cumulative). The operation with the most A-Time is the bottleneck.'],
+      ['Id', 'Unique operation identifier. An asterisk (*) means a predicate is listed in the Predicate Information section.'],
+      ['Operation', 'The operation performed.\n\nHow to read: execution starts at the most-indented (innermost) operation, which passes its result up to its parent. Siblings at the same depth run top-to-bottom. In the example below, the order is ④ → ③ → ② → ① → ⓪.'],
+      ['Name', 'The table or index the operation acts on.'],
+      ['Rows', 'E-Rows — the CBO\'s estimated row count before execution.'],
+      ['Cost', 'Relative cost the CBO assigned to this operation.'],
+      ['Time', 'CBO-estimated wall-clock time for this operation (HH:MM:SS).'],
+      ['A-Rows', 'Actual Rows — real rows returned. A large gap vs Rows (E-Rows) signals a statistics problem.'],
       ['CR', 'Consistent Reads — logical blocks read for read consistency (cumulative, includes children).'],
       ['PR', 'Physical Reads — blocks read from disk. 0 means all served from Buffer Cache.'],
-      ['PW', 'Physical Writes — blocks written to disk (direct path, temp sort spill, etc.).'],
+      ['PW', 'Physical Writes — blocks written to disk (direct path write, temp sort spill, etc.).'],
+      ['A-Time', 'Actual elapsed time for this operation (cumulative). The operation with the highest A-Time is the bottleneck.'],
     ],
     rsoAnalysis: 'Performance Analysis with Row Source Operation',
     rsoAnalysisTable: [
@@ -425,6 +435,35 @@ SET AUTOTRACE TRACEONLY STATISTICS`,
   },
 }
 
+function MultilineTable({ headers, rows }: { headers: string[]; rows: string[][] }) {
+  return (
+    <div className="mb-6 overflow-hidden rounded-lg border">
+      <table className="w-full text-xs">
+        <thead>
+          <tr className="border-b bg-muted/60">
+            {headers.map((h, i) => (
+              <th key={i} className="px-4 py-2.5 text-left font-mono font-bold text-muted-foreground">
+                {h}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row, ri) => (
+            <tr key={ri} className={`border-b last:border-0 ${ri % 2 === 0 ? 'bg-background' : 'bg-muted/20'}`}>
+              {row.map((cell, ci) => (
+                <td key={ci} className={`px-4 py-3 font-mono text-[11px] text-foreground/80 align-top whitespace-pre-line${ci === 0 ? ' font-semibold text-foreground w-36' : ci === 1 && row.length > 2 ? ' w-36 text-muted-foreground' : ' leading-relaxed'}`}>
+                  {cell}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )
+}
+
 export function OptimizerPlanPage() {
   const lang = useSimulationStore((s) => s.lang)
   const t = T[lang]
@@ -442,21 +481,21 @@ export function OptimizerPlanPage() {
 
       {/* ── 5가지 정보 영역 개요 ── */}
       <SectionTitle>{t.areasTitle}</SectionTitle>
-      <div className="mb-6 overflow-x-auto rounded-lg border border-border">
-        <table className="w-full text-sm">
+      <div className="mb-6 overflow-hidden rounded-lg border">
+        <table className="w-full text-xs">
           <thead>
-            <tr className="border-b border-border bg-muted/50">
+            <tr className="border-b bg-muted/60">
               {(isKo ? ['번호', '영역', '내용'] : ['#', 'Area', 'Description']).map((h, i) => (
-                <th key={h} className={`px-4 py-2 text-left font-semibold text-foreground${i === 0 ? ' whitespace-nowrap' : ''}`}>{h}</th>
+                <th key={i} className="px-4 py-2.5 text-left font-mono font-bold text-muted-foreground">{h}</th>
               ))}
             </tr>
           </thead>
           <tbody>
-            {t.areasTable.map((row, i) => (
-              <tr key={i} className="border-b border-border last:border-0 hover:bg-muted/30">
-                <td className="px-4 py-3 text-base font-bold text-amber-500 w-10 whitespace-nowrap">{row[0]}</td>
-                <td className="px-4 py-3 font-mono font-semibold text-blue-600 whitespace-nowrap w-52">{row[1]}</td>
-                <td className="px-4 py-3 text-muted-foreground">{row[2]}</td>
+            {t.areasTable.map((row, ri) => (
+              <tr key={ri} className={`border-b last:border-0 ${ri % 2 === 0 ? 'bg-background' : 'bg-muted/20'}`}>
+                <td className="px-4 py-2 font-mono text-base font-bold text-foreground/80">{row[0]}</td>
+                <td className="px-4 py-2 font-mono text-[11px] text-foreground/80">{row[1]}</td>
+                <td className="px-4 py-2 font-mono text-[11px] text-foreground/80">{row[2]}</td>
               </tr>
             ))}
           </tbody>
@@ -471,17 +510,23 @@ export function OptimizerPlanPage() {
       <div className="mt-4">
         <SqlBlock sql={t.sqlTraceSql} />
       </div>
-      <SqlTraceDisplay lang={lang} />
-      <SubTitle>{isKo ? 'Call Statistics 컬럼 설명' : 'Call Statistics Column Reference'}</SubTitle>
-      <Table
-        headers={isKo ? ['컬럼', '설명'] : ['Column', 'Description']}
-        rows={t.sqlTraceCols}
-      />
-      <SubTitle>{t.sqlTraceExtraTitle}</SubTitle>
-      <Table
-        headers={isKo ? ['항목', '설명'] : ['Field', 'Description']}
-        rows={t.sqlTraceExtraCols}
-      />
+      <div className="mt-6">
+        <SqlTraceDisplay lang={lang} />
+      </div>
+      <div className="mt-6">
+        <SubTitle>{isKo ? 'Call Statistics 컬럼 설명' : 'Call Statistics Column Reference'}</SubTitle>
+        <MultilineTable
+          headers={isKo ? ['컬럼', '설명'] : ['Column', 'Description']}
+          rows={t.sqlTraceCols}
+        />
+      </div>
+      <div className="mt-6">
+        <SubTitle>{t.sqlTraceExtraTitle}</SubTitle>
+        <MultilineTable
+          headers={isKo ? ['항목', '설명'] : ['Field', 'Description']}
+          rows={t.sqlTraceExtraCols}
+        />
+      </div>
       <InfoBox variant="usage">
         <strong>{t.sqlTraceAnalysis}</strong>
         <br />
@@ -510,12 +555,21 @@ export function OptimizerPlanPage() {
       <div className="mt-4">
         <SqlBlock sql={t.rsoCursorSql} />
       </div>
-      <RowSourceOperationDisplay lang={lang} />
-      <SubTitle>{isKo ? 'Row Source Operation 컬럼 설명' : 'Row Source Operation Column Reference'}</SubTitle>
-      <Table
-        headers={isKo ? ['컬럼', '설명'] : ['Column', 'Description']}
-        rows={t.rsoCols}
-      />
+      <div className="mt-6">
+        <RowSourceOperationDisplay lang={lang} />
+      </div>
+      <InfoBox variant="tip">
+        {isKo
+          ? 'Row Source Operation은 트리 구조를 표현합니다. 들여쓰기가 깊을수록 먼저 실행됩니다. 가장 안쪽 오퍼레이션부터 시작해 결과를 부모에게 전달하며 루트(Id 0)까지 올라갑니다. 같은 깊이의 형제는 위에서 아래 순서로 실행됩니다.'
+          : 'How to read — the plan is a tree. The most-indented (deepest) operation runs first and passes its result up to its parent, continuing to the root (Id 0). Siblings at the same depth run top-to-bottom.'}
+      </InfoBox>
+      <div className="mt-6">
+        <SubTitle>{isKo ? 'Row Source Operation 컬럼 설명' : 'Row Source Operation Column Reference'}</SubTitle>
+        <MultilineTable
+          headers={t.rsoColHeaders}
+          rows={t.rsoCols}
+        />
+      </div>
       <InfoBox variant="usage">
         <strong>{t.rsoAnalysis}</strong>
         <br />
@@ -554,12 +608,16 @@ export function OptimizerPlanPage() {
       <div className="mt-4">
         <SqlBlock sql={t.predSql} />
       </div>
-      <PredicateInfoDisplay lang={lang} />
-      <SubTitle>{isKo ? 'access vs filter 차이' : 'access vs filter'}</SubTitle>
-      <Table
-        headers={isKo ? ['유형', '의미', '성능 관점'] : ['Type', 'Meaning', 'Performance Impact']}
-        rows={t.predTypes}
-      />
+      <div className="mt-6">
+        <PredicateInfoDisplay lang={lang} />
+      </div>
+      <div className="mt-6">
+        <SubTitle>{isKo ? 'access vs filter 차이' : 'access vs filter'}</SubTitle>
+        <Table
+          headers={isKo ? ['유형', '의미', '성능 관점'] : ['Type', 'Meaning', 'Performance Impact']}
+          rows={t.predTypes}
+        />
+      </div>
       <InfoBox variant="usage">
         <strong>{t.predAnalysis}</strong>
         <br />
@@ -574,12 +632,16 @@ export function OptimizerPlanPage() {
       <div className="mt-4">
         <SqlBlock sql={t.projSql} />
       </div>
-      <ColumnProjectionDisplay lang={lang} />
-      <SubTitle>{isKo ? 'Column Projection 항목 설명' : 'Column Projection Reference'}</SubTitle>
-      <Table
-        headers={isKo ? ['항목', '설명'] : ['Item', 'Description']}
-        rows={t.projCols}
-      />
+      <div className="mt-6">
+        <ColumnProjectionDisplay lang={lang} />
+      </div>
+      <div className="mt-6">
+        <SubTitle>{isKo ? 'Column Projection 항목 설명' : 'Column Projection Reference'}</SubTitle>
+        <Table
+          headers={isKo ? ['항목', '설명'] : ['Item', 'Description']}
+          rows={t.projCols}
+        />
+      </div>
       <InfoBox variant="usage">
         <strong>{t.projAnalysis}</strong>
         <br />
@@ -594,12 +656,16 @@ export function OptimizerPlanPage() {
       <div className="mt-4">
         <SqlBlock sql={t.statsAutoSql} />
       </div>
-      <StatisticsDisplay lang={lang} />
-      <SubTitle>{isKo ? 'Statistics 항목 설명' : 'Statistics Column Reference'}</SubTitle>
-      <Table
-        headers={isKo ? ['항목', '설명'] : ['Statistic', 'Description']}
-        rows={t.statsCols}
-      />
+      <div className="mt-6">
+        <StatisticsDisplay lang={lang} />
+      </div>
+      <div className="mt-6">
+        <SubTitle>{isKo ? 'Statistics 항목 설명' : 'Statistics Column Reference'}</SubTitle>
+        <Table
+          headers={isKo ? ['항목', '설명'] : ['Statistic', 'Description']}
+          rows={t.statsCols}
+        />
+      </div>
       <InfoBox variant="usage">
         <strong>{t.statsAnalysis}</strong>
         <br />
@@ -614,7 +680,9 @@ export function OptimizerPlanPage() {
       <div className="mt-4">
         <SqlBlock sql={t.fullPlanSql} />
       </div>
-      <FullPlanDisplay lang={lang} />
+      <div className="mt-6">
+        <FullPlanDisplay lang={lang} />
+      </div>
 
       <Divider />
 

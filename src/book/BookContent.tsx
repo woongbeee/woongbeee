@@ -63,7 +63,10 @@ export const BookContent = memo(function BookContent({ sectionId, onNavigate }: 
       </div>
 
       {/* Content area */}
-      <div className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto">
+      <div className={cn(
+        'min-h-0 flex-1',
+        sectionId === 'optimizer-simulator' ? 'overflow-hidden' : 'overflow-x-hidden overflow-y-auto',
+      )}>
         <AnimatePresence mode="wait">
           <motion.div
             key={sectionId}

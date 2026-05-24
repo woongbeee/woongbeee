@@ -253,8 +253,12 @@ export function AccordionSection({
           className={cn('shrink-0 text-muted-foreground transition-transform duration-200', open && 'rotate-180')}
         />
       </button>
-      <div className="border-b" />
-      {open && <div className="px-5 py-5">{children}</div>}
+      {open && (
+        <>
+          <div className="border-b" />
+          <div className="px-5 py-5">{children}</div>
+        </>
+      )}
     </div>
   )
 }

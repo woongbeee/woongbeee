@@ -5,6 +5,7 @@ import { useInternalsStore } from '@/store/internalsStore'
 import { TableOfContents } from './TableOfContents'
 import { BookContent } from './BookContent'
 import { GlossaryPanel } from './GlossaryPanel'
+import { SchemaPanel } from './SchemaPanel'
 import { Badge } from '@/components/ui/badge'
 import { IconLanguage, IconSettings, IconChevronRight } from '@tabler/icons-react'
 
@@ -59,14 +60,18 @@ export function BookLayout() {
   const setLang = useSimulationStore((s) => s.setLang)
   const t = T[lang]
 
-  const [tocOpen, setTocOpen]         = useState(true)
-  const [tocWidth, setTocWidth]       = useState(DEFAULT_WIDTH)
+  const [tocOpen, setTocOpen]           = useState(true)
+  const [tocWidth, setTocWidth]         = useState(DEFAULT_WIDTH)
   const [glossaryOpen, setGlossaryOpen] = useState(false)
+  const [schemaOpen, setSchemaOpen]     = useState(false)
   const [activeSectionId, setActiveSectionId] = useState('intro-overview')
 
   const toggleToc      = () => setTocOpen((v) => !v)
   const toggleGlossary = () => setGlossaryOpen((v) => !v)
+  const toggleSchema   = () => setSchemaOpen((v) => !v)
   const toggleLang     = () => setLang(lang === 'ko' ? 'en' : 'ko')
+
+  const isSimulator = activeSectionId === 'optimizer-simulator'
 
   // Drag-to-resize
   const onDragStart = (e: React.MouseEvent) => {
@@ -170,12 +175,16 @@ export function BookLayout() {
           />
         </main>
 
-        {/* Glossary Panel */}
-        <GlossaryPanel
-          sectionId={activeSectionId}
-          open={glossaryOpen}
-          onToggle={toggleGlossary}
-        />
+        {/* Right panel: Schema for simulator, Glossary elsewhere */}
+        {isSimulator ? (
+          <SchemaPanel open={schemaOpen} onToggle={toggleSchema} />
+        ) : (
+          <GlossaryPanel
+            sectionId={activeSectionId}
+            open={glossaryOpen}
+            onToggle={toggleGlossary}
+          />
+        )}
       </div>
     </div>
   )

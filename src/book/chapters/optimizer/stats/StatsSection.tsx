@@ -14,7 +14,6 @@ import {
   Divider,
   Table,
   ConceptGrid,
-  AccordionSection,
   SqlBlock,
 } from '../../shared'
 import { SelectivityWidget } from '../shared/diagrams'
@@ -147,13 +146,10 @@ export function OptimizerStatsPage() {
 
       <Divider />
 
-      <div className="mt-2">
-        <AccordionSection title={t.histTitle}>
-          <Prose>{t.histDesc}</Prose>
-          <div className="mt-4">
-            <SqlBlock sql={t.histSql} />
-          </div>
-        </AccordionSection>
+      <SectionTitle>{t.histTitle}</SectionTitle>
+      <Prose>{t.histDesc}</Prose>
+      <div className="mt-4">
+        <SqlBlock sql={t.histSql} />
       </div>
     </PageContainer>
   )

@@ -1,11 +1,12 @@
 import { IconBolt } from '@tabler/icons-react'
 import { useSimulationStore } from '@/store/simulationStore'
-import { PageContainer, ChapterTitle, ConceptGrid, SimulatorPlaceholder } from '../shared'
+import { PageContainer, ChapterTitle, ConceptGrid } from '../shared'
 import { OptimizerOverviewPage } from './overview/OverviewSection'
 import { OptimizerStatsPage } from './stats/StatsSection'
 import { OptimizerAccessPathPage } from './access-path/AccessPathSection'
 import { OptimizerPlanPage } from './plan/PlanSection'
 import { PlanReadingSection } from './plan/PlanReadingSection'
+import { OptimizerSimulator } from './simulator/OptimizerSimulator'
 
 const LANDING_ITEMS = {
   ko: [
@@ -24,20 +25,7 @@ export function OptimizerChapterPage({ sectionId }: { sectionId: string }) {
   const lang = useSimulationStore((s) => s.lang)
   const isKo = lang === 'ko'
 
-  if (sectionId === 'optimizer-simulator') {
-    return (
-      <PageContainer>
-        <ChapterTitle
-          icon={<IconBolt size={36} stroke={1.5} className="text-orange-500" />}
-          title="Optimizer Simulator"
-          subtitle={isKo
-            ? 'SQL을 입력하고 CBO가 생성하는 실행 계획을 확인하세요.'
-            : 'Enter a SQL query and inspect the execution plan the CBO generates.'}
-        />
-        <SimulatorPlaceholder label="Optimizer Simulator" color="orange" />
-      </PageContainer>
-    )
-  }
+  if (sectionId === 'optimizer-simulator') return <OptimizerSimulator />
 
   if (sectionId === 'optimizer-overview')     return <OptimizerOverviewPage />
   if (sectionId === 'optimizer-stats')        return <OptimizerStatsPage />

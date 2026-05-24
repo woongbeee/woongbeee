@@ -58,10 +58,12 @@ export function ExplainPlanTable({
   rows,
   showStats = false,
   caption,
+  lang = 'ko',
 }: {
   rows: PlanRow[]
   showStats?: boolean
   caption?: string
+  lang?: 'ko' | 'en'
 }) {
   // ── 컬럼 너비 계산 ──────────────────────────────────────────────
   const opW   = Math.max(9, ...rows.map(r => r.depth * 2 + r.operation.length))
@@ -163,24 +165,30 @@ export function ExplainPlanTable({
           <span className="block" style={{ color: '#475569' }}>{sep}</span>
         </pre>
       </div>
-      {hasNotes && (
-        <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 dark:border-amber-900/40 dark:bg-amber-950/20">
-          <div className="flex items-center gap-2 border-b border-amber-200 px-4 py-2 dark:border-amber-900/40">
-            <span className="text-xs font-bold text-amber-600 dark:text-amber-400">오퍼레이션별 설명</span>
-            <span className="rounded bg-amber-100 px-1.5 py-0.5 text-[10px] text-amber-500 dark:bg-amber-900/40 dark:text-amber-400">
-              조건절 있는 행 (* 표시)
-            </span>
+      {hasNotes && (() => {
+        const noteRows = rows.filter(r => r.note)
+        const isKo = lang === 'ko'
+        return (
+          <div className="mt-4 overflow-hidden rounded-xl border border-amber-200 bg-amber-50 dark:border-amber-900/40 dark:bg-amber-950/20">
+            <div className="grid grid-cols-[3rem_5rem_1fr] border-b border-amber-200 bg-amber-100/60 dark:border-amber-900/40 dark:bg-amber-900/20">
+              <span className="px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">Id</span>
+              <span className="px-2 py-2 text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">{isKo ? '실행 순서' : 'Exec Order'}</span>
+              <span className="px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">{isKo ? '설명' : 'Description'}</span>
+            </div>
+            <div className="divide-y divide-amber-100 dark:divide-amber-900/30">
+              {noteRows.map((row, idx) => (
+                <div key={row.id} className="grid grid-cols-[3rem_5rem_1fr]">
+                  <span className="px-3 py-2.5 font-mono text-xs font-bold text-amber-500 self-start">{row.id}</span>
+                  <span className="px-2 py-2.5 font-mono text-[11px] font-semibold text-amber-600 dark:text-amber-400 self-start">
+                    {isKo ? `${noteRows.length - idx}번째` : `${noteRows.length - idx}${idx === noteRows.length - 1 ? 'st' : idx === noteRows.length - 2 ? 'nd' : idx === noteRows.length - 3 ? 'rd' : 'th'}`}
+                  </span>
+                  <span className="px-3 py-2.5 text-xs leading-relaxed text-foreground/70">{row.note}</span>
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="divide-y divide-amber-100 dark:divide-amber-900/30">
-            {rows.filter(r => r.note).map(row => (
-              <div key={row.id} className="flex gap-3 px-4 py-2.5">
-                <span className="mt-0.5 shrink-0 font-mono text-xs font-bold text-amber-500">{row.id} -</span>
-                <span className="text-xs leading-relaxed text-foreground/70">{row.note}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+        )
+      })()}
     </div>
   )
 }
@@ -756,17 +764,21 @@ export function SqlTraceDisplay({ lang }: { lang: 'ko' | 'en' }) {
 // Row Source Operation 섹션 예시: ALLSTATS LAST 출력 (A-Rows, CR, PR, PW 포함)
 
 const RSO_ROWS_KO: PlanRow[] = [
-  { id: 0, depth: 0, operation: 'SELECT STATEMENT', rows: 50, cost: 12, actualRows: 50, cr: 18, pr: 0, pw: 0, elapsed: '00:00:00.02', note: '쿼리 전체가 0.02초 만에 완료되어 최종 50행을 반환했습니다. CR=18은 이 쿼리가 발생시킨 전체 논리 읽기 횟수로, 자식 오퍼레이션(1·2·3)의 읽기가 모두 누적된 값입니다.' },
-  { id: 1, depth: 1, operation: 'HASH JOIN', rows: 50, cost: 12, actualRows: 50, cr: 18, pr: 0, pw: 0, elapsed: '00:00:00.02', note: 'DEPARTMENTS(27행)를 Build Input으로 해시 테이블을 만들고, EMPLOYEES 인덱스 스캔 결과(107행)를 Probe해 50행을 조인했습니다. 해시 조인은 PGA 메모리에서 수행되며, PR=0이므로 디스크 유출(spill)은 없었습니다.' },
-  { id: 2, depth: 2, operation: 'TABLE ACCESS FULL', name: 'DEPARTMENTS', rows: 27, cost: 3, actualRows: 27, cr: 7, pr: 0, pw: 0, elapsed: '00:00:00.01', note: 'DEPARTMENTS 테이블을 Full Scan하여 27행을 읽었습니다. CBO 추정(E-Rows=27)과 실제(A-Rows=27)가 일치해 통계가 정확한 상태입니다. 논리 블록 7개(CR=7)를 읽었으며, 물리 읽기(PR=0)는 없어 모두 Buffer Cache에서 처리됐습니다.' },
-  { id: 3, depth: 2, operation: 'INDEX RANGE SCAN', name: 'EMP_DEPT_IX', rows: 107, cost: 2, actualRows: 107, cr: 3, pr: 0, pw: 0, elapsed: '00:00:00.01', note: 'EMP_DEPT_IX 인덱스를 Range Scan하여 DEPARTMENT_ID > 50 조건에 맞는 107개의 ROWID를 수집했습니다. 루트→브랜치→리프 순으로 3블록(CR=3)만 읽었으며, 물리 읽기(PR=0)는 없어 매우 효율적인 인덱스 탐색입니다.' },
+  { id: 0, depth: 0, operation: 'SELECT STATEMENT', rows: 85, cost: 47, time: '00:00:01', actualRows: 85, cr: 3847, pr: 312, pw: 0, elapsed: '00:00:02.14', note: '마지막으로 실행됩니다. 모든 자식 오퍼레이션의 CR·PR이 누적된 최종값을 보여줍니다. 쿼리 전체가 2.14초 걸려 85행을 반환했고, PR=312는 Buffer Cache를 벗어나 디스크에서 읽어야 했던 블록 수입니다.' },
+  { id: 1, depth: 1, operation: 'HASH JOIN', rows: 85, cost: 47, time: '00:00:01', actualRows: 85, cr: 3847, pr: 312, pw: 0, elapsed: '00:00:02.13', note: 'Id 2, 4→3의 결과를 받은 후 실행됩니다. DEPARTMENTS(11행)로 해시 테이블을 만들고 EMPLOYEES 결과(3,420행)로 Probe해 85행을 조인했습니다. E-Rows=85로 추정은 정확하나, 자식들의 CR·PR이 여기에 누적됩니다.' },
+  { id: 2, depth: 2, operation: 'TABLE ACCESS FULL', name: 'DEPARTMENTS', rows: 11, cost: 3, time: '00:00:01', actualRows: 11, cr: 8, pr: 0, pw: 0, elapsed: '00:00:00.01', note: 'Id 3보다 먼저, 위에서 아래 순서로 실행됩니다. DEPARTMENTS 전체를 스캔해 11행을 읽었습니다. E-Rows=11, A-Rows=11로 통계가 정확하고, CR=8로 논리 읽기도 적습니다. PR=0이므로 모두 Buffer Cache 히트입니다.' },
+  { id: 3, depth: 2, operation: 'TABLE ACCESS BY INDEX ROWID', name: 'EMPLOYEES', rows: 10, cost: 43, time: '00:00:01', actualRows: 3420, cr: 3839, pr: 312, pw: 0, elapsed: '00:00:02.12', note: '⚠️ Id 4의 결과(ROWID 목록)를 받아 실행됩니다. 병목 오퍼레이션. CBO는 10행을 예상(E-Rows=10)했지만 실제 3,420행(A-Rows=3,420)이 반환되었습니다. 통계 오류로 선택도를 크게 과소평가한 상태이며, ROWID마다 테이블 블록을 랜덤 읽어 CR=3,839, PR=312의 대규모 I/O가 발생했습니다.' },
+  { id: 4, depth: 3, operation: 'INDEX RANGE SCAN', name: 'EMP_NAME_IX', rows: 10, cost: 2, time: '00:00:01', actualRows: 3420, cr: 5, pr: 0, pw: 0, elapsed: '00:00:00.01', note: '가장 먼저 실행됩니다. 가장 안쪽(깊은 들여쓰기)이기 때문입니다. EMP_NAME_IX를 Range Scan해 3,420개의 ROWID를 수집해 부모(Id 3)에 전달합니다. 인덱스 탐색 자체는 CR=5로 효율적입니다.' },
+  { id: 5, depth: 1, operation: 'TABLE ACCESS FULL', name: 'DEPARTMENTS', rows: 11, cost: 3, time: '00:00:01', actualRows: 11, cr: 8, pr: 0, pw: 0, elapsed: '00:00:00.01' },
 ]
 
 const RSO_ROWS_EN: PlanRow[] = [
-  { id: 0, depth: 0, operation: 'SELECT STATEMENT', rows: 50, cost: 12, actualRows: 50, cr: 18, pr: 0, pw: 0, elapsed: '00:00:00.02', note: 'The entire query completed in 0.02s and returned 50 rows. CR=18 is the total logical reads for the whole query — it accumulates all reads from child operations (1, 2, 3).' },
-  { id: 1, depth: 1, operation: 'HASH JOIN', rows: 50, cost: 12, actualRows: 50, cr: 18, pr: 0, pw: 0, elapsed: '00:00:00.02', note: 'Built a hash table from DEPARTMENTS (27 rows) as the Build Input, then probed it with the 107 ROWIDs from the index scan, producing 50 joined rows. The hash join ran in PGA memory — PR=0 confirms there was no spill to disk.' },
-  { id: 2, depth: 2, operation: 'TABLE ACCESS FULL', name: 'DEPARTMENTS', rows: 27, cost: 3, actualRows: 27, cr: 7, pr: 0, pw: 0, elapsed: '00:00:00.01', note: 'Scanned the entire DEPARTMENTS table and read 27 rows. The CBO estimate (E-Rows=27) matches the actual (A-Rows=27), confirming statistics are accurate. 7 logical blocks were read (CR=7), all from Buffer Cache — no physical reads (PR=0).' },
-  { id: 3, depth: 2, operation: 'INDEX RANGE SCAN', name: 'EMP_DEPT_IX', rows: 107, cost: 2, actualRows: 107, cr: 3, pr: 0, pw: 0, elapsed: '00:00:00.01', note: 'Performed a range scan on EMP_DEPT_IX to collect 107 ROWIDs matching DEPARTMENT_ID > 50. Only 3 blocks were read (CR=3) traversing root → branch → leaf. No physical reads (PR=0) — a highly efficient index access.' },
+  { id: 0, depth: 0, operation: 'SELECT STATEMENT', rows: 85, cost: 47, time: '00:00:01', actualRows: 85, cr: 3847, pr: 312, pw: 0, elapsed: '00:00:02.14', note: 'Runs last — the root. CR and PR here are cumulative totals from all child operations. The query took 2.14s and returned 85 rows. PR=312 means 312 blocks could not be served from the Buffer Cache and required disk reads.' },
+  { id: 1, depth: 1, operation: 'HASH JOIN', rows: 85, cost: 47, time: '00:00:01', actualRows: 85, cr: 3847, pr: 312, pw: 0, elapsed: '00:00:02.13', note: 'Runs after receiving results from Id 2 and Id 4→3. Builds a hash table from DEPARTMENTS (11 rows), then probes with EMPLOYEES results (3,420 rows) to produce 85 joined rows. E-Rows=85 is accurate, but CR and PR from children accumulate here.' },
+  { id: 2, depth: 2, operation: 'TABLE ACCESS FULL', name: 'DEPARTMENTS', rows: 11, cost: 3, time: '00:00:01', actualRows: 11, cr: 8, pr: 0, pw: 0, elapsed: '00:00:00.01', note: 'Runs before Id 3 — siblings at the same depth execute top-to-bottom. Full scan of DEPARTMENTS returned 11 rows. E-Rows=11 matches A-Rows=11; statistics are accurate. CR=8 is minimal and PR=0 means a full Buffer Cache hit.' },
+  { id: 3, depth: 2, operation: 'TABLE ACCESS BY INDEX ROWID', name: 'EMPLOYEES', rows: 10, cost: 43, time: '00:00:01', actualRows: 3420, cr: 3839, pr: 312, pw: 0, elapsed: '00:00:02.12', note: '⚠️ Runs after receiving the ROWID list from Id 4. This is the bottleneck. The CBO estimated 10 rows (E-Rows=10) but 3,420 rows (A-Rows=3,420) were returned — stale statistics caused a severe selectivity underestimate. Each ROWID triggers a random table block read: CR=3,839 and PR=312.' },
+  { id: 4, depth: 3, operation: 'INDEX RANGE SCAN', name: 'EMP_NAME_IX', rows: 10, cost: 2, time: '00:00:01', actualRows: 3420, cr: 5, pr: 0, pw: 0, elapsed: '00:00:00.01', note: 'Runs first — it is the most-indented (deepest) operation. Performs a range scan on EMP_NAME_IX and passes 3,420 ROWIDs up to its parent (Id 3). The index scan itself is efficient: CR=5, PR=0.' },
+  { id: 5, depth: 1, operation: 'TABLE ACCESS FULL', name: 'DEPARTMENTS', rows: 11, cost: 3, time: '00:00:01', actualRows: 11, cr: 8, pr: 0, pw: 0, elapsed: '00:00:00.01' },
 ]
 
 export function RowSourceOperationDisplay({ lang }: { lang: 'ko' | 'en' }) {
@@ -774,7 +786,11 @@ export function RowSourceOperationDisplay({ lang }: { lang: 'ko' | 'en' }) {
   const caption = isKo
     ? 'DBMS_XPLAN.DISPLAY_CURSOR(format => \'ALLSTATS LAST\') 출력 예시'
     : "DBMS_XPLAN.DISPLAY_CURSOR(format => 'ALLSTATS LAST') output example"
-  return <ExplainPlanTable rows={isKo ? RSO_ROWS_KO : RSO_ROWS_EN} showStats caption={caption} />
+  return (
+    <div>
+      <ExplainPlanTable rows={isKo ? RSO_ROWS_KO : RSO_ROWS_EN} showStats caption={caption} lang={lang} />
+    </div>
+  )
 }
 
 // ── PredicateInfoDisplay ──────────────────────────────────────────────────────

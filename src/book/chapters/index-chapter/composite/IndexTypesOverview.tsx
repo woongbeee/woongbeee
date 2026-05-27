@@ -13,119 +13,127 @@ const T = {
   ko: {
     whatTitle: '인덱스란?',
     whatDesc:
-      '인덱스는 테이블 데이터 접근 속도를 높이기 위한 선택적 오브젝트입니다. 책 뒤의 색인처럼, 전체 내용을 처음부터 읽지 않고 원하는 항목을 바로 찾을 수 있게 해줍니다.',
-    whatHeapTitle: '테이블의 데이터는 어떤 순서로 저장될까?',
+      '인덱스는 테이블(또는 테이블 클러스터)에 딸려 있는 선택적인 구조예요. 원할 때 만들고, 필요 없으면 지울 수 있죠. 인덱스를 만들거나 지워도 테이블 안의 데이터에는 아무런 영향이 없어요. 그저 데이터를 더 빨리 찾을 수 있도록 도와주는 역할을 합니다.',
+    whatAnalogyTitle: '이해하기 쉬운 비유 — HR 매니저의 파일 박스',
+    whatAnalogyDesc:
+      '인사 담당자가 직원 폴더를 여러 개의 박스에 아무렇게나 넣어 두었다고 상상해보세요. Whalen(직원 번호 200)을 찾으려면 모든 박스를 처음부터 하나씩 뒤져야 해요. 정말 귀찮겠죠?\n\n인덱스는 바로 이 문제를 해결해줍니다. 모든 직원 번호와 그 폴더 위치를 미리 정리된 목록으로 만들어 두는 거예요:\n  ID 100 → Box 3, 1번째\n  ID 101 → Box 7, 8번째\n  ID 200 → Box 1, 10번째\n\n이제 Whalen을 찾고 싶다면 목록에서 200번을 찾아 "Box 1, 10번째"로 바로 달려가면 됩니다!',
+    whatHeapTitle: '인덱스가 없으면 어떻게 될까?',
     whatHeapDesc:
-      '오라클의 일반 테이블은 힙 구조(heap-organized) 입니다. 자료 구조에서 heap은 최댓값·최솟값을 빠르게 찾도록 정렬된 구조를 뜻하지만, 오라클에서는 의미가 다릅니다. 영어 단어 "heap"의 원래 뜻인 "차곡차곡 쌓아올리다"처럼, 정렬 기준 없이 크기에 맞는 빈 공간에 데이터를 적재하는 저장 방식입니다.\n\n데이터의 물리적 저장 순서와 논리적 순서가 일치하지 않으므로, 특정 행을 찾으려면 테이블 전체를 처음부터 끝까지 읽어야 합니다. 인덱스는 바로 이 문제를 해결합니다. 창고에 물건이 무작위로 쌓여 있다면 일일이 뒤져야 하지만, 창고 지도가 있으면 원하는 물건이 어디 있는지 바로 알 수 있는 것과 같습니다.',
+      '인덱스가 없는 테이블에서 값을 찾으려면 Full Table Scan(테이블 전체 읽기)을 해야 해요. 예를 들어, 인덱스가 없는 hr.departments 테이블에서 location 2700을 찾으면 모든 블록의 모든 행을 처음부터 끝까지 읽어야 합니다. 데이터가 많아질수록 이 방식은 엄청나게 느려지죠.\n\n오라클의 일반 테이블은 힙(heap) 구조예요. "heap"은 그냥 빈 자리가 있으면 거기에 데이터를 넣는 방식이라서, 데이터가 논리적인 순서 없이 이리저리 흩어져 저장됩니다.',
     whatPoints: [
-      { icon: '🔗', text: '테이블과 논리적·물리적으로 독립 — 인덱스를 삭제하거나 생성해도 테이블 데이터에는 영향 없음' },
-      { icon: '⚡', text: '쿼리 실행 속도에만 영향 — 결과의 정확성은 인덱스 유무와 무관' },
-      { icon: '🔄', text: 'DML(INSERT/UPDATE/DELETE) 발생 시 데이터베이스가 자동으로 유지 관리' },
+      { icon: '🔗', text: '테이블과 완전히 독립되어 있어요 — 인덱스를 만들거나 지워도 테이블 데이터는 전혀 바뀌지 않습니다' },
+      { icon: '⚡', text: '속도에만 영향을 줘요 — 인덱스가 있든 없든 조회 결과는 똑같고, 빠르기만 달라집니다' },
+      { icon: '🔄', text: 'DML(Data Manipulation Language, INSERT/UPDATE/DELETE)이 일어날 때마다 Oracle이 인덱스를 자동으로 갱신해줍니다' },
+      { icon: '🤖', text: 'Oracle 19c부터는 자동 인덱싱(Automated Indexing)을 지원해요 — 실제 사용 패턴을 보고 인덱스를 알아서 만들고 관리해줍니다' },
     ],
 
     whenTitle: '인덱스를 만들어야 할 때',
     whenItems: [
       {
         ok: true,
-        title: '조회 빈도가 높고 결과 행이 적을 때',
-        desc: '전체 데이터 중에서 소수만 쿼리할 때가 많은 경우, 인덱스 스캔이 Full Table Scan보다 유리합니다.',
+        title: '해당 컬럼을 자주 조회하고, 결과 행이 전체의 일부일 때',
+        desc: '인덱스가 걸린 컬럼을 자주 찾는데 결과 행이 전체의 일부에 불과하다면, 인덱스 스캔이 Full Table Scan(테이블 전체 읽기)보다 훨씬 빨라요. 찾는 행이 적을수록(선택도가 낮을수록) 인덱스 효과가 더 크게 나타납니다.',
         example: 'WHERE employee_id = 145  -- 1행만 반환',
       },
       {
         ok: true,
-        title: '참조 무결성 제약(FK)이 있는 컬럼',
-        desc: '부모 테이블의 행이 삭제되거나 수정될 때 자식 테이블에 그 값을 참조하는 행이 있는지 확인해야 하는데, 이때 FK 컬럼에 인덱스가 있으면 해당 행을 빠르게 찾아낼 수 있습니다. 또, 테이블끼리 조인할 때도 FK컬럼이 자주 연결점이 되므로 조인 계획에 유리할 수 있습니다.',
+        title: 'FK(Foreign Key, 외래 키) 컬럼',
+        desc: '부모 테이블의 행이 삭제되거나 수정될 때, Oracle은 자식 테이블에 연결된 행이 있는지 확인해야 해요. FK 컬럼에 인덱스가 없으면 자식 테이블 전체에 자물쇠(Full Table Lock)가 걸려서 여러 사람이 동시에 작업하기가 어려워집니다. FK 컬럼에는 꼭 인덱스를 만들어 주세요!',
         example: 'FOREIGN KEY (department_id) REFERENCES departments(department_id)',
       },
       {
         ok: false,
-        title: '테이블의 전체 또는 과반의 데이터를 조회하는 쿼리가 많을 때',
-        desc: '인덱스를 거쳐 블록을 하나씩 찾는 것보다 Full Table Scan이 오히려 빠릅니다.',
+        title: '쿼리가 테이블 행 대부분을 가져올 때',
+        desc: '인덱스를 통해 블록을 하나하나 찾아가면 오히려 Full Table Scan(테이블 전체 읽기)보다 I/O가 더 많아질 수 있어요. 전체 행의 상당 부분을 읽어야 한다면 그냥 처음부터 끝까지 쭉 읽는 게 더 빠릅니다.',
         example: 'WHERE salary > 1000  -- 대부분의 행이 해당',
       },
       {
         ok: false,
-        title: 'DML이 매우 빈번한 작은 테이블',
-        desc: '인덱스는 항상 정렬 상태를 유지하면서 데이터를 INSERT/UPDATE/DELETE 해야 하므로, 이런 작업이 빈번한 테이블에서는 인덱스 사용의 이득보다 데이터 정렬 관리의 비용이 더 클 수 있습니다.',
-        example: '수백 행 미만의 코드 테이블',
+        title: 'DML(Data Manipulation Language, INSERT/UPDATE/DELETE)이 매우 잦은 테이블',
+        desc: '인덱스가 있으면 데이터를 추가·수정·삭제할 때마다 인덱스도 함께 업데이트해야 해서 속도가 느려져요. 인덱스가 많을수록 이 부담도 커집니다. 쓰기 작업이 굉장히 많은 테이블이라면 인덱스를 최대한 줄이는 게 좋아요.',
+        example: '수백 행 미만의 코드 테이블 또는 대량 INSERT가 잦은 로그 테이블',
       },
     ],
     whenOk: '인덱스 생성 권장',
     whenNo: '인덱스 생성 비권장',
 
-    costTitle: '인덱스를 사용하는 비용',
+    costTitle: '인덱스를 쓰면 드는 비용',
     costItems: [
-      { icon: '💾', title: '디스크 공간', desc: '인덱스 세그먼트가 별도 공간을 차지합니다. 테이블과 다른 테이블스페이스에 저장할 수 있습니다.' },
-      { icon: '🔄', title: 'DML 오버헤드', desc: 'INSERT, UPDATE, DELETE 시 인덱스도 함께 갱신됩니다. 인덱스가 많을수록 DML 성능이 저하됩니다.' },
-      { icon: '🧠', title: '옵티마이저 부담', desc: '인덱스가 많으면 옵티마이저가 최적 실행 계획을 찾는 데 더 많은 시간이 걸립니다.' },
+      { icon: '💾', title: '디스크 공간', desc: '인덱스는 테이블과 별도로 저장 공간을 차지해요. 테이블과 다른 테이블스페이스에 저장할 수도 있습니다.' },
+      { icon: '🔄', title: 'DML(Data Manipulation Language) 오버헤드', desc: 'INSERT, UPDATE, DELETE 할 때마다 인덱스도 함께 갱신해야 해요. 인덱스가 많을수록 쓰기 속도가 느려집니다.' },
+      { icon: '🧠', title: '옵티마이저(Optimizer) 부담', desc: '인덱스가 많아지면 옵티마이저가 최적의 실행 방법을 고르는 데 더 오래 걸려요.' },
     ],
-    optimizerNote: '옵티마이저(Optimizer)란 SQL을 실행하기 전에 "어떤 순서로, 어떤 방법으로 데이터를 읽을지"를 결정하는 Oracle의 핵심 엔진입니다. 인덱스가 많을수록 선택지가 늘어나 결정에 시간이 더 걸립니다. 옵티마이저는 이후 챕터에서 자세히 다룹니다.',
+    optimizerNote: '옵티마이저(Optimizer)란 SQL을 실행하기 전에 "어떤 순서로, 어떤 방법으로 데이터를 읽을지" 를 결정해주는 Oracle의 핵심 엔진이에요. 인덱스가 많을수록 선택지도 늘어나서 결정하는 데 시간이 더 걸립니다. 옵티마이저에 대해서는 뒤에 나오는 챕터에서 자세히 다룰 거예요!',
 
     stateTitle: '인덱스 상태',
-    stateDesc: '인덱스는 두 가지 독립적인 상태를 가집니다: Usability(유지 여부)와 Visibility(옵티마이저 사용 여부).',
+    stateDesc: '인덱스에는 두 가지 독립적인 상태가 있어요. 하나는 Usability(DML로 인덱스를 계속 갱신할지 여부)이고, 다른 하나는 Visibility(옵티마이저가 이 인덱스를 사용할지 여부)예요. Unusable 상태의 인덱스는 옵티마이저가 무시하고 DML 갱신도 하지 않아요. 대량 데이터를 빠르게 넣어야 할 때, 인덱스를 아예 지웠다가 다시 만드는 대신 Unusable로 바꿨다가 재구성하는 방법을 쓰기도 합니다.',
     usabilityRows: [
-      { state: 'Usable', dml: '✓ 유지', optimizer: '✓ 사용', space: '✓ 소비', badge: 'emerald', use: '정상 운영' },
-      { state: 'Unusable', dml: '✗ 유지 안 함', optimizer: '✗ 무시', space: '✗ 없음', badge: 'rose', use: '대량 로드 성능 향상용' },
+      { state: 'Usable', dml: '✓ 갱신', optimizer: '✓ 사용', space: '✓ 소비', badge: 'emerald', use: '정상 운영' },
+      { state: 'Unusable', dml: '✗ 갱신 안 함', optimizer: '✗ 무시', space: '✗ 없음', badge: 'rose', use: '대량 데이터 로드 성능 향상용' },
     ],
     visibilityRows: [
-      { state: 'Visible', dml: '✓ 유지', optimizer: '✓ 사용', space: '✓ 소비', badge: 'emerald', use: '정상 운영' },
-      { state: 'Invisible', dml: '✓ 유지', optimizer: '✗ 무시', space: '✓ 소비', badge: 'amber', use: '삭제 전 영향 테스트용' },
+      { state: 'Visible', dml: '✓ 갱신', optimizer: '✓ 사용', space: '✓ 소비', badge: 'emerald', use: '정상 운영' },
+      { state: 'Invisible', dml: '✓ 갱신', optimizer: '✗ 무시', space: '✓ 소비', badge: 'amber', use: '삭제 전 영향 미리 테스트용' },
     ],
     stateHeaderAspect: '상태',
-    stateHeaderDml: 'DML 유지',
+    stateHeaderDml: 'DML 갱신',
     stateHeaderOpt: '옵티마이저',
     stateHeaderSpace: '공간',
     stateHeaderUse: '용도',
 
     typesTitle: '인덱스 종류 한눈에 보기',
     types: [
-      { name: 'B-Tree Index',           color: 'violet',  icon: '🌲', badge: '기본값', desc: '가장 일반적인 인덱스. Root → Branch → Leaf 균형 트리 구조로, 대부분의 상황에서 기본으로 사용됩니다.' },
-      { name: 'Bitmap Index',           color: 'emerald', icon: '🗺️', badge: 'DW',    desc: '값의 종류가 적은 컬럼에 유리합니다. 비트 연산으로 여러 조건을 동시에 처리합니다.' },
-      { name: 'Function-Based Index',   color: 'orange',  icon: 'ƒ',  badge: 'FBI',   desc: '함수나 표현식의 결과를 키로 저장합니다. 대소문자 구분 없이 검색할 때 자주 활용됩니다.' },
-      { name: 'Composite Index',        color: 'purple',  icon: '⊕',  badge: '복합',  desc: '2개 이상의 컬럼을 묶어 하나의 인덱스로 만듭니다. 선두 컬럼이 WHERE 조건에 있어야 효과적입니다.' },
-      { name: 'Reverse Key Index',      color: 'rose',    icon: '↔',  badge: 'RAC',   desc: '키 값을 뒤집어 저장합니다. 순차 증가하는 값이 특정 블록에 몰리는 현상을 분산시킵니다.' },
-      { name: 'Index-Organized Table',  color: 'amber',   icon: '⬡',  badge: 'IOT',   desc: '테이블 자체가 B-Tree 인덱스 구조입니다. 기본 키로만 조회하는 테이블에 적합합니다.' },
+      { name: 'B-Tree Index',           color: 'violet',  icon: '🌲', badge: '기본값', desc: '가장 흔하게 쓰이는 인덱스예요. Root → Branch → Leaf로 이어지는 균형 잡힌 트리 구조로, 웬만한 상황에서는 이걸 쓰면 됩니다.' },
+      { name: 'Bitmap Index',           color: 'emerald', icon: '🗺️', badge: 'DW',    desc: '값의 종류가 아주 적은 컬럼에 어울려요. 비트(0/1) 연산으로 여러 조건을 한꺼번에 처리할 수 있습니다.' },
+      { name: 'Function-Based Index',   color: 'orange',  icon: 'ƒ',  badge: 'FBI',   desc: '함수나 표현식의 결과값을 키로 저장해요. 대소문자 구분 없이 검색할 때 자주 활용됩니다.' },
+      { name: 'Composite Index',        color: 'purple',  icon: '⊕',  badge: '복합',  desc: '컬럼 2개 이상을 묶어서 하나의 인덱스로 만들어요. WHERE 조건에 첫 번째 컬럼이 꼭 포함되어야 효과가 있습니다.' },
+      { name: 'Reverse Key Index',      color: 'rose',    icon: '↔',  badge: 'RAC',   desc: '키 값을 거꾸로 뒤집어서 저장해요. 숫자가 순서대로 증가하는 값들이 특정 블록에 몰리는 현상을 막아줍니다.' },
+      { name: 'Index-Organized Table',  color: 'amber',   icon: '⬡',  badge: 'IOT',   desc: '테이블 자체가 B-Tree 인덱스 구조로 이루어져 있어요. 기본 키로만 조회하는 테이블에 딱 맞습니다.' },
     ],
 
   },
   en: {
     whatTitle: 'What is an Index?',
     whatDesc:
-      'An index is an optional object that speeds up data access on a table. Like the index at the back of a book, it lets you jump straight to what you need without reading everything from the start.',
-    whatHeapTitle: 'How is data stored in a table?',
+      'An index is an optional structure, associated with a table or table cluster, that can sometimes speed data access. Indexes are schema objects that are logically and physically independent of the data in the objects with which they are associated. Thus, you can drop or create an index without physically affecting the indexed table.',
+    whatAnalogyTitle: 'The Official Analogy — HR Manager\'s File Boxes',
+    whatAnalogyDesc:
+      'Imagine an HR manager who stores employee folders in a set of boxes at random. To find Whalen (employee ID 200), the manager must search through every box in sequence.\n\nAn index solves this by maintaining a sorted list of every employee ID with its folder location:\n  ID 100 → Box 3, position 1\n  ID 101 → Box 7, position 8\n  ID 200 → Box 1, position 10\n\nNow finding Whalen means looking up 200 in the list and going directly to "Box 1, position 10."',
+    whatHeapTitle: 'What happens without an index?',
     whatHeapDesc:
-      'A standard Oracle table uses heap-organized storage. In data structures, a "heap" refers to a sorted structure optimized for finding max or min values — but Oracle uses the word differently. True to its literal meaning of "to pile up," Oracle simply writes each row into any available free space, with no sorting applied.\n\nBecause physical storage order has nothing to do with logical data order, finding rows that match a condition means scanning the whole table from start to finish. An index solves this problem. Think of it as a warehouse map: instead of searching every shelf, you look up the map to find exactly where each item is.',
+      'If a heap-organized table has no indexes, the database must perform a full table scan to find a value. For example, a query of location 2700 in the unindexed hr.departments table requires the database to search every row in every block. This approach does not scale well as data volumes increase.\n\nA standard Oracle table is heap-organized: rows are inserted wherever free space is available, with no guaranteed sort order. Physical storage order has no relation to logical data order.',
     whatPoints: [
-      { icon: '🔗', text: 'Physically independent from the table — creating or dropping an index never touches the table data' },
-      { icon: '⚡', text: 'Affects only query speed — results are identical with or without an index' },
-      { icon: '🔄', text: 'Automatically maintained by Oracle on every DML (INSERT / UPDATE / DELETE)' },
+      { icon: '🔗', text: 'Logically and physically independent from the table — creating or dropping an index never touches the table data' },
+      { icon: '⚡', text: 'Affects only the speed of execution — query results are identical with or without an index' },
+      { icon: '🔄', text: 'Automatically maintained by Oracle on every DML (INSERT / UPDATE / DELETE) — no user action required' },
+      { icon: '🤖', text: 'Starting with Oracle 19c, Automated Indexing monitors the workload and creates or manages indexes automatically' },
     ],
 
     whenTitle: 'When to Create an Index',
     whenItems: [
       {
         ok: true,
-        title: 'High-frequency queries that return few rows',
-        desc: 'When a query touches only a small fraction of the table, an index scan is far cheaper than a Full Table Scan.',
+        title: 'The indexed columns are queried frequently and return a small percentage of rows',
+        desc: 'When a query selects a low percentage of rows (low selectivity), an index scan is far cheaper than a Full Table Scan. The lower the selectivity — the fewer rows returned — the more an index helps.',
         example: 'WHERE employee_id = 145  -- returns 1 row',
       },
       {
         ok: true,
-        title: 'Foreign key columns',
-        desc: 'When a parent row is deleted or updated, Oracle must verify no child rows reference it. An index on the FK column makes this lookup fast. FK columns also appear frequently in join conditions, making an index beneficial for join plans as well.',
+        title: 'Referential integrity (foreign key) columns',
+        desc: 'When a parent row is deleted or updated, Oracle must verify no child rows reference it. Without an index on the FK column, Oracle acquires a full table lock on the child table, severely hurting concurrency. Always index foreign key columns.',
         example: 'FOREIGN KEY (department_id) REFERENCES departments(department_id)',
       },
       {
         ok: false,
-        title: 'Queries that return most of the table',
-        desc: 'Fetching blocks one at a time through an index is slower than a single sequential Full Table Scan.',
+        title: 'Queries that return most rows of the table',
+        desc: 'Accessing blocks individually through an index generates more I/O than a single sequential Full Table Scan when a large fraction of rows matches. The optimizer will often prefer a full scan in this case.',
         example: 'WHERE salary > 1000  -- matches most rows',
       },
       {
         ok: false,
-        title: 'Small tables with heavy DML',
-        desc: 'An index must stay sorted on every INSERT, UPDATE, and DELETE. On write-heavy tables, that maintenance cost can outweigh any read benefit.',
-        example: 'Lookup tables with fewer than a few hundred rows',
+        title: 'Tables with very frequent DML',
+        desc: 'Every INSERT, UPDATE, and DELETE must update all indexes on the table. The more indexes, the higher the write overhead. On tables with heavy DML, minimizing index count is often better than maximizing read optimization.',
+        example: 'High-frequency log tables or small code lookup tables',
       },
     ],
     whenOk: 'Recommended',
@@ -140,7 +148,7 @@ const T = {
     optimizerNote: 'The Optimizer is Oracle\'s core engine that decides how to execute a SQL statement — which path to take, which indexes to use, and in what order to read data. The more indexes exist, the more choices it has to evaluate. We\'ll cover the Optimizer in depth in a later chapter.',
 
     stateTitle: 'Index States',
-    stateDesc: 'An index has two independent state dimensions: Usability (whether DML maintains it) and Visibility (whether the optimizer uses it).',
+    stateDesc: 'An index has two independent state dimensions: Usability (whether DML maintains it) and Visibility (whether the optimizer uses it). An unusable index, which is ignored by the optimizer, is not maintained by DML operations. Instead of dropping an index and later re-creating it, you can make it unusable and then rebuild it — useful for improving bulk load performance.',
     usabilityRows: [
       { state: 'Usable', dml: '✓ Maintained', optimizer: '✓ Used', space: '✓ Consumed', badge: 'emerald', use: 'Normal operation' },
       { state: 'Unusable', dml: '✗ Not maintained', optimizer: '✗ Ignored', space: '✗ None', badge: 'rose', use: 'Speed up bulk loads' },
@@ -237,7 +245,12 @@ export function IndexTypesOverview() {
       <SectionTitle>{t.whatTitle}</SectionTitle>
       <Prose>{t.whatDesc}</Prose>
 
-      <div className="rounded-xl border border-amber-200 bg-amber-50/50 p-5">
+      <div className="rounded-xl border border-violet-200 bg-violet-50/50 p-5">
+        <p className="mb-2 text-xs font-bold text-violet-800">{t.whatAnalogyTitle}</p>
+        <Prose className="text-[12px] text-violet-900/80 whitespace-pre-line">{t.whatAnalogyDesc}</Prose>
+      </div>
+
+      <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50/50 p-5">
         <p className="mb-2 text-xs font-bold text-amber-800">{t.whatHeapTitle}</p>
         <Prose className="text-[12px] text-amber-900/80">{t.whatHeapDesc}</Prose>
       </div>
@@ -375,7 +388,7 @@ export function IndexTypesOverview() {
 
       <InfoBox variant="tip">
         {lang === 'ko'
-          ? 'Invisible 인덱스는 DML 유지는 하면서 옵티마이저에게만 숨깁니다. 운영 중인 인덱스를 삭제하기 전에 Invisible로 전환해 성능 영향을 먼저 확인하는 용도로 활용합니다.'
+          ? 'Invisible 인덱스는 DML(Data Manipulation Language)로 계속 갱신되지만 옵티마이저에게는 보이지 않아요. 실제 운영 중인 인덱스를 바로 삭제하기 전에 Invisible로 바꿔서 "이게 없어지면 성능이 어떻게 될까?" 를 미리 확인하는 용도로 쓰입니다.'
           : 'An Invisible index is still maintained by DML but hidden from the optimizer. Use it to safely test the impact of dropping an index in production before actually removing it.'}
       </InfoBox>
 

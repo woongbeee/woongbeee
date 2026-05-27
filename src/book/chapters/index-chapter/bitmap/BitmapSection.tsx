@@ -31,43 +31,43 @@ const T = {
   ko: {
     pageTitle: 'Bitmap 인덱스',
     pageSubtitle:
-      'Bitmap 인덱스는 저카디널리티 컬럼(성별, 상태 코드 등 고유값이 적은 컬럼)에 최적화된 인덱스입니다. ' +
-      '각 고유값마다 0/1 비트 배열을 유지하고, 복수 조건을 비트 연산으로 초고속 병합합니다.',
+      'Bitmap 인덱스는 카디널리티(Cardinality, 고유값의 수)가 낮은 컬럼 — 예를 들어 성별이나 상태 코드처럼 종류가 몇 가지 안 되는 컬럼 — 에 딱 맞는 인덱스예요. ' +
+      '고유값마다 0과 1로 이루어진 비트 배열을 하나씩 가지고 있고, 여러 조건을 비트 연산으로 아주 빠르게 합칠 수 있어요.',
 
-    structureTitle: 'Bitmap 인덱스란?',
+    structureTitle: 'Bitmap 인덱스가 뭐예요?',
     structureDesc:
-      '각 고유 값마다 하나의 비트맵 벡터(0/1 배열)를 유지합니다. 각 비트는 테이블의 한 행에 대응하며, 해당 행의 컬럼 값이 이 키와 일치하면 1, 아니면 0입니다. 비트맵은 내부적으로 B-Tree 구조에 저장되어 키 범위 접근이 가능합니다.',
+      'Bitmap 인덱스는 인덱스 키마다 비트맵(0과 1의 배열)을 저장해요. 일반 B-Tree 인덱스는 엔트리 하나가 행 하나를 가리키지만, Bitmap 인덱스는 키 하나가 여러 행을 한꺼번에 가리킬 수 있어요. 비트맵의 각 비트는 행 번호(ROWID)와 하나씩 대응되는데, 그 비트가 1이면 해당 행이 그 키 값을 가지고 있다는 뜻이에요. 실제로 어떤 행인지는 매핑 함수가 비트 위치를 ROWID(Row Identifier, 행의 물리적 주소)로 변환해서 알려줘요.',
     structureNote:
-      'Bitmap 인덱스는 OLAP / Data Warehouse 환경에 적합합니다. DML(INSERT/UPDATE/DELETE) 시 해당 키의 비트맵 전체에 잠금이 걸리므로 OLTP 환경에서는 사용하지 않는 것이 좋습니다.',
+      'Bitmap 인덱스는 컬럼의 카디널리티(Cardinality)가 낮을 때, 즉 전체 행 수에 비해 고유한 값의 종류가 적을 때 가장 잘 맞아요. 또 테이블이 거의 읽기 전용이거나 DML(Data Manipulation Language, 데이터 삽입·수정·삭제) 작업이 많지 않은 환경이어야 해요. 하나의 행을 수정하더라도 그 키 전체가 잠기기 때문에, 동시에 여러 사람이 데이터를 바꾸는 OLTP(Online Transaction Processing, 실시간 업무 처리) 환경에는 맞지 않아요. OLAP(Online Analytical Processing, 분석용 대용량 조회)이나 데이터 웨어하우스(DW, Data Warehouse) 환경에 딱이에요.',
 
-    vsTitle: 'B-Tree vs Bitmap',
+    vsTitle: 'B-Tree vs Bitmap — 어떻게 달라요?',
     vsHeaders: ['항목', 'B-Tree', 'Bitmap'],
     vsRows: [
-      ['카디널리티',        '고카디널리티 (많은 고유값)',          '저카디널리티 (적은 고유값)'],
-      ['NULL 인덱싱',      '❌ 모든 키가 NULL인 행 제외',          '✓ NULL도 하나의 키로 인덱싱'],
-      ['공간 효율',         '저카디널리티에서 낭비',                '저카디널리티에서 매우 효율적'],
-      ['DML 성능',         '행 단위 빠른 갱신',                    '행 수정 시 전체 비트맵 잠금 (OLTP 비권장)'],
-      ['복수 조건 AND/OR', '각 인덱스 → 병합 처리',               '비트 연산으로 초고속 병합'],
-      ['사용 환경',         'OLTP',                                 'OLAP / DW'],
+      ['카디널리티',        '고카디널리티 (고유값이 많을 때)',          '저카디널리티 (고유값이 적을 때)'],
+      ['NULL 처리',         '❌ 모든 키가 NULL인 행은 인덱스에서 빠짐',  '✓ NULL도 하나의 키 값으로 인덱싱돼요'],
+      ['저장 공간',         '고유값이 적은 컬럼에서 공간 낭비',          '고유값이 적은 컬럼에서 아주 효율적'],
+      ['DML 성능',         '행 단위로 빠르게 수정 가능',                '행을 수정하면 비트맵 전체를 잠금 → OLTP에 비권장'],
+      ['AND/OR 복합 조건', '인덱스별로 따로 처리 후 병합',               '비트 연산으로 초고속 병합'],
+      ['주 사용 환경',      'OLTP(Online Transaction Processing)',       'OLAP(Online Analytical Processing) / DW(Data Warehouse)'],
     ],
 
-    indexCombineTitle: 'Index Combine',
+    indexCombineTitle: 'Index Combine — 인덱스를 합치는 마법',
     indexCombineDesc:
-      'Oracle 옵티마이저는 여러 B-Tree 인덱스가 존재할 때 각각을 비트맵으로 변환(BITMAP CONVERSION)한 뒤 비트 연산으로 병합(BITMAP AND/OR)하여 조건을 충족하는 행만 선별합니다. 인덱스 하나만 사용할 때보다 훨씬 적은 블록 I/O로 복수 조건을 처리할 수 있습니다.',
+      'B-Tree 인덱스가 여러 개 있을 때, Oracle 옵티마이저(Optimizer)는 각 인덱스 스캔 결과를 비트맵으로 변환(BITMAP CONVERSION)한 뒤 비트 연산으로 합쳐요(BITMAP AND/OR). 이렇게 하면 조건에 맞는 행만 쏙 걸러낼 수 있고, 인덱스 하나만 쓸 때보다 훨씬 적은 블록 I/O로 여러 조건을 동시에 처리할 수 있어요.',
     indexCombineSteps: [
-      { label: '① B-Tree Index Scan',           desc: '각 조건에 맞는 B-Tree 인덱스를 개별적으로 Range/Unique 스캔합니다.' },
-      { label: '② BITMAP CONVERSION',           desc: '스캔 결과 ROWID 목록을 비트맵 벡터로 변환합니다. 각 비트는 테이블 행 한 개에 대응합니다.' },
-      { label: '③ BITMAP AND / OR',             desc: '변환된 비트맵들을 비트 연산으로 병합합니다. AND는 교집합, OR은 합집합입니다.' },
-      { label: '④ BITMAP CONVERSION TO ROWIDS', desc: '최종 비트맵에서 1인 위치를 ROWID로 역변환하여 테이블 행을 읽습니다.' },
+      { label: '① B-Tree Index Scan',           desc: '각 조건에 해당하는 B-Tree 인덱스를 따로따로 Range/Unique 스캔해요.' },
+      { label: '② BITMAP CONVERSION',           desc: '스캔으로 얻은 ROWID 목록을 비트맵 벡터로 바꿔요. 비트 하나가 테이블 행 하나에 대응해요.' },
+      { label: '③ BITMAP AND / OR',             desc: '변환된 비트맵들을 비트 연산으로 합쳐요. AND는 두 조건을 모두 만족하는 행, OR은 둘 중 하나라도 만족하는 행을 골라내요.' },
+      { label: '④ BITMAP CONVERSION TO ROWIDs', desc: '최종 비트맵에서 1인 자리를 ROWID(Row Identifier)로 다시 변환해서 실제 테이블 행을 읽어요.' },
     ],
-    indexCombineWhen: 'Index Combine은 언제 선택되나?',
+    indexCombineWhen: 'Index Combine은 언제 선택될까요?',
     indexCombineWhenItems: [
-      '두 컬럼에 별도 B-Tree 인덱스가 존재하고, 두 조건 모두 WHERE 절에 사용될 때',
-      '복합 인덱스(Composite Index)가 없거나, 복합 인덱스보다 Combine 비용이 낮을 때',
-      '각 인덱스의 선택도가 낮아 단독 스캔만으로 행 수를 크게 줄일 수 있을 때',
+      '두 컬럼에 각각 별도의 B-Tree 인덱스가 있고, 두 조건이 모두 WHERE 절에 쓰일 때',
+      '두 컬럼을 함께 묶은 복합 인덱스(Composite Index)가 없거나, 복합 인덱스보다 Combine 방식의 비용이 더 낮을 때',
+      '각 인덱스의 선택도(Selectivity)가 충분히 낮아서 인덱스 하나만으로도 행 수를 많이 줄일 수 있을 때',
     ],
 
-    simulLabel: '컬럼과 조건을 선택하고 연산을 실행하면 Index Combine이 내부적으로 어떻게 동작하는지 단계별로 확인할 수 있습니다.',
+    simulLabel: '컬럼과 조건을 골라서 연산을 실행해 보세요. Index Combine이 내부에서 어떻게 동작하는지 단계별로 확인할 수 있어요.',
     col1Label: '조건 1',
     col2Label: '조건 2',
     val1Label: '값 1',
@@ -80,12 +80,53 @@ const T = {
     rowCountLabel: '선택된 행 수',
     planLabel: '실행 계획 예시',
 
-    bitmapJoinTitle: 'Bitmap Join Index',
-    bitmapJoinDesc:
-      '조인 대상 테이블의 컬럼 값으로 비트맵을 생성합니다. 예: ORDERS.STATUS를 기반으로 CUSTOMERS 테이블 행을 비트맵으로 표현 — 조인 없이 빠른 필터링이 가능합니다.',
-    compressionTitle: '비트맵 압축 (RLE)',
-    compressionDesc:
-      'Oracle은 연속된 0 또는 1 구간을 RLE(Run-Length Encoding)로 압축합니다. 실제 데이터에서 비트맵 크기는 이론적 크기보다 훨씬 작습니다.',
+    bitmapJoinTitle: 'Bitmap Join Index — 조인을 미리 담아두는 인덱스',
+    bitmapJoinWhat:
+      'Bitmap Join Index는 두 개 이상의 테이블을 조인한 결과를 미리 인덱스에 담아두는 방식이에요. ' +
+      '일반 Bitmap 인덱스는 하나의 테이블 안에서만 동작하지만, Bitmap Join Index는 다른 테이블의 컬럼 값을 기준으로 비트맵을 만들어요. ' +
+      '그래서 쿼리를 실행할 때 조인을 직접 하지 않아도 인덱스만 보고 필터링이 끝나요.',
+    bitmapJoinHow:
+      '예를 들어, EMPLOYEES(직원) 테이블과 JOBS(직책) 테이블이 있을 때 ' +
+      '"직책이 Accountant(회계사)인 직원이 몇 명이에요?" 라는 쿼리를 생각해 볼게요.\n\n' +
+      '인덱스 없이 조회하면 JOBS 테이블에서 Accountant를 찾고, EMPLOYEES 테이블과 조인해야 해요. ' +
+      'Bitmap Join Index가 있으면 이미 EMPLOYEES의 ROWID(행 주소)가 job_title 값으로 분류되어 인덱스에 들어 있어서, ' +
+      '테이블 접근 없이 인덱스만으로 답을 바로 낼 수 있어요.',
+    bitmapJoinStructLabel: '인덱스 내부 구조 — 어떻게 저장되나요?',
+    bitmapJoinStructDesc:
+      '인덱스 엔트리 하나는 이렇게 생겼어요:\n' +
+      '  [jobs.job_title 값]  →  [employees.rowid 범위 시작]  [employees.rowid 범위 끝]  [비트맵]\n\n' +
+      '같은 job_title을 가진 EMPLOYEES 행들의 ROWID(행 주소)가 비트맵으로 압축되어 저장돼요.',
+    bitmapJoinVsLabel: 'Materialized View와 비교하면?',
+    bitmapJoinVsDesc:
+      '조인 결과를 미리 저장한다는 점에서 Materialized View(구체화 뷰)와 비슷해 보이지만, ' +
+      'Bitmap Join Index는 저장 공간이 훨씬 작아요. Materialized View는 실제 데이터 행을 통째로 복사해 두지만, ' +
+      'Bitmap Join Index는 비트맵만 저장하기 때문이에요.',
+    bitmapJoinWhen: '언제 써야 하나요?',
+    bitmapJoinWhenItems: [
+      '데이터 웨어하우스(DW)의 스타 스키마(Star Schema) — 팩트 테이블과 차원 테이블을 자주 조인할 때',
+      '조인 조건이 항상 같고(PK-FK 조인), 조인 컬럼의 카디널리티(Cardinality)가 낮을 때',
+      '읽기 위주 환경 — DML(Data Manipulation Language, 데이터 삽입·수정·삭제)이 거의 없을 때',
+    ],
+    bitmapJoinNote:
+      'Bitmap Join Index는 팩트 테이블(fact table)에 만들어요. 차원 테이블(dimension table)의 컬럼을 인덱스 키로 쓰고, 팩트 테이블의 ROWID(행 주소)를 비트맵으로 저장하는 구조예요.',
+
+    compressionTitle: '비트맵 압축 — RLE(Run-Length Encoding)',
+    compressionWhat:
+      '비트맵을 아무 처리 없이 저장하면 테이블 행 수만큼 비트가 필요해요. 행이 100만 개면 비트도 100만 개가 필요한 셈이죠. ' +
+      '그런데 실제 데이터를 보면 같은 값이 연속으로 이어지는 경우가 많아요.\n\n' +
+      'Oracle은 이런 연속 구간을 RLE(Run-Length Encoding, 반복 구간 압축)로 묶어서 저장해요. ' +
+      '"0이 12번 연속" → `0×12`, "1이 8번 연속" → `1×8` 이런 식이죠. ' +
+      '덕분에 실제 디스크에 저장되는 비트맵 크기는 이론적인 크기보다 훨씬 작아요.',
+    compressionStorageLabel: '실제 저장 방식 — 범위 + 비트맵',
+    compressionStorageDesc:
+      '비트맵 인덱스의 Leaf 블록 엔트리 하나는 이렇게 생겼어요:\n\n' +
+      '  [키 값]  [시작 ROWID]  [끝 ROWID]  [비트맵]\n\n' +
+      '비트맵이 커지면 여러 엔트리로 나눠서 저장해요. 시작 ROWID(행 주소)부터 끝 ROWID까지의 범위를 비트맵 하나가 커버하는 거예요. ' +
+      '범위 밖의 행은 그냥 0으로 처리돼요.',
+    compressionExampleLabel: '압축 예시',
+    compressionNote:
+      '카디널리티(Cardinality)가 낮을수록 같은 값이 연속으로 몰리는 경향이 있어서, RLE 압축 효과가 훨씬 커져요. ' +
+      '성별(M/F) 같은 컬럼은 M 비트맵에 0과 1이 큰 덩어리로 뭉쳐 나오기 때문에 압축률이 아주 높아요.',
   },
   en: {
     pageTitle: 'Bitmap Index',
@@ -95,9 +136,9 @@ const T = {
 
     structureTitle: 'What is a Bitmap Index?',
     structureDesc:
-      'For each distinct value, a bitmap vector (array of 0/1) is maintained. Each bit corresponds to one row in the table — 1 if that row matches this key value, 0 otherwise. Bitmaps are internally stored in a B-Tree structure for key-range access.',
+      'In a bitmap index, the database stores a bitmap for each index key. In a conventional B-tree index, one index entry points to a single row. In a bitmap index, each index key stores pointers to multiple rows. Each bit in the bitmap corresponds to a possible rowid. If the bit is set, then the row with the corresponding rowid contains the key value. A mapping function converts the bit position to an actual rowid.',
     structureNote:
-      'Bitmap indexes are suited for OLAP / Data Warehouse workloads. DML (INSERT/UPDATE/DELETE) acquires a lock on the entire bitmap for the affected key, making them unsuitable for OLTP environments.',
+      'Bitmap indexes are best suited when the indexed columns have low cardinality — the number of distinct values is small compared to the number of table rows — and the indexed table is either read-only or not subject to significant DML. If the indexed column in a single row is updated, the database locks the entire key entry (e.g., "M" or "F"), not just the individual bit. Because a key points to many rows, DML typically locks all of those rows. For this reason, bitmap indexes are not appropriate for many OLTP applications.',
 
     vsTitle: 'B-Tree vs Bitmap',
     vsHeaders: ['Aspect', 'B-Tree', 'Bitmap'],
@@ -140,11 +181,52 @@ const T = {
     planLabel: 'Execution Plan Example',
 
     bitmapJoinTitle: 'Bitmap Join Index',
-    bitmapJoinDesc:
-      'A bitmap index built on a column from a joined table. E.g., a bitmap on ORDERS.STATUS for rows in the CUSTOMERS table — enables filtering without the join.',
-    compressionTitle: 'Bitmap Compression (RLE)',
-    compressionDesc:
-      'Oracle compresses consecutive runs of 0s or 1s using RLE (Run-Length Encoding). In real data, actual bitmap storage is far smaller than the theoretical size.',
+    bitmapJoinWhat:
+      'A bitmap join index is a bitmap index for the join of two or more tables. ' +
+      'Unlike a regular bitmap index built on a single table, a bitmap join index uses a column from a joined table as the index key ' +
+      'while storing rowids of the indexed (fact) table. ' +
+      'This allows the optimizer to apply the restriction from the joined table before the join is executed.',
+    bitmapJoinHow:
+      'Consider EMPLOYEES joined to JOBS. The query "How many employees have the job title Accountant?" would normally:\n' +
+      '1. Scan JOBS for the Accountant row\n' +
+      '2. Join to EMPLOYEES via job_id\n\n' +
+      'With a bitmap join index on employees(jobs.job_title), the index already stores which EMPLOYEES rowids correspond to each job_title value. ' +
+      'The optimizer can resolve the filter directly from the index without touching either base table.',
+    bitmapJoinStructLabel: 'Index Internal Structure',
+    bitmapJoinStructDesc:
+      'Each leaf entry in the index looks like this:\n' +
+      '  [jobs.job_title value]  →  [low employees rowid]  [high employees rowid]  [bitmap]\n\n' +
+      'The bitmap encodes which EMPLOYEES rows (within the rowid range) hold that job_title value.',
+    bitmapJoinVsLabel: 'Bitmap Join Index vs. Materialized View',
+    bitmapJoinVsDesc:
+      'Both pre-compute join results, but a bitmap join index is often much more storage-efficient than a materialized join view ' +
+      'because it stores only compressed bitmaps rather than full copies of the joined rows.',
+    bitmapJoinWhen: 'When to use',
+    bitmapJoinWhenItems: [
+      'Data warehouse star schemas — frequent equijoins between fact and dimension tables',
+      'Consistent join predicate (PK–FK join) with low-cardinality dimension columns',
+      'Read-heavy environments — bitmap indexes are not suitable for high-DML workloads',
+    ],
+    bitmapJoinNote:
+      'The index is created on the fact table. The dimension table column is the index key; the fact table rowids are stored in the bitmap.',
+
+    compressionTitle: 'Bitmap Compression — RLE',
+    compressionWhat:
+      'Storing a raw bitmap requires one bit per table row — a million-row table means a million bits per key value. ' +
+      'In practice, low-cardinality data tends to cluster: long runs of 0s broken by clusters of 1s.\n\n' +
+      'Oracle compresses these consecutive runs using RLE (Run-Length Encoding): ' +
+      '"twelve 0s" → 0×12, "eight 1s" → 1×8. This makes the actual stored bitmap far smaller than the theoretical size.',
+    compressionStorageLabel: 'How Leaf Entries Store Bitmaps',
+    compressionStorageDesc:
+      'A single leaf entry in a bitmap index looks like this:\n\n' +
+      '  [key value]  [low rowid]  [high rowid]  [bitmap]\n\n' +
+      'The bitmap covers only the rowid range between the low and high values. ' +
+      'When a bitmap grows too large, Oracle splits it across multiple entries. ' +
+      'Rows outside the range are implicitly 0.',
+    compressionExampleLabel: 'Compression Example',
+    compressionNote:
+      'The lower the cardinality, the more values cluster together and the higher the RLE compression ratio. ' +
+      'A GENDER column (M/F) produces long homogeneous runs in each bitmap, compressing extremely well.',
   },
 }
 
@@ -490,44 +572,198 @@ export function BitmapSection() {
 
       <Divider />
 
-      {/* ── 4. Bitmap Join Index + Compression ── */}
-      <div className="grid gap-5 md:grid-cols-2">
-        <div>
-          <SectionTitle>{t.bitmapJoinTitle}</SectionTitle>
-          <Prose>{t.bitmapJoinDesc}</Prose>
-          <div className="mt-3 rounded-lg bg-muted/40 p-3 font-mono text-[10px] text-foreground leading-relaxed whitespace-pre">
-            {`CREATE BITMAP INDEX ord_cust_status_bix\n  ON orders(customers.status)\n  FROM orders, customers\n  WHERE orders.customer_id = customers.customer_id;`}
-          </div>
-        </div>
+      {/* ── 4. Bitmap Join Index ── */}
+      <SectionTitle>{t.bitmapJoinTitle}</SectionTitle>
+      <Prose>{t.bitmapJoinWhat}</Prose>
 
-        <div>
-          <SectionTitle>{t.compressionTitle}</SectionTitle>
-          <Prose>{t.compressionDesc}</Prose>
-          <div className="mt-3 space-y-2">
-            <div>
-              <div className="mb-1 font-mono text-[10px] text-muted-foreground">{lang === 'ko' ? '원본 비트맵' : 'Raw bitmap'}</div>
-              <div className="flex flex-wrap gap-px">
-                {Array.from({ length: 20 }).map((_, i) => (
-                  <div key={i} className={cn('flex h-5 w-5 items-center justify-center rounded-sm font-mono text-[9px]',
-                    i < 12 ? 'bg-muted text-muted-foreground' : 'bg-blue-100 text-blue-700'
-                  )}>{i < 12 ? 0 : 1}</div>
-                ))}
-              </div>
+      {/* 작동 방식 카드 */}
+      <div className="mt-4 rounded-xl border bg-card p-5">
+        <p className="mb-3 font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+          {t.bitmapJoinHow.split('\n')[0]}
+        </p>
+        <div className="grid gap-3 sm:grid-cols-2">
+          {/* Without index */}
+          <div className="rounded-lg border border-rose-200 bg-rose-50/40 p-4">
+            <div className="mb-2 font-mono text-[10px] font-bold text-rose-700">
+              {lang === 'ko' ? '인덱스 없을 때' : 'Without index'}
             </div>
-            <div className="flex items-center gap-2">
-              <div className="h-px flex-1 border-t border-dashed" />
-              <span className="font-mono text-[10px] text-muted-foreground">RLE</span>
-              <div className="h-px flex-1 border-t border-dashed" />
+            <ol className="space-y-1.5">
+              {(lang === 'ko'
+                ? ['JOBS 테이블에서 Accountant 행 찾기', 'EMPLOYEES와 job_id로 조인', '조인된 결과에서 집계']
+                : ['Scan JOBS for Accountant rows', 'Join to EMPLOYEES via job_id', 'Aggregate the joined result']
+              ).map((s, i) => (
+                <li key={i} className="flex items-start gap-2 text-[11px] text-muted-foreground">
+                  <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-rose-200 font-mono text-[9px] font-bold text-rose-700">{i + 1}</span>
+                  {s}
+                </li>
+              ))}
+            </ol>
+          </div>
+          {/* With index */}
+          <div className="rounded-lg border border-emerald-200 bg-emerald-50/40 p-4">
+            <div className="mb-2 font-mono text-[10px] font-bold text-emerald-700">
+              {lang === 'ko' ? 'Bitmap Join Index 있을 때' : 'With Bitmap Join Index'}
             </div>
-            <div>
-              <div className="mb-1 font-mono text-[10px] text-muted-foreground">{lang === 'ko' ? '압축 결과' : 'Compressed'}</div>
-              <div className="flex gap-2">
-                <span className="rounded bg-muted px-2 py-1 font-mono text-[10px]">0×12</span>
-                <span className="rounded bg-blue-100 px-2 py-1 font-mono text-[10px] text-blue-700">1×8</span>
-              </div>
+            <ol className="space-y-1.5">
+              {(lang === 'ko'
+                ? ['인덱스에서 job_title = Accountant 비트맵 조회', 'ROWID(행 주소)를 바로 테이블에 적용', '조인 단계 건너뜀']
+                : ['Look up job_title = Accountant bitmap in index', 'Apply rowids directly to EMPLOYEES', 'Join step skipped entirely']
+              ).map((s, i) => (
+                <li key={i} className="flex items-start gap-2 text-[11px] text-muted-foreground">
+                  <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-emerald-200 font-mono text-[9px] font-bold text-emerald-700">{i + 1}</span>
+                  {s}
+                </li>
+              ))}
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      {/* CREATE 문 */}
+      <div className="mt-4">
+        <p className="mb-1.5 font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+          {t.bitmapJoinStructLabel}
+        </p>
+        <div className="rounded-lg bg-muted/40 p-4 font-mono text-[11px] leading-relaxed text-foreground whitespace-pre">
+          {`-- 인덱스 생성\nCREATE BITMAP INDEX employees_bm_idx\n  ON     employees (jobs.job_title)   -- 키: 다른 테이블 컬럼\n  FROM   employees, jobs              -- 조인 대상\n  WHERE  employees.job_id = jobs.job_id;  -- 조인 조건\n\n-- 이 인덱스가 도움이 되는 쿼리\nSELECT COUNT(*)\nFROM   employees, jobs\nWHERE  employees.job_id = jobs.job_id\nAND    jobs.job_title   = 'Accountant';`}
+        </div>
+      </div>
+
+      {/* 내부 구조 */}
+      <div className="mt-4 rounded-xl border bg-muted/20 p-4">
+        <p className="mb-3 font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+          {t.bitmapJoinStructDesc.split('\n')[0]}
+        </p>
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse font-mono text-[10px]">
+            <thead>
+              <tr className="border-b">
+                <th className="px-3 py-1.5 text-left text-muted-foreground">jobs.job_title</th>
+                <th className="px-3 py-1.5 text-left text-muted-foreground">low rowid</th>
+                <th className="px-3 py-1.5 text-left text-muted-foreground">high rowid</th>
+                <th className="px-3 py-1.5 text-left text-muted-foreground">bitmap</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[
+                ['Accountant',           'AAAQNK…ABSAAj', 'AAAQNK…ABSAAp', '10110010'],
+                ['Accountant',           'AAAQNK…ABSAAq', 'AAAQNK…ABSAAz', '01001100'],
+                ['Accounting Manager',   'AAAQNK…ABTAAa', 'AAAQNK…ABTAAh', '10000001'],
+                ['Administration Asst.', 'AAAQNK…ABTAAi', 'AAAQNK…ABTAAp', '00100000'],
+              ].map(([key, lo, hi, bm], i) => (
+                <tr key={i} className="border-b last:border-0">
+                  <td className="px-3 py-1.5 font-bold text-blue-700">{key}</td>
+                  <td className="px-3 py-1.5 text-muted-foreground">{lo}</td>
+                  <td className="px-3 py-1.5 text-muted-foreground">{hi}</td>
+                  <td className="px-3 py-1.5">
+                    <span className="rounded bg-muted px-1.5 py-0.5">{bm}</span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* vs Materialized View + When to use */}
+      <div className="mt-4 grid gap-4 sm:grid-cols-2">
+        <div className="rounded-xl border bg-card p-4">
+          <p className="mb-2 font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+            {t.bitmapJoinVsLabel}
+          </p>
+          <p className="text-[11px] leading-relaxed text-muted-foreground">{t.bitmapJoinVsDesc}</p>
+        </div>
+        <InfoBox variant="tip" title={t.bitmapJoinWhen}>
+          <ul className="mt-1 space-y-1">
+            {t.bitmapJoinWhenItems.map((item, i) => (
+              <li key={i} className="flex items-start gap-2 text-[11px]">
+                <span className="mt-0.5 shrink-0 font-mono text-rose-400">▸</span>
+                {item}
+              </li>
+            ))}
+          </ul>
+        </InfoBox>
+      </div>
+
+      <div className="mt-4">
+        <InfoBox variant="note">{t.bitmapJoinNote}</InfoBox>
+      </div>
+
+      <Divider />
+
+      {/* ── 5. Bitmap Compression ── */}
+      <SectionTitle>{t.compressionTitle}</SectionTitle>
+      <Prose>{t.compressionWhat}</Prose>
+
+      {/* 압축 시각화 */}
+      <div className="mt-4 rounded-xl border bg-card p-5">
+        <p className="mb-4 font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+          {t.compressionExampleLabel}
+        </p>
+
+        {/* 시나리오: GENDER = 'M' 비트맵 (26행) */}
+        <div className="space-y-4">
+          {/* Raw */}
+          <div>
+            <div className="mb-1.5 font-mono text-[10px] text-muted-foreground">
+              {lang === 'ko' ? '원본 비트맵 (26비트, GENDER = \'M\')' : "Raw bitmap (26 bits, GENDER = 'M')"}
+            </div>
+            <div className="flex flex-wrap gap-px">
+              {[0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0].map((b, i) => (
+                <div key={i} className={cn(
+                  'flex h-6 w-6 items-center justify-center rounded-sm font-mono text-[9px] font-bold',
+                  b === 1 ? 'bg-blue-100 text-blue-700' : 'bg-muted text-muted-foreground/50'
+                )}>{b}</div>
+              ))}
+            </div>
+          </div>
+
+          {/* Arrow */}
+          <div className="flex items-center gap-3">
+            <div className="h-px flex-1 border-t border-dashed border-muted-foreground/30" />
+            <div className="flex items-center gap-1.5 rounded-full border bg-muted/60 px-3 py-1 font-mono text-[10px] text-muted-foreground">
+              <span>RLE</span>
+            </div>
+            <div className="h-px flex-1 border-t border-dashed border-muted-foreground/30" />
+          </div>
+
+          {/* Compressed */}
+          <div>
+            <div className="mb-1.5 font-mono text-[10px] text-muted-foreground">
+              {lang === 'ko' ? '압축 결과 — 26비트 → 5개 청크' : 'Compressed — 26 bits → 5 chunks'}
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              {[
+                { bits: '0×4', color: 'bg-muted text-muted-foreground' },
+                { bits: '1×2', color: 'bg-blue-100 text-blue-700' },
+                { bits: '0×10', color: 'bg-muted text-muted-foreground' },
+                { bits: '1×4', color: 'bg-blue-100 text-blue-700' },
+                { bits: '0×6', color: 'bg-muted text-muted-foreground' },
+              ].map((chunk, i) => (
+                <span key={i} className={cn('rounded px-3 py-1.5 font-mono text-[11px] font-bold', chunk.color)}>
+                  {chunk.bits}
+                </span>
+              ))}
             </div>
           </div>
         </div>
+      </div>
+
+      {/* 저장 구조 */}
+      <div className="mt-4">
+        <p className="mb-1.5 font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+          {t.compressionStorageLabel}
+        </p>
+        <div className="rounded-lg bg-muted/40 p-4 font-mono text-[11px] leading-relaxed text-foreground whitespace-pre">
+          {lang === 'ko'
+            ? `-- Leaf 블록 엔트리 구조\n[키 값]  [시작 ROWID]  [끝 ROWID]  [RLE 압축 비트맵]\n\n예)\nShipping Clerk, AAAPzR…ABSABQ, AAAPzR…ABSABZ, 0010000100\nShipping Clerk, AAAPzR…ABSABa, AAAPzR…ABSABh, 010010\nStock Clerk,    AAAPzR…ABSAAa, AAAPzR…ABSAAc, 1001001100\nStock Clerk,    AAAPzR…ABSAAd, AAAPzR…ABSAAt, 0101001001`
+            : `-- Leaf block entry structure\n[key value]  [low rowid]  [high rowid]  [RLE-compressed bitmap]\n\ne.g.\nShipping Clerk, AAAPzR…ABSABQ, AAAPzR…ABSABZ, 0010000100\nShipping Clerk, AAAPzR…ABSABa, AAAPzR…ABSABh, 010010\nStock Clerk,    AAAPzR…ABSAAa, AAAPzR…ABSAAc, 1001001100\nStock Clerk,    AAAPzR…ABSAAd, AAAPzR…ABSAAt, 0101001001`}
+        </div>
+        <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground">{t.compressionStorageDesc}</p>
+      </div>
+
+      <div className="mt-8">
+        <InfoBox variant="summary">{t.compressionNote}</InfoBox>
       </div>
     </PageContainer>
   )

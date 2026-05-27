@@ -25,7 +25,8 @@
       "Bash(/c/Users/woong/AppData/Local/ms-playwright/chromium-1223/chrome-win64/chrome.exe --headless=new --no-sandbox --screenshot=/c/Users/woong/OneDrive/Desktop/oracleDataBaseSystem/verify_01_landing.png --window-size=1400,900 http://localhost:5199)",
       "Bash(dir C:\\\\Users\\\\woong\\\\OneDrive\\\\Desktop\\\\oracleDataBaseSystem\\\\src\\\\book\\\\chapters\\\\internals\\\\concurrency *)",
       "Bash(dir C:\\\\Users\\\\woong\\\\OneDrive\\\\Desktop\\\\oracleDataBaseSystem\\\\src\\\\book\\\\chapters\\\\internals\\\\transaction *)",
-      "PowerShell(\\(Get-Content \"C:\\\\Users\\\\woong\\\\OneDrive\\\\Desktop\\\\oracleDataBaseSystem\\\\src\\\\book\\\\chapters\\\\internals\\\\transaction\\\\TransactionSection.tsx\" | Measure-Object -Line\\).Lines)"
+      "PowerShell(\\(Get-Content \"C:\\\\Users\\\\woong\\\\OneDrive\\\\Desktop\\\\oracleDataBaseSystem\\\\src\\\\book\\\\chapters\\\\internals\\\\transaction\\\\TransactionSection.tsx\" | Measure-Object -Line\\).Lines)",
+      "Bash(Get-ChildItem *)"
     ]
   }
 }

@@ -11,65 +11,65 @@ import { IconRoute } from '@tabler/icons-react'
 const T = {
   ko: {
     title: '인덱스에서 테이블로 가는 법',
-    subtitle: 'ROWID를 손에 넣었다고 바로 행 데이터가 오는 것이 아닙니다. Buffer Cache 해시 체인을 탐색하고, Latch를 잡고, Buffer를 Pin하고, 필요하면 디스크 I/O까지 — 생각보다 훨씬 긴 여정을 거쳐야 합니다.',
-    overviewTitle: '왜 이렇게 복잡한가?',
-    overviewDesc: 'Oracle은 디스크 I/O를 피하기 위해 자주 쓰는 블록을 메모리(Buffer Cache)에 올려둡니다. 그런데 수십만 개의 블록이 Buffer Cache에 올라와 있을 수 있기 때문에, "이 DBA가 이미 캐시에 있는가?"를 빠르게 찾으려면 해시 테이블 구조가 필요합니다. 동시에 여러 프로세스가 같은 버퍼를 건드릴 수 있으므로, 접근 순서를 제어하는 Latch와 Lock도 반드시 필요합니다.',
+    subtitle: 'ROWID(행 식별자)를 손에 넣었다고 바로 행 데이터가 오는 게 아니에요. Buffer Cache 해시 체인을 탐색하고, Latch를 잡고, Buffer를 Pin하고, 필요하면 디스크 I/O(Input/Output, 디스크 입출력)까지 — 생각보다 훨씬 긴 여정이 기다리고 있어요.',
+    overviewTitle: '왜 이렇게 복잡한가요?',
+    overviewDesc: 'Oracle은 디스크 I/O(Input/Output, 디스크 입출력)를 줄이기 위해 자주 쓰는 블록을 메모리(Buffer Cache)에 올려둬요. 그런데 수십만 개의 블록이 동시에 Buffer Cache에 올라와 있을 수 있기 때문에, "이 DBA(Data Block Address, 데이터 블록 주소)가 이미 캐시에 있는가?"를 빠르게 찾으려면 해시 테이블 구조가 필요해요. 거기다 여러 프로세스가 동시에 같은 버퍼를 건드릴 수 있어서, 접근 순서를 제어하는 Latch와 Lock도 꼭 필요하답니다.',
     stepsTitle: '단계별 과정',
     walkthrough: [
       {
         step: 1,
         phase: 'ROWID → DBA 변환',
         color: 'violet',
-        detail: 'ROWID에서 File# + Block# 를 꺼내 Data Block Address(DBA)를 만듭니다. DBA는 "파일 N번의 M번째 블록"을 가리키는 64비트 주소입니다.',
+        detail: 'ROWID(행 식별자)에서 File# + Block# 를 꺼내 DBA(Data Block Address, 데이터 블록 주소)를 만들어요. DBA는 "파일 N번의 M번째 블록"을 가리키는 64비트 주소예요.',
         note: null,
       },
       {
         step: 2,
         phase: 'DBA → 해시값 계산',
         color: 'blue',
-        detail: 'DBA에 해시 함수를 적용해 Buffer Cache의 어느 버킷(해시 체인)에 해당 블록이 있는지 결정합니다. Oracle은 DBA를 일정 비트 수로 나눠 해시 버킷 번호를 구합니다.',
+        detail: 'DBA(Data Block Address, 데이터 블록 주소)에 해시 함수를 적용해서, Buffer Cache의 어느 버킷(해시 체인)에 해당 블록이 있는지 결정해요. Oracle은 DBA를 일정 비트 수로 나눠 해시 버킷 번호를 구해요.',
         note: 'hash_bucket = DBA % num_hash_buckets',
       },
       {
         step: 3,
         phase: 'Cache Buffer Chain Latch 획득',
         color: 'amber',
-        detail: '해당 해시 버킷의 연결 리스트(Buffer Chain)를 읽거나 수정하려면 먼저 Cache Buffers Chain Latch를 잡아야 합니다. 다른 프로세스가 같은 Latch를 보유하고 있으면 Spin 대기 → Sleep 대기가 발생합니다.',
+        detail: '해당 해시 버킷의 연결 리스트(Buffer Chain)를 읽거나 수정하려면, 먼저 Cache Buffers Chain Latch를 잡아야 해요. 다른 프로세스가 같은 Latch를 쥐고 있으면 Spin 대기 → Sleep 대기가 발생해요.',
         note: '대기 이벤트: latch: cache buffers chains',
       },
       {
         step: 4,
         phase: '해시 체인 탐색 (Buffer Lookup)',
         color: 'amber',
-        detail: 'Latch를 잡은 상태에서 해당 버킷의 Buffer Header 연결 리스트를 선형 탐색합니다. 각 Buffer Header에는 DBA 값이 있어 찾는 DBA와 일치하는지 비교합니다.',
+        detail: 'Latch를 잡은 채로 해당 버킷의 Buffer Header 연결 리스트를 쭉 훑어봐요. 각 Buffer Header에는 DBA(Data Block Address, 데이터 블록 주소) 값이 있어서, 찾는 DBA와 일치하는지 하나씩 비교해요.',
         note: 'Buffer Header: DBA, state, pin count, dirty flag…',
       },
       {
         step: 5,
         phase: 'Buffer Pin (Buffer Busy 대기)',
         color: 'amber',
-        detail: '원하는 Buffer를 찾으면 해당 Buffer를 Pin(참조 카운트 증가)합니다. 이미 다른 프로세스가 그 버퍼를 변경 중이면(exclusive pin) Buffer Busy 대기가 발생합니다.',
+        detail: '원하는 Buffer를 찾으면 그 Buffer를 Pin(참조 카운트 증가)해요. 이미 다른 프로세스가 exclusive pin으로 그 버퍼를 수정 중이라면 Buffer Busy 대기가 발생해요.',
         note: '대기 이벤트: buffer busy waits / read by other session',
       },
       {
         step: 6,
         phase: 'Latch 해제',
         color: 'emerald',
-        detail: 'Buffer를 Pin한 후에는 Cache Buffers Chain Latch를 즉시 놓습니다. Pin이 보호자 역할을 이어받아 버퍼가 교체(evict)되지 않도록 막습니다.',
+        detail: 'Buffer를 Pin한 뒤에는 Cache Buffers Chain Latch를 바로 놔줘요. 이제 Pin이 보호자 역할을 대신해서 버퍼가 교체(evict)되지 않도록 막아줘요.',
         note: null,
       },
       {
         step: 7,
         phase: '[Cache Miss] 디스크 I/O',
         color: 'rose',
-        detail: '버킷에 해당 DBA가 없으면 Cache Miss입니다. 빈 Buffer Frame을 확보하고(LRU 교체 가능), 디스크에서 블록을 읽어 Buffer Cache에 올린 뒤 다시 Pin합니다.',
+        detail: '버킷에 찾는 DBA(Data Block Address, 데이터 블록 주소)가 없으면 Cache Miss예요. 빈 Buffer Frame을 확보하고(LRU 방식으로 오래된 것 교체), 디스크에서 블록을 읽어 Buffer Cache에 올린 뒤 다시 Pin해요.',
         note: '대기 이벤트: db file sequential read (단일 블록)',
       },
       {
         step: 8,
         phase: '행 데이터 반환',
         color: 'slate',
-        detail: 'Buffer가 메모리에 올라와 있고 Pin이 완료되면, ROWID의 Row# (슬롯 번호)로 블록 내 Row Directory를 찾아 실제 행 데이터를 읽어 반환합니다.',
+        detail: 'Buffer가 메모리에 올라와 Pin까지 완료되면, ROWID(행 식별자)의 Row# (슬롯 번호)로 블록 안의 Row Directory를 찾아 실제 행 데이터를 읽어 반환해요.',
         note: null,
       },
     ],
@@ -80,29 +80,29 @@ const T = {
     waits: [
       {
         event: 'latch: cache buffers chains',
-        cause: '해시 체인 Latch 경합. 같은 버킷에 핫 블록이 집중되거나 Latch를 오래 보유하는 작업이 있을 때 발생.',
-        fix: 'DB_BLOCK_SIZE 최적화, 핫 블록 분산(파티셔닝), CACHE 절로 자주 쓰는 블록을 Keep Pool에 배치.',
+        cause: '해시 체인 Latch 경합이에요. 같은 버킷에 핫 블록이 몰리거나, Latch를 오래 잡고 있는 작업이 있을 때 발생해요.',
+        fix: 'DB_BLOCK_SIZE 최적화, 핫 블록 분산(파티셔닝), CACHE 절로 자주 쓰는 블록을 Keep Pool에 배치해 보세요.',
       },
       {
         event: 'buffer busy waits',
-        cause: '다른 세션이 같은 버퍼를 exclusive pin으로 수정 중. INSERT/UPDATE 집중 구간에서 자주 발생.',
-        fix: 'Sequence Cache 크기 확대, Reverse Key Index 도입, Hot Table은 파티셔닝으로 버퍼 분산.',
+        cause: '다른 세션이 exclusive pin으로 같은 버퍼를 수정 중이에요. INSERT/UPDATE가 몰리는 구간에서 자주 발생해요.',
+        fix: 'Sequence Cache 크기를 늘리거나, Reverse Key Index를 도입하거나, 핫한 테이블을 파티셔닝해서 버퍼를 분산해 보세요.',
       },
       {
         event: 'read by other session',
-        cause: '한 세션이 디스크에서 블록을 읽어오는 동안 같은 블록이 필요한 다른 세션이 대기.',
-        fix: 'Buffer Cache 크기(DB_CACHE_SIZE) 확대, 자주 쓰는 테이블을 CACHE로 지정.',
+        cause: '한 세션이 디스크에서 블록을 읽어오는 동안, 같은 블록이 필요한 다른 세션이 기다리는 상황이에요.',
+        fix: 'Buffer Cache 크기(DB_CACHE_SIZE)를 늘리거나, 자주 쓰는 테이블에 CACHE 절을 지정해 보세요.',
       },
       {
         event: 'db file sequential read',
-        cause: '단일 블록 랜덤 I/O. 인덱스를 타는 쿼리에서 ROWID마다 발생할 수 있음.',
-        fix: '인덱스 Covering(필요 컬럼을 인덱스에 포함)으로 테이블 접근 자체를 없애거나, 선택도 낮은 컬럼 조회는 Full Scan 고려.',
+        cause: '단일 블록 랜덤 I/O(Input/Output, 디스크 입출력)예요. 인덱스를 타는 쿼리에서 ROWID(행 식별자)마다 발생할 수 있어요.',
+        fix: 'Covering Index(필요한 컬럼을 인덱스에 포함)로 테이블 접근 자체를 없애거나, 선택도가 낮은 컬럼 조회는 Full Scan을 고려해 보세요.',
       },
     ],
-    costTitle: '왜 인덱스가 항상 빠른 게 아닌가?',
-    costDesc: '위 과정을 보면 ROWID 한 개당 최소 3~4단계(해시 → Latch → Chain 탐색 → Pin)를 거칩니다. 결과가 1~2건이면 이 비용은 무시할 수 있지만, 수천~수만 건을 ROWID로 한 건씩 랜덤 접근하면 동일한 과정이 수만 번 반복됩니다. 이 시점에서는 테이블 전체를 순서대로 읽는 Full Table Scan이 훨씬 효율적입니다.',
+    costTitle: '왜 인덱스가 항상 빠른 게 아닌가요?',
+    costDesc: '위 과정을 보면 ROWID(행 식별자) 한 개당 최소 3~4단계(해시 → Latch → Chain 탐색 → Pin)를 거쳐요. 결과가 1~2건이면 이 비용은 별거 아니지만, 수천~수만 건을 ROWID로 한 건씩 랜덤하게 접근하면 같은 과정이 수만 번 반복되는 거예요. 이럴 때는 테이블 전체를 순서대로 쭉 읽는 Full Table Scan이 훨씬 효율적이에요.',
     coveringTitle: '해결책: Covering Index (Index-Only Scan)',
-    coveringDesc: 'SELECT하는 모든 컬럼이 인덱스에 포함되어 있으면 ROWID로 테이블을 찾아갈 필요가 없습니다. 인덱스 Leaf 블록에서 데이터를 바로 반환하므로 위의 Buffer Cache 탐색 비용이 인덱스 블록에 대해서만 발생합니다.',
+    coveringDesc: 'SELECT하는 모든 컬럼이 인덱스에 포함되어 있으면 ROWID(행 식별자)로 테이블을 찾아갈 필요가 없어요. 인덱스 Leaf 블록에서 데이터를 바로 반환하기 때문에, Buffer Cache 탐색 비용이 인덱스 블록에 대해서만 발생해요.',
     coveringSql: `-- 인덱스: IDX_EMP_SAL (employee_id, salary)
 SELECT employee_id, salary   -- 두 컬럼 모두 인덱스에 있음
 FROM   employees
@@ -220,31 +220,31 @@ const ANATOMY_TERMS = {
   ko: {
     bufferCache: {
       label: 'Buffer Cache',
-      desc: 'SGA 안에 있는 메모리 영역. 디스크에서 읽은 데이터 블록을 올려두어 반복 I/O를 피합니다. DB_CACHE_SIZE 파라미터로 크기를 조정합니다.',
+      desc: 'SGA(System Global Area) 안에 있는 메모리 영역이에요. 디스크에서 읽은 데이터 블록을 여기에 올려두어 반복적인 I/O(Input/Output, 디스크 입출력)를 피해요. DB_CACHE_SIZE 파라미터로 크기를 조정할 수 있어요.',
     },
     hashBucket: {
       label: 'Hash Bucket',
-      desc: 'DBA(Data Block Address)를 해시 함수에 넣어 나온 버킷 번호. "이 블록이 캐시에 있는가?"를 O(1)에 가깝게 찾기 위한 인덱스 역할입니다. 버킷 수는 내부적으로 자동 결정됩니다.',
+      desc: 'DBA(Data Block Address, 데이터 블록 주소)를 해시 함수에 넣어 나온 버킷 번호예요. "이 블록이 캐시에 있는가?"를 거의 O(1) 속도로 찾을 수 있도록 도와주는 인덱스 역할을 해요. 버킷 수는 내부적으로 자동으로 결정돼요.',
     },
     hashChain: {
       label: 'Hash Chain',
-      desc: '같은 버킷에 해시된 Buffer Header들이 연결된 링크드 리스트. Latch를 잡고 이 체인을 선형 탐색해 원하는 DBA의 BH를 찾습니다.',
+      desc: '같은 버킷에 해시된 Buffer Header들이 연결된 링크드 리스트예요. Latch를 잡고 이 체인을 순서대로 훑으면서 원하는 DBA(Data Block Address, 데이터 블록 주소)의 Buffer Header를 찾아요.',
     },
     bufferHeader: {
       label: 'Buffer Header',
-      desc: '각 버퍼 블록의 메타데이터 구조체. DBA, 상태(free/clean/dirty), pin count, dirty flag 등을 보관합니다. 실제 데이터는 없고 Buffer Block을 가리키는 포인터를 갖습니다.',
+      desc: '각 버퍼 블록의 메타데이터 구조체예요. DBA(Data Block Address, 데이터 블록 주소), 상태(free/clean/dirty), pin count, dirty flag 등을 보관해요. 실제 데이터는 없고, Buffer Block을 가리키는 포인터를 갖고 있어요.',
     },
     bufferBlock: {
       label: 'Buffer Block',
-      desc: '실제 데이터 블록이 올라오는 메모리 프레임. 디스크의 8KB(또는 설정값) 블록과 동일한 크기. Buffer Header의 포인터로 연결됩니다.',
+      desc: '실제 데이터 블록이 올라오는 메모리 프레임이에요. 디스크의 8KB(또는 설정값) 블록과 똑같은 크기예요. Buffer Header의 포인터로 연결되어 있어요.',
     },
     latch: {
       label: 'Latch',
-      desc: 'Hash Chain을 읽거나 수정하기 전에 반드시 획득해야 하는 경량 직렬화 메커니즘. Spin → Sleep 순서로 대기하며, "latch: cache buffers chains" 대기 이벤트가 발생할 수 있습니다.',
+      desc: 'Hash Chain을 읽거나 수정하기 전에 반드시 먼저 획득해야 하는 경량 직렬화 메커니즘이에요. Spin(CPU를 잡고 반복 대기) → Sleep(잠시 기다렸다 재시도) 순서로 대기하고, 경합이 심하면 "latch: cache buffers chains" 대기 이벤트가 나타나요.',
     },
     bufferHandle: {
       label: 'Buffer Handle',
-      desc: '버퍼를 Pin(참조 카운트 증가)한 후 해당 세션이 갖는 핸들. Latch를 놓은 뒤에도 Pin이 유지되어 버퍼가 evict되지 않도록 보호합니다.',
+      desc: '버퍼를 Pin(참조 카운트 증가)한 뒤 해당 세션이 갖게 되는 핸들이에요. Latch를 놓은 뒤에도 Pin이 유지되어 다른 프로세스가 그 버퍼를 내쫓지(evict) 못하도록 보호해줘요.',
     },
   },
   en: {
@@ -1233,7 +1233,7 @@ export function TableAccessSection() {
       <Prose>{t.costDesc}</Prose>
       <InfoBox variant="warning">
         {isKo
-          ? '선택도가 낮은 컬럼(결과 행 수가 전체의 10~20% 이상)에 인덱스를 쓰면 ROWID마다 위 8단계가 반복됩니다. Full Table Scan의 멀티블록 순차 읽기보다 훨씬 느려질 수 있습니다.'
+          ? '선택도가 낮은 컬럼(결과 행 수가 전체의 10~20% 이상)에 인덱스를 쓰면 ROWID(행 식별자)마다 위 8단계가 반복돼요. Full Table Scan의 멀티블록 순차 읽기보다 훨씬 느려질 수 있어요.'
           : 'Using an index on a low-selectivity column (returning 10–20%+ of rows) repeats all 8 steps per ROWID. This can be far slower than a sequential multi-block Full Table Scan.'}
       </InfoBox>
 

@@ -271,7 +271,22 @@ src/book/chapters/internals/overview/process/
 
 **참고 문서:** Oracle 26 공식 문서 — [Process Architecture](https://docs.oracle.com/en/database/oracle/oracle-database/26/cncpt/process-architecture.html)
 
-나머지 챕터(join, optimizer, sort, partition, parallel, query-transform, index-chapter)는 `index.tsx` 단일 파일로 구성된다.
+나머지 챕터(join, sort, partition, parallel, query-transform)는 `index.tsx` 단일 파일로 구성된다.
+
+- `optimizer/` — 섹션이 독립 파일로 분리되어 있다:
+
+  **`optimizer` TOC 구조 (현재):**
+  ```
+  5. 옵티마이저 원리
+     5.1 CBO 개요          → overview/OverviewSection.tsx
+     5.2 통계 정보와 선택도 → stats/StatsSection.tsx
+     5.3 액세스 패스        → access-path/AccessPathSection.tsx
+     5.4 실행 계획          → plan/PlanSection.tsx
+         5.4.1 실행 계획 읽는 연습하기 → plan/PlanReadingSection.tsx
+     5.5 Optimizer Simulator → simulator/OptimizerSimulator.tsx
+  ```
+
+  공유 다이어그램 컴포넌트는 `shared/diagrams.tsx`에 위치 (`ExplainPlanTable`, `PlanRow` 타입 등). `OptimizerSimulator`는 `BookContent`의 `SectionRouter`에서 레이아웃 wrapper 없이 직접 렌더링된다.
 
 - `index-chapter/` — 섹션이 독립 파일로 분리되어 있다:
 
@@ -475,3 +490,13 @@ SVG 레이아웃 상수는 **의존 관계 순서대로** 선언한다 — 예: 
 - Sapphire(파란계열), Tangerine(주황), Gold 액센트 컬러 사용
 - shadcn/ui 스타일: `base-nova`
 - React Flow 커스텀 오버라이드는 `index.css` 내 `.react-flow` 셀렉터에만 허용
+
+## 문장,말투,번역
+너는 20년차 베테랑 번역가야.
+
+[번역 지침]
+1. 직역을 절대 금지하며, 문맥과 의역을 최우선으로 해.
+2. 산업군별 전문 용어(Terminology)가 확실하지 않다면 영어를 그대로 사용하거나 가장 대중적인 용어를 써.
+3. 영어로 된 축약어가 나올 때는 꼭 full word 를 괄호 안에 넣어줘
+4. 말투는 친근하고 친절하게, 초등학교 5학년쯤 아이를 상대로 설명한다고 생각해줘.
+5. 참고 문서들은 대부분 영어로 된 문서들인데, 원본이 영어라는 걸 눈치챌 수 없도록, 최대한 자연스러운 한국어를 구사해야해

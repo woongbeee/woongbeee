@@ -17,56 +17,58 @@ const T = {
   ko: {
     pageTitle: 'ROWID 구조',
     pageSubtitle:
-      'ROWID는 Oracle 테이블에서 각 행(Row)의 물리적 위치를 나타내는 고유한 주소입니다. ' +
-      'B-Tree 인덱스의 Leaf 블록은 인덱스 키값과 함께 ROWID를 저장하며, ' +
-      '오라클은 이 ROWID를 이용해 테이블 블록을 단 한 번의 I/O로 직접 찾아갑니다.',
+      'ROWID(행 식별자)는 Oracle 테이블에서 각 행이 디스크의 어디에 저장되어 있는지를 알려주는 고유한 주소예요. ' +
+      'B-Tree 인덱스의 Leaf 블록은 인덱스 키값과 함께 ROWID를 저장해두고, ' +
+      '오라클은 이 ROWID를 이용해 단 한 번의 I/O(Input/Output, 디스크 입출력)로 테이블 블록을 바로 찾아가요.',
 
-    whatTitle: 'ROWID란?',
+    whatTitle: 'ROWID란 뭔가요?',
     whatDesc:
-      'ROWID는 "이 행은 디스크의 어느 파일, 어느 블록, 몇 번째 슬롯에 있다"를 가리키는 포인터입니다. ' +
-      '테이블 풀 스캔 없이 특정 행에 바로 접근할 수 있어, 인덱스 기반 조회의 마지막 단계에서 반드시 쓰입니다.',
+      'ROWID(행 식별자)는 "이 행은 디스크의 어느 파일, 어느 블록, 몇 번째 슬롯에 있어요"라고 알려주는 포인터예요. ' +
+      '테이블을 처음부터 끝까지 뒤지지 않아도 특정 행에 바로 접근할 수 있어서, 인덱스 기반 조회의 마지막 단계에서 반드시 쓰여요. ' +
+      '단 1번의 I/O(Input/Output, 디스크 입출력)로 해당 블록을 바로 읽을 수 있어서 단일 행 접근 방법 중 가장 빠르답니다. ' +
+      '또한 ROWID는 행이 디스크에 물리적으로 어떻게 저장되어 있는지를 직접 나타내기 때문에, 인덱스 Clustering Factor를 계산하는 기준이 되기도 해요.',
     whatNote:
-      'ROWID는 행이 INSERT될 때 결정되며, 해당 행이 다른 블록으로 이동(행 이동 또는 재구성)되지 않는 한 변하지 않습니다.',
+      'ROWID(행 식별자)는 행이 INSERT될 때 결정되고, 파티션 이동이나 테이블 재구성처럼 행이 다른 블록으로 옮겨가지 않는 한 바뀌지 않아요. 행의 정확한 물리적 위치를 담고 있어서, 하나의 행에 접근하는 방법 중 가장 효율적이에요.',
 
     structureTitle: 'Extended ROWID 구조',
     structureDesc:
-      'Oracle 8 이후 파티션 테이블 등을 지원하기 위해 도입된 Extended ROWID는 Base64로 인코딩된 18자리 문자열입니다. ' +
-      '4개의 파트로 나뉘며, 각 파트가 다른 위치 정보를 담습니다.',
+      'Oracle 8부터 파티션 테이블 등을 지원하기 위해 도입된 Extended ROWID는 Base64로 인코딩된 18자리 문자열이에요. ' +
+      '총 4개 파트로 나뉘어 있고, 각 파트가 다른 위치 정보를 담고 있어요.',
 
     parts: [
       {
         label: 'OOOOOO',
         name: 'Data Object Number',
         chars: '6자리',
-        desc: '테이블·파티션이 속한 세그먼트를 식별하는 번호. 같은 테이블이라도 파티션마다 다를 수 있습니다.',
+        desc: '테이블이나 파티션이 속한 세그먼트를 식별하는 번호예요. 같은 테이블이라도 파티션마다 번호가 달라질 수 있어요.',
         color: 'violet' as const,
       },
       {
         label: 'FFF',
         name: 'Relative File Number',
         chars: '3자리',
-        desc: '데이터 파일 번호. 하나의 테이블스페이스 안에서 해당 블록이 어느 .dbf 파일에 있는지를 가리킵니다.',
+        desc: '데이터 파일 번호예요. 하나의 테이블스페이스 안에서 해당 블록이 어느 .dbf 파일에 들어있는지를 알려줘요.',
         color: 'blue' as const,
       },
       {
         label: 'BBBBBB',
         name: 'Block Number',
         chars: '6자리',
-        desc: '파일 안에서 해당 블록의 번호. 블록은 Oracle I/O의 최소 단위이므로 이 번호로 블록을 직접 찾습니다.',
+        desc: '파일 안에서 해당 블록의 번호예요. 블록은 Oracle I/O(Input/Output, 디스크 입출력)의 최소 단위라서, 이 번호로 블록을 바로 찾아가요.',
         color: 'emerald' as const,
       },
       {
         label: 'RRR',
         name: 'Row Number (Slot)',
         chars: '3자리',
-        desc: '블록 안에서 행의 슬롯 번호. 블록 헤더의 Row Directory가 이 번호로 실제 행 데이터 위치를 가리킵니다.',
+        desc: '블록 안에서 행이 위치한 슬롯 번호예요. 블록 헤더의 Row Directory가 이 번호를 보고 실제 행 데이터 위치를 찾아줘요.',
         color: 'orange' as const,
       },
     ],
 
     exampleTitle: '실제 ROWID 읽어보기',
     exampleDesc:
-      'ROWID 컬럼은 테이블에 저장된 컬럼은 아니지만, SELECT 절에 명시하면 조회할 수 있습니다.',
+      'ROWID는 테이블에 저장된 컬럼은 아니지만, SELECT 절에 명시하면 볼 수 있어요.',
     exampleSql: `SELECT ROWID, employee_id, last_name
 FROM   employees
 WHERE  employee_id = 100;`,
@@ -81,7 +83,7 @@ WHERE  employee_id = 100;`,
       'Base64 디코딩 예시: AAASXJ → Object# 4,951 / AAE → File# 4 / AAAACX → Block# 151 / AAA → Row# 0',
 
     usageTitle: 'ROWID 활용',
-    usageDesc: 'ROWID는 직접 WHERE 조건으로 써서 가장 빠른 단건 조회를 할 수 있습니다.',
+    usageDesc: 'ROWID(행 식별자)를 WHERE 조건에 직접 써서 단건 조회를 가장 빠르게 할 수 있어요.',
     usageSql: `-- ROWID로 직접 행 조회 (가장 빠른 단건 접근)
 SELECT * FROM employees WHERE ROWID = 'AAASXJAAEAAAACXAAA';
 
@@ -93,19 +95,19 @@ WHERE  ROWID NOT IN (
   GROUP BY employee_id
 );`,
     usageTip:
-      'ROWID를 직접 저장해 두었다가 나중에 그 행을 다시 접근하는 패턴은 행이 이동(파티션 이동, 테이블 재구성)되면 무효가 됩니다. ' +
-      '장기 보관용 식별자로는 PK를 사용하세요.',
+      'ROWID(행 식별자)를 저장해 뒀다가 나중에 다시 접근하는 방식은, 행이 파티션 이동이나 테이블 재구성으로 다른 블록으로 옮겨가면 그 ROWID가 무효가 돼요. ' +
+      '오랫동안 보관할 식별자로는 PK를 쓰세요.',
 
     indexTitle: 'B-Tree 인덱스에서 ROWID가 쓰이는 순서',
     indexSteps: [
-      { n: 1, desc: 'Root → Branch → Leaf 블록을 순서대로 읽으며 인덱스 키값 비교' },
-      { n: 2, desc: 'Leaf 블록에서 일치하는 키값의 ROWID 획득' },
-      { n: 3, desc: 'ROWID(Object# + File# + Block# + Row#)로 테이블 블록 직접 접근' },
-      { n: 4, desc: '블록 내 Row Directory에서 슬롯 번호로 행 데이터 반환' },
+      { n: 1, desc: 'Root → Branch → Leaf 블록을 차례로 읽으며 인덱스 키값을 비교해요' },
+      { n: 2, desc: 'Leaf 블록에서 찾는 키값과 일치하는 ROWID(행 식별자)를 가져와요' },
+      { n: 3, desc: 'ROWID(Object# + File# + Block# + Row#)로 테이블 블록에 바로 접근해요' },
+      { n: 4, desc: '블록 안의 Row Directory에서 슬롯 번호로 실제 행 데이터를 찾아 반환해요' },
     ],
     indexNote:
-      '인덱스를 타더라도 Leaf에서 ROWID를 꺼낸 뒤 테이블 블록을 읽는 단계(Table Access by Index ROWID)가 항상 필요합니다. ' +
-      '이 때문에 선택도가 낮은(=결과가 많은) 컬럼에 인덱스를 쓰면 오히려 Full Scan보다 느릴 수 있습니다.',
+      '인덱스를 타더라도 Leaf에서 ROWID(행 식별자)를 꺼낸 뒤 테이블 블록을 읽는 단계(Table Access by Index ROWID)가 반드시 필요해요. ' +
+      '그래서 선택도가 낮은(=결과 행이 많은) 컬럼에 인덱스를 쓰면 오히려 Full Scan보다 느려질 수 있어요.',
   },
   en: {
     pageTitle: 'ROWID Structure',
@@ -117,9 +119,11 @@ WHERE  ROWID NOT IN (
     whatTitle: 'What is a ROWID?',
     whatDesc:
       'A ROWID is a pointer that says "this row is in this file, this block, and this slot within that block." ' +
-      'It lets Oracle reach a specific row without scanning the whole table — it is the final step of every index-based lookup.',
+      'It lets Oracle reach a specific row without scanning the whole table — it is the final step of every index-based lookup. ' +
+      'ROWIDs are the fastest way to access a single row: Oracle can read the row in a single I/O by jumping directly to the physical block. ' +
+      'ROWIDs also provide information about how rows are stored on disk, which is why the index clustering factor is measured in terms of ROWID-to-block relationships.',
     whatNote:
-      'A ROWID is assigned when a row is first inserted and does not change unless the row physically moves (e.g., during partition migration or table reorganization).',
+      'A ROWID is assigned when a row is first inserted and does not change unless the row physically moves (e.g., during partition migration or table reorganization). Because a ROWID encodes the exact physical location of a row, it is the single most efficient way to access any row.',
 
     structureTitle: 'Extended ROWID Structure',
     structureDesc:

@@ -14,42 +14,210 @@ import {
 const T = {
   ko: {
     title: '트랜잭션 격리 수준',
-    subtitle: 'ANSI/ISO SQL 표준의 4가지 격리 수준과 Oracle이 이를 구현하는 방식을 살펴봅니다.',
-    phenomena: '동시성 문제 현상',
-    phenomenaDesc: '격리 수준마다 허용하는 부작용이 다릅니다.',
+    subtitle: 'ANSI/ISO SQL 표준의 격리 수준과 Oracle이 MVCC를 통해 이를 구현하는 방식을 살펴봅니다.',
+    overviewTitle: '격리 수준이란?',
+    overviewDesc:
+      'Oracle은 SQL92 표준의 격리 수준을 지원하며, MVCC를 활용해 높은 동시성을 유지하면서도 일관된 데이터를 제공합니다. 격리 수준이 높을수록 일관성은 강해지지만 동시성은 낮아질 수 있습니다.',
+    phenomena: '동시성 이상 현상 (Concurrency Anomalies)',
+    phenomenaDesc:
+      '각 격리 수준은 허용하는 이상 현상의 종류로 구분됩니다. Oracle은 MVCC 덕분에 Dirty Read를 어느 격리 수준에서도 허용하지 않습니다.',
     levelsTitle: 'Oracle의 격리 수준',
     readCommittedTitle: 'Read Committed (기본값)',
     readCommittedDesc:
-      '모든 쿼리는 쿼리가 시작된 시점에 커밋된 데이터만 봅니다. 같은 트랜잭션 내에서도 두 번의 SELECT 사이에 다른 트랜잭션이 커밋하면, 두 번째 SELECT에서 다른 결과가 나올 수 있습니다(Non-Repeatable Read).',
+      '트랜잭션이 실행하는 모든 쿼리는 쿼리가 시작되기 전에 커밋된 데이터만 읽습니다 — 트랜잭션이 시작된 시점이 아닌 쿼리 시작 시점 기준입니다. 즉 같은 트랜잭션 내에서도 두 번의 SELECT 사이에 다른 트랜잭션이 커밋하면 두 번째 SELECT에서 다른 결과가 나올 수 있습니다(Non-Repeatable Read).',
+    readCommittedConflictTitle: 'Read Committed에서의 쓰기 충돌',
+    readCommittedConflictDesc:
+      '두 세션이 같은 행을 수정하려 할 때 어떤 일이 벌어지는지 살펴봐요.',
     serializableTitle: 'Serializable',
     serializableDesc:
-      '트랜잭션이 시작된 시점에 커밋된 데이터만 봅니다. 마치 다른 사용자가 없는 것처럼 동작합니다. 다른 트랜잭션이 동일 행을 변경하고 커밋한 후 이 트랜잭션이 같은 행을 변경하려 하면 ORA-08177 오류가 발생합니다.',
+      '트랜잭션 전체 동안 트랜잭션이 시작된 시점에 커밋된 데이터만 볼 수 있습니다 — 마치 다른 사용자가 없는 것처럼 동작합니다. 다른 트랜잭션이 동일 행을 변경·커밋한 후 이 트랜잭션이 같은 행을 변경하려 하면 ORA-08177 오류가 발생합니다.',
+    serializableExampleTitle: 'Serializable에서의 쓰기 충돌',
+    serializableExampleDesc:
+      '트랜잭션 3이 Read Committed로 Hintz의 급여를 7100으로 변경하고 커밋합니다. 트랜잭션 4는 Serializable로 시작한 후 Hintz를 수정하려 하면, 트랜잭션 3이 트랜잭션 4 시작 이후에 커밋했으므로 ORA-08177이 발생합니다.',
     readOnlyTitle: 'Read-Only',
     readOnlyDesc:
-      'Serializable과 동일한 일관성 보장을 제공하지만, 데이터 변경이 불가합니다. 장기 리포트 쿼리나 일관된 스냅샷이 필요한 조회 작업에 적합합니다.',
+      'Serializable과 동일한 일관성 보장을 제공하지만, SYS를 제외한 데이터 변경이 불가합니다. 장기 리포트 쿼리나 일관된 스냅샷이 필요한 조회 작업에 적합합니다. ORA-08177 오류의 영향을 받지 않습니다.',
     lostUpdateTitle: 'Lost Update 문제',
     lostUpdateDesc:
-      'Read Committed에서는 두 트랜잭션이 같은 행을 각자 읽고 수정하면 한쪽 변경이 사라질 수 있습니다. 애플리케이션에서 SELECT ... FOR UPDATE로 잠금 후 수정하거나, UPDATE 시 WHERE 절에 원본 값을 포함하는 방식으로 방지해야 합니다.',
+      'Read Committed에서는 두 트랜잭션이 같은 행을 각자 읽고 수정하면 한쪽 변경이 사라질 수 있습니다. 위 공식 문서 예시에서 Session 1이 Banda의 급여를 7000으로 올리더라도, Session 2가 그 이후 6300으로 덮어쓰면 Session 1의 변경은 사라집니다.',
+    lostUpdateSolution:
+      'SELECT ... FOR UPDATE로 먼저 행을 잠그거나, UPDATE WHERE 절에 원본 값을 포함해 낙관적 잠금(Optimistic Locking)을 구현합니다.',
+    throughputNote:
+      '직렬화 격리 수준을 많은 애플리케이션에서 동시에 사용하면 처리량이 크게 저하될 수 있습니다. Oracle은 자동으로 가장 낮은 수준의 제한을 적용해 최대한의 동시성을 유지하면서도 데이터 무결성을 보장합니다.',
   },
   en: {
     title: 'Transaction Isolation Levels',
-    subtitle: 'Explore the four ANSI/ISO SQL isolation levels and how Oracle implements them.',
+    subtitle:
+      'Explore the ANSI/ISO SQL isolation levels and how Oracle implements them through MVCC.',
+    overviewTitle: 'What are Isolation Levels?',
+    overviewDesc:
+      "Oracle supports SQL92 isolation levels, using MVCC to maintain high concurrency while delivering consistent data. Higher isolation levels provide stronger consistency guarantees but may reduce concurrency.",
     phenomena: 'Concurrency Anomalies',
-    phenomenaDesc: 'Each isolation level permits different side effects.',
+    phenomenaDesc:
+      'Isolation levels are defined by the anomalies they permit. Oracle never allows dirty reads at any isolation level — MVCC prevents them entirely.',
     levelsTitle: "Oracle's Isolation Levels",
     readCommittedTitle: 'Read Committed (default)',
     readCommittedDesc:
-      'Every query sees only data committed before the query started. Even within the same transaction, if another transaction commits between two SELECT statements, the second SELECT may return different results (Non-Repeatable Read).',
+      "Every query executed by a transaction sees only data committed before the query — not the transaction — began. Even within the same transaction, if another transaction commits between two SELECT statements, the second SELECT may return different results (Non-Repeatable Read).",
+    readCommittedConflictTitle: 'Conflicting Writes in Read Committed',
+    readCommittedConflictDesc:
+      "What happens when two sessions try to modify the same row at the same time.",
     serializableTitle: 'Serializable',
     serializableDesc:
-      'Sees only data committed when the transaction began — as if no other users exist. If another transaction modifies and commits the same row, and this transaction then tries to modify it, ORA-08177 is raised.',
+      "A serializable transaction sees only changes committed at the time the transaction — not the query — began. It operates in an environment that makes it appear as if no other users were modifying data in the database. If another transaction modifies and commits the same row after this transaction began, and this transaction then tries to modify that row, ORA-08177 is raised.",
+    serializableExampleTitle: 'Conflicting Writes in Serializable',
+    serializableExampleDesc:
+      "Transaction 3 (READ COMMITTED) updates Hintz's salary to 7100 and commits. Transaction 4 (SERIALIZABLE) then tries to update Hintz — because Transaction 3 committed after Transaction 4 began, ORA-08177 is raised.",
     readOnlyTitle: 'Read-Only',
     readOnlyDesc:
-      'Provides the same consistency guarantee as Serializable, but data modification is not allowed. Ideal for long-running reports or queries that need a stable snapshot.',
+      'Provides the same consistency guarantee as Serializable, but does not permit data modifications in the transaction (unless the user is SYS). Ideal for long-running reports or queries that need a stable snapshot. Not susceptible to ORA-08177.',
     lostUpdateTitle: 'Lost Update Problem',
     lostUpdateDesc:
-      'In Read Committed, if two transactions each read and modify the same row, one update can be silently overwritten. Prevent this by using SELECT ... FOR UPDATE before modifying, or by including the original value in the UPDATE WHERE clause.',
+      "In Read Committed, if two transactions each read and modify the same row, one update can be silently overwritten. In the Oracle docs example, even if Session 1 raises Banda's salary to 7000, Session 2's subsequent update to 6300 overwrites it — Session 1's change is lost.",
+    lostUpdateSolution:
+      'Use SELECT ... FOR UPDATE to lock the row first, or implement optimistic locking by including the original value in the UPDATE WHERE clause.',
+    throughputNote:
+      'Running many applications in serializable mode can seriously compromise throughput. Oracle automatically uses the lowest applicable level of restrictiveness to provide the highest degree of data concurrency yet also provide fail-safe data integrity.',
   },
+}
+
+// Read Committed 쓰기 충돌 다이어그램 (공식 문서 예시: Banda)
+const ReadCommittedConflictDiagram = ({ lang }: { lang: 'ko' | 'en' }) => {
+  const isKo = lang === 'ko'
+  const COL_A = 120
+  const COL_B = 420
+  const startY = 30
+
+  const steps: { y: number; session: 'A' | 'B' | 'both'; label: string; sub?: string; color: string }[] = [
+    { y: startY, session: 'both', label: isKo ? '초기 상태: Banda.salary = 6200' : 'Initial state: Banda.salary = 6200', color: '#64748b' },
+    { y: startY + 50, session: 'A', label: isKo ? 'UPDATE: salary → 7000' : 'UPDATE: salary → 7000', sub: isKo ? '(미커밋)' : '(uncommitted)', color: '#2563eb' },
+    { y: startY + 100, session: 'B', label: 'SELECT salary', sub: isKo ? '→ 6200 반환 (읽기 일관성)' : '→ returns 6200 (read consistency)', color: '#7c3aed' },
+    { y: startY + 150, session: 'B', label: isKo ? 'UPDATE: salary → 6300 시도' : 'UPDATE: salary → 6300 (attempt)', sub: isKo ? '→ Session A 완료까지 대기 ⏳' : '→ blocks until Session A finishes ⏳', color: '#dc2626' },
+    { y: startY + 200, session: 'A', label: 'COMMIT', sub: isKo ? '(salary = 7000 확정)' : '(salary = 7000 committed)', color: '#059669' },
+    { y: startY + 250, session: 'B', label: isKo ? 'UPDATE 재개: salary → 6300' : 'UPDATE resumes: salary → 6300', sub: isKo ? '(커밋된 7000 위에 덮어씀)' : '(overwrites committed 7000)', color: '#7c3aed' },
+    { y: startY + 300, session: 'B', label: 'COMMIT', sub: isKo ? '최종 salary = 6300 ← Lost Update!' : 'Final salary = 6300 ← Lost Update!', color: '#059669' },
+  ]
+
+  return (
+    <svg viewBox="0 0 560 410" className="w-full max-w-2xl mx-auto" aria-label="Read Committed conflict diagram">
+      {/* 헤더 */}
+      <rect x="40" y="5" width="200" height="24" rx="5" fill="#eff6ff" stroke="#bfdbfe" strokeWidth="1" />
+      <text x="140" y="21" fontSize="10" fill="#1d4ed8" textAnchor="middle" fontWeight="bold">
+        Session A (READ COMMITTED)
+      </text>
+      <rect x="320" y="5" width="200" height="24" rx="5" fill="#f5f3ff" stroke="#ddd6fe" strokeWidth="1" />
+      <text x="420" y="21" fontSize="10" fill="#7c3aed" textAnchor="middle" fontWeight="bold">
+        Session B (READ COMMITTED)
+      </text>
+
+      {/* 세로 타임라인 */}
+      <line x1={COL_A} y1="34" x2={COL_A} y2="375" stroke="#bfdbfe" strokeWidth="1.5" strokeDasharray="4,3" />
+      <line x1={COL_B} y1="34" x2={COL_B} y2="375" stroke="#ddd6fe" strokeWidth="1.5" strokeDasharray="4,3" />
+
+      {steps.map((step, i) => {
+        if (step.session === 'both') {
+          return (
+            <g key={i}>
+              <rect x="100" y={step.y + 4} width="360" height="26" rx="5" fill="#f8fafc" stroke="#e2e8f0" strokeWidth="1" />
+              <text x="280" y={step.y + 21} fontSize="9" fill={step.color} textAnchor="middle" fontWeight="bold">
+                {step.label}
+              </text>
+            </g>
+          )
+        }
+        const cx = step.session === 'A' ? COL_A : COL_B
+        const rectX = step.session === 'A' ? 40 : 320
+        return (
+          <g key={i}>
+            <circle cx={cx} cy={step.y + 12} r="5" fill={step.color} />
+            <rect x={rectX} y={step.y} width="200" height={step.sub ? 32 : 22} rx="4" fill="white" stroke="#e2e8f0" strokeWidth="1" />
+            <text x={cx} y={step.y + 13} fontSize="9" fill={step.color} textAnchor="middle" fontWeight="bold">
+              {step.label}
+            </text>
+            {step.sub && (
+              <text x={cx} y={step.y + 25} fontSize="8" fill="#64748b" textAnchor="middle">
+                {step.sub}
+              </text>
+            )}
+          </g>
+        )
+      })}
+
+      {/* 결과 박스 */}
+      <rect x="100" y="378" width="360" height="26" rx="5" fill="#fee2e2" stroke="#fca5a5" strokeWidth="1.5" />
+      <text x="280" y="395" fontSize="9" fill="#dc2626" textAnchor="middle" fontWeight="bold">
+        {isKo
+          ? 'Session A의 변경(7000)이 사라짐 — Lost Update 발생!'
+          : "Session A's change (7000) is gone — Lost Update occurred!"}
+      </text>
+    </svg>
+  )
+}
+
+// Serializable ORA-08177 다이어그램 (공식 문서 예시: Hintz)
+const SerializableConflictDiagram = ({ lang }: { lang: 'ko' | 'en' }) => {
+  const isKo = lang === 'ko'
+  return (
+    <svg viewBox="0 0 560 280" className="w-full max-w-2xl mx-auto" aria-label="Serializable conflict diagram">
+      {/* 헤더 */}
+      <rect x="40" y="5" width="200" height="24" rx="5" fill="#fffbeb" stroke="#fde68a" strokeWidth="1" />
+      <text x="140" y="21" fontSize="10" fill="#92400e" textAnchor="middle" fontWeight="bold">
+        Transaction 3 (READ COMMITTED)
+      </text>
+      <rect x="320" y="5" width="200" height="24" rx="5" fill="#f5f3ff" stroke="#ddd6fe" strokeWidth="1" />
+      <text x="420" y="21" fontSize="10" fill="#7c3aed" textAnchor="middle" fontWeight="bold">
+        Transaction 4 (SERIALIZABLE)
+      </text>
+
+      <line x1="140" y1="34" x2="140" y2="255" stroke="#fde68a" strokeWidth="1.5" strokeDasharray="4,3" />
+      <line x1="420" y1="34" x2="420" y2="255" stroke="#ddd6fe" strokeWidth="1.5" strokeDasharray="4,3" />
+
+      {/* T4 시작 */}
+      <circle cx={420} cy={50} r="5" fill="#7c3aed" />
+      <rect x="320" y="38" width="200" height="22" rx="4" fill="white" stroke="#e2e8f0" strokeWidth="1" />
+      <text x="420" y="53" fontSize="9" fill="#7c3aed" textAnchor="middle" fontWeight="bold">
+        {isKo ? 'T4 시작 (SCN 기록)' : 'T4 begins (SCN recorded)'}
+      </text>
+
+      {/* T3 UPDATE */}
+      <circle cx={140} cy={90} r="5" fill="#d97706" />
+      <rect x="40" y="78" width="200" height="32" rx="4" fill="white" stroke="#e2e8f0" strokeWidth="1" />
+      <text x="140" y="91" fontSize="9" fill="#d97706" textAnchor="middle" fontWeight="bold">
+        {isKo ? "Hintz.salary → 7100" : "Hintz.salary → 7100"}
+      </text>
+      <text x="140" y="103" fontSize="8" fill="#64748b" textAnchor="middle">
+        {isKo ? "(T4 시작 이후 커밋)" : "(commits after T4 began)"}
+      </text>
+
+      {/* T3 COMMIT */}
+      <circle cx={140} cy={140} r="5" fill="#059669" />
+      <rect x="40" y="128" width="200" height="22" rx="4" fill="white" stroke="#e2e8f0" strokeWidth="1" />
+      <text x="140" y="143" fontSize="9" fill="#059669" textAnchor="middle" fontWeight="bold">
+        COMMIT
+      </text>
+
+      {/* T4 UPDATE 시도 */}
+      <circle cx={420} cy={180} r="5" fill="#dc2626" />
+      <rect x="320" y="168" width="200" height="32" rx="4" fill="#fef2f2" stroke="#fecaca" strokeWidth="1" />
+      <text x="420" y="181" fontSize="9" fill="#dc2626" textAnchor="middle" fontWeight="bold">
+        {isKo ? "Hintz.salary UPDATE 시도" : "Attempts Hintz.salary UPDATE"}
+      </text>
+      <text x="420" y="193" fontSize="8" fill="#9f1239" textAnchor="middle">
+        {isKo ? "→ ORA-08177 발생!" : "→ ORA-08177 raised!"}
+      </text>
+
+      {/* 오류 설명 박스 */}
+      <rect x="80" y="220" width="400" height="44" rx="8" fill="#fef2f2" stroke="#fecaca" strokeWidth="1.5" />
+      <text x="280" y="238" fontSize="10" fill="#dc2626" textAnchor="middle" fontWeight="bold">
+        ORA-08177: cannot serialize access for this transaction
+      </text>
+      <text x="280" y="256" fontSize="9" fill="#9f1239" textAnchor="middle">
+        {isKo
+          ? 'T4 시작 이후 다른 트랜잭션이 같은 행을 커밋했으므로 직렬화 위반'
+          : 'Another transaction committed the same row after T4 began — serialization violation'}
+      </text>
+    </svg>
+  )
 }
 
 export function IsolationSection() {
@@ -64,6 +232,9 @@ export function IsolationSection() {
         subtitle={t.subtitle}
       />
 
+      <SectionTitle>{t.overviewTitle}</SectionTitle>
+      <Prose>{t.overviewDesc}</Prose>
+
       <SectionTitle>{t.phenomena}</SectionTitle>
       <Prose>{t.phenomenaDesc}</Prose>
       <Table
@@ -75,59 +246,153 @@ export function IsolationSection() {
           'Repeatable Read',
           'Serializable',
         ]}
-        rows={lang === 'ko' ? [
-          ['Dirty Read', '미커밋 데이터를 읽음', '발생', '없음', '없음', '없음'],
-          ['Non-Repeatable Read', '같은 행을 두 번 읽으면 값이 다름', '발생', '발생', '없음', '없음'],
-          ['Phantom Read', '같은 조건으로 두 번 쿼리하면 행 수가 다름', '발생', '발생', '발생', '없음'],
-          ['Lost Update', '한 트랜잭션의 변경이 다른 트랜잭션에 덮임', '발생', '발생*', '없음', '없음'],
-        ] : [
-          ['Dirty Read', 'Reads uncommitted data', 'Possible', 'None', 'None', 'None'],
-          ['Non-Repeatable Read', 'Same row returns different value on second read', 'Possible', 'Possible', 'None', 'None'],
-          ['Phantom Read', 'Same query returns different row count', 'Possible', 'Possible', 'Possible', 'None'],
-          ['Lost Update', "One transaction's change is overwritten by another", 'Possible', 'Possible*', 'None', 'None'],
-        ]}
+        rows={
+          lang === 'ko'
+            ? [
+                [
+                  'Dirty Read',
+                  '미커밋 데이터를 읽음',
+                  '발생',
+                  '없음 (MVCC)',
+                  '없음 (MVCC)',
+                  '없음 (MVCC)',
+                ],
+                [
+                  'Non-Repeatable Read',
+                  '같은 행을 두 번 읽으면 값이 다름',
+                  '발생',
+                  '발생',
+                  '없음',
+                  '없음',
+                ],
+                [
+                  'Phantom Read',
+                  '같은 조건으로 두 번 쿼리하면 행 수가 다름',
+                  '발생',
+                  '발생',
+                  '발생',
+                  '없음',
+                ],
+                [
+                  'Lost Update',
+                  '한 트랜잭션의 변경이 다른 트랜잭션에 덮임',
+                  '발생',
+                  '발생*',
+                  '없음',
+                  '없음',
+                ],
+              ]
+            : [
+                [
+                  'Dirty Read',
+                  'Reads uncommitted data',
+                  'Possible',
+                  'None (MVCC)',
+                  'None (MVCC)',
+                  'None (MVCC)',
+                ],
+                [
+                  'Non-Repeatable Read',
+                  'Same row returns different value on second read',
+                  'Possible',
+                  'Possible',
+                  'None',
+                  'None',
+                ],
+                [
+                  'Phantom Read',
+                  'Same query returns different row count',
+                  'Possible',
+                  'Possible',
+                  'Possible',
+                  'None',
+                ],
+                [
+                  'Lost Update',
+                  "One transaction's change is overwritten by another",
+                  'Possible',
+                  'Possible*',
+                  'None',
+                  'None',
+                ],
+              ]
+        }
       />
 
       <Divider />
 
       <SectionTitle>{t.levelsTitle}</SectionTitle>
 
-      <SectionTitle>{t.readCommittedTitle}</SectionTitle>
-      <Prose>{t.readCommittedDesc}</Prose>
-      <div className="mt-4">
-        <SqlBlock
-          sql={lang === 'ko' ? `-- 기본값 — 별도 설정 필요 없음
--- 세션 수준으로 변경 시:
-ALTER SESSION SET ISOLATION_LEVEL = READ COMMITTED;` : `-- Default — no extra setup needed
--- To set at session level:
-ALTER SESSION SET ISOLATION_LEVEL = READ COMMITTED;`}
-        />
-      </div>
+      <div className="space-y-4">
+        {/* Read Committed */}
+        <div className="rounded-xl border bg-card p-6">
+          <h3 className="mb-3 text-sm font-bold">{t.readCommittedTitle}</h3>
+          <Prose>{t.readCommittedDesc}</Prose>
+          <div className="mt-4">
+            <SqlBlock
+              sql={
+                lang === 'ko'
+                  ? `-- 기본값 — 별도 설정 필요 없음
+-- 세션 수준으로 명시적 설정:
+ALTER SESSION SET ISOLATION_LEVEL = READ COMMITTED;`
+                  : `-- Default — no extra setup needed
+-- Explicit session-level setting:
+ALTER SESSION SET ISOLATION_LEVEL = READ COMMITTED;`
+              }
+            />
+          </div>
+          <p className="mt-6 mb-2 text-sm font-semibold text-foreground/80">
+            {t.readCommittedConflictTitle}
+          </p>
+          <Prose>{t.readCommittedConflictDesc}</Prose>
+          <div className="mt-4 rounded-xl border border-violet-100 bg-violet-50/30 p-4">
+            <ReadCommittedConflictDiagram lang={lang} />
+          </div>
+        </div>
 
-      <Divider />
+        {/* Serializable */}
+        <div className="rounded-xl border bg-card p-6">
+          <h3 className="mb-3 text-sm font-bold">{t.serializableTitle}</h3>
+          <Prose>{t.serializableDesc}</Prose>
+          <div className="mt-4">
+            <SqlBlock
+              sql={
+                lang === 'ko'
+                  ? `ALTER SESSION SET ISOLATION_LEVEL = SERIALIZABLE;
+-- 또는 트랜잭션 단위로:
+SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
 
-      <SectionTitle>{t.serializableTitle}</SectionTitle>
-      <Prose>{t.serializableDesc}</Prose>
-      <div className="mt-4">
-        <SqlBlock
-          sql={lang === 'ko' ? `ALTER SESSION SET ISOLATION_LEVEL = SERIALIZABLE;
-
--- 다른 트랜잭션이 같은 행을 수정·커밋한 뒤 이 트랜잭션이
--- 같은 행을 수정하려 하면:
--- ORA-08177: cannot serialize access for this transaction` : `ALTER SESSION SET ISOLATION_LEVEL = SERIALIZABLE;
+-- 다른 트랜잭션이 같은 행을 수정·커밋한 뒤
+-- 이 트랜잭션이 같은 행을 수정하려 하면:
+-- ORA-08177: cannot serialize access for this transaction`
+                  : `ALTER SESSION SET ISOLATION_LEVEL = SERIALIZABLE;
+-- Or per-transaction:
+SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
 
 -- If another transaction modifies and commits the same row
--- and this transaction then tries to modify it:
--- ORA-08177: cannot serialize access for this transaction`}
-        />
-      </div>
+-- after this transaction began, and this transaction
+-- then tries to modify it:
+-- ORA-08177: cannot serialize access for this transaction`
+              }
+            />
+          </div>
+          <p className="mt-6 mb-2 text-sm font-semibold text-foreground/80">
+            {t.serializableExampleTitle}
+          </p>
+          <Prose>{t.serializableExampleDesc}</Prose>
+          <div className="mt-4 rounded-xl border border-amber-100 bg-amber-50/30 p-4">
+            <SerializableConflictDiagram lang={lang} />
+          </div>
+        </div>
 
-      <Divider />
-
-      <SectionTitle>{t.readOnlyTitle}</SectionTitle>
-      <Prose>{t.readOnlyDesc}</Prose>
-      <div className="mt-4">
-        <SqlBlock sql="SET TRANSACTION READ ONLY;" />
+        {/* Read-Only */}
+        <div className="rounded-xl border bg-card p-6">
+          <h3 className="mb-3 text-sm font-bold">{t.readOnlyTitle}</h3>
+          <Prose>{t.readOnlyDesc}</Prose>
+          <div className="mt-4">
+            <SqlBlock sql="SET TRANSACTION READ ONLY;" />
+          </div>
+        </div>
       </div>
 
       <Divider />
@@ -136,20 +401,32 @@ ALTER SESSION SET ISOLATION_LEVEL = READ COMMITTED;`}
         <strong>{t.lostUpdateTitle}</strong>
         <br />
         {t.lostUpdateDesc}
+        <br />
+        <span className="text-xs mt-1 block opacity-90">{t.lostUpdateSolution}</span>
       </InfoBox>
 
       <div className="mt-4">
         <SqlBlock
-          sql={lang === 'ko' ? `-- Lost Update 방지: SELECT ... FOR UPDATE 사용
+          sql={
+            lang === 'ko'
+              ? `-- Lost Update 방지: SELECT ... FOR UPDATE 사용
 SELECT salary FROM employees WHERE employee_id = 100 FOR UPDATE;
 -- 위 행이 잠기므로 다른 세션은 UPDATE 전에 대기해야 함
-UPDATE employees SET salary = 7000 WHERE employee_id = 100;
-COMMIT;` : `-- Prevent Lost Update: use SELECT ... FOR UPDATE
+UPDATE employees SET salary = salary + 1000 WHERE employee_id = 100;
+COMMIT;`
+              : `-- Prevent Lost Update: use SELECT ... FOR UPDATE
 SELECT salary FROM employees WHERE employee_id = 100 FOR UPDATE;
 -- The row is locked; another session must wait before updating
-UPDATE employees SET salary = 7000 WHERE employee_id = 100;
-COMMIT;`}
+UPDATE employees SET salary = salary + 1000 WHERE employee_id = 100;
+COMMIT;`
+          }
         />
+      </div>
+
+      <div className="mt-8">
+        <InfoBox variant="note">
+          {t.throughputNote}
+        </InfoBox>
       </div>
     </PageContainer>
   )

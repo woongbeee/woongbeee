@@ -5,13 +5,13 @@ import { IconCpu } from '@tabler/icons-react'
 const T = {
   ko: {
     title: '프로세스 개요',
-    subtitle: '오라클 인스턴스를 구성하는 세 종류의 프로세스',
+    subtitle: '오라클 인스턴스를 구성하는 세 가지 프로세스 종류',
 
-    whatTitle: '오라클 프로세스란?',
+    whatTitle: '오라클 프로세스가 뭐예요?',
     whatP1:
-      '오라클 데이터베이스는 작업을 처리하기 위해 여러 종류의 프로세스를 함께 실행합니다. 프로세스(process)란 운영 체제가 할당한 실행 단위로, 각자 맡은 역할을 수행하며 데이터베이스 전체가 올바르게 동작하도록 협력합니다.',
+      '오라클 데이터베이스는 여러 종류의 프로세스가 함께 돌아가면서 작업을 처리해요. 프로세스(process)란 운영 체제가 할당한 실행 단위인데, 각자 맡은 역할을 수행하면서 데이터베이스 전체가 잘 돌아가도록 협력하는 거예요.',
     whatP2:
-      '오라클의 프로세스는 크게 세 그룹으로 나뉩니다. 클라이언트 프로세스는 사용자 애플리케이션에서 실행되고, 서버 프로세스는 SQL 파싱·실행·데이터 반환을 담당하며, 백그라운드 프로세스는 인스턴스가 시작될 때 자동으로 기동해 지속적으로 유지보수 작업을 수행합니다.',
+      '오라클 프로세스는 크게 세 그룹으로 나뉘어요. 클라이언트 프로세스는 사용자 애플리케이션 쪽에서 실행되고, 서버 프로세스는 SQL 파싱·실행·데이터 반환을 맡고, 백그라운드 프로세스는 인스턴스가 켜질 때 자동으로 시작되어 내부 유지 관리 작업을 쉬지 않고 수행해요.',
 
     typesTitle: '프로세스 세 종류',
     types: [
@@ -19,57 +19,57 @@ const T = {
         label: '클라이언트 프로세스',
         labelEn: 'Client Process',
         color: 'blue' as const,
-        desc: '사용자 PC 또는 미들티어 서버에서 실행. SQL*Plus, JDBC, OCI 등 오라클 클라이언트 코드가 실행되는 프로세스. 서버 프로세스와 직접 메모리를 공유하지 않습니다.',
+        desc: '사용자 PC나 중간 서버에서 실행돼요. SQL*Plus, JDBC, OCI 같은 오라클 클라이언트 코드가 이 프로세스 안에서 실행되고, 서버 프로세스와 메모리를 직접 공유하지는 않아요.',
       },
       {
         label: '서버 프로세스',
         labelEn: 'Server Process',
         color: 'violet' as const,
-        desc: 'DB 서버에서 실행. 클라이언트 요청을 받아 SQL을 파싱·최적화·실행하고 결과를 반환합니다. Dedicated(전용) 또는 Shared(공유) 모드로 동작합니다.',
+        desc: 'DB 서버 안에서 실행돼요. 클라이언트 요청을 받아 SQL을 파싱·최적화·실행하고 결과를 돌려줘요. Dedicated(전용) 또는 Shared(공유) 모드로 동작해요.',
       },
       {
         label: '백그라운드 프로세스',
         labelEn: 'Background Process',
         color: 'teal' as const,
-        desc: '인스턴스 시작 시 자동 기동. DBWn, LGWR, CKPT, SMON, PMON 등이 있으며, 버퍼 플러시·로그 기록·인스턴스 복구·잠금 해제 등 유지보수 작업을 담당합니다.',
+        desc: '인스턴스가 시작될 때 자동으로 켜져요. DBWn(데이터베이스 라이터), LGWR(로그 라이터), CKPT(체크포인트), SMON(시스템 모니터), PMON(프로세스 모니터) 등이 있고, 버퍼 쓰기·로그 기록·인스턴스 복구·잠금 해제 같은 유지 관리를 담당해요.',
       },
     ],
 
     architectureTitle: '프로세스 아키텍처 전체 구조',
     architectureDesc:
-      '클라이언트 애플리케이션이 SQL을 보내면 리스너(Listener)가 연결을 중재하고, 서버 프로세스가 SGA의 공유 메모리를 읽고 씁니다. 백그라운드 프로세스들은 독립적으로 실행되며 각자의 역할을 수행합니다.',
+      '클라이언트 애플리케이션이 SQL을 보내면 Listener(리스너)가 연결을 중간에서 처리하고, 서버 프로세스가 SGA(System Global Area)의 공유 메모리를 읽고 써요. 백그라운드 프로세스들은 독립적으로 실행되면서 각자 맡은 역할을 수행해요.',
 
     connectionTitle: '연결 방식',
     connections: [
       {
         label: 'Bequeath (BEQ)',
-        desc: '클라이언트와 서버가 같은 물리 서버에 있을 때 네트워크 없이 직접 스폰(spawn). SQL*Plus 로컬 접속이 해당됩니다.',
+        desc: '클라이언트와 서버가 같은 물리 서버에 있을 때, 네트워크 없이 바로 서버 프로세스를 만들어요. SQL*Plus 로컬 접속이 여기에 해당해요.',
       },
       {
         label: 'Oracle Net Listener',
-        desc: '원격 클라이언트 접속 시 리스너가 먼저 연결을 받고, 서버 프로세스(전용) 또는 디스패처(공유)로 넘깁니다.',
+        desc: '원격에서 접속할 때는 리스너가 먼저 연결을 받아 전용 서버 프로세스나 디스패처(공유 서버)로 넘겨줘요.',
       },
       {
         label: 'Dedicated Broker (LREG)',
-        desc: 'Oracle 12c 이후 LREG 프로세스가 리스너에 서비스 정보를 자동 등록합니다. 관리자가 수동으로 등록할 필요가 없습니다.',
+        desc: 'Oracle 12c 이후에는 LREG 프로세스가 리스너에 서비스 정보를 자동으로 등록해줘요. 관리자가 직접 등록할 필요가 없어졌어요.',
       },
     ],
 
     bgOverviewTitle: '주요 백그라운드 프로세스 한눈에 보기',
     bgProcesses: [
-      { abbr: 'DBWn', name: 'Database Writer',    desc: '더티 버퍼를 데이터 파일에 씁니다' },
-      { abbr: 'LGWR', name: 'Log Writer',          desc: 'Redo Log Buffer를 Redo 로그 파일에 씁니다' },
-      { abbr: 'CKPT', name: 'Checkpoint',          desc: '체크포인트 SCN을 제어 파일과 데이터 파일 헤더에 기록합니다' },
-      { abbr: 'SMON', name: 'System Monitor',      desc: '인스턴스 복구·임시 세그먼트 정리·딕셔너리 테이블 병합을 수행합니다' },
-      { abbr: 'PMON', name: 'Process Monitor',     desc: '실패한 클라이언트 프로세스를 감지해 롤백·잠금 해제·리소스 반환을 합니다' },
-      { abbr: 'ARCn', name: 'Archiver',            desc: '리두 로그 그룹을 아카이브 로그로 복사합니다 (아카이브 모드 시)' },
-      { abbr: 'MMON', name: 'Manageability Monitor', desc: 'AWR 스냅샷을 주기적으로 캡처하고 임계값 경고를 생성합니다' },
-      { abbr: 'RECO', name: 'Recoverer',           desc: '분산 트랜잭션의 장애를 자동으로 복구합니다' },
+      { abbr: 'DBWn', name: 'Database Writer(데이터베이스 라이터)',    desc: '수정된 더티(dirty) 버퍼를 데이터 파일에 써요.' },
+      { abbr: 'LGWR', name: 'Log Writer(로그 라이터)',                  desc: 'Redo Log Buffer에 쌓인 내용을 Redo 로그 파일에 기록해요.' },
+      { abbr: 'CKPT', name: 'Checkpoint(체크포인트)',                   desc: '체크포인트 SCN을 제어 파일과 데이터 파일 헤더에 기록해요.' },
+      { abbr: 'SMON', name: 'System Monitor(시스템 모니터)',             desc: '인스턴스 복구, 임시 세그먼트 정리, 딕셔너리 테이블 병합을 담당해요.' },
+      { abbr: 'PMON', name: 'Process Monitor(프로세스 모니터)',          desc: '문제가 생긴 클라이언트 프로세스를 감지해 롤백·잠금 해제·리소스 반환을 처리해요.' },
+      { abbr: 'ARCn', name: 'Archiver(아카이버)',                        desc: '아카이브 모드일 때 Redo 로그 그룹을 아카이브 로그로 복사해요.' },
+      { abbr: 'MMON', name: 'Manageability Monitor(관리 모니터)',        desc: 'AWR 스냅샷을 주기적으로 캡처하고 임계값 경고를 만들어요.' },
+      { abbr: 'RECO', name: 'Recoverer(복구기)',                         desc: '분산 트랜잭션에서 생긴 장애를 자동으로 복구해요.' },
     ],
 
     noteTitle: '싱글 스레드 vs 멀티스레드',
     noteDesc:
-      'Unix/Linux에서는 각 서버 프로세스와 백그라운드 프로세스가 별도의 OS 프로세스로 실행됩니다. Windows와 일부 구성에서는 오라클이 단일 OS 프로세스 안의 스레드로 실행될 수도 있습니다(멀티스레드 모델). 동작 원리는 동일하지만, 리소스 사용 방식이 다릅니다.',
+      'Unix/Linux에서는 각 서버 프로세스와 백그라운드 프로세스가 별도의 OS 프로세스로 돌아가요. Windows나 일부 설정에서는 오라클이 하나의 OS 프로세스 안에서 여러 스레드로 실행되기도 해요(멀티스레드 모델). 동작 원리는 같지만 리소스를 사용하는 방식이 달라요.',
   },
   en: {
     title: 'Process Overview',

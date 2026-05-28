@@ -20,10 +20,10 @@ const T = {
     subtitle: 'RMAN·병렬 쿼리·공유 서버 UGA를 위한 선택적 SGA 메모리 영역',
 
     // ── What is ──
-    whatTitle: 'Large Pool이란?',
-    whatP1: 'Large Pool은 SGA 안에 선택적(optional)으로 구성하는 메모리 영역으로, Shared Pool에 할당하기엔 지나치게 큰 메모리 블록이 필요한 작업을 위해 설계되었습니다.',
-    whatP2: 'Shared Pool이 SQL 파싱 결과나 딕셔너리 메타데이터 같은 작은 단위를 LRU 방식으로 관리하는 것과 달리, Large Pool은 LRU 리스트가 없습니다. 할당된 메모리는 세션이나 작업이 명시적으로 해제할 때까지 유지되며, 해제되는 즉시 다른 프로세스가 곧바로 재사용합니다.',
-    whatP3: 'Large Pool을 따로 두는 이유는 단편화(fragmentation) 방지입니다. RMAN 백업이나 병렬 쿼리처럼 수 MB 단위의 버퍼가 필요한 작업이 Shared Pool 안에서 메모리를 조각낼 경우, SQL 파싱 공간이 줄어들어 Hard Parse가 폭증할 수 있습니다. Large Pool은 이런 대형 할당을 격리해 Shared Pool을 보호합니다.',
+    whatTitle: 'Large Pool이 뭐예요?',
+    whatP1: 'Large Pool은 SGA 안에 선택적(optional)으로 구성하는 메모리 영역이에요. Shared Pool에 할당하기엔 지나치게 큰 메모리 블록이 필요한 작업을 위해 설계됐어요.',
+    whatP2: 'Shared Pool이 SQL 파싱 결과나 딕셔너리 메타데이터 같은 작은 단위를 LRU 방식으로 관리하는 것과 달리, Large Pool은 LRU 리스트가 없어요. 할당된 메모리는 세션이나 작업이 명시적으로 해제할 때까지 유지되고, 해제되는 즉시 다른 프로세스가 곧바로 재사용해요.',
+    whatP3: 'Large Pool을 따로 두는 이유는 단편화(fragmentation) 방지예요. RMAN 백업이나 병렬 쿼리처럼 수 MB 단위의 버퍼가 필요한 작업이 Shared Pool 안에서 메모리를 조각낼 경우, SQL 파싱 공간이 줄어들어 Hard Parse가 폭증할 수 있어요. Large Pool은 이런 대형 할당을 격리해서 Shared Pool을 보호해요.',
 
     // ── Users ──
     usersTitle: 'Large Pool을 사용하는 구성 요소',
@@ -32,31 +32,31 @@ const T = {
         icon: 'db',
         label: 'RMAN (Recovery Manager)',
         color: 'emerald' as const,
-        desc: 'RMAN I/O 자식 프로세스가 백업·복구 작업에 사용하는 버퍼를 Large Pool에서 할당합니다. 백업 스트림 하나당 수십 MB가 필요하므로 Shared Pool과 분리하는 것이 필수입니다.',
+        desc: 'RMAN I/O 자식 프로세스가 백업·복구 작업에 사용하는 버퍼를 Large Pool에서 할당해요. 백업 스트림 하나당 수십 MB가 필요하므로 Shared Pool과 분리하는 것이 필수예요.',
       },
       {
         icon: 'cpu',
         label: '병렬 실행 (Parallel Execution)',
         color: 'blue' as const,
-        desc: '병렬 쿼리 코디네이터와 병렬 서버 프로세스 간 데이터를 교환하는 메시지 버퍼를 Large Pool에서 할당합니다. 병렬 도(DOP)가 높을수록 버퍼 수가 늘어납니다.',
+        desc: '병렬 쿼리 코디네이터와 병렬 서버 프로세스 간 데이터를 교환하는 메시지 버퍼를 Large Pool에서 할당해요. 병렬 도(DOP)가 높을수록 버퍼 수가 늘어나요.',
       },
       {
         icon: 'server',
         label: '공유 서버 UGA (Shared Server)',
         color: 'violet' as const,
-        desc: 'Dedicated Server 모드에서는 UGA(User Global Area)가 PGA에 위치하지만, Shared Server 모드에서는 UGA를 SGA 안에 두어야 합니다. Large Pool이 설정되어 있으면 UGA가 Large Pool에, 없으면 Shared Pool에 할당됩니다.',
+        desc: 'Dedicated Server 모드에서는 UGA(User Global Area)가 PGA에 위치하지만, Shared Server 모드에서는 UGA를 SGA 안에 두어야 해요. Large Pool이 설정되어 있으면 UGA가 Large Pool에, 없으면 Shared Pool에 할당돼요.',
       },
       {
         icon: 'bolt',
         label: '지연 삽입 (Deferred Insert)',
         color: 'amber' as const,
-        desc: 'MEMOPTIMIZE_WRITE 힌트를 사용하는 IoT(사물인터넷) 스타일의 고속 INSERT 버퍼를 Large Pool에서 관리합니다. 삽입이 버퍼에 쌓이면 SMCO/Wnnn 백그라운드 프로세스가 비동기로 디스크에 씁니다.',
+        desc: 'MEMOPTIMIZE_WRITE 힌트를 사용하는 IoT(사물인터넷) 스타일의 고속 INSERT 버퍼를 Large Pool에서 관리해요. 삽입이 버퍼에 쌓이면 SMCO/Wnnn 백그라운드 프로세스가 비동기로 디스크에 써요.',
       },
     ],
 
     // ── vs Shared Pool ──
     vsTitle: 'Shared Pool과의 차이',
-    vsDesc: 'Large Pool과 Shared Pool은 모두 SGA 안에 있지만, 메모리 관리 방식이 완전히 다릅니다.',
+    vsDesc: 'Large Pool과 Shared Pool은 모두 SGA 안에 있지만, 메모리 관리 방식이 완전히 달라요.',
     vsRows: [
       { attr: 'LRU 리스트', shared: '있음 — 오래된 항목 자동 해제', large: '없음 — 명시 해제 전까지 유지' },
       { attr: '할당 단위', shared: '작은 단위 (SQL 커서, 딕셔너리 행 등)', large: '큰 단위 (수백 KB ~ 수십 MB)' },
@@ -70,13 +70,13 @@ const T = {
 
     // ── Deferred Insert ──
     deferredTitle: '지연 삽입(Deferred Insert) 메커니즘',
-    deferredDesc: 'MEMOPTIMIZE_WRITE 힌트는 IoT 기기처럼 초당 수천 건의 INSERT가 발생하는 환경에서 쓰이는 "fire-and-forget" 삽입 방식입니다.',
+    deferredDesc: 'MEMOPTIMIZE_WRITE 힌트는 IoT 기기처럼 초당 수천 건의 INSERT가 발생하는 환경에서 쓰이는 "fire-and-forget" 삽입 방식이에요.',
     deferredSteps: [
-      { n: '1', label: '버퍼 할당', desc: '인스턴스 기동 후 첫 MEMOPTIMIZE_WRITE INSERT 시점에 Large Pool에서 버퍼를 할당합니다.' },
-      { n: '2', label: 'Large Pool에 쓰기', desc: '서버 프로세스가 데이터를 Large Pool 버퍼에 씁니다. 각 쓰기에 세션별 시퀀스 번호가 찍힙니다.' },
-      { n: '3', label: '비동기 디스크 기록', desc: 'SMCO와 Wnnn 헬퍼 프로세스가 버퍼 데이터를 표준 데이터 블록 포맷으로 비동기 기록합니다.' },
+      { n: '1', label: '버퍼 할당', desc: '인스턴스 기동 후 첫 MEMOPTIMIZE_WRITE INSERT 시점에 Large Pool에서 버퍼를 할당해요.' },
+      { n: '2', label: 'Large Pool에 쓰기', desc: '서버 프로세스가 데이터를 Large Pool 버퍼에 써요. 각 쓰기에 세션별 시퀀스 번호가 찍혀요.' },
+      { n: '3', label: '비동기 디스크 기록', desc: 'SMCO와 Wnnn 헬퍼 프로세스가 버퍼 데이터를 표준 데이터 블록 포맷으로 비동기 기록해요.' },
     ],
-    deferredNote: '지연 삽입은 자동 COMMIT되며 ROLLBACK이 불가능합니다. 또한 제약 조건(constraints)과 인덱스 유지보수는 Large Pool 쓰기 시점이 아닌 디스크 기록 시점에 수행됩니다. 성능 극대화를 위해 Oracle은 제약 조건 비활성화를 권장합니다.',
+    deferredNote: '지연 삽입은 자동 COMMIT되며 ROLLBACK이 불가능해요. 또한 제약 조건(constraints)과 인덱스 유지보수는 Large Pool 쓰기 시점이 아닌 디스크 기록 시점에 수행돼요. 성능 극대화를 위해 Oracle은 제약 조건 비활성화를 권장해요.',
     deferredSql: `-- MEMOPTIMIZE_WRITE 힌트 사용 예
 INSERT /*+ MEMOPTIMIZE_WRITE */ INTO sensor_data
   (sensor_id, ts, value)
@@ -85,26 +85,26 @@ VALUES (:sid, :ts, :val);
 
     // ── No LRU ──
     noLruTitle: 'LRU 없음 — 메모리 할당 규칙',
-    noLruP1: 'Large Pool은 LRU 리스트를 관리하지 않기 때문에, Oracle이 임의로 기존 내용을 밀어내고 새 내용을 쓰는 일이 없습니다.',
-    noLruP2: '세션이나 백그라운드 프로세스가 메모리를 해제하는 즉시 그 공간은 다른 요청에 즉시 사용할 수 있게 됩니다. Large Pool이 꽉 찬 상태에서 추가 할당이 필요하면 ORA-04031 에러가 발생합니다 — Shared Pool과 달리 자동으로 공간을 만들어주지 않습니다.',
-    noLruNote: 'LARGE_POOL_SIZE가 설정되지 않으면(0이거나 미설정) RMAN·병렬 쿼리·UGA가 Shared Pool을 사용합니다. 이 경우 Shared Pool 단편화가 심해져 ORA-04031이 Shared Pool에서 발생할 수 있습니다. RMAN을 사용하거나 병렬 처리를 자주 쓴다면 Large Pool을 반드시 설정하세요.',
+    noLruP1: 'Large Pool은 LRU 리스트가 없기 때문에, Oracle이 멋대로 기존 내용을 밀어내고 새 내용을 덮어쓰는 일이 없어요.',
+    noLruP2: '세션이나 백그라운드 프로세스가 메모리를 해제하는 즉시 그 공간을 다른 요청이 바로 가져갈 수 있어요. 반대로 Large Pool이 꽉 찬 상태에서 추가 할당이 필요하면 ORA-04031 에러가 발생해요 — Shared Pool과 달리 자동으로 공간을 만들어주지 않거든요.',
+    noLruNote: 'LARGE_POOL_SIZE가 설정되어 있지 않으면(0이거나 미설정) RMAN·병렬 쿼리·UGA가 전부 Shared Pool을 써요. 그러면 Shared Pool 단편화가 심해져서 결국 ORA-04031이 Shared Pool에서 터질 수 있어요. RMAN을 사용하거나 병렬 처리를 자주 쓴다면 Large Pool은 꼭 설정해 두세요.',
 
     // ── Parameters ──
     paramsTitle: '주요 파라미터',
     params: [
-      { name: 'LARGE_POOL_SIZE', desc: 'Large Pool 크기를 명시적으로 지정합니다. SGA_TARGET이 설정된 경우(ASMM) Oracle이 자동으로 조정합니다.' },
-      { name: 'PARALLEL_EXECUTION_MESSAGE_SIZE', desc: '병렬 실행 메시지 버퍼 하나의 크기. 기본값은 16 KB이며 Large Pool에서 할당됩니다.' },
-      { name: 'MEMOPTIMIZE_POOL_SIZE', desc: '지연 삽입(MEMOPTIMIZE_WRITE) 전용 Large Pool 내 예약 영역 크기.' },
+      { name: 'LARGE_POOL_SIZE', desc: 'Large Pool 크기를 직접 지정해요. SGA_TARGET이 설정된 경우(ASMM) Oracle이 알아서 조정해 줘요.' },
+      { name: 'PARALLEL_EXECUTION_MESSAGE_SIZE', desc: '병렬 실행 메시지 버퍼 하나의 크기예요. 기본값은 16 KB이며 Large Pool에서 할당돼요.' },
+      { name: 'MEMOPTIMIZE_POOL_SIZE', desc: '지연 삽입(MEMOPTIMIZE_WRITE) 전용으로 Large Pool 안에 예약해 둘 영역 크기예요.' },
     ],
 
     // ── Summary ──
     summaryTitle: 'Large Pool 핵심 정리',
     summaryItems: [
-      'Large Pool은 선택적 SGA 영역 — 없으면 해당 메모리가 Shared Pool에서 할당됨',
-      'LRU 리스트 없음 — 세션·프로세스가 명시적으로 해제하기 전까지 메모리 유지',
+      'Large Pool은 선택적 SGA 영역이에요 — 없으면 해당 메모리가 Shared Pool에서 할당돼요',
+      'LRU 리스트 없음 — 세션·프로세스가 직접 해제하기 전까지 메모리가 그대로 유지돼요',
       '주요 사용자: RMAN 버퍼, 병렬 쿼리 메시지 버퍼, 공유 서버 UGA, 지연 삽입 버퍼',
-      'Shared Pool을 단편화로부터 보호 — 대형 할당을 격리',
-      'RMAN·병렬 처리 환경에서는 LARGE_POOL_SIZE 설정이 필수',
+      'Shared Pool을 단편화로부터 보호해요 — 대형 할당을 여기서 격리하거든요',
+      'RMAN·병렬 처리 환경이라면 LARGE_POOL_SIZE 설정은 필수예요',
     ],
   },
 

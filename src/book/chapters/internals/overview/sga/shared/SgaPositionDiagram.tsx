@@ -131,7 +131,7 @@ const COMPONENTS: {
 ]
 
 interface Props {
-  activeId: SgaComponentId
+  activeId: SgaComponentId | null
 }
 
 export function SgaPositionDiagram({ activeId }: Props) {
@@ -143,9 +143,11 @@ export function SgaPositionDiagram({ activeId }: Props) {
       <div className="flex h-[140px] gap-2">
         {COMPONENTS.map((c) => {
           const isActive = c.id === activeId
-          const colorCls = c.id === activeId
+          const colorCls = isActive
             ? `${c.highlight.border} ${c.highlight.bg} ${c.highlight.ring} ${c.highlight.text} shadow-md`
-            : c.dim
+            : activeId === null
+              ? `${c.highlight.border} ${c.highlight.bg} ${c.highlight.text}`
+              : c.dim
           return (
             <motion.div
               key={c.id}

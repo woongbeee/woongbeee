@@ -21,57 +21,57 @@ const T = {
   ko: {
     title: '데이터 동시성과 정합성',
     subtitle:
-      '여러 사용자가 동시에 같은 데이터를 읽고 쓸 때 Oracle이 어떻게 충돌을 막고 일관된 결과를 보장하는지 살펴봅니다.',
-    overviewTitle: '동시성과 정합성이란?',
+      '여러 사용자가 동시에 같은 데이터를 읽고 쓸 때, Oracle이 어떻게 충돌을 막고 일관된 결과를 보장하는지 알아봐요.',
+    overviewTitle: '동시성과 정합성이 뭐예요?',
     overviewDesc:
-      '멀티유저 데이터베이스에서는 동시에 실행되는 여러 트랜잭션의 문장들이 같은 데이터를 수정할 수 있습니다. 동시에 실행되는 트랜잭션들은 의미있고 일관된 결과를 만들어야 합니다.\n\n데이터 동시성(Concurrency)은 여러 사용자가 동시에 데이터에 접근할 수 있는 능력을 말하며, 데이터 정합성(Consistency)은 각 사용자가 데이터를 일관된 뷰로 볼 수 있음을 의미합니다. 이 두 가지를 동시에 달성하는 것이 Oracle 동시성 모델의 핵심 과제입니다.',
+      '여러 사람이 동시에 쓰는 데이터베이스에서는, 동시에 실행되는 여러 트랜잭션이 같은 데이터를 수정할 수 있어요. 그럴 때도 결과는 의미 있고 일관되어야 하죠.\n\n데이터 동시성(Concurrency)은 여러 사람이 동시에 데이터에 접근할 수 있는 능력이고, 데이터 정합성(Consistency)은 각 사용자가 데이터를 일관된 시각으로 볼 수 있음을 의미해요. 이 둘을 동시에 만족시키는 게 Oracle 동시성 모델의 핵심 숙제예요.',
     concepts: '핵심 개념',
     conceptItems: [
       {
         icon: <IconEye size={20} stroke={1.5} className="text-blue-500" />,
         title: 'Read Consistency',
-        desc: '각 사용자는 커밋된 데이터만 보는 일관된 스냅샷을 봅니다. Oracle은 어떤 격리 수준에서도 Dirty Read를 허용하지 않습니다.',
+        desc: '각 사용자는 커밋된 데이터만 보는 일관된 스냅샷을 봐요. Oracle은 어떤 격리 수준에서도 Dirty Read(미커밋 데이터 읽기)를 허용하지 않아요.',
       },
       {
         icon: <IconHistory size={20} stroke={1.5} className="text-indigo-500" />,
         title: 'MVCC',
-        desc: 'Multi-Version Concurrency Control — 다중 버전 읽기 일관성. 읽기와 쓰기가 서로를 차단하지 않습니다.',
+        desc: 'Multi-Version Concurrency Control(다중 버전 동시성 제어) — 데이터의 여러 버전을 동시에 유지해서 읽기와 쓰기가 서로를 방해하지 않아요.',
       },
       {
         icon: <IconLock size={20} stroke={1.5} className="text-amber-500" />,
         title: 'Locking',
-        desc: 'DML은 수정된 행에만 Row Lock을 걸어 쓰기 충돌을 방지합니다. 읽기는 절대 쓰기를 막지 않습니다.',
+        desc: 'DML은 수정된 행에만 Row Lock을 걸어 쓰기 충돌을 막아요. 읽기는 절대 쓰기를 막지 않아요.',
       },
       {
         icon: <IconArrowsShuffle size={20} stroke={1.5} className="text-violet-500" />,
         title: 'SCN',
-        desc: 'System Change Number — Oracle이 시간 순서를 추적하는 단조 증가 숫자. MVCC의 "시점" 기준입니다.',
+        desc: 'System Change Number(시스템 변경 번호) — Oracle이 시간 순서를 추적하는 계속 증가하는 숫자예요. MVCC에서 "어떤 시점"을 기준 삼는 도구예요.',
       },
     ],
-    challengeTitle: '동시성과 정합성의 트레이드오프',
+    challengeTitle: '동시성과 정합성, 둘 다 잡을 수 있을까요?',
     challengeDesc:
-      '완전한 격리는 높은 정합성을 보장하지만 동시성을 해칩니다. 예를 들어 한 트랜잭션이 테이블을 조회하는 동안 다른 트랜잭션이 같은 테이블에 행을 삽입할 수 없다면, 동시성이 심각하게 저하됩니다. Oracle은 MVCC를 통해 이 트레이드오프를 최소화합니다.',
+      '완전한 격리를 보장하면 정합성은 높아지지만 동시성이 떨어져요. 예를 들어 한 트랜잭션이 테이블을 조회하는 동안 다른 트랜잭션이 같은 테이블에 행을 삽입할 수 없다면, 처리 속도가 심각하게 떨어지겠죠. Oracle은 MVCC(다중 버전 동시성 제어)로 이 딜레마를 최소화해요.',
     howTitle: 'Oracle의 접근 방식',
     howItems: [
       {
         label: 'MVCC로 읽기-쓰기 충돌 제거',
-        desc: 'SELECT는 Undo에서 이전 버전을 재구성해 쓰기와 충돌 없이 일관된 데이터를 반환합니다.',
+        desc: 'SELECT는 Undo에서 이전 버전을 재구성해, 쓰기와 충돌 없이 일관된 데이터를 반환해요.',
       },
       {
-        label: '행 수준 잠금',
-        desc: '수정된 행에만 락을 걸어 잠금 충돌을 최소화합니다. 페이지 수준이나 테이블 수준 잠금은 사용하지 않습니다.',
+        label: '행(row) 수준 잠금',
+        desc: '수정된 행에만 락을 걸어 충돌을 최소화해요. 페이지 수준이나 테이블 수준 잠금은 사용하지 않아요.',
       },
       {
         label: '락 에스컬레이션 없음',
-        desc: 'Row Lock이 많아져도 Table Lock으로 에스컬레이션하지 않습니다. 항상 행 수준으로만 잠급니다.',
+        desc: 'Row Lock이 아무리 많아져도 Table Lock으로 확대하지 않아요. 항상 행 수준만 잠가요.',
       },
       {
         label: '자동 최소 잠금 정책',
-        desc: 'Oracle은 데이터 무결성을 보장하는 가장 낮은 수준의 제한을 자동 적용해 최대한의 동시성을 유지합니다.',
+        desc: 'Oracle이 데이터 무결성을 보장하는 가장 낮은 수준의 제한을 자동으로 적용해, 동시성을 최대한 유지해요.',
       },
     ],
-    sectionMapTitle: '이 챕터의 구성',
-    sectionMapDesc: '데이터 동시성과 정합성 챕터는 아래 4가지 주제로 구성됩니다.',
+    sectionMapTitle: '이 챕터에서 다루는 내용',
+    sectionMapDesc: '데이터 동시성과 정합성 챕터는 아래 4가지 주제로 이루어져 있어요.',
   },
   en: {
     title: 'Data Concurrency & Consistency',
@@ -225,7 +225,7 @@ const ConcurrencyOverviewDiagram = ({ lang }: { lang: 'ko' | 'en' }) => {
       <rect x="140" y="188" width="340" height="24" rx="5" fill="#eff6ff" stroke="#bfdbfe" strokeWidth="1" />
       <text x="310" y="204" fontSize="9" fill="#1d4ed8" textAnchor="middle" fontWeight="bold">
         {isKo
-          ? 'Reader는 Writer를 기다리지 않고, Writer는 Reader를 막지 않습니다'
+          ? 'Reader는 Writer를 기다리지 않고, Writer는 Reader를 막지 않아요'
           : 'Readers never wait for writers — writers never block readers'}
       </text>
 
@@ -299,7 +299,7 @@ export function ConcurrencySection() {
       <div className="mt-8">
         <InfoBox variant="note">
           {lang === 'ko'
-            ? 'Oracle은 다중 버전 일관성 모델(multiversion consistency model)을 사용합니다. 데이터베이스는 여러 동시 사용자에게 각각 특정 시점에 일관된 데이터 뷰를 제공할 수 있습니다. 서로 다른 버전의 데이터 블록이 동시에 존재할 수 있으므로, 트랜잭션은 쿼리가 요구하는 시점에 커밋된 데이터 버전을 읽을 수 있습니다.'
+            ? 'Oracle은 다중 버전 일관성 모델(multiversion consistency model)을 사용해요. 여러 사람이 동시에 접속해도 각자 특정 시점에 일관된 데이터 뷰를 볼 수 있어요. 같은 블록의 여러 버전이 동시에 존재할 수 있기 때문에, 트랜잭션은 쿼리가 요구하는 시점에 커밋된 버전의 데이터를 읽을 수 있어요.'
             : 'Oracle uses a multiversion consistency model. The database can present a view of data to multiple concurrent users, with each view consistent to a point in time. Because different versions of data blocks can exist simultaneously, transactions can read the version of data committed at the point in time required by a query.'}
         </InfoBox>
       </div>

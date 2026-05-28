@@ -15,22 +15,22 @@ import { cn } from '@/lib/utils'
 const T = {
   ko: {
     title: 'ACID 속성',
-    subtitle: '트랜잭션이 데이터 무결성을 보장하기 위해 반드시 만족해야 하는 네 가지 속성입니다.',
+    subtitle: '트랜잭션이 데이터 무결성을 지키려면 반드시 만족해야 하는 네 가지 속성이 있어요.',
     atomicityDetailTitle: '문장 수준 원자성 vs 트랜잭션 수준 원자성',
     acidAtomicityDetail:
-      "문장 수준 원자성(Statement-Level Atomicity)과 트랜잭션 수준 원자성이 구분됩니다. 하나의 SQL 문장이 실패하면 그 문장의 변경만 자동 롤백되며, 그 앞의 문장은 유지됩니다. 단, 파싱(구문 분석) 오류는 문장 수준 롤백을 발생시키지 않습니다 — 데드락이나 제약 조건 위반은 문장 수준 롤백을 발생시킵니다. COMMIT 전 장애 시 Oracle이 자동 ROLLBACK을 수행해 모든 변경을 취소합니다. Undo Segment가 이 역할을 담당합니다.",
-    scnTitle: 'SCN (System Change Number)',
+      "Oracle에서는 문장 수준 원자성(Statement-Level Atomicity)과 트랜잭션 수준 원자성을 구별해요. 하나의 SQL 문장이 실패하면 그 문장의 변경만 자동으로 롤백되고, 그 앞에 성공한 문장들은 그대로 유지돼요. 단, 파싱(구문 분석) 오류는 문장 수준 롤백을 일으키지 않아요 — 데드락이나 제약 조건 위반일 때만 문장 수준 롤백이 발생해요. COMMIT 전에 장애가 생기면 Oracle이 자동으로 ROLLBACK을 수행해서 모든 변경을 취소해요. 이 역할을 Undo Segment가 담당해요.",
+    scnTitle: 'SCN (System Change Number, 시스템 변경 번호)',
     scnDesc:
-      'SCN은 데이터베이스 이벤트를 순서화하는 논리적 타임스탬프입니다. 단조 증가하는 숫자로, SCN이 낮을수록 더 이른 사건입니다. 여러 이벤트가 동시에 발생하면 같은 SCN을 공유할 수 있습니다.\n\nOracle은 트랜잭션이 데이터를 변경할 때 SCN을 Undo Segment에 기록하고, COMMIT 시 LGWR이 SCN을 온라인 리두 로그에 기록합니다. 이 SCN이 인스턴스 복구와 미디어 복구의 기준점이 됩니다.',
+      'SCN(System Change Number, 시스템 변경 번호)은 데이터베이스에서 일어나는 모든 사건의 순서를 기록하는 논리적 타임스탬프예요. 숫자가 계속 증가하기만 하고, SCN이 낮을수록 더 일찍 일어난 일이에요. 여러 사건이 동시에 발생하면 같은 SCN을 가질 수도 있어요.\n\nOracle은 트랜잭션이 데이터를 바꿀 때 SCN을 Undo Segment에 기록하고, COMMIT 시에는 LGWR(로그 라이터)이 SCN을 온라인 리두 로그에 기록해요. 이 SCN이 인스턴스 복구와 미디어 복구의 기준점이 돼요.',
     summary:
-      'ACID는 트랜잭션 시스템의 이론적 기반입니다. Oracle은 Undo Segment(원자성·격리성), 제약 조건 검증(일관성), Redo Log(지속성)으로 ACID를 구현합니다. SCN은 모든 트랜잭션 이벤트의 논리적 순서를 결정합니다.',
+      'ACID는 트랜잭션 시스템의 이론적 토대예요. Oracle은 Undo Segment(원자성·격리성), 제약 조건 검증(일관성), Redo Log(지속성)로 ACID를 구현해요. SCN(System Change Number)은 모든 트랜잭션 이벤트의 논리적 순서를 결정해요.',
     acidItems: [
       {
         letter: 'A',
         name: '원자성 (Atomicity)',
-        desc: '트랜잭션 내 모든 작업은 전부 성공하거나 전부 실패합니다. 중간 상태는 존재하지 않습니다.',
+        desc: '트랜잭션 안의 모든 작업은 전부 성공하거나 전부 실패해요. 절반만 성공하는 중간 상태는 없어요.',
         detail:
-          'COMMIT 전에 오류가 발생하면 Oracle은 자동으로 ROLLBACK을 수행해 변경을 모두 취소합니다. Undo Segment가 이 역할을 담당합니다.\n\n문장 수준 원자성(Statement-Level Atomicity): 개별 SQL 문장도 원자 단위입니다. 하나의 UPDATE가 실패해도 그 이전 UPDATE의 변경은 유지되며, 실패한 UPDATE의 변경만 자동 롤백됩니다.',
+          'COMMIT 전에 오류가 생기면 Oracle이 자동으로 ROLLBACK을 수행해서 변경을 모두 취소해요. Undo Segment가 이 역할을 맡고 있어요.\n\n문장 수준 원자성(Statement-Level Atomicity): 개별 SQL 문장 하나하나도 원자 단위예요. 하나의 UPDATE가 실패해도 그 이전 UPDATE의 변경은 살아 있고, 실패한 UPDATE의 변경만 자동 롤백돼요.',
         color: 'blue' as const,
         collapseLabel: '▼ Oracle의 구현 방식',
         expandLabel: '▲ 접기',
@@ -38,9 +38,9 @@ const T = {
       {
         letter: 'C',
         name: '일관성 (Consistency)',
-        desc: '트랜잭션 전후로 데이터베이스는 항상 유효한 상태(제약 조건 만족)를 유지합니다.',
+        desc: '트랜잭션 전후로 데이터베이스는 항상 제약 조건을 만족하는 유효한 상태를 유지해요.',
         detail:
-          'PRIMARY KEY, FOREIGN KEY, NOT NULL 같은 제약 조건은 COMMIT 시점에 검증됩니다. 위반이 있으면 트랜잭션이 롤백됩니다.',
+          'PRIMARY KEY, FOREIGN KEY, NOT NULL 같은 제약 조건은 COMMIT 시점에 검증돼요. 위반이 발견되면 트랜잭션 전체가 롤백돼요.',
         color: 'emerald' as const,
         collapseLabel: '▼ Oracle의 구현 방식',
         expandLabel: '▲ 접기',
@@ -48,9 +48,9 @@ const T = {
       {
         letter: 'I',
         name: '격리성 (Isolation)',
-        desc: '실행 중인 트랜잭션의 중간 결과는 다른 트랜잭션에게 보이지 않습니다.',
+        desc: '진행 중인 트랜잭션의 중간 결과는 다른 트랜잭션에 보이지 않아요.',
         detail:
-          'Oracle은 MVCC(Multi Version Concurrency Control)로 이를 구현합니다. 다른 세션이 커밋되지 않은 변경을 읽으려 하면, Undo Segment에서 이전 버전 데이터를 재구성해 반환합니다. SCN(System Change Number)이 각 이벤트의 논리적 순서를 결정합니다.',
+          'Oracle은 MVCC(Multi-Version Concurrency Control, 다중 버전 동시성 제어)로 이걸 구현해요. 다른 세션이 아직 커밋되지 않은 변경을 읽으려 하면, Undo Segment에서 이전 버전 데이터를 재구성해서 돌려줘요. SCN(System Change Number)이 각 이벤트의 논리적 순서를 결정해요.',
         color: 'violet' as const,
         collapseLabel: '▼ Oracle의 구현 방식',
         expandLabel: '▲ 접기',
@@ -58,9 +58,9 @@ const T = {
       {
         letter: 'D',
         name: '지속성 (Durability)',
-        desc: 'COMMIT된 트랜잭션의 변경은 시스템 장애가 발생해도 유지됩니다.',
+        desc: 'COMMIT된 트랜잭션의 변경은 시스템 장애가 발생해도 사라지지 않아요.',
         detail:
-          'LGWR(Log Writer) 프로세스가 COMMIT 시점에 Redo Log Buffer를 온라인 리두 로그 파일에 즉시 기록합니다. 인스턴스가 충돌해도 이 파일로 변경을 복구할 수 있습니다. COMMIT 자체의 속도는 트랜잭션 크기와 무관하며, LGWR의 디스크 I/O 시간이 주된 소요 시간입니다.',
+          'LGWR(Log Writer, 로그 라이터) 프로세스가 COMMIT 시점에 Redo Log Buffer를 온라인 리두 로그 파일에 즉시 기록해요. 인스턴스가 충돌해도 이 파일로 변경 내용을 복구할 수 있어요. COMMIT 자체의 속도는 트랜잭션 크기와 관계없고, LGWR의 디스크 I/O 시간이 대부분을 차지해요.',
         color: 'orange' as const,
         collapseLabel: '▼ Oracle의 구현 방식',
         expandLabel: '▲ 접기',

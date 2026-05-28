@@ -15,24 +15,24 @@ import { cn } from '@/lib/utils'
 const T = {
   ko: {
     title: 'SAVEPOINT — 중간 복원 지점',
-    subtitle: 'SAVEPOINT를 사용하면 트랜잭션 전체를 롤백하지 않고 특정 지점까지만 되돌릴 수 있습니다.',
+    subtitle: 'SAVEPOINT를 사용하면 트랜잭션 전체를 롤백하지 않고 특정 지점까지만 되돌릴 수 있어요.',
     desc:
-      'SAVEPOINT는 트랜잭션 중간에 이름 있는 복원 지점을 만듭니다. ROLLBACK TO SAVEPOINT 명령으로 그 지점 이후의 변경만 취소하고, 트랜잭션은 계속 유지됩니다.\n\nSAVEPOINT 이전의 변경은 취소되지 않으며, 최종적으로 COMMIT 또는 ROLLBACK으로 트랜잭션을 종료해야 합니다.',
+      'SAVEPOINT는 트랜잭션 중간에 이름 있는 복원 지점을 만들어요. ROLLBACK TO SAVEPOINT 명령을 쓰면 그 지점 이후의 변경만 취소되고, 트랜잭션은 계속 살아 있어요.\n\nSAVEPOINT 이전의 변경은 취소되지 않아요. 최종적으로 COMMIT 또는 ROLLBACK으로 트랜잭션을 끝내야 해요.',
     exampleTitle: 'SAVEPOINT 사용 예시',
     lockTitle: 'ROLLBACK TO SAVEPOINT 시 락(Lock) 동작',
     lockRows: [
-      ['지정 SAVEPOINT 이후 문장 롤백', 'SAVEPOINT 이후의 변경만 취소됨'],
-      ['지정 SAVEPOINT 보존', 'ROLLBACK TO 한 SAVEPOINT는 계속 유효'],
-      ['이후 SAVEPOINT 삭제', 'ROLLBACK TO 한 지점보다 나중의 SAVEPOINT는 모두 삭제됨'],
-      ['SAVEPOINT 이후에 획득한 락 해제', 'SAVEPOINT 이전에 획득한 락은 유지됨'],
-      ['트랜잭션 활성 유지', 'ROLLBACK TO SAVEPOINT는 트랜잭션을 종료하지 않음'],
+      ['지정 SAVEPOINT 이후 문장 롤백', 'SAVEPOINT 이후의 변경만 취소돼요'],
+      ['지정 SAVEPOINT 보존', 'ROLLBACK TO 한 SAVEPOINT는 계속 유효해요'],
+      ['이후 SAVEPOINT 삭제', 'ROLLBACK TO 한 지점보다 나중의 SAVEPOINT는 모두 삭제돼요'],
+      ['SAVEPOINT 이후에 획득한 락 해제', 'SAVEPOINT 이전에 획득한 락은 유지돼요'],
+      ['트랜잭션 활성 유지', 'ROLLBACK TO SAVEPOINT는 트랜잭션을 종료하지 않아요'],
     ],
     lockNote:
-      '다른 세션이 ROLLBACK TO SAVEPOINT로 해제된 행 락을 즉시 획득하는 게 아닙니다. 차단된 세션은 메인 트랜잭션(잠금 보유 트랜잭션 자체) 전체가 COMMIT/ROLLBACK될 때까지 기다립니다.',
+      '다른 세션이 ROLLBACK TO SAVEPOINT로 해제된 행 락을 즉시 획득하는 건 아니에요. 차단된 세션은 메인 트랜잭션 전체가 COMMIT 또는 ROLLBACK될 때까지 기다려요.',
     note:
-      'SAVEPOINT는 동일한 이름으로 재정의하면 이전 SAVEPOINT가 덮어씌워집니다. RELEASE SAVEPOINT 명령으로 명시적으로 해제할 수도 있습니다.',
+      'SAVEPOINT를 같은 이름으로 다시 만들면 이전 SAVEPOINT가 덮어씌워져요. RELEASE SAVEPOINT 명령으로 명시적으로 해제할 수도 있어요.',
     summary:
-      'COMMIT은 변경을 영구화하고, ROLLBACK은 Undo Segment로 복원하며, SAVEPOINT는 부분 롤백을 가능하게 합니다. ACID 속성은 트랜잭션이 데이터 무결성을 보장하는 방식의 근거입니다.',
+      'COMMIT은 변경을 영구적으로 확정하고, ROLLBACK은 Undo Segment로 이전 상태를 복원하며, SAVEPOINT는 부분 롤백을 가능하게 해줘요. ACID 속성은 트랜잭션이 데이터 무결성을 지키는 방식의 이론적 토대예요.',
     diagramSteps: [
       { label: 'INSERT A', state: 'normal' as const },
       { label: 'SAVEPOINT sp1', state: 'sp' as const, note: 'SP1' },

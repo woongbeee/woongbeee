@@ -16,61 +16,61 @@ const T = {
   ko: {
     title: '락(Lock) 메커니즘',
     subtitle:
-      'Oracle이 데이터 무결성을 보장하기 위해 사용하는 다양한 락의 종류와 동작 방식을 살펴봅니다.',
+      'Oracle이 데이터 무결성을 지키기 위해 사용하는 락의 종류와 동작 방식을 알아봐요.',
     fourRules: '락의 4가지 원칙',
     ruleItems: [
       {
         num: '1',
-        title: '행만 잠긴다',
-        desc: 'DML은 수정된 행에만 Row Lock(TX)을 건다. 블록이나 테이블 전체를 잠그지 않는다.',
+        title: '행(row)만 잠겨요',
+        desc: 'DML은 수정된 행에만 Row Lock(TX)을 걸어요. 블록 전체나 테이블 전체를 잠그지 않아요.',
       },
       {
         num: '2',
-        title: '쓰기는 쓰기를 막는다',
-        desc: '두 트랜잭션이 같은 행을 동시에 수정하려 하면 나중에 온 트랜잭션은 앞선 트랜잭션이 완료될 때까지 대기한다.',
+        title: '쓰기는 쓰기를 막아요',
+        desc: '두 트랜잭션이 같은 행을 동시에 수정하려 하면, 나중에 온 트랜잭션은 앞선 트랜잭션이 끝날 때까지 기다려야 해요.',
       },
       {
         num: '3',
-        title: '읽기는 쓰기를 막지 않는다',
-        desc: 'SELECT는 행을 잠그지 않는다(FOR UPDATE 제외). 변경 중인 행도 MVCC로 이전 버전을 읽는다.',
+        title: '읽기는 쓰기를 막지 않아요',
+        desc: 'SELECT는 행을 잠그지 않아요(FOR UPDATE 제외). 수정 중인 행도 MVCC 덕분에 이전 버전을 읽을 수 있어요.',
       },
       {
         num: '4',
-        title: '쓰기는 읽기를 막지 않는다',
-        desc: 'UPDATE 중인 행도 SELECT로 자유롭게 읽을 수 있다. Undo에서 이전 버전을 제공한다.',
+        title: '쓰기는 읽기를 막지 않아요',
+        desc: 'UPDATE 중인 행도 SELECT로 자유롭게 읽을 수 있어요. Undo가 이전 버전을 제공해 줘요.',
       },
     ],
     lockTypes: '락의 종류',
     dmlLocksTitle: 'DML 락 (Data Locks)',
     dmlLocksDesc:
-      'DML 락은 동시에 접근하는 여러 사용자가 데이터를 변경할 때 그 무결성을 보호합니다.',
+      'DML 락은 여러 사용자가 동시에 데이터를 변경할 때 데이터 무결성을 지켜줘요.',
     rowLockTitle: 'Row Lock (TX — Transaction Lock)',
     rowLockDesc:
-      'INSERT, UPDATE, DELETE, MERGE, SELECT ... FOR UPDATE 실행 시 수정된 각 행에 독점(Exclusive) 락이 걸립니다. Oracle은 락 정보를 별도의 락 관리자가 아닌 데이터 블록 헤더(ITL — Interested Transaction List)에 저장합니다. 트랜잭션이 COMMIT 또는 ROLLBACK될 때 해제됩니다.',
+      'INSERT, UPDATE, DELETE, MERGE, SELECT ... FOR UPDATE를 실행하면 수정된 각 행에 독점(Exclusive) 락이 걸려요. Oracle은 락 정보를 별도의 락 관리자에 저장하지 않고 데이터 블록 헤더(ITL — Interested Transaction List)에 저장해요. 트랜잭션이 COMMIT 또는 ROLLBACK될 때 락이 풀려요.',
     tableLockTitle: 'Table Lock (TM)',
     tableLockDesc:
-      'DML 실행 시 해당 테이블 전체에도 TM(Table Lock)이 걸립니다. Row Lock을 보호하기 위해 DDL이 테이블 구조를 변경하지 못하게 막는 역할입니다. TM 락의 모드에 따라 다른 세션의 DML 허용 여부가 달라집니다.',
+      'DML을 실행하면 해당 테이블 전체에도 TM(Table Lock)이 걸려요. Row Lock이 걸린 동안 DDL이 테이블 구조를 바꾸지 못하도록 막아주는 역할이에요. TM 락 모드에 따라 다른 세션의 DML 허용 여부가 달라져요.',
     tmModes: 'TM 락 모드 (제한 약 → 강)',
     ddlLocksTitle: 'DDL 락 (Dictionary Locks)',
     ddlLocksDesc:
-      'DDL 락은 DDL 작업 중 스키마 객체를 보호합니다. Oracle은 개별 스키마 객체만 잠그며, 데이터 딕셔너리 전체를 잠그는 일은 없습니다.',
+      'DDL 락은 DDL 작업 중에 스키마 객체를 보호해요. Oracle은 수정하거나 참조하는 개별 스키마 객체만 잠그고, 데이터 딕셔너리 전체를 잠그는 일은 없어요.',
     ddlLockTypes: 'DDL 락 종류',
     systemLocksTitle: '시스템 락 (Latches & Mutexes)',
     systemLocksDesc:
-      'Latch와 Mutex는 SGA의 공유 데이터 구조를 보호하는 저수준 직렬화 메커니즘입니다. 일반 Oracle Lock과 달리 큐잉을 지원하지 않으며 매우 짧은 시간 동안만 보유됩니다.',
+      'Latch와 Mutex는 SGA(System Global Area)의 공유 데이터 구조를 보호하는 저수준 직렬화 메커니즘이에요. 일반 Oracle 락과 달리 대기 큐를 지원하지 않고 아주 짧은 시간 동안만 보유해요.',
     latchDesc:
-      'Latch는 여러 프로세스가 동시에 공유 데이터 구조를 수정하지 못하도록 막습니다. Buffer Cache, Shared Pool 등 SGA 구성요소 보호에 사용됩니다. Latch는 짧은 스핀 후 대기하며, 해제되는 즉시 다음 요청자가 획득합니다.',
+      'Latch는 여러 프로세스가 동시에 공유 데이터 구조를 수정하지 못하도록 막아요. Buffer Cache, Shared Pool 같은 SGA 구성요소 보호에 쓰여요. Latch는 짧게 스핀(spin)하다 대기하고, 풀리는 즉시 다음 요청자가 획득해요.',
     mutexDesc:
-      'Mutex(Mutual Exclusion Object)는 단일 객체를 동시 접근으로부터 보호합니다. Latch보다 세밀하게 특정 커서나 라이브러리 캐시 객체를 보호합니다. 메모리 사용량이 더 적고 더 세밀한 동시성 제어가 가능합니다.',
-    fkTitle: '외래키(FK) 인덱스 주의사항',
+      'Mutex(Mutual Exclusion Object, 상호 배타 객체)는 단일 객체를 동시 접근으로부터 보호해요. Latch보다 세밀하게 특정 커서나 라이브러리 캐시 객체를 보호하고, 메모리 사용량도 더 적어요.',
+    fkTitle: '외래키(FK) 컬럼에 인덱스를 꼭 만드세요',
     fkDesc:
-      '자식 테이블의 외래키 컬럼에 인덱스가 없으면, 부모 테이블의 기본키를 수정/삭제할 때 자식 테이블 전체에 Full Table Lock이 걸립니다. 다른 세션이 자식 테이블을 수정할 수 없게 됩니다. 외래키 컬럼에는 반드시 인덱스를 생성하세요.',
-    escalationTitle: '락 에스컬레이션 없음',
+      '자식 테이블의 외래키 컬럼에 인덱스가 없으면, 부모 테이블의 기본키를 수정/삭제할 때 자식 테이블 전체에 Full Table Lock이 걸려요. 다른 세션이 자식 테이블을 수정할 수 없게 돼요. 외래키 컬럼에는 반드시 인덱스를 만들어 주세요.',
+    escalationTitle: '락 에스컬레이션이 없어요',
     escalationDesc:
-      'Oracle은 Row Lock을 Table Lock으로 에스컬레이션하지 않습니다. 일부 DB는 행 락이 너무 많아지면 테이블 전체를 잠그는데, 이 경우 교착상태 가능성이 커집니다. Oracle은 항상 행 수준으로만 잠급니다.',
-    autoLockTitle: '자동 잠금 원칙',
+      'Oracle은 Row Lock이 아무리 많아져도 Table Lock으로 확대(에스컬레이션)하지 않아요. 일부 DB는 행 락이 너무 많아지면 테이블 전체를 잠그는데, 이러면 교착상태(Deadlock)가 생기기 쉬워요. Oracle은 항상 행 수준으로만 잠가요.',
+    autoLockTitle: '자동 최소 잠금 원칙',
     autoLockDesc:
-      'Oracle은 데이터 동시성을 최대화하는 가장 낮은 수준의 제한을 자동으로 적용합니다. 데이터 무결성을 보장하면서도 불필요한 잠금을 최소화합니다.',
+      'Oracle은 데이터 동시성을 최대화하는 가장 낮은 수준의 제한을 자동으로 적용해요. 데이터 무결성을 지키면서도 불필요한 잠금은 최소화해요.',
   },
   en: {
     title: 'Lock Mechanisms',
@@ -232,7 +232,7 @@ const LockDiagram = ({ lang }: { lang: 'ko' | 'en' }) => (
       {lang === 'ko' ? '데이터 블록 헤더에' : '(ITL), not in a'}
     </text>
     <text x="514" y="132" fontSize="8" fill="#78350f" textAnchor="middle">
-      {lang === 'ko' ? '저장됩니다.' : 'separate lock mgr.'}
+      {lang === 'ko' ? '저장돼요.' : 'separate lock mgr.'}
     </text>
     <text x="514" y="148" fontSize="8" fill="#d97706" textAnchor="middle" fontStyle="italic">
       {lang === 'ko' ? '→ 락 에스컬레이션 없음' : '→ No lock escalation'}

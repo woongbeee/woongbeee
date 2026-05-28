@@ -10,7 +10,7 @@ import {
   Table,
   AccordionSection,
 } from '../../shared'
-import { cn } from '@/lib/utils'
+import { cn } from '@/lib/utils.ts'
 
 const T = {
   ko: {
@@ -18,63 +18,45 @@ const T = {
     titleSub: 'Multi-Version Concurrency Control',
     titleDesc: '— 다중 버전 읽기 일관성',
     subtitle:
-      'Oracle은 데이터 블록의 여러 버전을 동시에 유지해, 읽기와 쓰기가 서로를 막지 않도록 합니다.',
-    overviewTitle: '읽기 일관성이란?',
+      'Oracle은 데이터 블록의 여러 버전을 동시에 유지해서, 읽기와 쓰기가 서로를 방해하지 않도록 해요.',
+    overviewTitle: '읽기 일관성이 뭐예요?',
     overviewDesc:
-      'Oracle은 다중 버전 일관성 모델(multiversion consistency model)을 사용합니다. 데이터베이스는 여러 동시 사용자에게 각각 특정 시점에 일관된 데이터 뷰를 제공할 수 있습니다. 데이터 블록의 서로 다른 버전이 동시에 존재할 수 있으므로, 트랜잭션은 쿼리가 요구하는 시점에 커밋된 데이터 버전을 읽을 수 있습니다.',
+      'Oracle은 다중 버전 일관성 모델(multiversion consistency model)을 사용해요. 여러 사람이 동시에 접속해도 각자 특정 시점에 일관된 데이터 뷰를 볼 수 있어요. 같은 블록의 여러 버전이 동시에 존재할 수 있기 때문에, 트랜잭션은 쿼리가 요구하는 시점에 커밋된 버전의 데이터를 읽을 수 있어요.',
     guarantees: '읽기 일관성의 세 가지 보장',
     guaranteeItems: [
       {
         num: '1',
         color: 'bg-blue-500',
-        title: '커밋된 데이터만 읽음',
-        text: 'Oracle은 Dirty Read를 절대 허용하지 않습니다. 미커밋 데이터를 읽는 것 자체가 불가능합니다.',
+        title: '커밋된 데이터만 읽어요',
+        text: 'Oracle은 Dirty Read(커밋되지 않은 데이터를 읽는 것)를 절대 허용하지 않아요. 미커밋 데이터를 읽는 일 자체가 불가능해요.',
       },
       {
         num: '2',
         color: 'bg-indigo-500',
         title: '단일 시점 일관성',
-        text: '쿼리가 반환하는 데이터는 단일 시점에 커밋된, 일관된 데이터입니다. 쿼리 실행 중에 다른 트랜잭션이 커밋해도 그 변경은 보이지 않습니다.',
+        text: '쿼리가 반환하는 데이터는 단 하나의 시점에 커밋된 일관된 데이터예요. 쿼리가 실행되는 중에 다른 트랜잭션이 커밋해도 그 변경은 보이지 않아요.',
       },
       {
         num: '3',
         color: 'bg-violet-500',
-        title: '읽기와 쓰기는 서로를 막지 않음',
-        text: 'Oracle의 쿼리는 결코 다른 쿼리나 DML을 대기시키지 않습니다. 읽기는 쓰기를 막지 않고, 쓰기는 읽기를 막지 않습니다.',
+        title: '읽기와 쓰기는 서로를 막지 않아요',
+        text: 'Oracle의 쿼리는 다른 쿼리나 DML을 절대 기다리게 하지 않아요. 읽기가 쓰기를 막지 않고, 쓰기도 읽기를 막지 않아요.',
       },
     ],
     howTitle: 'MVCC는 어떻게 동작하나요?',
     howDesc:
-      '사용자가 데이터를 수정할 때마다 Oracle은 Undo 항목을 만들어 Undo Segment에 기록합니다. Undo Segment에는 미커밋 또는 최근 커밋된 트랜잭션에 의해 변경된 데이터의 이전 값이 담깁니다.',
-    crCloneTitle: 'CR Clone 생성 과정',
+      '데이터를 수정할 때마다 Oracle은 Undo 항목을 만들어 Undo Segment에 기록해요. Undo Segment에는 커밋되지 않은, 또는 최근에 커밋된 트랜잭션이 바꾼 데이터의 이전 값이 들어 있어요.',
+    crCloneTitle: 'CR Clone은 어떻게 만들어지나요?',
     crCloneDesc:
-      'SELECT가 SCN 10023에서 시작되었는데, 읽어야 할 블록의 SCN이 10024라면 Oracle은 어떻게 할까요? 해당 블록을 새 버퍼로 복사한 뒤 Undo 데이터를 적용해 이전 버전을 재구성합니다. 이렇게 재구성된 블록을 CR Clone(Consistent Read Clone)이라고 합니다.',
-    steps: [
-      { num: '1', color: 'bg-blue-500', text: 'SELECT 시작 시점의 SCN을 기록합니다.' },
-      {
-        num: '2',
-        color: 'bg-indigo-500',
-        text: '블록의 SCN이 쿼리 SCN보다 크면 → 현재 블록을 새 버퍼로 복사합니다.',
-      },
-      {
-        num: '3',
-        color: 'bg-violet-500',
-        text: 'Undo에서 이전 값을 적용해 CR Clone(이전 버전)을 재구성합니다.',
-      },
-      {
-        num: '4',
-        color: 'bg-purple-500',
-        text: '쿼리 SCN 이전에 커밋된 데이터만 결과로 반환합니다.',
-      },
-    ],
+      'SELECT가 SCN 10023 시점에서 시작됐는데, 읽으려는 블록의 SCN이 10024라면 Oracle은 어떻게 할까요? 해당 블록을 새 버퍼에 복사한 다음 Undo 데이터를 적용해서 이전 버전을 재구성해요. 이렇게 다시 만들어진 블록을 CR Clone(Consistent Read Clone, 일관된 읽기 복사본)이라고 해요.',
     statementVsTransaction: '문장 수준 vs 트랜잭션 수준 읽기 일관성',
     statementVsTransactionDesc:
-      '읽기 일관성은 문장 수준(Statement-Level)과 트랜잭션 수준(Transaction-Level) 두 가지로 나뉩니다. Oracle은 기본적으로 문장 수준 읽기 일관성을 제공합니다.',
+      '읽기 일관성은 문장 수준(Statement-Level)과 트랜잭션 수준(Transaction-Level) 두 가지가 있어요. Oracle은 기본적으로 문장 수준 읽기 일관성을 제공해요.',
     undoTitle: 'ORA-01555: snapshot too old',
     undoDesc:
-      'Undo 데이터가 덮어쓰여지기 전에 오래된 쿼리의 CR Clone이 필요하면 ORA-01555: snapshot too old 오류가 발생합니다. UNDO_RETENTION 파라미터로 Undo 보관 기간을 늘려 방지할 수 있습니다.',
+      'Undo 데이터가 덮어씌워지기 전에 오래된 쿼리의 CR Clone이 필요하면 ORA-01555: snapshot too old 오류가 발생해요. UNDO_RETENTION 파라미터로 Undo 보관 기간을 늘려서 예방할 수 있어요.',
     snapshotTooOldCause:
-      '원인: Undo Segment가 재사용될 때 쿼리가 아직 이전 버전을 필요로 하는 상황입니다. 특히 오래 실행되는 배치 쿼리나 SERIALIZABLE 트랜잭션에서 발생합니다.',
+      '원인: Undo Segment가 재사용될 때 쿼리가 아직 이전 버전을 필요로 하는 상황이에요. 특히 오래 실행되는 배치 쿼리나 SERIALIZABLE 트랜잭션에서 자주 발생해요.',
   },
   en: {
     title: 'MVCC',
@@ -112,24 +94,6 @@ const T = {
     crCloneTitle: 'How CR Clones are Created',
     crCloneDesc:
       "Suppose a SELECT starts at SCN 10023 but the block it needs has SCN 10024. Oracle copies the current block to a new buffer and applies undo data to reconstruct the earlier version. These reconstructed data blocks are called consistent read (CR) clones.",
-    steps: [
-      { num: '1', color: 'bg-blue-500', text: 'The SCN at the moment SELECT starts is recorded.' },
-      {
-        num: '2',
-        color: 'bg-indigo-500',
-        text: 'If a block SCN is greater than the query SCN → copy the current block to a new buffer.',
-      },
-      {
-        num: '3',
-        color: 'bg-violet-500',
-        text: 'Apply undo data to reconstruct the earlier version as a CR Clone.',
-      },
-      {
-        num: '4',
-        color: 'bg-purple-500',
-        text: 'Return only data committed before the query SCN.',
-      },
-    ],
     statementVsTransaction: 'Statement-Level vs Transaction-Level Consistency',
     statementVsTransactionDesc:
       'Read consistency comes in two forms: statement-level and transaction-level. Oracle provides statement-level read consistency by default.',
@@ -269,7 +233,7 @@ const CRCloneDiagram = ({ lang }: { lang: 'ko' | 'en' }) => {
       </text>
       <text x="340" y="276" fontSize="9" fill="#3b82f6" textAnchor="middle">
         {isKo
-          ? 'UPDATE가 진행 중이어도 SELECT는 즉시 이전 버전을 반환합니다'
+          ? 'UPDATE가 진행 중이어도 SELECT는 즉시 이전 버전을 반환해요'
           : 'Even while UPDATE is in progress, SELECT immediately returns the prior version'}
       </text>
 
@@ -334,21 +298,6 @@ export function MvccSection() {
 
       <AccordionSection title={t.crCloneTitle} defaultOpen>
         <Prose>{t.crCloneDesc}</Prose>
-        <div className="mt-4 space-y-3">
-          {t.steps.map((step) => (
-            <div key={step.num} className="flex items-start gap-3">
-              <span
-                className={cn(
-                  'flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white',
-                  step.color,
-                )}
-              >
-                {step.num}
-              </span>
-              <p className="text-sm text-muted-foreground leading-relaxed pt-0.5">{step.text}</p>
-            </div>
-          ))}
-        </div>
       </AccordionSection>
 
       <div className="w-full max-w-2xl mx-auto my-6 rounded-xl border border-blue-100 bg-blue-50/40 p-4">

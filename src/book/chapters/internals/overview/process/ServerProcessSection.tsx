@@ -7,58 +7,58 @@ const T = {
     title: '서버 프로세스',
     subtitle: 'SQL을 파싱·실행·반환하는 DB 서버 측 프로세스',
 
-    whatTitle: '서버 프로세스란?',
+    whatTitle: '서버 프로세스가 하는 일',
     whatP1:
-      '서버 프로세스(Server Process)는 클라이언트 프로세스가 보낸 SQL을 실제로 처리하는 주체입니다. SQL 파싱, 실행 계획 생성, 데이터 블록 읽기, 결과 반환까지 모든 "쿼리 실행" 작업이 여기서 이루어집니다.',
+      '서버 프로세스(Server Process)는 클라이언트가 보낸 SQL을 실제로 처리하는 주체예요. SQL 파싱, 실행 계획 만들기, 데이터 블록 읽기, 결과 돌려주기까지 — "쿼리 실행"과 관련된 모든 일이 여기서 이루어져요.',
     whatP2:
-      '서버 프로세스는 항상 SGA를 공유 메모리로 참조하며, 각자 고유의 PGA(Program Global Area)를 할당받습니다. 처리 모드에 따라 Dedicated(전용) 서버와 Shared(공유) 서버로 구분됩니다.',
+      '서버 프로세스는 항상 SGA(System Global Area)를 공유 메모리로 사용하고, 자기만의 PGA(Program Global Area)를 따로 할당받아요. 처리 방식에 따라 Dedicated(전용) 서버와 Shared(공유) 서버로 나뉘어요.',
 
-    dedicatedTitle: 'Dedicated Server (전용 서버)',
+    dedicatedTitle: 'Dedicated Server — 전용 서버',
     dedicatedDesc:
-      '클라이언트 프로세스 하나당 서버 프로세스 하나가 1:1로 대응합니다. 클라이언트가 연결을 유지하는 동안 해당 서버 프로세스는 다른 클라이언트를 처리하지 않습니다. 대부분의 OLTP 환경 기본값입니다.',
+      '클라이언트 하나당 서버 프로세스 하나가 1:1로 딱 붙어서 담당해요. 연결이 끊어지기 전까지는 그 서버 프로세스가 다른 클라이언트 요청을 처리하지 않아요. 대부분의 OLTP 환경에서 기본으로 사용하는 방식이에요.',
     dedicatedFeatures: [
-      '연결이 살아있는 동안 프로세스가 전용으로 묶입니다.',
-      'UGA(User Global Area)가 PGA 안에 위치합니다.',
-      '세션 수 = 서버 프로세스 수이므로, 수천 개의 동시 연결은 OS 리소스를 많이 사용합니다.',
-      'Connection Pool(미들티어) 없이 직접 연결 시 확장성에 제약이 생깁니다.',
+      '연결이 살아있는 동안 프로세스가 그 세션만을 위해 전용으로 묶여요.',
+      'UGA(User Global Area)가 PGA 안에 들어가요.',
+      '세션 수 = 서버 프로세스 수이기 때문에 동시 접속자가 수천 명이면 OS 리소스를 많이 사용해요.',
+      '미들티어의 Connection Pool 없이 직접 연결하면 확장성이 떨어질 수 있어요.',
     ],
 
-    sharedTitle: 'Shared Server (공유 서버)',
+    sharedTitle: 'Shared Server — 공유 서버',
     sharedDesc:
-      '여러 클라이언트가 소수의 서버 프로세스를 공유합니다. 디스패처(Dispatcher, Dnnn)가 클라이언트 요청을 수신 큐(Request Queue)에 넣으면, 유휴 서버 프로세스(Snnn)가 꺼내 처리하고 응답 큐(Response Queue)에 결과를 씁니다.',
+      '여러 클라이언트가 소수의 서버 프로세스를 함께 나눠 써요. 디스패처(Dispatcher, Dnnn)가 클라이언트 요청을 수신 큐(Request Queue)에 넣으면, 쉬고 있던 서버 프로세스(Snnn)가 꺼내서 처리하고 응답 큐(Response Queue)에 결과를 써요.',
     sharedFeatures: [
-      '디스패처(Dnnn)가 클라이언트 연결을 받아 SGA 요청 큐에 넣습니다.',
-      '서버 프로세스(Snnn)들이 큐를 돌아가며 처리합니다.',
-      'UGA가 PGA가 아닌 SGA(Large Pool)에 위치합니다.',
-      '동시 접속자 수 대비 서버 프로세스 수를 훨씬 줄일 수 있어 메모리를 절약합니다.',
-      '각 요청이 다른 서버 프로세스에서 처리될 수 있으므로 세션 컨텍스트는 SGA에 보관됩니다.',
+      '디스패처(Dnnn)가 클라이언트 연결을 받아 SGA 요청 큐에 넣어줘요.',
+      '서버 프로세스(Snnn)들이 큐를 번갈아가며 처리해요.',
+      'UGA(User Global Area)가 PGA가 아닌 SGA(Large Pool) 안에 들어가요.',
+      '동시 접속자 수 대비 서버 프로세스 수를 훨씬 줄일 수 있어서 메모리를 아껴요.',
+      '각 요청을 서로 다른 서버 프로세스가 처리할 수 있기 때문에, 세션 컨텍스트는 SGA에 보관해요.',
     ],
 
-    compTitle: '비교: Dedicated vs Shared Server',
+    compTitle: 'Dedicated vs Shared Server 비교',
     compRows: [
-      { aspect: '서버 프로세스 수',   dedicated: '세션 수와 동일 (1:1)',  shared: '소수, 여러 세션 공유' },
-      { aspect: 'UGA 위치',           dedicated: 'PGA 내부',              shared: 'SGA(Large Pool)' },
-      { aspect: '메모리 사용',         dedicated: '세션당 PGA 독립 할당',  shared: 'PGA 공유로 절약' },
-      { aspect: '적합한 환경',         dedicated: 'OLTP, 대부분의 경우',   shared: '동시 접속자 매우 많은 환경' },
+      { aspect: '서버 프로세스 수',   dedicated: '세션 수와 동일 (1:1)',  shared: '소수, 여러 세션이 공유' },
+      { aspect: 'UGA 위치',           dedicated: 'PGA 내부',              shared: 'SGA (Large Pool)' },
+      { aspect: '메모리 사용',         dedicated: '세션마다 PGA 독립 할당', shared: 'PGA 공유로 절약' },
+      { aspect: '적합한 환경',         dedicated: 'OLTP, 대부분의 경우',   shared: '동시 접속자가 아주 많은 환경' },
       { aspect: '설정',               dedicated: '기본값 (별도 설정 불필요)', shared: 'DISPATCHERS, SHARED_SERVERS 파라미터 필요' },
     ],
 
     dispatcherTitle: '디스패처(Dispatcher, Dnnn)',
     dispatcherDesc:
-      'Shared Server 모드에서 디스패처는 클라이언트와 직접 통신합니다. 여러 클라이언트의 연결 요청을 수신하고, 각 요청을 SGA 내 요청 큐(Request Queue)에 넣습니다. 서버 프로세스가 처리를 완료하면 응답을 응답 큐(Response Queue)에 쓰고, 디스패처가 이를 클라이언트에게 돌려줍니다.',
+      'Shared Server 모드에서 디스패처가 클라이언트와 직접 통신해요. 여러 클라이언트의 요청을 받아 SGA 안의 요청 큐(Request Queue)에 넣고, 서버 프로세스가 처리를 마치면 응답 큐(Response Queue)에서 결과를 가져다가 클라이언트에게 돌려줘요.',
     dispatcherNote:
-      'V$DISPATCHER 뷰로 현재 디스패처 상태와 부하를 모니터링할 수 있습니다. 디스패처가 병목이면 DISPATCHERS 파라미터로 수를 늘립니다.',
+      'V$DISPATCHER 뷰로 디스패처의 현재 상태와 부하를 확인할 수 있어요. 디스패처가 병목이면 DISPATCHERS 파라미터로 수를 늘리면 돼요.',
 
     pgaPosTitle: 'PGA 위치 비교 (세션별 메모리)',
     pgaPosNote:
-      'Dedicated Server에서 PGA는 서버 프로세스마다 독립적으로 OS에서 할당됩니다. Shared Server에서는 세션 컨텍스트(UGA)를 Large Pool에 저장하기 때문에, Large Pool 크기를 충분히 확보해야 합니다.',
+      'Dedicated Server에서는 서버 프로세스마다 OS로부터 PGA를 독립적으로 받아요. Shared Server에서는 세션 컨텍스트(UGA)를 Large Pool에 저장하기 때문에, Large Pool 크기를 넉넉하게 잡아야 해요.',
 
     paramsTitle: '관련 파라미터',
     params: [
-      { name: 'DISPATCHERS',       desc: "Shared Server의 디스패처 수와 프로토콜 설정. 예: \"(PROTOCOL=TCP)(DISPATCHERS=3)\"" },
-      { name: 'SHARED_SERVERS',    desc: '시작 시 생성할 서버 프로세스 수. Oracle이 부하에 따라 자동으로 늘리거나 줄입니다.' },
-      { name: 'MAX_SHARED_SERVERS',desc: 'Shared Server 프로세스의 최대 수.' },
-      { name: 'MAX_DISPATCHERS',   desc: '디스패처 프로세스의 최대 수.' },
+      { name: 'DISPATCHERS',       desc: "Shared Server의 디스패처 수와 프로토콜을 설정해요. 예: \"(PROTOCOL=TCP)(DISPATCHERS=3)\"" },
+      { name: 'SHARED_SERVERS',    desc: '시작 시 만들 서버 프로세스 수예요. Oracle이 부하에 따라 자동으로 늘리거나 줄여요.' },
+      { name: 'MAX_SHARED_SERVERS',desc: 'Shared Server 프로세스의 최대 수예요.' },
+      { name: 'MAX_DISPATCHERS',   desc: '디스패처 프로세스의 최대 수예요.' },
     ],
   },
   en: {

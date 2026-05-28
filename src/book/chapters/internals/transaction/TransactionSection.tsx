@@ -13,10 +13,10 @@ export function TransactionSection() {
 
   const conceptItems = isKo
     ? [
-        { icon: <IconHistory size={20} stroke={1.5} />, title: 'COMMIT', desc: '트랜잭션의 모든 변경을 영구적으로 확정합니다.' },
-        { icon: <IconRefresh size={20} stroke={1.5} />, title: 'ROLLBACK', desc: '트랜잭션의 모든 변경을 취소하고 이전 상태로 되돌립니다.' },
-        { icon: <IconFlag size={20} stroke={1.5} />, title: 'SAVEPOINT', desc: '트랜잭션 중간에 복원 지점을 설정합니다.' },
-        { icon: <IconShieldCheck size={20} stroke={1.5} />, title: 'ACID', desc: '원자성, 일관성, 격리성, 지속성 — 트랜잭션의 네 가지 보장.' },
+        { icon: <IconHistory size={20} stroke={1.5} />, title: 'COMMIT', desc: '트랜잭션의 모든 변경을 영구적으로 확정해요.' },
+        { icon: <IconRefresh size={20} stroke={1.5} />, title: 'ROLLBACK', desc: '트랜잭션의 모든 변경을 취소하고 이전 상태로 되돌려요.' },
+        { icon: <IconFlag size={20} stroke={1.5} />, title: 'SAVEPOINT', desc: '트랜잭션 중간에 복원 지점을 설정해요.' },
+        { icon: <IconShieldCheck size={20} stroke={1.5} />, title: 'ACID', desc: '원자성, 일관성, 격리성, 지속성 — 트랜잭션의 네 가지 보장이에요.' },
       ]
     : [
         { icon: <IconHistory size={20} stroke={1.5} />, title: 'COMMIT', desc: 'Makes all changes in the transaction permanent.' },
@@ -31,7 +31,7 @@ export function TransactionSection() {
         icon={<IconRefresh size={36} stroke={1.5} className="text-teal-500" />}
         title={isKo ? '트랜잭션(Transaction)' : 'Transactions'}
         subtitle={isKo
-          ? '트랜잭션은 Oracle이 데이터를 안전하게 변경하는 논리적 작업 단위입니다. 왼쪽 목차에서 하위 섹션을 선택하세요.'
+          ? '트랜잭션은 Oracle이 데이터를 안전하게 변경하는 논리적 작업 단위예요. 왼쪽 목차에서 하위 섹션을 선택하세요.'
           : 'A transaction is the logical unit of work Oracle uses to modify data safely. Select a subsection from the left table of contents.'}
       />
       <ConceptGrid items={conceptItems} />

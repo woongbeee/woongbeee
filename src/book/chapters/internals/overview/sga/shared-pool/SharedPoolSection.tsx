@@ -21,65 +21,65 @@ const T = {
     subtitle: 'SQL 파싱 결과와 메타데이터를 모든 세션이 공유하는 SGA 구성 요소',
 
     // ── What is ──
-    whatTitle: 'Shared Pool이란?',
-    whatP1: 'Shared Pool은 SGA 안에서 Buffer Cache 다음으로 중요한 메모리 영역입니다. 핵심 역할은 딱 하나입니다 — "같은 SQL을 다시 파싱하지 않는다."',
-    whatP2: 'Oracle이 SQL 문장을 처음 받으면 문법 검사 → 권한 확인 → 실행 계획 수립의 과정을 거쳐야 합니다. 이 과정을 Hard Parse라고 하며 CPU를 많이 씁니다. Shared Pool은 그 결과물(파싱된 커서·실행 계획)을 캐시해 두었다가, 동일한 SQL이 다시 오면 이 캐시를 재사용(Soft Parse)하게 합니다.',
-    whatP3: '단순히 SQL만 캐시하는 게 아닙니다. 테이블·컬럼·권한 등 데이터 딕셔너리 메타데이터, 쿼리 결과, PL/SQL 코드까지 하나의 공유 메모리 풀 안에서 관리됩니다.',
+    whatTitle: 'Shared Pool이 뭐예요?',
+    whatP1: 'Shared Pool은 SGA 안에서 Buffer Cache 다음으로 중요한 메모리 영역이에요. 핵심 역할은 딱 하나예요 — "같은 SQL을 두 번 파싱하지 않는다."',
+    whatP2: 'Oracle이 SQL 문장을 처음 받으면 문법 검사 → 권한 확인 → 실행 계획 수립 과정을 거쳐야 해요. 이걸 Hard Parse라고 부르는데 CPU를 꽤 많이 써요. Shared Pool은 그 결과물(파싱된 커서·실행 계획)을 캐시해 두었다가, 똑같은 SQL이 다시 오면 이 캐시를 그대로 재사용(Soft Parse)해요.',
+    whatP3: '단순히 SQL만 캐시하는 게 아니에요. 테이블·컬럼·권한 같은 데이터 딕셔너리 메타데이터, 쿼리 결과, PL/SQL 코드까지 하나의 공유 메모리 풀 안에서 함께 관리돼요.',
 
     // ── Components ──
     componentsTitle: 'Shared Pool의 구성',
 
     libTitle: 'Library Cache',
-    libDesc: '파싱된 SQL 커서와 실행 계획을 저장하는 핵심 영역. Shared SQL Area, PL/SQL 컴파일 코드, Java 클래스 등이 포함됩니다. 모든 세션이 동일한 커서를 공유하므로, 100개 세션이 같은 SQL을 실행해도 실행 계획은 하나만 메모리에 존재합니다.',
+    libDesc: '파싱된 SQL 커서와 실행 계획을 저장하는 핵심 영역이에요. Shared SQL Area, PL/SQL 컴파일 코드, Java 클래스 등이 여기 들어와요. 모든 세션이 같은 커서를 공유하기 때문에, 100개 세션이 동시에 같은 SQL을 실행해도 메모리에 실행 계획은 하나만 있으면 돼요.',
 
     dictTitle: 'Data Dictionary Cache (Row Cache)',
-    dictDesc: '테이블 정의, 컬럼 목록, 권한, 인덱스 정보 등 데이터 딕셔너리를 행(Row) 단위로 캐시합니다. SQL 파싱 때 "이 테이블이 있는지, 이 컬럼이 맞는지" 확인할 때 반드시 필요합니다. Row Cache라고도 부릅니다.',
+    dictDesc: '테이블 정의, 컬럼 목록, 권한, 인덱스 정보 같은 데이터 딕셔너리를 행(Row) 단위로 캐시해요. SQL을 파싱할 때 "이 테이블이 진짜 있나? 이 컬럼 맞나?" 확인하려면 반드시 필요해요. Row Cache라고도 불러요.',
 
     resultTitle: 'Server Result Cache',
-    resultDesc: '쿼리의 실행 결과 자체를 캐시합니다. 동일한 쿼리가 다시 오면 재실행 없이 저장된 결과를 바로 반환합니다. 참조 객체가 변경되면 자동으로 무효화됩니다.',
+    resultDesc: '쿼리의 실행 결과 자체를 캐시해요. 똑같은 쿼리가 다시 오면 SQL을 다시 실행하지 않고 저장된 결과를 바로 돌려줘요. 참조하는 객체가 바뀌면 자동으로 무효화돼요.',
 
     reservedTitle: 'Reserved Pool',
-    reservedDesc: '5 KB 이상의 큰 메모리 청크가 필요할 때(대형 PL/SQL 패키지, 복잡한 실행 계획 등)를 위해 예약해 둔 영역. 일반 Shared Pool 영역이 단편화되더라도 큰 할당이 실패하지 않도록 보호합니다.',
+    reservedDesc: '5 KB 이상의 큰 메모리 덩어리가 필요할 때(대형 PL/SQL 패키지, 복잡한 실행 계획 등)를 위해 미리 예약해 둔 영역이에요. 일반 Shared Pool 영역이 단편화되더라도 큰 할당이 실패하지 않도록 보호해 줘요.',
 
     // ── Parse lifecycle ──
-    parseTitle: 'SQL은 어떻게 처리되나? — Hard Parse vs Soft Parse',
-    parseDesc: 'SQL이 Oracle에 도착하면 Library Cache를 먼저 검색합니다. 결과에 따라 완전히 다른 경로를 밟습니다.',
+    parseTitle: 'SQL은 어떻게 처리될까요? — Hard Parse vs Soft Parse',
+    parseDesc: 'SQL이 Oracle에 도착하면 Library Cache를 먼저 뒤져봐요. 거기서 뭘 찾느냐에 따라 완전히 다른 길을 가요.',
 
     hardTitle: 'Hard Parse — 처음 보는 SQL',
-    hardDesc: 'Library Cache에 일치하는 커서가 없을 때 수행하는 전체 파싱 과정입니다. CPU를 집중적으로 사용합니다.',
+    hardDesc: 'Library Cache에 맞는 커서가 없을 때 처음부터 전부 파싱하는 과정이에요. CPU를 꽤 많이 써요.',
     hardSteps: [
-      { n: '1', label: '문법 검사 (Syntax Check)', desc: 'SELECT, FROM, WHERE 등 SQL 문법이 올바른지 확인합니다.' },
-      { n: '2', label: '의미 검사 (Semantic Check)', desc: '테이블·컬럼이 실제로 존재하는지, 접근 권한이 있는지 Data Dictionary Cache에서 확인합니다.' },
-      { n: '3', label: '실행 계획 생성 (Optimization)', desc: 'CBO(Cost-Based Optimizer)가 통계 정보를 바탕으로 여러 실행 계획의 비용을 추정하고 최선을 선택합니다.' },
-      { n: '4', label: 'Library Cache에 저장', desc: '완성된 커서(파싱 트리 + 실행 계획)를 Shared SQL Area에 저장합니다. 이후 동일 SQL 재실행 시 재사용됩니다.' },
+      { n: '1', label: '문법 검사 (Syntax Check)', desc: 'SELECT, FROM, WHERE 같은 SQL 문법이 올바른지 확인해요.' },
+      { n: '2', label: '의미 검사 (Semantic Check)', desc: '테이블·컬럼이 실제로 있는지, 접근 권한은 있는지 Data Dictionary Cache에서 확인해요.' },
+      { n: '3', label: '실행 계획 생성 (Optimization)', desc: 'CBO(Cost-Based Optimizer, 비용 기반 옵티마이저)가 통계 정보를 바탕으로 여러 실행 계획의 비용을 비교해서 가장 좋은 걸 골라요.' },
+      { n: '4', label: 'Library Cache에 저장', desc: '완성된 커서(파싱 트리 + 실행 계획)를 Shared SQL Area에 저장해요. 이후 같은 SQL이 오면 다시 꺼내 써요.' },
     ],
 
     softTitle: 'Soft Parse — 이미 캐시된 SQL',
-    softDesc: 'Library Cache에 동일한 SQL이 있으면 단계 1~3을 건너뛰고 저장된 커서를 바로 재사용합니다. CPU 비용이 거의 없습니다.',
-    softNote: 'Soft Parse가 되려면 SQL 문자열이 대소문자·공백·줄바꿈까지 완전히 일치해야 합니다. "SELECT * FROM EMP"와 "select * from emp"는 서로 다른 SQL로 각각 Hard Parse됩니다.',
+    softDesc: 'Library Cache에 똑같은 SQL이 있으면 1~3단계를 건너뛰고 저장된 커서를 바로 재사용해요. CPU 비용이 거의 없어요.',
+    softNote: 'Soft Parse가 되려면 SQL 문자열이 대소문자·공백·줄바꿈까지 완전히 똑같아야 해요. "SELECT * FROM EMP"와 "select * from emp"는 Oracle 눈에 서로 다른 SQL이라 각각 따로 Hard Parse돼요.',
 
     // ── Shared vs Private ──
     sharedPrivateTitle: 'Shared SQL Area vs Private SQL Area',
-    sharedPrivateDesc: '하나의 SQL은 두 가지 메모리 영역을 동시에 사용합니다. SGA의 Shared SQL Area는 모든 세션이 공유하고, PGA의 Private SQL Area는 세션마다 독립적으로 존재합니다.',
+    sharedPrivateDesc: 'SQL 하나가 실행될 때 두 가지 메모리 영역이 동시에 쓰여요. SGA의 Shared SQL Area는 모든 세션이 함께 쓰고, PGA의 Private SQL Area는 세션마다 따로 존재해요.',
     sharedAreaLabel: 'Shared SQL Area',
-    sharedAreaDesc: '파싱 트리, 실행 계획, 최적화 정보 — 모든 세션이 공유하는 읽기 전용 영역. Library Cache에 저장됩니다.',
+    sharedAreaDesc: '파싱 트리, 실행 계획, 최적화 정보 — 모든 세션이 공유하는 읽기 전용 영역이에요. Library Cache에 저장돼요.',
     privateAreaLabel: 'Private SQL Area',
-    privateAreaDesc: '바인드 변수 값, 쿼리 실행 상태(Persistent Area + Runtime Area) — 서버 프로세스의 PGA에 저장됩니다.',
-    sharedPrivateNote: '100개 세션이 같은 SQL을 실행하면 Shared SQL Area는 1개, Private SQL Area는 세션마다 1개씩 100개가 생깁니다. Shared Pool 덕분에 SQL 실행에 필요한 메모리가 크게 절약됩니다.',
+    privateAreaDesc: '바인드 변수 값, 쿼리 실행 상태(Persistent Area + Runtime Area) — 각 서버 프로세스의 PGA에 저장돼요.',
+    sharedPrivateNote: '100개 세션이 같은 SQL을 실행하면 Shared SQL Area는 딱 1개, Private SQL Area는 세션마다 하나씩 100개가 생겨요. Shared Pool 덕분에 메모리를 훨씬 효율적으로 쓸 수 있어요.',
 
     // ── Child cursor ──
     childCursorTitle: 'Parent Cursor와 Child Cursor',
-    childCursorDesc: 'Library Cache의 커서는 두 단계로 구성됩니다. Parent Cursor는 SQL 텍스트 자체를 키로 갖는 해시 버킷 항목입니다. 하지만 같은 SQL 텍스트라도 실행 환경이 다르면(다른 스키마, 다른 최적화 파라미터, 다른 바인드 타입 등) 실행 계획이 달라질 수 있습니다. 이 경우 Oracle은 동일한 Parent 아래에 별도의 Child Cursor를 추가합니다.',
+    childCursorDesc: 'Library Cache의 커서는 두 단계로 이루어져 있어요. Parent Cursor는 SQL 텍스트 자체를 키로 갖는 해시 버킷 항목이에요. 그런데 같은 SQL 텍스트라도 실행 환경이 다르면(다른 스키마, 다른 옵티마이저 파라미터, 다른 바인드 타입 등) 실행 계획이 달라질 수 있어요. 이런 경우 Oracle은 같은 Parent 아래에 별도의 Child Cursor를 하나 더 달아줘요.',
     childCursorItems: [
-      { label: 'Parent Cursor', desc: 'SQL 텍스트의 해시값으로 찾는 항목. 텍스트가 같으면 항상 동일한 Parent를 가리킵니다.' },
-      { label: 'Child Cursor #0', desc: '첫 번째 Hard Parse로 생성된 실행 계획. 대부분의 경우 여기에서 끝납니다.' },
-      { label: 'Child Cursor #N', desc: '스키마·파라미터·바인드 타입 등의 차이로 인해 실행 계획이 달라질 때 추가됩니다.' },
+      { label: 'Parent Cursor', desc: 'SQL 텍스트의 해시값으로 찾는 항목이에요. 텍스트가 같으면 항상 같은 Parent를 가리켜요.' },
+      { label: 'Child Cursor #0', desc: '첫 번째 Hard Parse로 만들어진 실행 계획이에요. 대부분은 여기서 끝나요.' },
+      { label: 'Child Cursor #N', desc: '스키마·파라미터·바인드 타입 등이 달라서 실행 계획이 바뀔 때 추가로 붙어요.' },
     ],
-    childCursorNote: 'Child Cursor가 너무 많이 생기는 현상(Version Count 급증)은 Hard Parse 폭증의 신호입니다. V$SQL의 VERSION_COUNT 컬럼으로 확인할 수 있습니다.',
+    childCursorNote: 'Child Cursor가 너무 많이 생기는 현상(Version Count 급증)은 Hard Parse가 폭증하고 있다는 신호예요. V$SQL의 VERSION_COUNT 컬럼으로 확인할 수 있어요.',
 
     // ── Bind variables ──
     bindTitle: '바인드 변수와 Shared Pool',
-    bindDesc: 'Shared Pool을 효율적으로 쓰려면 바인드 변수(:v1, :p1 등)를 사용해야 합니다.',
+    bindDesc: 'Shared Pool을 효율적으로 쓰려면 바인드 변수(:v1, :p1 등)를 활용해야 해요.',
     bindBadSql: `-- Hard Parse 3번 발생 (리터럴 값이 다름)
 SELECT * FROM employees WHERE employee_id = 100;
 SELECT * FROM employees WHERE employee_id = 101;
@@ -89,34 +89,34 @@ SELECT * FROM employees WHERE employee_id = :id;
 -- :id = 100 → Soft Parse
 -- :id = 101 → Soft Parse
 -- :id = 102 → Soft Parse`,
-    bindNote: '리터럴 값(100, 101, 102)이 SQL 안에 그대로 들어가면 Oracle은 각각을 다른 SQL로 취급해 매번 Hard Parse합니다. 바인드 변수로 바꾸면 SQL 텍스트가 동일해지므로 첫 번째만 Hard Parse하고 이후는 모두 Soft Parse로 재사용합니다.',
+    bindNote: '리터럴 값(100, 101, 102)이 SQL 안에 그대로 들어가면 Oracle은 각각을 완전히 다른 SQL로 보고 매번 Hard Parse해요. 바인드 변수로 바꾸면 SQL 텍스트가 항상 같아지니까 처음 한 번만 Hard Parse하고 그 이후는 전부 Soft Parse로 재사용할 수 있어요.',
 
     // ── Result Cache ──
     resultCacheTitle: 'Server Result Cache — 쿼리 결과까지 캐시',
-    resultCacheP1: 'Library Cache가 실행 계획을 캐시한다면, Result Cache는 쿼리의 최종 결과 데이터 자체를 캐시합니다. 동일한 쿼리가 다시 오면 SQL을 아예 실행하지 않고 캐시된 결과를 바로 반환합니다.',
-    resultCacheP2: '참조하는 테이블이 변경되면 Oracle이 자동으로 해당 캐시를 무효화합니다. 자주 조회되지만 잘 바뀌지 않는 집계 쿼리, 코드 테이블 조회 등에 효과적입니다.',
+    resultCacheP1: 'Library Cache가 실행 계획을 캐시한다면, Result Cache는 쿼리의 최종 결과 데이터 자체를 캐시해요. 똑같은 쿼리가 다시 오면 SQL을 아예 실행하지 않고 캐시된 결과를 바로 돌려줘요.',
+    resultCacheP2: '참조하는 테이블이 바뀌면 Oracle이 자동으로 해당 캐시를 무효화해요. 자주 조회되지만 잘 안 바뀌는 집계 쿼리나 코드 테이블 조회 같은 경우에 특히 효과적이에요.',
     resultCacheSql: `-- RESULT_CACHE 힌트로 결과 캐시 요청
 SELECT /*+ RESULT_CACHE */ dept_id, COUNT(*) AS cnt
 FROM   employees
 GROUP  BY dept_id;`,
-    resultCacheNote: 'RESULT_CACHE_MODE = FORCE 설정 시 모든 쿼리에 자동 적용됩니다. V$RESULT_CACHE_OBJECTS 뷰에서 캐시 현황을 확인할 수 있습니다.',
+    resultCacheNote: 'RESULT_CACHE_MODE = FORCE로 설정하면 모든 쿼리에 자동으로 적용돼요. V$RESULT_CACHE_OBJECTS 뷰에서 캐시 현황을 확인할 수 있어요.',
 
     // ── Parameters ──
     paramsTitle: '주요 파라미터',
     params: [
-      { name: 'SHARED_POOL_SIZE', desc: 'Shared Pool 전체 크기. ASMM(SGA_TARGET 설정) 시 자동 조정됩니다.' },
-      { name: 'SHARED_POOL_RESERVED_SIZE', desc: '예약 풀 크기. 보통 SHARED_POOL_SIZE의 10~30%로 설정합니다.' },
-      { name: 'RESULT_CACHE_MODE', desc: 'Result Cache 동작 방식. OFF(기본) / MANUAL(힌트 사용) / FORCE(항상 캐시).' },
+      { name: 'SHARED_POOL_SIZE', desc: 'Shared Pool 전체 크기예요. ASMM(SGA_TARGET 설정) 환경에서는 Oracle이 자동으로 조정해 줘요.' },
+      { name: 'SHARED_POOL_RESERVED_SIZE', desc: '예약 풀 크기예요. 보통 SHARED_POOL_SIZE의 10~30% 정도로 설정해요.' },
+      { name: 'RESULT_CACHE_MODE', desc: 'Result Cache 동작 방식이에요. OFF(기본) / MANUAL(힌트 사용) / FORCE(항상 캐시) 중 하나를 고를 수 있어요.' },
     ],
 
     // ── Summary ──
     summaryTitle: 'Shared Pool 핵심 정리',
     summaryItems: [
-      'Library Cache: 파싱된 SQL 커서와 실행 계획을 캐시 — Hard Parse를 Soft Parse로 전환',
-      'Data Dictionary Cache: 테이블·컬럼·권한 메타데이터를 행 단위로 캐시',
-      'Server Result Cache: 쿼리 결과 자체를 캐시 — 재실행 없이 즉시 반환',
-      'Reserved Pool: 큰 메모리 할당을 위한 예약 공간 — 단편화 방지',
-      '바인드 변수 사용이 Shared Pool 효율의 핵심 — 리터럴 SQL은 Hard Parse를 반복 유발',
+      'Library Cache: 파싱된 SQL 커서와 실행 계획을 캐시해요 — Hard Parse를 Soft Parse로 바꿔줘요',
+      'Data Dictionary Cache: 테이블·컬럼·권한 메타데이터를 행 단위로 캐시해요',
+      'Server Result Cache: 쿼리 결과 자체를 캐시해요 — 재실행 없이 바로 돌려줄 수 있어요',
+      'Reserved Pool: 큰 메모리 할당을 위해 예약해 둔 공간이에요 — 단편화로 인한 실패를 막아줘요',
+      '바인드 변수 사용이 Shared Pool 효율의 핵심이에요 — 리터럴 SQL은 Hard Parse를 계속 유발해요',
     ],
   },
 

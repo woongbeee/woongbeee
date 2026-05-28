@@ -2,8 +2,6 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useSimulationStore } from '@/store/simulationStore'
 import { ChapterTitle, SectionTitle, Prose, InfoBox, Divider } from '../../../shared'
-import { OracleInstanceMap } from '../../shared/OracleInstanceMap'
-import type { InstanceComponentId } from '../../shared/OracleInstanceMap'
 import { cn } from '@/lib/utils'
 import {
   IconCpu,
@@ -11,33 +9,33 @@ import {
   IconServer,
   IconNetwork,
 } from '@tabler/icons-react'
+import { SgaPositionDiagram } from './shared/SgaPositionDiagram'
+import type { SgaComponentId } from './shared/SgaPositionDiagram'
 
 // ── Translation strings ────────────────────────────────────────────────────
 
 const T = {
   ko: {
     title: 'SGA — System Global Area',
-    subtitle: '모든 서버 프로세스와 백그라운드 프로세스가 함께 읽고 쓰는 공용 메모리 공간입니다. Oracle 인스턴스가 시작될 때 운영체제로부터 한 번에 예약하며, 인스턴스가 살아 있는 동안 유지됩니다.',
+    subtitle: '모든 서버 프로세스와 백그라운드 프로세스가 함께 읽고 쓰는 공용 메모리 공간이에요. Oracle 인스턴스가 시작될 때 운영체제에서 통째로 예약하고, 인스턴스가 살아 있는 동안 유지돼요.',
 
-    whatTitle: 'SGA란 무엇인가?',
-    whatP1: 'Oracle 인스턴스를 시작하면 OS가 메모리의 한 영역을 통째로 Oracle에게 넘깁니다. 이 영역이 SGA(System Global Area)입니다. 서버에 접속한 모든 세션, 모든 백그라운드 프로세스가 이 메모리를 공유합니다.',
-    whatP2: 'PGA가 "내 방(세션 전용)"이라면 SGA는 "공용 라운지"입니다. Buffer Cache, Shared Pool, Redo Log Buffer 등 Oracle의 핵심 캐시 구조가 모두 SGA 안에 있습니다. SGA의 크기와 구성 방식은 성능과 직결되며, DBA가 가장 먼저 튜닝하는 영역이기도 합니다.',
-    whatP3: 'Oracle 10g부터는 ASMM(Automatic Shared Memory Management)으로 SGA 내부 구성 요소의 크기를 자동으로 조정할 수 있고, 12c부터는 SGA와 PGA를 합친 Memory Target(AMM)도 지원합니다.',
+    whatTitle: 'SGA가 뭐예요?',
+    whatP1: 'Oracle 인스턴스를 시작하면 OS가 메모리의 한 영역을 통째로 Oracle에 넘겨줘요. 이 영역이 SGA(System Global Area)예요. 서버에 접속한 모든 세션과 모든 백그라운드 프로세스가 이 메모리를 함께 써요.',
+    whatP2: 'PGA가 "나만 쓰는 방(세션 전용)"이라면 SGA는 "모두가 쓰는 공용 라운지"예요. Buffer Cache, Shared Pool, Redo Log Buffer 같은 Oracle의 핵심 캐시 구조가 모두 SGA 안에 자리잡고 있어요. SGA 크기와 구성 방식은 성능과 직결되기 때문에 DBA가 가장 먼저 튜닝하는 영역이기도 해요.',
+    whatP3: 'Oracle 10g부터는 ASMM(Automatic Shared Memory Management, 자동 공유 메모리 관리)으로 SGA 내부 구성 요소 크기를 자동으로 조정할 수 있고, 12c부터는 SGA와 PGA를 합쳐서 관리하는 AMM(Automatic Memory Management, 자동 메모리 관리)도 지원해요.',
 
     serverModeTitle: 'Dedicated Server vs RAC — SGA가 달라지는 방식',
-    serverModeDesc: '동일한 SGA 개념이 서버 구성 방식에 따라 어떻게 달라지는지 살펴봅니다.',
+    serverModeDesc: '같은 SGA 개념이 서버 구성 방식에 따라 어떻게 달라지는지 살펴봐요.',
 
     dedicatedLabel: 'Dedicated Server',
     racLabel: 'RAC (Real Application Clusters)',
 
-    dedicatedDesc: '가장 일반적인 구성입니다. 서버 한 대 위에서 Oracle 인스턴스 하나가 뜨고, 그 인스턴스의 SGA를 모든 세션이 공유합니다. SGA는 서버 물리 메모리 위에 단 하나 존재합니다.',
-    racDesc: '여러 서버(노드)가 동일한 데이터베이스 파일을 공유하는 고가용성 아키텍처입니다. 각 노드는 독립적인 인스턴스와 독립적인 SGA를 가집니다. 노드 간 데이터 일관성은 GCS/GES 레이어(Cache Fusion)가 네트워크를 통해 유지합니다.',
+    dedicatedDesc: '가장 일반적인 구성이에요. 서버 한 대 위에서 Oracle 인스턴스 하나가 뜨고, 그 인스턴스의 SGA를 모든 세션이 함께 써요. SGA는 서버 물리 메모리 위에 딱 하나만 존재해요.',
+    racDesc: '여러 서버(노드)가 동일한 데이터베이스 파일을 공유하는 고가용성 구조예요. 각 노드는 독립적인 인스턴스와 독립적인 SGA를 가져요. 노드 간 데이터 일관성은 GCS/GES 레이어(Cache Fusion)가 네트워크를 통해 유지해요.',
 
     tableHeaders: ['항목', 'Dedicated Server', 'RAC'],
     tableHeadersEn: ['Item', 'Dedicated Server', 'RAC'],
 
-    componentsTitle: 'SGA 구성 요소',
-    componentsDesc: '각 항목을 클릭하면 다이어그램에서 해당 위치가 강조됩니다.',
     clickHint: '항목을 클릭하세요',
   },
   en: {
@@ -61,8 +59,6 @@ const T = {
     tableHeaders: ['Item', 'Dedicated Server', 'RAC'],
     tableHeadersEn: ['Item', 'Dedicated Server', 'RAC'],
 
-    componentsTitle: 'SGA Components',
-    componentsDesc: 'Click any component to highlight it in the diagram.',
     clickHint: 'Click a component',
   },
 }
@@ -94,7 +90,6 @@ type SgaDetail = { term: string; desc: string; isParam?: boolean }
 
 type SgaComponent = {
   id: string
-  highlightIds: InstanceComponentId[]
   labelKo: string
   labelEn: string
   tagColor: string
@@ -107,16 +102,15 @@ type SgaComponent = {
 const SGA_COMPONENTS: SgaComponent[] = [
   {
     id: 'buffer-cache',
-    highlightIds: ['buffer-cache'],
     labelKo: 'Buffer Cache',
     labelEn: 'Buffer Cache',
     tagColor: 'bg-blue-500',
-    descKo: '디스크에서 읽어온 데이터 블록(기본 8KB)을 메모리에 보관하는 캐시입니다. 같은 블록이 다시 필요할 때 디스크 접근 없이 메모리에서 바로 꺼내 씁니다. SGA 안에서 가장 큰 비중을 차지하며, Oracle 성능의 핵심 지표인 Buffer Cache Hit Ratio에 직접 영향을 줍니다.',
+    descKo: '디스크에서 읽어온 데이터 블록(기본 8KB)을 메모리에 보관하는 캐시예요. 같은 블록이 다시 필요할 때 디스크에 가지 않고 메모리에서 바로 꺼내 써요. SGA 안에서 가장 큰 비중을 차지하고, Oracle 성능의 핵심 지표인 Buffer Cache Hit Ratio에 직접 영향을 줘요.',
     descEn: 'A cache that holds data blocks (8 KB by default) read from disk. When the same block is needed again, Oracle serves it from memory instead of hitting disk. It is the largest component in the SGA and directly determines the Buffer Cache Hit Ratio — Oracle\'s most watched performance metric.',
     detailsKo: [
-      { term: 'LRU 알고리즘', desc: '가장 오래 사용되지 않은 블록을 밀어내어 새 블록을 올릴 공간을 확보합니다.' },
-      { term: 'Dirty Buffer', desc: '메모리에서 수정됐지만 아직 디스크에 쓰이지 않은 블록. DBWn이 플러시합니다.' },
-      { term: 'DB_CACHE_SIZE', desc: 'SGA 내 Buffer Cache 크기를 지정하는 파라미터. ASMM 사용 시 자동 조정됩니다.', isParam: true },
+      { term: 'LRU 알고리즘', desc: '가장 오랫동안 쓰이지 않은 블록을 밀어내고 새 블록이 들어올 공간을 만듭니다.' },
+      { term: 'Dirty Buffer', desc: '메모리에서 수정됐지만 아직 디스크에 쓰이지 않은 블록. DBWn(데이터베이스 라이터)이 이걸 주기적으로 디스크에 씁니다.' },
+      { term: 'DB_CACHE_SIZE', desc: 'SGA 내 Buffer Cache 크기를 지정하는 파라미터예요. ASMM을 쓰면 자동으로 조정돼요.', isParam: true },
     ],
     detailsEn: [
       { term: 'LRU algorithm', desc: 'Evicts the least recently used block to make room for a new one.' },
@@ -126,16 +120,15 @@ const SGA_COMPONENTS: SgaComponent[] = [
   },
   {
     id: 'shared-pool',
-    highlightIds: ['shared-pool', 'library-cache', 'dict-cache'],
     labelKo: 'Shared Pool',
     labelEn: 'Shared Pool',
     tagColor: 'bg-indigo-500',
-    descKo: 'SQL 파싱 결과(실행 계획)와 테이블·컬럼 메타데이터를 캐시하는 영역입니다. Library Cache와 Dictionary Cache(Row Cache)로 구성됩니다. 같은 SQL이 다시 오면 파싱을 건너뛰고 Library Cache의 커서를 재사용(Soft Parse)하여 CPU를 절약합니다.',
+    descKo: 'SQL 파싱 결과(실행 계획)와 테이블·컬럼 메타데이터를 캐시하는 영역이에요. Library Cache와 Dictionary Cache(Row Cache)로 구성돼요. 같은 SQL이 다시 들어오면 파싱을 건너뛰고 Library Cache의 커서를 재사용(Soft Parse)해서 CPU를 아껴요.',
     descEn: 'Caches SQL parse results (execution plans) and table/column metadata. Consists of the Library Cache and Dictionary Cache (Row Cache). When the same SQL arrives again, Oracle skips parsing and reuses the cached cursor (Soft Parse), saving CPU.',
     detailsKo: [
-      { term: 'Library Cache', desc: 'SQL 커서(파싱 트리 + 실행 계획)를 저장. Hard Parse 비용을 줄이는 핵심 구조.' },
-      { term: 'Dictionary Cache', desc: '테이블·컬럼·권한 등 딕셔너리 메타데이터를 행 단위로 캐시. Row Cache라고도 부름.' },
-      { term: 'SHARED_POOL_SIZE', desc: 'Shared Pool 크기 파라미터. Library Cache 래치 경합이 심하면 늘려야 합니다.', isParam: true },
+      { term: 'Library Cache', desc: 'SQL 커서(파싱 트리 + 실행 계획)를 저장해요. Hard Parse 비용을 줄이는 핵심 구조예요.' },
+      { term: 'Dictionary Cache', desc: '테이블·컬럼·권한 같은 딕셔너리 메타데이터를 행(Row) 단위로 캐시해요. Row Cache라고도 불러요.' },
+      { term: 'SHARED_POOL_SIZE', desc: 'Shared Pool 크기를 지정하는 파라미터예요. Library Cache 래치 경합이 심하면 늘려야 해요.', isParam: true },
     ],
     detailsEn: [
       { term: 'Library Cache', desc: 'Stores SQL cursors (parse tree + execution plan). Core structure for reducing Hard Parse cost.' },
@@ -145,16 +138,15 @@ const SGA_COMPONENTS: SgaComponent[] = [
   },
   {
     id: 'redo-buffer',
-    highlightIds: ['redo-buffer'],
     labelKo: 'Redo Log Buffer',
     labelEn: 'Redo Log Buffer',
     tagColor: 'bg-orange-500',
-    descKo: '데이터 변경 내역("이 블록의 이 값을 저 값으로 바꿨다")을 순서대로 기록하는 메모리 링 버퍼입니다. LGWR가 주기적으로, 그리고 COMMIT 시 즉시 디스크 Redo Log File에 내려씁니다. 크기가 작은 편이며 빠른 순차 쓰기를 위해 설계됐습니다.',
+    descKo: '데이터 변경 내역("이 블록의 이 값을 저 값으로 바꿨다")을 순서대로 기록하는 메모리 링 버퍼예요. LGWR(로그 라이터)가 주기적으로, 그리고 COMMIT 시 즉시 디스크 Redo Log File에 써요. 크기가 작은 편이고 빠른 순차 쓰기를 위해 설계됐어요.',
     descEn: 'A circular memory buffer that records data change vectors ("change this value in this block to that value") in sequence. LGWR periodically flushes it to disk, and always flushes it immediately at COMMIT. It is intentionally small and designed for fast sequential writes.',
     detailsKo: [
-      { term: 'WAL 원칙', desc: 'Redo Log Buffer가 디스크에 먼저 기록돼야 Buffer Cache의 변경이 유효합니다.' },
-      { term: 'Redo Log Buffer Allocation Latch', desc: '버퍼에 항목을 쓸 때 보호하는 래치. 경합 시 log buffer space 대기 이벤트가 발생합니다.' },
-      { term: 'LOG_BUFFER', desc: 'Redo Log Buffer 크기 파라미터. 일반적으로 4MB~16MB. 너무 크면 LGWR 지연이 생깁니다.', isParam: true },
+      { term: 'WAL 원칙', desc: 'Redo Log Buffer가 디스크에 먼저 기록돼야 Buffer Cache의 변경이 유효해요. 로그가 먼저, 데이터가 나중이에요.' },
+      { term: 'Redo Log Buffer Allocation Latch', desc: '버퍼에 항목을 쓸 때 보호하는 래치예요. 경합이 심하면 log buffer space 대기 이벤트가 발생해요.' },
+      { term: 'LOG_BUFFER', desc: 'Redo Log Buffer 크기를 지정하는 파라미터예요. 보통 4MB~16MB. 너무 크면 LGWR(로그 라이터) 지연이 생겨요.', isParam: true },
     ],
     detailsEn: [
       { term: 'WAL principle', desc: 'The Redo Log Buffer must be flushed to disk before a Buffer Cache change is considered durable.' },
@@ -163,22 +155,21 @@ const SGA_COMPONENTS: SgaComponent[] = [
     ],
   },
   {
-    id: 'undo',
-    highlightIds: ['undo'],
-    labelKo: 'Undo Segment (UNDO Tablespace)',
-    labelEn: 'Undo Segment (UNDO Tablespace)',
-    tagColor: 'bg-amber-500',
-    descKo: 'UPDATE·DELETE 전 원본 값을 보관하는 영역입니다. 엄밀히는 디스크 UNDO Tablespace에 저장되지만, SGA의 Buffer Cache 안에 Undo 블록이 올라와 관리됩니다. ROLLBACK 시 원본 복원, 읽기 일관성(MVCC) 시 이전 버전 재구성에 사용합니다.',
-    descEn: "Stores before-images of rows before UPDATE or DELETE. Strictly speaking it lives on disk in the UNDO Tablespace, but undo blocks are loaded into the Buffer Cache for in-memory management. Used to restore data on ROLLBACK and to reconstruct old row versions for read consistency (MVCC).",
+    id: 'large-pool',
+    labelKo: 'Large Pool',
+    labelEn: 'Large Pool',
+    tagColor: 'bg-teal-500',
+    descKo: 'RMAN(Recovery Manager) 백업·복구, 병렬 쿼리, Shared Server의 UGA처럼 크고 일회성인 메모리 요청을 전담하는 선택적 영역이에요. 이런 작업을 Shared Pool에서 처리하면 Library Cache가 밀려날 수 있어서 따로 분리해 둔 거예요.',
+    descEn: 'An optional area dedicated to large, one-time memory requests such as RMAN backup/recovery, parallel query execution, and UGA for Shared Server. Isolating these from the Shared Pool prevents them from crowding out the Library Cache.',
     detailsKo: [
-      { term: 'MVCC', desc: '읽는 쪽이 쓰는 쪽을 기다리지 않습니다. Oracle이 Undo로 이전 시점의 데이터를 재구성해 줍니다.' },
-      { term: 'Automatic Undo Management', desc: 'Oracle이 UNDO Tablespace를 자동 관리. 수동 Rollback Segment 방식을 대체합니다.' },
-      { term: 'UNDO_RETENTION', desc: 'Undo 데이터를 최소 몇 초 보유할지 설정. 긴 쿼리가 ORA-01555를 피하려면 충분히 설정해야 합니다.', isParam: true },
+      { term: 'RMAN(Recovery Manager)', desc: '백업·복구 I/O 버퍼를 Large Pool에서 할당해요. Shared Pool이 오염되는 걸 막아줘요.' },
+      { term: '병렬 쿼리 메시지 버퍼', desc: '병렬 실행 서버들끼리 통신할 때 쓰는 메시지 버퍼를 Large Pool에서 할당해요.' },
+      { term: 'LARGE_POOL_SIZE', desc: 'Large Pool 크기를 지정하는 파라미터예요. 설정하지 않으면 Large Pool 자체가 생성되지 않아요.', isParam: true },
     ],
     detailsEn: [
-      { term: 'MVCC', desc: "Readers don't wait for writers. Oracle reconstructs an older version of the data from Undo on demand." },
-      { term: 'Automatic Undo Management', desc: 'Oracle manages the UNDO Tablespace automatically, replacing the manual Rollback Segment approach.' },
-      { term: 'UNDO_RETENTION', desc: 'Sets the minimum seconds to retain undo data. Must be long enough to prevent ORA-01555 for long queries.', isParam: true },
+      { term: 'RMAN', desc: 'Backup and recovery I/O buffers are allocated from the Large Pool, keeping the Shared Pool uncontaminated.' },
+      { term: 'Parallel query message buffers', desc: 'Message buffers used for communication between parallel execution servers are allocated here.' },
+      { term: 'LARGE_POOL_SIZE', desc: 'Parameter that sets Large Pool size. If not set, no Large Pool is created.', isParam: true },
     ],
   },
 ]
@@ -217,82 +208,6 @@ function ServerModeCard({
   )
 }
 
-// ── SgaDiagram (simplified inline) ────────────────────────────────────────
-
-function SgaDiagram({
-  activeId,
-  onSelect,
-}: {
-  activeId: string | null
-  onSelect: (id: string) => void
-}) {
-  const lang = useSimulationStore((s) => s.lang)
-
-  const components = [
-    { id: 'buffer-cache',  labelKo: 'Buffer Cache',     labelEn: 'Buffer Cache',     size: 'flex-[3]', baseColor: 'border-blue-200 bg-blue-50/60 text-blue-700',   activeColor: 'border-blue-500 bg-blue-100 ring-2 ring-blue-300 text-blue-800'   },
-    { id: 'shared-pool',   labelKo: 'Shared Pool',      labelEn: 'Shared Pool',      size: 'flex-[2]', baseColor: 'border-indigo-200 bg-indigo-50/60 text-indigo-700', activeColor: 'border-indigo-500 bg-indigo-100 ring-2 ring-indigo-300 text-indigo-800' },
-    { id: 'redo-buffer',   labelKo: 'Redo Log Buffer',  labelEn: 'Redo Log Buffer',  size: 'flex-[2]', baseColor: 'border-orange-200 bg-orange-50/60 text-orange-700', activeColor: 'border-orange-500 bg-orange-100 ring-2 ring-orange-300 text-orange-800' },
-    { id: 'undo',          labelKo: 'Undo Segment',     labelEn: 'Undo Segment',     size: 'flex-[2]', baseColor: 'border-amber-200 bg-amber-50/60 text-amber-700',  activeColor: 'border-amber-500 bg-amber-100 ring-2 ring-amber-300 text-amber-800'  },
-  ]
-
-  const subComponents: Record<string, Array<{ labelKo: string; labelEn: string }>> = {
-    'shared-pool': [
-      { labelKo: 'Library Cache', labelEn: 'Library Cache' },
-      { labelKo: 'Dict Cache',    labelEn: 'Dict Cache' },
-    ],
-  }
-
-  return (
-    <div className="rounded-2xl border-2 border-blue-300 bg-blue-50/30 p-4">
-      <div className="mb-2 font-mono text-[10px] font-bold uppercase tracking-widest text-blue-600/70">
-        SGA — System Global Area
-      </div>
-      <div className="flex gap-2">
-        {components.map((c) => {
-          const isActive = activeId === c.id
-          const sub = subComponents[c.id]
-          return (
-            <motion.button
-              key={c.id}
-              onClick={() => onSelect(c.id)}
-              animate={isActive ? { scale: [1, 1.03, 1] } : { scale: 1 }}
-              transition={isActive ? { repeat: Infinity, duration: 1.4, repeatDelay: 0.4 } : {}}
-              className={cn(
-                c.size,
-                'relative rounded-xl border-2 p-3 text-left transition-all cursor-pointer',
-                isActive ? c.activeColor : c.baseColor,
-              )}
-            >
-              {isActive && (
-                <motion.div
-                  className="absolute -top-2 -right-2 flex h-4 w-4 items-center justify-center rounded-full bg-blue-500 text-white"
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: 'spring', stiffness: 400 }}
-                >
-                  <span className="text-[8px] font-bold">★</span>
-                </motion.div>
-              )}
-              <div className="font-mono text-[11px] font-bold leading-tight">
-                {lang === 'ko' ? c.labelKo : c.labelEn}
-              </div>
-              {sub && (
-                <div className="mt-2 flex flex-col gap-1">
-                  {sub.map((s, i) => (
-                    <div key={i} className="rounded-md border border-current/20 bg-white/50 px-2 py-1 font-mono text-[9px] font-semibold opacity-80">
-                      {lang === 'ko' ? s.labelKo : s.labelEn}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </motion.button>
-          )
-        })}
-      </div>
-    </div>
-  )
-}
-
 // ── SgaSection ─────────────────────────────────────────────────────────────
 
 export function SgaSection() {
@@ -303,9 +218,6 @@ export function SgaSection() {
   const [activeComponentId, setActiveComponentId] = useState<string | null>(null)
 
   const activeComponent = SGA_COMPONENTS.find((c) => c.id === activeComponentId) ?? null
-  const highlightIds: InstanceComponentId[] = activeComponent
-    ? activeComponent.highlightIds
-    : ['sga', 'buffer-cache', 'shared-pool', 'library-cache', 'dict-cache', 'redo-buffer', 'undo']
 
   function handleComponentSelect(id: string) {
     setActiveComponentId((prev) => (prev === id ? null : id))
@@ -323,17 +235,119 @@ export function SgaSection() {
 
       {/* ── 1. SGA란? ── */}
       <SectionTitle>{t.whatTitle}</SectionTitle>
+      <Prose>{t.whatP1}</Prose>
+      <Prose>{t.whatP2}</Prose>
+      <Prose>{t.whatP3}</Prose>
 
-      <div className="grid grid-cols-[1fr_320px] gap-8 items-start">
-        <div>
-          <Prose>{t.whatP1}</Prose>
-          <Prose>{t.whatP2}</Prose>
-          <Prose>{t.whatP3}</Prose>
-        </div>
-        <div className="sticky top-6">
-          <OracleInstanceMap highlightIds={highlightIds} />
-        </div>
+      <SgaPositionDiagram
+        activeId={((): SgaComponentId | null => {
+          const MAP: Record<string, SgaComponentId> = {
+            'buffer-cache': 'buffer-cache',
+            'shared-pool': 'shared-pool',
+            'redo-buffer': 'redo-log-buffer',
+            'large-pool': 'large-pool',
+          }
+          if (!activeComponentId) return null
+          return MAP[activeComponentId] ?? null
+        })()}
+      />
+
+      {/* Component selector pills */}
+      <div className="flex flex-wrap gap-2 mb-4">
+        {SGA_COMPONENTS.map((c) => {
+          const isActive = activeComponentId === c.id
+          return (
+            <button
+              key={c.id}
+              onClick={() => handleComponentSelect(c.id)}
+              className={cn(
+                'rounded-lg border px-4 py-2 font-mono text-xs font-bold transition-all',
+                isActive
+                  ? `${c.tagColor} border-transparent text-white shadow-sm`
+                  : 'border-border bg-card text-muted-foreground hover:border-slate-400 hover:text-foreground',
+              )}
+            >
+              {lang === 'ko' ? c.labelKo : c.labelEn}
+            </button>
+          )
+        })}
       </div>
+
+      {/* Detail card */}
+      <AnimatePresence mode="wait">
+        {activeComponent ? (
+          <motion.div
+            key={activeComponent.id}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.18 }}
+            className="mb-4 rounded-xl border border-border bg-card overflow-hidden"
+          >
+            <div className="flex items-center gap-2.5 border-b border-border bg-muted/40 px-5 py-3">
+              <span className={cn('rounded px-2.5 py-0.5 font-mono text-xs font-bold text-white', activeComponent.tagColor)}>
+                {lang === 'ko' ? activeComponent.labelKo : activeComponent.labelEn}
+              </span>
+            </div>
+            <div className="px-5 py-4 border-b border-border">
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                {lang === 'ko' ? activeComponent.descKo : activeComponent.descEn}
+              </p>
+            </div>
+            {(() => {
+              const details = lang === 'ko' ? activeComponent.detailsKo : activeComponent.detailsEn
+              const normal = details.filter((r) => !r.isParam)
+              const params = details.filter((r) => r.isParam)
+              return (
+                <div className="flex flex-col divide-y divide-border">
+                  {normal.map((row, i) => (
+                    <div key={i} className="grid grid-cols-[180px_1fr] text-xs">
+                      <div className="flex items-center border-r border-border bg-muted/30 px-4 py-2.5">
+                        <span className="font-mono font-bold text-slate-600">{row.term}</span>
+                      </div>
+                      <div className="flex items-center px-4 py-2.5">
+                        <span className="leading-snug text-muted-foreground">{row.desc}</span>
+                      </div>
+                    </div>
+                  ))}
+                  {params.length > 0 && (
+                    <>
+                      <div className="flex items-center gap-2 bg-slate-50/80 px-4 py-1.5 border-t border-border">
+                        <span className="rounded border border-slate-300 bg-slate-100 px-1.5 py-0.5 font-mono text-[9px] font-bold uppercase tracking-wider text-slate-500">
+                          PARAMETER
+                        </span>
+                        <span className="text-[10px] text-slate-400">
+                          {lang === 'ko' ? '관련 초기화 파라미터' : 'Initialization parameter'}
+                        </span>
+                      </div>
+                      {params.map((row, i) => (
+                        <div key={i} className="grid grid-cols-[180px_1fr] text-xs bg-slate-50/40">
+                          <div className="flex items-center border-r border-border bg-slate-100/60 px-4 py-2.5">
+                            <span className="font-mono font-bold text-slate-500">{row.term}</span>
+                          </div>
+                          <div className="flex items-center px-4 py-2.5">
+                            <span className="leading-snug text-muted-foreground">{row.desc}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </>
+                  )}
+                </div>
+              )
+            })()}
+          </motion.div>
+        ) : (
+          <motion.div
+            key="empty"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="mb-4 flex h-16 items-center justify-center rounded-xl border-2 border-dashed border-border"
+          >
+            <span className="font-mono text-sm text-muted-foreground">↑ {t.clickHint}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <Divider />
 
@@ -456,7 +470,7 @@ export function SgaSection() {
             </div>
             <p className="mt-3 text-[11px] text-violet-600/80">
               {lang === 'ko'
-                ? '⚡ Cache Fusion: 노드 1이 수정한 블록을 노드 2가 필요하면 디스크 대신 네트워크 인터커넥트로 직접 전달합니다.'
+                ? '⚡ Cache Fusion: 노드 1이 수정한 블록을 노드 2가 필요하면 디스크 대신 네트워크 인터커넥트로 직접 전달해요.'
                 : '⚡ Cache Fusion: If Node 2 needs a block modified by Node 1, Oracle sends it over the interconnect directly — no disk involved.'}
             </p>
           </motion.div>
@@ -491,122 +505,11 @@ export function SgaSection() {
 
       <InfoBox variant="note">
         {lang === 'ko' ? (
-          <>RAC는 고가용성과 수평 확장을 제공하지만, Cache Fusion 트래픽으로 인한 <strong>인터커넥트 지연</strong>이 새로운 병목이 될 수 있습니다. 단일 인스턴스보다 복잡한 튜닝이 필요합니다.</>
+          <>RAC(Real Application Clusters)는 고가용성과 수평 확장을 제공하지만, Cache Fusion 트래픽으로 인한 <strong>인터커넥트 지연</strong>이 새로운 병목이 될 수 있어요. 단일 인스턴스보다 튜닝이 훨씬 복잡하고 어렵거든요.</>
         ) : (
           <>RAC provides high availability and horizontal scale-out, but <strong>interconnect latency</strong> from Cache Fusion traffic can introduce new bottlenecks. Tuning is significantly more complex than a single-instance setup.</>
         )}
       </InfoBox>
-
-      <Divider />
-
-      {/* ── 3. SGA 구성 요소 ── */}
-      <SectionTitle>{t.componentsTitle}</SectionTitle>
-      <Prose>{t.componentsDesc}</Prose>
-
-      <div className="space-y-4">
-        {/* SGA diagram */}
-        <SgaDiagram activeId={activeComponentId} onSelect={handleComponentSelect} />
-
-        {/* Component selector pills */}
-        <div className="flex flex-wrap gap-2">
-          {SGA_COMPONENTS.map((c) => {
-            const isActive = activeComponentId === c.id
-            return (
-              <button
-                key={c.id}
-                onClick={() => handleComponentSelect(c.id)}
-                className={cn(
-                  'rounded-lg border px-4 py-2 font-mono text-xs font-bold transition-all',
-                  isActive
-                    ? `${c.tagColor} border-transparent text-white shadow-sm`
-                    : 'border-border bg-card text-muted-foreground hover:border-slate-400 hover:text-foreground',
-                )}
-              >
-                {lang === 'ko' ? c.labelKo : c.labelEn}
-              </button>
-            )
-          })}
-        </div>
-
-        {/* Detail card */}
-        <AnimatePresence mode="wait">
-          {activeComponent ? (
-            <motion.div
-              key={activeComponent.id}
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -6 }}
-              transition={{ duration: 0.18 }}
-              className="rounded-xl border border-border bg-card overflow-hidden"
-            >
-              {/* header */}
-              <div className="flex items-center gap-2.5 border-b border-border bg-muted/40 px-5 py-3">
-                <span className={cn('rounded px-2.5 py-0.5 font-mono text-xs font-bold text-white', activeComponent.tagColor)}>
-                  {lang === 'ko' ? activeComponent.labelKo : activeComponent.labelEn}
-                </span>
-              </div>
-              {/* desc */}
-              <div className="px-5 py-4 border-b border-border">
-                <p className="text-sm leading-relaxed text-muted-foreground">
-                  {lang === 'ko' ? activeComponent.descKo : activeComponent.descEn}
-                </p>
-              </div>
-              {/* details table */}
-              {(() => {
-                const details = lang === 'ko' ? activeComponent.detailsKo : activeComponent.detailsEn
-                const normal = details.filter((r) => !r.isParam)
-                const params = details.filter((r) => r.isParam)
-                return (
-                  <div className="flex flex-col divide-y divide-border">
-                    {normal.map((row, i) => (
-                      <div key={i} className="grid grid-cols-[180px_1fr] text-xs">
-                        <div className="flex items-center border-r border-border bg-muted/30 px-4 py-2.5">
-                          <span className="font-mono font-bold text-slate-600">{row.term}</span>
-                        </div>
-                        <div className="flex items-center px-4 py-2.5">
-                          <span className="leading-snug text-muted-foreground">{row.desc}</span>
-                        </div>
-                      </div>
-                    ))}
-                    {params.length > 0 && (
-                      <>
-                        <div className="flex items-center gap-2 bg-slate-50/80 px-4 py-1.5 border-t border-border">
-                          <span className="rounded border border-slate-300 bg-slate-100 px-1.5 py-0.5 font-mono text-[9px] font-bold uppercase tracking-wider text-slate-500">
-                            {lang === 'ko' ? 'PARAMETER' : 'PARAMETER'}
-                          </span>
-                          <span className="text-[10px] text-slate-400">
-                            {lang === 'ko' ? '관련 초기화 파라미터' : 'Initialization parameter'}
-                          </span>
-                        </div>
-                        {params.map((row, i) => (
-                          <div key={i} className="grid grid-cols-[180px_1fr] text-xs bg-slate-50/40">
-                            <div className="flex items-center border-r border-border bg-slate-100/60 px-4 py-2.5">
-                              <span className="font-mono font-bold text-slate-500">{row.term}</span>
-                            </div>
-                            <div className="flex items-center px-4 py-2.5">
-                              <span className="leading-snug text-muted-foreground">{row.desc}</span>
-                            </div>
-                          </div>
-                        ))}
-                      </>
-                    )}
-                  </div>
-                )
-              })()}
-            </motion.div>
-          ) : (
-            <motion.div
-              key="empty"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="flex h-20 items-center justify-center rounded-xl border-2 border-dashed border-border"
-            >
-              <span className="font-mono text-sm text-muted-foreground">↑ {t.clickHint}</span>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
 
       <div className="mt-8">
       <InfoBox variant="summary">
@@ -614,10 +517,10 @@ export function SgaSection() {
           <>
             <strong>SGA 핵심 정리</strong>
             <ul className="mt-2 space-y-1 list-none">
-              <li>• <strong>Buffer Cache</strong> — 디스크 블록을 메모리에 올려 디스크 I/O를 줄입니다</li>
-              <li>• <strong>Shared Pool</strong> — SQL 파싱 결과를 재사용해 CPU를 절약합니다</li>
-              <li>• <strong>Redo Log Buffer</strong> — 변경 내역을 메모리에 모아 순차적으로 디스크에 씁니다</li>
-              <li>• <strong>Undo Segment</strong> — ROLLBACK과 읽기 일관성(MVCC)을 가능하게 합니다</li>
+              <li>• <strong>Buffer Cache</strong> — 디스크 블록을 메모리에 올려 두어 디스크 I/O를 줄여요</li>
+              <li>• <strong>Shared Pool</strong> — SQL 파싱 결과를 재사용해서 CPU를 아껴요</li>
+              <li>• <strong>Redo Log Buffer</strong> — 변경 내역을 메모리에 모아 순차적으로 디스크에 써요</li>
+              <li>• <strong>Large Pool</strong> — RMAN·병렬 쿼리 등 큰 메모리 요청을 Shared Pool과 분리해요</li>
             </ul>
           </>
         ) : (
@@ -627,7 +530,7 @@ export function SgaSection() {
               <li>• <strong>Buffer Cache</strong> — Keeps disk blocks in memory to reduce disk I/O</li>
               <li>• <strong>Shared Pool</strong> — Reuses SQL parse results to save CPU</li>
               <li>• <strong>Redo Log Buffer</strong> — Batches change records in memory for sequential disk writes</li>
-              <li>• <strong>Undo Segment</strong> — Enables ROLLBACK and read consistency (MVCC)</li>
+              <li>• <strong>Large Pool</strong> — Isolates RMAN, parallel query, and other large allocations from the Shared Pool</li>
             </ul>
           </>
         )}

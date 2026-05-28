@@ -1,6 +1,8 @@
 import { motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { useSimulationStore } from '@/store/simulationStore'
+import { SgaPositionDiagram } from '../overview/sga/shared/SgaPositionDiagram'
+import type { SgaComponentId } from '../overview/sga/shared/SgaPositionDiagram'
 
 export type InstanceComponentId =
   | 'server-process'
@@ -11,6 +13,7 @@ export type InstanceComponentId =
   | 'buffer-cache'
   | 'redo-buffer'
   | 'undo'
+  | 'large-pool'
   | 'shared-pool'
   | 'dbwr'
   | 'lgwr'
@@ -226,8 +229,6 @@ export function OracleInstanceMap({ highlightIds, callout, horizontal = false, h
     ['library-cache', 'dict-cache', 'buffer-cache', 'redo-buffer', 'undo', 'shared-pool'].some(id =>
       highlightIds.includes(id as InstanceComponentId)
     )
-  const sharedPoolHighlighted = highlightIds.includes('shared-pool') ||
-    ['library-cache', 'dict-cache'].some(id => highlightIds.includes(id as InstanceComponentId))
   const bgProcessHighlighted = ['dbwr', 'lgwr', 'ckpt', 'smon', 'pmon', 'arcn'].some(id =>
     highlightIds.includes(id as InstanceComponentId)
   )
@@ -274,72 +275,18 @@ export function OracleInstanceMap({ highlightIds, callout, horizontal = false, h
     </div>
   )
 
+  const sgaActiveId: SgaComponentId | null = (() => {
+    if (!hasHighlights || !sgaHighlighted) return null
+    if (highlightIds.includes('buffer-cache')) return 'buffer-cache'
+    if (highlightIds.includes('shared-pool') || highlightIds.includes('library-cache') || highlightIds.includes('dict-cache')) return 'shared-pool'
+    if (highlightIds.includes('redo-buffer')) return 'redo-log-buffer'
+    if (highlightIds.includes('large-pool')) return 'large-pool'
+    return null
+  })()
+
   const layerSga = (
-    <div
-      data-component-id="sga"
-      className={cn(
-        'cursor-pointer rounded-xl border-2 p-3 transition-all duration-300',
-        sgaHighlighted
-          ? 'border-blue-400 bg-blue-50/60 shadow-sm'
-          : sgaDimmed
-          ? 'border-border/20 bg-muted/10'
-          : 'border-blue-200 bg-blue-50/30'
-      )}
-    >
-      <SectionLabel dimmed={sgaDimmed}>SGA — System Global Area</SectionLabel>
-      {horizontal ? (
-        <div className="flex gap-2">
-          {/* Shared Pool */}
-          <div
-            data-component-id="shared-pool"
-            className={cn(
-              'flex-1 rounded-lg border-2 p-2 transition-all duration-300',
-              sharedPoolHighlighted
-                ? 'border-indigo-300 bg-indigo-50/60'
-                : sgaDimmed
-                ? 'border-border/20 bg-transparent'
-                : 'border-indigo-200/70 bg-indigo-50/30'
-            )}
-          >
-            <SectionLabel dimmed={sgaDimmed && !sharedPoolHighlighted}>Shared Pool</SectionLabel>
-            <div className="flex gap-1.5">
-              <MapBlock id="library-cache" highlightIds={highlightIds} className="flex-1" />
-              <MapBlock id="dict-cache" label="Dict Cache" highlightIds={highlightIds} className="flex-1" />
-            </div>
-          </div>
-          {/* Buffer / Log / Undo */}
-          <div className="flex flex-1 gap-1.5">
-            <MapBlock id="buffer-cache" label="Buffer Cache" highlightIds={highlightIds} className="flex-1" />
-            <MapBlock id="redo-buffer" label="Log Buffer" highlightIds={highlightIds} className="flex-1" />
-            <MapBlock id="undo" label="Undo" highlightIds={highlightIds} className="flex-1" />
-          </div>
-        </div>
-      ) : (
-        <>
-          <div
-            data-component-id="shared-pool"
-            className={cn(
-              'mb-2 rounded-lg border-2 p-2 transition-all duration-300',
-              sharedPoolHighlighted
-                ? 'border-indigo-300 bg-indigo-50/60'
-                : sgaDimmed
-                ? 'border-border/20 bg-transparent'
-                : 'border-indigo-200/70 bg-indigo-50/30'
-            )}
-          >
-            <SectionLabel dimmed={sgaDimmed && !sharedPoolHighlighted}>Shared Pool</SectionLabel>
-            <div className="grid grid-cols-2 gap-1.5">
-              <MapBlock id="library-cache" highlightIds={highlightIds} />
-              <MapBlock id="dict-cache" label="Dict Cache" highlightIds={highlightIds} />
-            </div>
-          </div>
-          <div className="grid grid-cols-3 gap-1.5">
-            <MapBlock id="buffer-cache" label="Buffer Cache" highlightIds={highlightIds} />
-            <MapBlock id="redo-buffer" label="Log Buffer" highlightIds={highlightIds} />
-            <MapBlock id="undo" label="Undo" highlightIds={highlightIds} />
-          </div>
-        </>
-      )}
+    <div className={cn('transition-opacity duration-300', sgaDimmed ? 'opacity-20 pointer-events-none' : 'opacity-100')}>
+      <SgaPositionDiagram activeId={sgaActiveId} />
     </div>
   )
 

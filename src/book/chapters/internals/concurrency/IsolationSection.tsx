@@ -14,36 +14,36 @@ import {
 const T = {
   ko: {
     title: '트랜잭션 격리 수준',
-    subtitle: 'ANSI/ISO SQL 표준의 격리 수준과 Oracle이 MVCC를 통해 이를 구현하는 방식을 살펴봅니다.',
-    overviewTitle: '격리 수준이란?',
+    subtitle: 'ANSI/ISO SQL 표준의 격리 수준과 Oracle이 MVCC를 통해 이를 구현하는 방식을 알아봐요.',
+    overviewTitle: '격리 수준이 뭐예요?',
     overviewDesc:
-      'Oracle은 SQL92 표준의 격리 수준을 지원하며, MVCC를 활용해 높은 동시성을 유지하면서도 일관된 데이터를 제공합니다. 격리 수준이 높을수록 일관성은 강해지지만 동시성은 낮아질 수 있습니다.',
+      'Oracle은 SQL92 표준의 격리 수준을 지원하고, MVCC(다중 버전 동시성 제어)를 활용해 높은 동시성을 유지하면서도 일관된 데이터를 제공해요. 격리 수준이 높아질수록 일관성은 강해지지만 동시성은 낮아질 수 있어요.',
     phenomena: '동시성 이상 현상 (Concurrency Anomalies)',
     phenomenaDesc:
-      '각 격리 수준은 허용하는 이상 현상의 종류로 구분됩니다. Oracle은 MVCC 덕분에 Dirty Read를 어느 격리 수준에서도 허용하지 않습니다.',
+      '각 격리 수준은 허용하는 이상 현상의 종류로 구분돼요. Oracle은 MVCC 덕분에 Dirty Read(미커밋 데이터 읽기)를 어느 격리 수준에서도 허용하지 않아요.',
     levelsTitle: 'Oracle의 격리 수준',
-    readCommittedTitle: 'Read Committed (기본값)',
+    readCommittedTitle: 'Read Committed — 기본값',
     readCommittedDesc:
-      '트랜잭션이 실행하는 모든 쿼리는 쿼리가 시작되기 전에 커밋된 데이터만 읽습니다 — 트랜잭션이 시작된 시점이 아닌 쿼리 시작 시점 기준입니다. 즉 같은 트랜잭션 내에서도 두 번의 SELECT 사이에 다른 트랜잭션이 커밋하면 두 번째 SELECT에서 다른 결과가 나올 수 있습니다(Non-Repeatable Read).',
-    readCommittedConflictTitle: 'Read Committed에서의 쓰기 충돌',
+      '트랜잭션이 실행하는 모든 쿼리는 쿼리가 시작되기 전에 커밋된 데이터만 읽어요 — 트랜잭션 시작 시점이 아닌 쿼리 시작 시점을 기준으로 해요. 같은 트랜잭션 안에서도 두 번째 SELECT 사이에 다른 트랜잭션이 커밋되면, 두 번째 SELECT에서 다른 결과가 나올 수 있어요(Non-Repeatable Read).',
+    readCommittedConflictTitle: 'Read Committed에서 쓰기 충돌이 발생하면?',
     readCommittedConflictDesc:
       '두 세션이 같은 행을 수정하려 할 때 어떤 일이 벌어지는지 살펴봐요.',
     serializableTitle: 'Serializable',
     serializableDesc:
-      '트랜잭션 전체 동안 트랜잭션이 시작된 시점에 커밋된 데이터만 볼 수 있습니다 — 마치 다른 사용자가 없는 것처럼 동작합니다. 다른 트랜잭션이 동일 행을 변경·커밋한 후 이 트랜잭션이 같은 행을 변경하려 하면 ORA-08177 오류가 발생합니다.',
-    serializableExampleTitle: 'Serializable에서의 쓰기 충돌',
+      '트랜잭션이 실행되는 내내 트랜잭션이 시작된 시점에 커밋된 데이터만 볼 수 있어요 — 마치 혼자 쓰는 것처럼 동작해요. 다른 트랜잭션이 같은 행을 변경·커밋한 뒤에 이 트랜잭션이 그 행을 바꾸려 하면 ORA-08177 오류가 발생해요.',
+    serializableExampleTitle: 'Serializable에서 쓰기 충돌이 발생하면?',
     serializableExampleDesc:
-      '트랜잭션 3이 Read Committed로 Hintz의 급여를 7100으로 변경하고 커밋합니다. 트랜잭션 4는 Serializable로 시작한 후 Hintz를 수정하려 하면, 트랜잭션 3이 트랜잭션 4 시작 이후에 커밋했으므로 ORA-08177이 발생합니다.',
+      '트랜잭션 3이 Read Committed로 Hintz의 급여를 7100으로 변경하고 커밋해요. 트랜잭션 4는 Serializable로 시작한 뒤 Hintz를 수정하려 하는데, 트랜잭션 3이 트랜잭션 4 시작 이후에 커밋했으므로 ORA-08177이 발생해요.',
     readOnlyTitle: 'Read-Only',
     readOnlyDesc:
-      'Serializable과 동일한 일관성 보장을 제공하지만, SYS를 제외한 데이터 변경이 불가합니다. 장기 리포트 쿼리나 일관된 스냅샷이 필요한 조회 작업에 적합합니다. ORA-08177 오류의 영향을 받지 않습니다.',
-    lostUpdateTitle: 'Lost Update 문제',
+      'Serializable과 똑같은 일관성을 보장하지만, SYS를 제외한 데이터 변경이 불가능해요. 오래 걸리는 리포트 쿼리나 일관된 스냅샷이 필요한 조회 작업에 딱 맞아요. ORA-08177 오류의 영향도 받지 않아요.',
+    lostUpdateTitle: 'Lost Update(갱신 손실) 문제',
     lostUpdateDesc:
-      'Read Committed에서는 두 트랜잭션이 같은 행을 각자 읽고 수정하면 한쪽 변경이 사라질 수 있습니다. 위 공식 문서 예시에서 Session 1이 Banda의 급여를 7000으로 올리더라도, Session 2가 그 이후 6300으로 덮어쓰면 Session 1의 변경은 사라집니다.',
+      'Read Committed에서는 두 트랜잭션이 같은 행을 각자 읽고 수정하면 한쪽 변경이 사라질 수 있어요. 예를 들어 Session 1이 Banda의 급여를 7000으로 올렸더라도, Session 2가 나중에 6300으로 덮어쓰면 Session 1의 변경은 흔적도 없이 사라져요.',
     lostUpdateSolution:
-      'SELECT ... FOR UPDATE로 먼저 행을 잠그거나, UPDATE WHERE 절에 원본 값을 포함해 낙관적 잠금(Optimistic Locking)을 구현합니다.',
+      'SELECT ... FOR UPDATE로 먼저 행을 잠그거나, UPDATE의 WHERE 절에 원본 값을 포함해 낙관적 잠금(Optimistic Locking)을 구현하면 예방할 수 있어요.',
     throughputNote:
-      '직렬화 격리 수준을 많은 애플리케이션에서 동시에 사용하면 처리량이 크게 저하될 수 있습니다. Oracle은 자동으로 가장 낮은 수준의 제한을 적용해 최대한의 동시성을 유지하면서도 데이터 무결성을 보장합니다.',
+      '직렬화 격리 수준을 많은 애플리케이션에서 동시에 사용하면 처리량이 크게 떨어질 수 있어요. Oracle은 자동으로 가장 낮은 수준의 제한을 적용해, 동시성을 최대한 유지하면서도 데이터 무결성을 보장해요.',
   },
   en: {
     title: 'Transaction Isolation Levels',

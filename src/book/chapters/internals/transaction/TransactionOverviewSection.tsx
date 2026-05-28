@@ -18,52 +18,52 @@ const T = {
   ko: {
     title: '트랜잭션(Transaction)',
     subtitle:
-      '트랜잭션은 Oracle이 데이터를 안전하게 변경하는 논리적 작업 단위입니다. 여러 SQL 문장이 모두 성공하거나, 하나라도 실패하면 전부 취소됩니다.',
-    concepts: '트랜잭션의 핵심 특성',
+      '트랜잭션은 Oracle이 데이터를 안전하게 변경하는 논리적 작업 단위예요. 여러 SQL 문장이 모두 성공하거나, 하나라도 실패하면 전부 취소돼요.',
+    concepts: '트랜잭션의 핵심 개념',
     conceptItems: [
       {
         icon: <IconHistory size={20} stroke={1.5} />,
         title: 'COMMIT',
-        desc: '트랜잭션의 모든 변경을 영구적으로 확정합니다. COMMIT 이후에는 취소할 수 없습니다.',
+        desc: '트랜잭션의 모든 변경을 영구적으로 확정해요. COMMIT 이후에는 되돌릴 수 없어요.',
       },
       {
         icon: <IconRefresh size={20} stroke={1.5} />,
         title: 'ROLLBACK',
-        desc: '트랜잭션의 모든 변경을 취소하고 이전 상태로 되돌립니다.',
+        desc: '트랜잭션의 모든 변경을 취소하고 이전 상태로 되돌려요.',
       },
       {
         icon: <IconFlag size={20} stroke={1.5} />,
         title: 'SAVEPOINT',
-        desc: '트랜잭션 중간에 복원 지점을 설정합니다. ROLLBACK TO SAVEPOINT로 해당 지점까지만 되돌릴 수 있습니다.',
+        desc: '트랜잭션 중간에 복원 지점을 설정해요. ROLLBACK TO SAVEPOINT로 그 지점까지만 되돌릴 수 있어요.',
       },
       {
         icon: <IconShieldCheck size={20} stroke={1.5} />,
         title: 'ACID',
-        desc: '트랜잭션이 보장해야 하는 네 가지 속성 — 원자성, 일관성, 격리성, 지속성.',
+        desc: '트랜잭션이 지켜야 하는 네 가지 속성 — 원자성(Atomicity), 일관성(Consistency), 격리성(Isolation), 지속성(Durability).',
       },
     ],
     overviewDesc:
-      'Oracle에서 트랜잭션은 첫 번째 DML(Data Manipulation Language) 문장이 실행되는 순간 자동으로 시작됩니다. COMMIT 또는 ROLLBACK이 실행될 때까지 모든 변경은 임시 상태이며, 다른 세션에서는 보이지 않습니다.\n\nDDL(CREATE, DROP, ALTER 등) 문장은 실행 전후에 자동 COMMIT이 발생합니다. 따라서 DDL 앞뒤의 DML 변경도 함께 확정되므로 주의해야 합니다.',
-    lifecycleTitle: '트랜잭션 생명주기',
-    lifecycleDesc: '트랜잭션은 첫 DML 실행 시 시작되어 COMMIT/ROLLBACK 또는 DDL 실행 시 종료됩니다.',
+      'Oracle에서 트랜잭션은 첫 번째 DML(Data Manipulation Language, 데이터 조작 언어) 문장이 실행되는 순간 자동으로 시작돼요. COMMIT 또는 ROLLBACK이 실행될 때까지 모든 변경은 임시 상태이고, 다른 세션에서는 보이지 않아요.\n\nDDL(Data Definition Language — CREATE, DROP, ALTER 등) 문장은 실행 전후로 자동 COMMIT이 발생해요. DDL 앞에 있던 DML 변경도 함께 확정되니 주의해야 해요.',
+    lifecycleTitle: '트랜잭션의 생명주기',
+    lifecycleDesc: '트랜잭션은 첫 DML 실행 시 시작되고, COMMIT/ROLLBACK 또는 DDL 실행 시 끝나요.',
     xidTitle: 'XID — 트랜잭션 식별자',
     xidDesc:
-      'Oracle은 트랜잭션 시작 시(첫 DML 실행 시점) Undo Segment에 슬롯을 할당하고, 해당 슬롯을 식별하는 XID(Transaction ID)를 부여합니다.\n\nXID는 세 숫자의 조합입니다:  Undo Segment 번호(USN) | 슬롯 번호 | 시퀀스 번호. 이 세 값이 합쳐져 데이터베이스 전체에서 고유한 트랜잭션 ID를 구성합니다.',
+      'Oracle은 트랜잭션이 시작되면(첫 DML 실행 시) Undo Segment에 슬롯을 할당하고, 그 슬롯을 식별하는 XID(Transaction ID)를 부여해요.\n\nXID는 세 숫자의 조합이에요: Undo Segment 번호(USN) | 슬롯 번호 | 시퀀스 번호. 이 세 값이 합쳐져서 데이터베이스 전체에서 고유한 트랜잭션 ID를 만들어요.',
     xidNote:
-      'XID는 파싱(Parse) 시점이 아니라 첫 번째 DML 실행 시 할당됩니다. V$TRANSACTION 뷰로 현재 활성 트랜잭션의 XID와 상태를 조회할 수 있습니다.',
-    activeStateTitle: '트랜잭션 활성 상태에서 Oracle이 유지하는 정보',
+      'XID는 SQL 파싱(Parse) 시점이 아니라 첫 번째 DML 실행 시 할당돼요. V$TRANSACTION 뷰로 현재 활성 트랜잭션의 XID와 상태를 조회할 수 있어요.',
+    activeStateTitle: '트랜잭션이 진행 중일 때 Oracle이 유지하는 정보',
     activeStateRows: [
-      ['Undo 데이터 생성', 'SGA에 SQL 문장이 변경한 이전 값(Before Image)이 보관됨'],
-      ['Redo 생성', 'Redo Log Buffer에 데이터 블록과 Undo 블록의 변경 내역이 기록됨'],
-      ['버퍼 수정', 'SGA Buffer Cache의 블록이 변경됨 (디스크 쓰기 시점은 COMMIT와 무관)'],
-      ['행 잠금(Lock)', '다른 세션은 잠긴 행을 변경할 수 없으며, 커밋 전 변경 내용도 볼 수 없음'],
+      ['Undo 데이터 생성', 'SGA에 SQL 문장이 바꾸기 전 값(Before Image)이 보관돼요.'],
+      ['Redo 생성', 'Redo Log Buffer에 데이터 블록과 Undo 블록의 변경 내역이 기록돼요.'],
+      ['버퍼 수정', 'SGA Buffer Cache의 블록이 변경돼요. (디스크에 쓰는 시점은 COMMIT와 별개예요.)'],
+      ['행 잠금(Lock)', '다른 세션은 잠긴 행을 변경할 수 없고, 커밋 전 변경 내용도 볼 수 없어요.'],
     ],
-    lifecycleEndTitle: '트랜잭션이 종료되는 경우',
+    lifecycleEndTitle: '트랜잭션이 끝나는 경우',
     lifecycleEndRows: [
-      ['COMMIT 또는 ROLLBACK 실행', '명시적 종료 — 가장 일반적인 방법'],
-      ['DDL 문장 실행 (CREATE / DROP / ALTER)', 'DDL 앞뒤로 암묵적 COMMIT 발생'],
-      ['정상 세션 종료 (EXIT / QUIT)', '미완료 트랜잭션 자동 COMMIT'],
-      ['비정상 세션 종료 (접속 끊김)', '자동 ROLLBACK — 커밋되지 않은 변경 취소'],
+      ['COMMIT 또는 ROLLBACK 실행', '명시적 종료 — 가장 일반적인 방법이에요.'],
+      ['DDL 문장 실행 (CREATE / DROP / ALTER)', 'DDL 앞뒤로 암묵적 COMMIT이 발생해요.'],
+      ['정상 세션 종료 (EXIT / QUIT)', '미완료 트랜잭션이 자동 COMMIT돼요.'],
+      ['비정상 세션 종료 (접속 끊김)', '자동 ROLLBACK — 커밋되지 않은 변경이 취소돼요.'],
     ],
   },
   en: {

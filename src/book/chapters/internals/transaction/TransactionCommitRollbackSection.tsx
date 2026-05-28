@@ -15,55 +15,55 @@ import { cn } from '@/lib/utils'
 const T = {
   ko: {
     title: 'COMMIT과 ROLLBACK',
-    subtitle: '트랜잭션을 완료하거나 취소하는 두 가지 핵심 명령어입니다.',
+    subtitle: '트랜잭션을 완료하거나 취소하는 두 가지 핵심 명령어예요.',
     commitTitle: 'COMMIT — 변경 확정',
-    commitDesc: 'COMMIT을 실행하면 Oracle은 아래 7단계를 원자적으로 수행합니다.',
+    commitDesc: 'COMMIT을 실행하면 Oracle은 아래 7단계를 원자적으로 수행해요.',
     commitSteps: [
-      { num: '①', title: 'SCN 생성', desc: '데이터베이스가 이 COMMIT에 대한 고유한 SCN(System Change Number)을 생성합니다.' },
-      { num: '②', title: 'Transaction Table 기록', desc: '내부 트랜잭션 테이블에 해당 트랜잭션이 커밋됨을 SCN과 함께 표시합니다.' },
-      { num: '③', title: 'Redo Log 기록 (LGWR)', desc: 'LGWR(Log Writer)가 Redo Log Buffer의 남은 항목을 온라인 리두 로그 파일에 기록하고 트랜잭션 SCN을 씁니다. 이 시점부터 지속성(Durability)이 보장됩니다.' },
-      { num: '④', title: '락(Lock) 해제', desc: '트랜잭션이 보유한 모든 행·테이블 락이 해제됩니다. 다른 세션이 해당 행에 접근할 수 있게 됩니다.' },
-      { num: '⑤', title: 'SAVEPOINT 삭제', desc: '트랜잭션 내 모든 SAVEPOINT가 삭제됩니다.' },
-      { num: '⑥', title: 'Commit Cleanout', desc: '변경된 블록이 아직 SGA에 있다면, ITL(Interested Transaction List) 슬롯에서 락 관련 트랜잭션 정보를 제거합니다. 블록이 이미 디스크에 쓰여졌다면 나중에 읽을 때 처리됩니다.' },
-      { num: '⑦', title: '트랜잭션 완료', desc: '트랜잭션이 완료 상태로 표시됩니다.' },
+      { num: '①', title: 'SCN 생성', desc: '데이터베이스가 이 COMMIT에 대한 고유한 SCN(System Change Number, 시스템 변경 번호)을 생성해요.' },
+      { num: '②', title: 'Transaction Table 기록', desc: '내부 트랜잭션 테이블에 해당 트랜잭션이 커밋됐음을 SCN과 함께 표시해요.' },
+      { num: '③', title: 'Redo Log 기록 (LGWR)', desc: 'LGWR(Log Writer, 로그 라이터)가 Redo Log Buffer에 남은 항목을 온라인 리두 로그 파일에 기록하고 트랜잭션 SCN을 써요. 바로 이 시점부터 지속성(Durability)이 보장돼요.' },
+      { num: '④', title: '락(Lock) 해제', desc: '트랜잭션이 보유한 모든 행·테이블 락이 풀려요. 다른 세션이 이제 해당 행에 접근할 수 있어요.' },
+      { num: '⑤', title: 'SAVEPOINT 삭제', desc: '트랜잭션 내 모든 SAVEPOINT가 삭제돼요.' },
+      { num: '⑥', title: 'Commit Cleanout', desc: '변경된 블록이 아직 SGA에 있다면, ITL(Interested Transaction List) 슬롯에서 락 관련 트랜잭션 정보를 제거해요. 블록이 이미 디스크에 쓰여졌다면 다음번에 읽을 때 처리돼요.' },
+      { num: '⑦', title: '트랜잭션 완료', desc: '트랜잭션이 완료 상태로 표시돼요.' },
     ],
     commitNote:
-      'COMMIT 자체는 데이터 블록을 디스크에 쓰지 않습니다. 변경된 블록(Dirty Buffer)은 DBWn(Database Writer) 프로세스가 나중에 비동기로 씁니다. COMMIT 속도는 변경된 데이터 크기와 무관하며, LGWR의 디스크 I/O가 주된 소요 시간입니다.',
+      'COMMIT 자체는 데이터 블록을 디스크에 쓰지 않아요. 변경된 블록(Dirty Buffer)은 DBWn(Database Writer, 데이터베이스 라이터) 프로세스가 나중에 비동기로 써요. COMMIT 속도는 변경된 데이터 크기와 관계없고, LGWR의 디스크 I/O가 대부분의 시간을 차지해요.',
     rollbackTitle: 'ROLLBACK — 변경 취소',
     rollbackDesc:
-      'ROLLBACK을 실행하면 Oracle은 Undo Segment에 저장된 이전 이미지(Before Image)를 역순으로 읽어 변경을 복원합니다.',
+      'ROLLBACK을 실행하면 Oracle은 Undo Segment에 저장된 이전 이미지(Before Image)를 역순으로 읽어서 변경을 되돌려요.',
     rollbackSteps: [
-      { num: '①', title: 'Undo 데이터 역순 읽기', desc: 'Undo Segment의 변경 항목을 최신 것부터 역순으로 읽습니다.' },
-      { num: '②', title: '각 작업 역전', desc: 'INSERT → DELETE 로 역전 / UPDATE → 원래 값으로 UPDATE / DELETE → INSERT 로 복원' },
-      { num: '③', title: '락(Lock) 해제', desc: '트랜잭션이 보유한 모든 행·테이블 락이 해제됩니다.' },
-      { num: '④', title: 'SAVEPOINT 삭제', desc: '트랜잭션 내 모든 SAVEPOINT가 삭제됩니다.' },
-      { num: '⑤', title: '트랜잭션 종료', desc: '트랜잭션이 종료됩니다.' },
+      { num: '①', title: 'Undo 데이터 역순 읽기', desc: 'Undo Segment의 변경 항목을 최신 것부터 역순으로 읽어요.' },
+      { num: '②', title: '각 작업 역전', desc: 'INSERT → DELETE로 역전 / UPDATE → 원래 값으로 UPDATE / DELETE → INSERT로 복원' },
+      { num: '③', title: '락(Lock) 해제', desc: '트랜잭션이 보유한 모든 행·테이블 락이 풀려요.' },
+      { num: '④', title: 'SAVEPOINT 삭제', desc: '트랜잭션 내 모든 SAVEPOINT가 삭제돼요.' },
+      { num: '⑤', title: '트랜잭션 종료', desc: '트랜잭션이 종료돼요.' },
     ],
     rollbackNote:
-      'ROLLBACK은 변경 규모에 비례해 시간이 걸립니다. 대량 변경 후 ROLLBACK은 오랜 시간이 소요될 수 있으므로, 작업 단위를 나눠 중간 COMMIT하는 패턴을 쓰기도 합니다.',
+      'ROLLBACK은 변경 규모에 비례해서 시간이 걸려요. 대량 변경 후 ROLLBACK은 꽤 오래 걸릴 수 있어서, 작업 단위를 나눠 중간마다 COMMIT하는 패턴을 쓰기도 해요.',
     setTxnTitle: 'SET TRANSACTION — 트랜잭션 속성 설정',
     setTxnDesc:
-      'SET TRANSACTION 문은 트랜잭션의 첫 번째 문장으로 사용하며, 트랜잭션에 이름을 붙이거나 격리 수준을 설정하는 데 씁니다.\n\n트랜잭션 이름은 V$TRANSACTION 뷰에서 조회되고, LogMiner 검색과 Enterprise Manager 모니터링에 활용됩니다. 장기 실행 트랜잭션이나 분산 트랜잭션 문제 해결 시 특히 유용합니다.',
+      'SET TRANSACTION 문은 트랜잭션의 첫 번째 문장으로 사용하며, 트랜잭션에 이름을 붙이거나 격리 수준을 설정할 때 써요.\n\n트랜잭션 이름은 V$TRANSACTION 뷰에서 조회할 수 있고, LogMiner 검색이나 Enterprise Manager 모니터링에서 활용돼요. 오래 걸리는 트랜잭션이나 분산 트랜잭션 문제를 해결할 때 특히 유용해요.',
     autoCommitTitle: '자동 COMMIT이 발생하는 경우',
     autoCommitTable: [
-      ['DDL 실행 (CREATE / DROP / ALTER 등)', 'DDL 앞뒤 DML도 함께 확정되므로 주의'],
-      ['정상 세션 종료 (EXIT / QUIT)', '미완료 트랜잭션이 있으면 자동 COMMIT'],
-      ['비정상 세션 종료 (접속 끊김)', '자동 ROLLBACK — COMMIT되지 않은 변경 취소'],
+      ['DDL 실행 (CREATE / DROP / ALTER 등)', 'DDL 앞뒤 DML도 함께 확정되니 주의해요'],
+      ['정상 세션 종료 (EXIT / QUIT)', '미완료 트랜잭션이 있으면 자동 COMMIT돼요'],
+      ['비정상 세션 종료 (접속 끊김)', '자동 ROLLBACK — COMMIT되지 않은 변경이 취소돼요'],
     ],
     autoCommitNote:
-      'Oracle의 자동 커밋 동작은 클라이언트 도구(SQL*Plus, SQL Developer, JDBC 등)의 autocommit 설정에 따라 달라질 수 있습니다. DML 후 명시적 COMMIT을 습관화하는 것이 안전합니다.',
+      'Oracle의 자동 커밋 동작은 클라이언트 도구(SQL*Plus, SQL Developer, JDBC 등)의 autocommit 설정에 따라 달라질 수 있어요. DML 후에는 명시적으로 COMMIT하는 습관을 들이는 게 안전해요.',
     autoTxnTitle: '자율 트랜잭션 (Autonomous Transaction)',
     autoTxnDesc:
-      '자율 트랜잭션(Autonomous Transaction)은 다른 트랜잭션(메인 트랜잭션) 내에서 독립적으로 실행되는 트랜잭션입니다. PL/SQL 서브프로그램에 PRAGMA AUTONOMOUS_TRANSACTION 지시어를 선언해 사용합니다.\n\n자율 트랜잭션은 메인 트랜잭션의 커밋되지 않은 변경을 볼 수 없고, 독립적으로 락을 관리하며, COMMIT해도 메인 트랜잭션에 영향을 주지 않습니다. 자율 트랜잭션이 COMMIT하면 그 변경은 즉시 다른 세션에 보입니다.',
+      '자율 트랜잭션(Autonomous Transaction)은 다른 트랜잭션(메인 트랜잭션) 안에서 독립적으로 실행되는 트랜잭션이에요. PL/SQL 서브프로그램에 PRAGMA AUTONOMOUS_TRANSACTION 지시어를 선언해서 사용해요.\n\n자율 트랜잭션은 메인 트랜잭션의 커밋되지 않은 변경을 볼 수 없고, 락도 독립적으로 관리해요. 자율 트랜잭션이 COMMIT해도 메인 트랜잭션에는 영향을 주지 않고, COMMIT된 변경은 즉시 다른 세션에서 볼 수 있어요.',
     autoTxnUseCase:
-      '대표적인 사용 사례: 에러 로그 기록. 메인 트랜잭션이 롤백되더라도 디버그/감사 로그는 별도로 COMMIT되어 유지되어야 할 때 자율 트랜잭션을 사용합니다.',
+      '가장 많이 쓰는 사례는 에러 로그 기록이에요. 메인 트랜잭션이 롤백되더라도 디버그·감사 로그는 별도로 COMMIT되어 남아야 할 때 자율 트랜잭션을 사용해요.',
     distTitle: '분산 트랜잭션과 2PC',
     distDesc:
-      '분산 트랜잭션(Distributed Transaction)은 데이터베이스 링크를 통해 두 개 이상의 별도 데이터베이스 노드의 데이터를 변경하는 트랜잭션입니다. Oracle은 2단계 커밋(2PC — Two-Phase Commit) 프로토콜로 모든 노드가 원자적으로 COMMIT 또는 ROLLBACK되도록 보장합니다.\n\n2PC는 사용자에게 투명하게 동작합니다 — 일반 COMMIT 문장만 실행하면 됩니다.',
+      '분산 트랜잭션(Distributed Transaction)은 데이터베이스 링크를 통해 두 개 이상의 데이터베이스 노드에 있는 데이터를 동시에 변경하는 트랜잭션이에요. Oracle은 2단계 커밋(2PC — Two-Phase Commit) 프로토콜로 모든 노드가 함께 COMMIT 또는 ROLLBACK되도록 보장해요.\n\n2PC는 사용자에게 투명하게 동작해요 — 그냥 평소처럼 COMMIT 문장을 실행하면 돼요.',
     distPhaseRows: [
-      ['1단계 (Prepare)', '글로벌 코디네이터가 각 데이터베이스에 "커밋 준비됐나?" 라고 물음. 각 DB가 YES/NO로 응답'],
-      ['2단계 (Commit/Rollback)', '모두 YES이면 COMMIT 브로드캐스트, 하나라도 NO이면 ROLLBACK 브로드캐스트'],
-      ['In-Doubt 트랜잭션', '2PC 도중 장애 발생 시 해결 대기 상태가 됨. RECO 백그라운드 프로세스가 자동 복구'],
+      ['1단계 (Prepare)', '글로벌 코디네이터가 각 데이터베이스에 "커밋 준비됐나요?" 라고 물어봐요. 각 DB가 YES/NO로 답해요'],
+      ['2단계 (Commit/Rollback)', '모두 YES이면 COMMIT을, 하나라도 NO이면 ROLLBACK을 전체에 전달해요'],
+      ['In-Doubt 트랜잭션', '2PC 도중 장애가 생기면 해결 대기 상태가 돼요. RECO 백그라운드 프로세스가 자동으로 복구해요'],
     ],
   },
   en: {

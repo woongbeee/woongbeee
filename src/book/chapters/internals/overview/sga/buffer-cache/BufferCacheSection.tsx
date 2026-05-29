@@ -20,35 +20,46 @@ const T = {
     title: 'Buffer Cache',
 
     whatTitle: 'Buffer Cache가 뭐예요?',
-    whatP1: '디스크에 저장된 데이터 파일에서 데이터 블록들을 복사해 저장해두는 곳이에요. 버퍼 캐시에 있는 데이터를 요청하면 디스크를 거치지 않고 메모리에서 즉시 꺼내줘요.',
-    whatP2: '메모리와 디스크의 속도 차이는 수천~수만 배에 달해요. Buffer Cache의 Hit Ratio(캐시 적중률)가 높을수록 데이터를 불러오는 속도가 빨라요. DBA가 가장 먼저 살피는 성능 지표 중 하나예요.',
-    whatP3: 'Buffer Cache 안의 각 단위 블록을 "버퍼(buffer)"라고 불러요. 하나의 버퍼는 디스크의 한 데이터 블록(기본 8KB)과 1:1로 대응돼요. 버퍼에는 블록 내용 외에도 상태 정보·주소·LRU 리스트 포인터 같은 메타데이터가 함께 담긴 헤더가 붙어 있어요.',
+    whatP1:
+      '디스크에 저장된 데이터 파일에서 데이터 블록들을 복사해 저장해두는 곳이에요. 버퍼 캐시에 있는 데이터를 요청하면 디스크를 거치지 않고 메모리에서 즉시 꺼내줘요.',
+    whatP2:
+      '메모리와 디스크의 속도 차이는 수천~수만 배에 달해요. Buffer Cache의 Hit Ratio(캐시 적중률)가 높을수록 데이터를 불러오는 속도가 빨라요. DBA가 가장 먼저 살피는 성능 지표 중 하나예요.',
+    whatP3:
+      'Buffer Cache 안의 각 단위 블록을 "버퍼(buffer)"라고 불러요. 하나의 버퍼는 디스크의 한 데이터 블록(기본 8KB)과 1:1로 대응돼요. 버퍼에는 블록 내용 외에도 상태 정보·주소·LRU 리스트 포인터 같은 메타데이터가 함께 담긴 헤더가 붙어 있어요.',
 
     whyTitle: '왜 Buffer Cache가 필요할까요? — 디스크와 메모리의 속도 차이!',
 
     statesTitle: '버퍼 상태',
     statesDesc: '각 버퍼는 세 가지 상태 중 하나를 가져요.',
     stateUnused: 'Unused (미사용)',
-    stateUnusedDesc: '아직 한 번도 사용되지 않은 버퍼예요. 인스턴스 시작 직후 Buffer Cache는 Unused 버퍼로 가득 차 있어요.',
+    stateUnusedDesc:
+      '아직 한 번도 사용되지 않은 버퍼예요. 인스턴스 시작 직후 Buffer Cache는 Unused 버퍼로 가득 차 있어요.',
     stateClean: 'Clean (정합)',
-    stateCleanDesc: '디스크 내용과 동일한 버퍼예요. 수정되지 않았거나, 수정 후 DBWn(데이터베이스 라이터)이 디스크에 기록을 완료한 상태예요. 재사용 대상이에요.',
+    stateCleanDesc:
+      '디스크 내용과 동일한 버퍼예요. 수정되지 않았거나, 수정 후 DBWn(데이터베이스 라이터)이 디스크에 기록을 완료한 상태예요. 재사용 대상이에요.',
     stateDirty: 'Dirty (변경됨)',
-    stateDirtyDesc: '메모리에서 수정됐지만 아직 디스크에 반영되지 않은 버퍼예요. DBWn이 Checkpoint 신호를 받거나 Dirty 리스트가 길어지면 디스크에 써요.',
+    stateDirtyDesc:
+      '메모리에서 수정됐지만 아직 디스크에 반영되지 않은 버퍼예요. DBWn이 Checkpoint 신호를 받거나 Dirty 리스트가 길어지면 디스크에 써요.',
 
     modesTitle: '버퍼 액세스 모드',
     modesDesc: 'Oracle은 두 가지 방식으로 버퍼에 접근해요.',
-    scnNote: 'SCN(System Change Number, 시스템 변경 번호)은 Oracle이 트랜잭션 순서를 기록하는 타임스탬프 같은 번호예요. 변경이 일어날 때마다 1씩 올라가며, "이 시점에 커밋된 데이터"를 정확히 특정하는 데 써요. 자세한 내용은 뒤에서 다뤄요.',
+    scnNote:
+      'SCN(System Change Number, 시스템 변경 번호)은 Oracle이 트랜잭션 순서를 기록하는 타임스탬프 같은 번호예요. 변경이 일어날 때마다 1씩 올라가며, "이 시점에 커밋된 데이터"를 정확히 특정하는 데 써요. 자세한 내용은 뒤에서 다뤄요.',
     modeCurrent: 'Current Mode (db block get)',
-    modeCurrentDesc: 'DML이 블록을 직접 수정하기 위해 Buffer Cache에서 블록을 가져오는 방식이에요. "현재 버전"이라는 뜻은 미커밋 데이터를 반환한다는 의미가 아니라, 물리적 블록 자체를 잠그고 그 위에 변경을 쓴다는 의미예요. Dirty Read와는 전혀 달라요.',
-    modeCurrentExample: 'A가 같은 블록의 Row 2개를 수정하고 아직 COMMIT하지 않은 상태예요. B가 같은 블록에 UPDATE를 실행하면 Current Mode로 블록을 가져와요. B는 A의 미커밋 데이터를 "읽어서 결과로 받는" 게 아니라, 같은 블록에 자신의 Row 3 변경을 덧써요. Row Lock으로 A와 B의 수정 대상이 겹치지 않도록 보호돼요.',
+    modeCurrentDesc:
+      'DML이 블록을 직접 수정하기 위해 Buffer Cache에서 블록을 가져오는 방식이에요. "현재 버전"이라는 뜻은 미커밋 데이터를 반환한다는 의미가 아니라, 물리적 블록 자체를 잠그고 그 위에 변경을 쓴다는 의미예요. Dirty Read와는 전혀 달라요.',
+    modeCurrentExample:
+      'A가 같은 블록의 Row 2개를 수정하고 아직 COMMIT하지 않은 상태예요. B가 같은 블록에 UPDATE를 실행하면 Current Mode로 블록을 가져와요. B는 A의 미커밋 데이터를 "읽어서 결과로 받는" 게 아니라, 같은 블록에 자신의 Row 3 변경을 덧써요. Row Lock으로 A와 B의 수정 대상이 겹치지 않도록 보호돼요.',
     modeCurrentScenario: [
       'A: Row 1 → "Alice" (미커밋)',
       'A: Row 2 → "Bob"   (미커밋)',
       'B: UPDATE → Current Mode로 블록 획득 → Row 3 수정',
     ],
     modeConsistent: 'Consistent Mode (consistent get)',
-    modeConsistentDesc: '쿼리가 시작된 시점의 SCN을 기준으로 일관된 스냅샷을 읽어요. 다른 트랜잭션이 블록을 수정 중이면 Oracle이 Undo로 이전 버전을 재구성해요. SELECT에서 사용해요.',
-    modeConsistentExample: '같은 상황에서 C가 SELECT를 실행해요. 쿼리 시작 시점의 SCN이 A의 수정 이전이므로, Oracle은 A의 Undo 데이터를 이용해 수정 전 값으로 블록을 재구성해서 돌려줘요.',
+    modeConsistentDesc:
+      '쿼리가 시작된 시점의 SCN을 기준으로 일관된 스냅샷을 읽어요. 다른 트랜잭션이 블록을 수정 중이면 Oracle이 Undo로 이전 버전을 재구성해요. SELECT에서 사용해요.',
+    modeConsistentExample:
+      '같은 상황에서 C가 SELECT를 실행해요. 쿼리 시작 시점의 SCN이 A의 수정 이전이므로, Oracle은 A의 Undo 데이터를 이용해 수정 전 값으로 블록을 재구성해서 돌려줘요.',
     modeConsistentScenario: [
       'A: Row 1, 2 수정 중 (미커밋, SCN 1005)',
       'C: SELECT 시작 (SCN 1000 기준)',
@@ -57,9 +68,12 @@ const T = {
     ],
 
     lruTitle: '버퍼를 관리하는 LRU 알고리즘과 Touch Count',
-    lruP1: 'LRU(Least Recently Used)는 "가장 오래 전에 사용된 것을 먼저 내보낸다"는 알고리즘이에요. 데이터에 마지막으로 접근한 시간만을 기준으로 버퍼를 관리해요.',
-    lruP2: 'Oracle은 여기서 한 발 더 나아가 Touch Count라는 개념을 추가했어요. 접근한 시간뿐 아니라 얼마나 자주 접근했는지(빈도)까지 함께 고려해서, 자주 쓰이는 블록은 오래 살아남고 한 번만 읽히는 블록은 빨리 내보내도록 해요.',
-    lruP3: 'LRU 리스트는 Hot End(자주 접근)와 Cold End(드물게 접근) 두 쪽으로 나뉘어요. 새로 올라온 블록은 Hot End와 Cold End 사이의 경계인 midpoint에 삽입돼요. 접근할 때마다 Touch Count가 올라가고, 임계값(기본 2)을 넘으면 Hot End로 승격돼요. 3초 이내 재접근은 카운트하지 않으며, 전체 테이블 스캔 시에도 동일하게 midpoint에 삽입해서 Hot End의 중요 블록이 밀려나지 않도록 해요.',
+    lruP1:
+      'LRU(Least Recently Used)는 "가장 오래 전에 사용된 것을 먼저 내보낸다"는 알고리즘이에요. 데이터에 마지막으로 접근한 시간만을 기준으로 버퍼를 관리해요.',
+    lruP2:
+      'Oracle은 여기서 한 발 더 나아가 Touch Count라는 개념을 추가했어요. 접근한 시간뿐 아니라 얼마나 자주 접근했는지(빈도)까지 함께 고려해서, 자주 쓰이는 블록은 오래 살아남고 한 번만 읽히는 블록은 빨리 내보내도록 해요.',
+    lruP3:
+      'LRU 리스트는 Hot End(자주 접근)와 Cold End(드물게 접근) 두 쪽으로 나뉘어요. 새로 올라온 블록은 Hot End와 Cold End 사이의 경계인 midpoint에 삽입돼요. 접근할 때마다 Touch Count가 올라가고, 임계값(기본 2)을 넘으면 Hot End로 승격돼요. 3초 이내 재접근은 카운트하지 않으며, 전체 테이블 스캔 시에도 동일하게 midpoint에 삽입해서 Hot End의 중요 블록이 밀려나지 않도록 해요.',
     touchTitle: 'Touch Count 규칙',
     touchRule1: '동일 블록 접근 시 Touch Count +1',
     touchRule2: '단, 3초 이내 재접근은 카운트 안 해요 (Pin 상태)',
@@ -67,45 +81,81 @@ const T = {
     touchRule4: 'Full Table Scan → Cold End 중간 삽입 (중요 블록 보호)',
 
     poolsTitle: 'Buffer Pool 구성',
-    poolsDesc: 'Database Buffer Cache는 하나 이상의 Buffer Pool로 구성돼요. 각 Pool은 독립된 LRU 리스트를 가져요.',
+    poolsDesc:
+      'Database Buffer Cache는 하나 이상의 Buffer Pool로 구성돼요. 각 Pool은 독립된 LRU 리스트를 가져요.',
     poolDefault: 'Default Pool',
-    poolDefaultDesc: '모든 버퍼가 기본으로 올라오는 Pool이에요. DB_CACHE_SIZE 파라미터로 크기를 설정해요.',
+    poolDefaultDesc:
+      '모든 버퍼가 기본으로 올라오는 Pool이에요. DB_CACHE_SIZE 파라미터로 크기를 설정해요.',
     poolKeep: 'Keep Pool',
-    poolKeepDesc: '자주 접근하는 작은 테이블·인덱스를 상주시키는 Pool이에요. LRU에 의해 밀려나지 않게 보호해요. DB_KEEP_CACHE_SIZE로 설정해요.',
+    poolKeepDesc:
+      '자주 접근하는 작은 테이블·인덱스를 상주시키는 Pool이에요. LRU에 의해 밀려나지 않게 보호해요. DB_KEEP_CACHE_SIZE로 설정해요.',
     poolRecycle: 'Recycle Pool',
-    poolRecycleDesc: '크고 거의 재사용되지 않는 세그먼트를 위한 Pool이에요. 빠르게 재활용해서 Default Pool을 보호해요. DB_RECYCLE_CACHE_SIZE로 설정해요.',
+    poolRecycleDesc:
+      '크고 거의 재사용되지 않는 세그먼트를 위한 Pool이에요. 빠르게 재활용해서 Default Pool을 보호해요. DB_RECYCLE_CACHE_SIZE로 설정해요.',
     poolNonStd: '비표준 블록 크기 Pool',
-    poolNonStdDesc: 'Oracle의 기본 블록 크기는 8KB예요. 그런데 특정 테이블스페이스를 2K·4K·16K·32K 블록으로 만들면, 그 블록은 기본 Default Pool에 올라오지 않아요. 블록 크기가 다른 버퍼들이 같은 Pool을 공유하면 관리가 복잡해지기 때문이에요. 대신 Oracle은 해당 크기에 맞는 별도의 Pool을 SGA 안에 따로 만들어서 거기에 보관해요. 예를 들어 16K 블록 테이블스페이스가 있다면 DB_16K_CACHE_SIZE 파라미터로 16K 전용 Pool 크기를 설정해야 해당 블록이 메모리에 올라올 수 있어요.',
+    poolNonStdDesc:
+      'Oracle의 기본 블록 크기는 8KB예요. 그런데 특정 테이블스페이스를 2K·4K·16K·32K 블록으로 만들면, 그 블록은 기본 Default Pool에 올라오지 않아요. 블록 크기가 다른 버퍼들이 같은 Pool을 공유하면 관리가 복잡해지기 때문이에요. 대신 Oracle은 해당 크기에 맞는 별도의 Pool을 SGA 안에 따로 만들어서 거기에 보관해요. 예를 들어 16K 블록 테이블스페이스가 있다면 DB_16K_CACHE_SIZE 파라미터로 16K 전용 Pool 크기를 설정해야 해당 블록이 메모리에 올라올 수 있어요.',
     poolDefaultSql: `-- 기본값. 별도 지정 없으면 Default Pool에 캐시됨\nCREATE TABLE orders (...) STORAGE (BUFFER_POOL DEFAULT);\nALTER TABLE orders STORAGE (BUFFER_POOL DEFAULT);`,
     poolKeepSql: `-- 자주 쓰는 소형 테이블을 LRU로부터 보호\nCREATE TABLE small_lookup (...) STORAGE (BUFFER_POOL KEEP);\nALTER TABLE small_lookup STORAGE (BUFFER_POOL KEEP);`,
     poolRecycleSql: `-- 크고 재사용 빈도가 낮은 세그먼트\nCREATE TABLE large_hist (...) STORAGE (BUFFER_POOL RECYCLE);\nALTER TABLE large_hist STORAGE (BUFFER_POOL RECYCLE);`,
 
     fullScanTitle: 'Full Table Scan과 Direct Path Read',
-    fullScanP1: '작은 테이블의 Full Scan: Cold End 중간에 삽입해요. 빠르게 재접근할 가능성이 있어서 Cache에 올려둬요.',
-    fullScanP2: '큰 테이블의 Full Scan: Oracle이 임계값(DB_FILE_MULTIBLOCK_READ_COUNT × Block size)을 초과하는 세그먼트에 대해 Direct Path Read를 수행해요. Buffer Cache를 완전히 건너뛰고 PGA로 직접 읽어서 캐시를 오염시키지 않아요.',
-    fullScanNote: 'Direct Path Read는 11g부터 직렬 Full Scan에도 자동으로 적용돼요. V$SQL_PLAN의 access 항목에서 direct path read 이벤트를 확인할 수 있어요.',
+    fullScanP1:
+      '작은 테이블의 Full Scan: Cold End 중간에 삽입해요. 빠르게 재접근할 가능성이 있어서 Cache에 올려둬요.',
+    fullScanP2:
+      '큰 테이블의 Full Scan: Oracle이 임계값(DB_FILE_MULTIBLOCK_READ_COUNT × Block size)을 초과하는 세그먼트에 대해 Direct Path Read를 수행해요. Buffer Cache를 완전히 건너뛰고 PGA로 직접 읽어서 캐시를 오염시키지 않아요.',
+    fullScanNote:
+      'Direct Path Read는 11g부터 직렬 Full Scan에도 자동으로 적용돼요. V$SQL_PLAN의 access 항목에서 direct path read 이벤트를 확인할 수 있어요.',
 
     paramsTitle: '주요 파라미터',
     param1: 'DB_CACHE_SIZE',
-    param1Desc: 'Default Pool 크기예요. ASMM(SGA_TARGET 설정) 시 자동 조정돼요.',
+    param1Desc:
+      'Default Pool 크기예요. ASMM(SGA_TARGET 설정) 시 자동 조정돼요.',
     param2: 'DB_KEEP_CACHE_SIZE',
     param2Desc: 'Keep Pool 크기예요. 0이면 Keep Pool이 없어요.',
     param3: 'DB_RECYCLE_CACHE_SIZE',
     param3Desc: 'Recycle Pool 크기예요. 0이면 Recycle Pool이 없어요.',
     param4: 'DB_nK_CACHE_SIZE',
-    param4Desc: '비표준 블록 크기(2K/4K/16K/32K) Pool 크기예요. 해당 블록 크기의 테이블스페이스가 있을 때만 설정해요.',
+    param4Desc:
+      '비표준 블록 크기(2K/4K/16K/32K) Pool 크기예요. 해당 블록 크기의 테이블스페이스가 있을 때만 설정해요.',
 
     dbwnTitle: 'Dirty 버퍼는 어떻게 디스크에 기록될까요? — DBWn 쓰기 흐름',
-    dbwnDesc: 'Buffer Cache에 수정된 Dirty 버퍼는 즉시 디스크에 쓰이지 않아요. DBWn(Database Writer, 데이터베이스 라이터)이 적절한 시점에 일괄로 써요. 이 과정에서 CKPT(체크포인트), LGWR(로그 라이터), Redo Log Buffer, Online Redo Log가 함께 관여해요.',
+    dbwnDesc:
+      'Buffer Cache에 수정된 Dirty 버퍼는 즉시 디스크에 쓰이지 않아요. DBWn(Database Writer, 데이터베이스 라이터)이 적절한 시점에 일괄로 써요. 이 과정에서 CKPT(체크포인트), LGWR(로그 라이터), Redo Log Buffer, Online Redo Log가 함께 관여해요.',
     dbwnSteps: [
-      { ids: ['buffer-cache'] as InstanceComponentId[], title: 'Dirty 버퍼 누적', desc: '트랜잭션이 블록을 수정하면 Buffer Cache 안의 해당 버퍼가 Dirty 상태가 돼요. Dirty 버퍼는 Dirty List(LRUW 리스트)에 등록되어 DBWn이 쓸 차례를 기다려요.' },
-      { ids: ['redo-buffer'] as InstanceComponentId[], title: 'Redo 항목 생성', desc: '블록 수정과 동시에 변경 내용(Before/After Image)을 담은 Redo 항목이 Redo Log Buffer에 기록돼요. 이 기록이 있어야 장애 시 복구가 가능해요.' },
-      { ids: ['ckpt', 'dbwr'] as InstanceComponentId[], title: 'CKPT → DBWn 신호', desc: 'Checkpoint가 발생하면 CKPT(체크포인트) 프로세스가 DBWn에게 Dirty 버퍼를 디스크에 쓰도록 신호를 보내요. Checkpoint는 Log Switch·설정 시간 초과·SHUTDOWN 등에 의해 트리거돼요.' },
-      { ids: ['lgwr', 'redo-buffer', 'redo-log-file'] as InstanceComponentId[], title: 'LGWR Write-Ahead', desc: 'DBWn이 Dirty 버퍼를 디스크에 쓰기 전, 해당 버퍼와 관련된 Redo 항목이 먼저 Online Redo Log 파일에 기록되어야 해요(WAL — Write-Ahead Logging). LGWR(로그 라이터)가 Redo Log Buffer의 내용을 Online Redo Log에 플러시한 뒤 DBWn에게 완료를 알려요.' },
-      { ids: ['dbwr', 'disk'] as InstanceComponentId[], title: 'DBWn → Data Files', desc: 'LGWR가 Redo를 먼저 기록한 뒤, DBWn이 Dirty 버퍼들을 Data Files에 써요. 기록된 버퍼는 Clean 상태가 되어 재사용할 수 있어요.' },
-      { ids: ['ckpt', 'control-file', 'disk'] as InstanceComponentId[], title: 'CKPT → 헤더 갱신', desc: 'DBWn 쓰기가 완료되면 CKPT가 Control File과 Data File 헤더의 Checkpoint SCN을 갱신해요. 이 SCN 이전 데이터는 디스크에 안전하게 보존되어 있다는 뜻이에요.' },
+      {
+        ids: ['buffer-cache'] as InstanceComponentId[],
+        title: 'Dirty 버퍼 누적',
+        desc: '트랜잭션이 블록을 수정하면 Buffer Cache 안의 해당 버퍼가 Dirty 상태가 돼요. Dirty 버퍼는 Dirty List(LRUW 리스트)에 등록되어 DBWn이 쓸 차례를 기다려요.',
+      },
+      {
+        ids: ['redo-buffer'] as InstanceComponentId[],
+        title: 'Redo 항목 생성',
+        desc: '블록 수정과 동시에 변경 내용(Before/After Image)을 담은 Redo 항목이 Redo Log Buffer에 기록돼요. 이 기록이 있어야 장애 시 복구가 가능해요.',
+      },
+      {
+        ids: ['ckpt', 'dbwr'] as InstanceComponentId[],
+        title: 'CKPT → DBWn 신호',
+        desc: 'Checkpoint가 발생하면 CKPT(체크포인트) 프로세스가 DBWn에게 Dirty 버퍼를 디스크에 쓰도록 신호를 보내요. Checkpoint는 Log Switch·설정 시간 초과·SHUTDOWN 등에 의해 트리거돼요.',
+      },
+      {
+        ids: ['lgwr', 'redo-buffer', 'redo-log-file'] as InstanceComponentId[],
+        title: 'LGWR Write-Ahead',
+        desc: 'DBWn이 Dirty 버퍼를 디스크에 쓰기 전, 해당 버퍼와 관련된 Redo 항목이 먼저 Online Redo Log 파일에 기록되어야 해요(WAL — Write-Ahead Logging). LGWR(로그 라이터)가 Redo Log Buffer의 내용을 Online Redo Log에 플러시한 뒤 DBWn에게 완료를 알려요.',
+      },
+      {
+        ids: ['dbwr', 'disk'] as InstanceComponentId[],
+        title: 'DBWn → Data Files',
+        desc: 'LGWR가 Redo를 먼저 기록한 뒤, DBWn이 Dirty 버퍼들을 Data Files에 써요. 기록된 버퍼는 Clean 상태가 되어 재사용할 수 있어요.',
+      },
+      {
+        ids: ['ckpt', 'control-file', 'disk'] as InstanceComponentId[],
+        title: 'CKPT → 헤더 갱신',
+        desc: 'DBWn 쓰기가 완료되면 CKPT가 Control File과 Data File 헤더의 Checkpoint SCN을 갱신해요. 이 SCN 이전 데이터는 디스크에 안전하게 보존되어 있다는 뜻이에요.',
+      },
     ],
-    dbwnNote: 'WAL(Write-Ahead Logging) 원칙: Redo가 먼저, 데이터가 나중. DBWn이 Data File에 쓰기 전 LGWR가 반드시 Redo Log에 먼저 기록해야 해요. 이 순서가 지켜져야만 장애 시 Redo 로그로 복구할 수 있어요.',
+    dbwnNote:
+      'WAL(Write-Ahead Logging) 원칙: Redo가 먼저, 데이터가 나중. DBWn이 Data File에 쓰기 전 LGWR가 반드시 Redo Log에 먼저 기록해야 해요. 이 순서가 지켜져야만 장애 시 Redo 로그로 복구할 수 있어요.',
 
     summaryTitle: 'Buffer Cache 핵심 정리',
     summaryItems: [
@@ -120,35 +170,46 @@ const T = {
     title: 'Buffer Cache',
 
     whatTitle: 'What is the Buffer Cache?',
-    whatP1: 'A place that copies and holds data blocks from the data files stored on disk. When data in the Buffer Cache is requested, Oracle returns it immediately from memory — no disk access needed.',
-    whatP2: 'The speed gap between memory and disk is thousands to tens of thousands of times. The higher the Buffer Cache Hit Ratio, the faster data retrieval becomes. It is one of the first performance metrics a DBA examines.',
-    whatP3: 'Each unit inside the Buffer Cache is called a "buffer." One buffer maps 1:1 to one data block on disk (8 KB by default). Each buffer has a header containing metadata: state flags, block address, and LRU list pointers.',
+    whatP1:
+      'A place that copies and holds data blocks from the data files stored on disk. When data in the Buffer Cache is requested, Oracle returns it immediately from memory — no disk access needed.',
+    whatP2:
+      'The speed gap between memory and disk is thousands to tens of thousands of times. The higher the Buffer Cache Hit Ratio, the faster data retrieval becomes. It is one of the first performance metrics a DBA examines.',
+    whatP3:
+      'Each unit inside the Buffer Cache is called a "buffer." One buffer maps 1:1 to one data block on disk (8 KB by default). Each buffer has a header containing metadata: state flags, block address, and LRU list pointers.',
 
     whyTitle: 'Why Buffer Cache Exists — The Speed Gap Between Disk and Memory',
 
     statesTitle: 'Buffer States',
     statesDesc: 'Each buffer is in exactly one of three states.',
     stateUnused: 'Unused',
-    stateUnusedDesc: 'A buffer that has never been used. Right after instance startup, the Buffer Cache is full of Unused buffers.',
+    stateUnusedDesc:
+      'A buffer that has never been used. Right after instance startup, the Buffer Cache is full of Unused buffers.',
     stateClean: 'Clean',
-    stateCleanDesc: 'The buffer matches its on-disk version — either it was never modified, or DBWn has already written it to disk. A candidate for reuse.',
+    stateCleanDesc:
+      'The buffer matches its on-disk version — either it was never modified, or DBWn has already written it to disk. A candidate for reuse.',
     stateDirty: 'Dirty',
-    stateDirtyDesc: 'Modified in memory but not yet written to disk. DBWn flushes Dirty buffers when triggered by a Checkpoint signal or when the Dirty list grows too long.',
+    stateDirtyDesc:
+      'Modified in memory but not yet written to disk. DBWn flushes Dirty buffers when triggered by a Checkpoint signal or when the Dirty list grows too long.',
 
     modesTitle: 'Buffer Access Modes',
     modesDesc: 'Oracle accesses buffers in two distinct modes.',
-    scnNote: 'SCN (System Change Number) is a sequential number Oracle increments with every change — think of it as a transaction timestamp. It lets Oracle pinpoint exactly which version of data was committed at a given moment. More detail comes later.',
+    scnNote:
+      'SCN (System Change Number) is a sequential number Oracle increments with every change — think of it as a transaction timestamp. It lets Oracle pinpoint exactly which version of data was committed at a given moment. More detail comes later.',
     modeCurrent: 'Current Mode (db block get)',
-    modeCurrentDesc: "The mode DML uses to acquire the physical block in the Buffer Cache for in-place modification. \"Current\" means Oracle locks the actual block and writes changes directly onto it — not that uncommitted data is returned to anyone. This is completely different from a dirty read.",
-    modeCurrentExample: "A has modified 2 rows in the same block and has not yet committed. B issues an UPDATE on the same block. Oracle fetches the block in Current Mode — B is not receiving A's uncommitted data as a query result; it is writing its own change (Row 3) onto the same physical block. Row-level locks ensure A's and B's modifications target different rows.",
+    modeCurrentDesc:
+      'The mode DML uses to acquire the physical block in the Buffer Cache for in-place modification. "Current" means Oracle locks the actual block and writes changes directly onto it — not that uncommitted data is returned to anyone. This is completely different from a dirty read.',
+    modeCurrentExample:
+      "A has modified 2 rows in the same block and has not yet committed. B issues an UPDATE on the same block. Oracle fetches the block in Current Mode — B is not receiving A's uncommitted data as a query result; it is writing its own change (Row 3) onto the same physical block. Row-level locks ensure A's and B's modifications target different rows.",
     modeCurrentScenario: [
       'A: Row 1 → "Alice" (uncommitted)',
       'A: Row 2 → "Bob"   (uncommitted)',
       'B: UPDATE → acquires block in Current Mode → modifies Row 3',
     ],
     modeConsistent: 'Consistent Mode (consistent get)',
-    modeConsistentDesc: 'Reads a snapshot of the block consistent with the SCN at which the query started. If another transaction has modified the block, Oracle reconstructs the older version using Undo data. Used by SELECT.',
-    modeConsistentExample: "In the same situation, C runs a SELECT. Its query-start SCN predates A's changes. Oracle applies A's Undo records to reconstruct the block as it looked before the modifications, and returns that clean snapshot to C.",
+    modeConsistentDesc:
+      'Reads a snapshot of the block consistent with the SCN at which the query started. If another transaction has modified the block, Oracle reconstructs the older version using Undo data. Used by SELECT.',
+    modeConsistentExample:
+      "In the same situation, C runs a SELECT. Its query-start SCN predates A's changes. Oracle applies A's Undo records to reconstruct the block as it looked before the modifications, and returns that clean snapshot to C.",
     modeConsistentScenario: [
       'A: modifying Row 1, 2 (uncommitted, SCN 1005)',
       'C: SELECT starts (reads as of SCN 1000)',
@@ -157,55 +218,97 @@ const T = {
     ],
 
     lruTitle: 'LRU Algorithm and Touch Count',
-    lruP1: 'LRU (Least Recently Used) is an algorithm that evicts whichever buffer was accessed least recently — in other words, it manages buffers based purely on when each block was last touched.',
-    lruP2: 'Oracle goes one step further by introducing Touch Count. Rather than considering only recency, Oracle also tracks access frequency — blocks that are accessed often stay in cache longer, while blocks read only once are evicted quickly.',
-    lruP3: 'The LRU list is split into a Hot End (frequently accessed) and a Cold End (rarely accessed). Newly loaded blocks are inserted at the midpoint — the boundary between Hot End and Cold End. Each access increments the block\'s Touch Count; once it exceeds the threshold (default: 2), the block is promoted to the Hot End. Re-access within 3 seconds does not count, and Full Table Scan blocks are also inserted at the midpoint to prevent them from evicting important Hot End data.',
+    lruP1:
+      'LRU (Least Recently Used) is an algorithm that evicts whichever buffer was accessed least recently — in other words, it manages buffers based purely on when each block was last touched.',
+    lruP2:
+      'Oracle goes one step further by introducing Touch Count. Rather than considering only recency, Oracle also tracks access frequency — blocks that are accessed often stay in cache longer, while blocks read only once are evicted quickly.',
+    lruP3:
+      "The LRU list is split into a Hot End (frequently accessed) and a Cold End (rarely accessed). Newly loaded blocks are inserted at the midpoint — the boundary between Hot End and Cold End. Each access increments the block's Touch Count; once it exceeds the threshold (default: 2), the block is promoted to the Hot End. Re-access within 3 seconds does not count, and Full Table Scan blocks are also inserted at the midpoint to prevent them from evicting important Hot End data.",
     touchTitle: 'Touch Count Rules',
     touchRule1: 'Access to a block → Touch Count +1',
-    touchRule2: 'Re-access within 3 seconds (while pinned) → does not increment',
+    touchRule2:
+      'Re-access within 3 seconds (while pinned) → does not increment',
     touchRule3: 'Touch Count ≥ threshold → promote to Hot End',
-    touchRule4: 'Full Table Scan → insert at Cold End midpoint (protects hot blocks)',
+    touchRule4:
+      'Full Table Scan → insert at Cold End midpoint (protects hot blocks)',
 
     poolsTitle: 'Buffer Pool Structure',
-    poolsDesc: 'The Database Buffer Cache can consist of one or more Buffer Pools, each with its own independent LRU list.',
+    poolsDesc:
+      'The Database Buffer Cache can consist of one or more Buffer Pools, each with its own independent LRU list.',
     poolDefault: 'Default Pool',
-    poolDefaultDesc: 'The pool where all buffers land by default. Sized with DB_CACHE_SIZE. Auto-managed under ASMM.',
+    poolDefaultDesc:
+      'The pool where all buffers land by default. Sized with DB_CACHE_SIZE. Auto-managed under ASMM.',
     poolKeep: 'Keep Pool',
-    poolKeepDesc: 'Keeps frequently accessed small tables and indexes in memory, protecting them from LRU eviction. Sized with DB_KEEP_CACHE_SIZE.',
+    poolKeepDesc:
+      'Keeps frequently accessed small tables and indexes in memory, protecting them from LRU eviction. Sized with DB_KEEP_CACHE_SIZE.',
     poolRecycle: 'Recycle Pool',
-    poolRecycleDesc: 'For large segments that are rarely reused. Recycles quickly to protect the Default Pool. Sized with DB_RECYCLE_CACHE_SIZE.',
+    poolRecycleDesc:
+      'For large segments that are rarely reused. Recycles quickly to protect the Default Pool. Sized with DB_RECYCLE_CACHE_SIZE.',
     poolNonStd: 'Non-Standard Block Size Pools',
-    poolNonStdDesc: "Oracle's default block size is 8KB. If you create a tablespace with a different block size — 2K, 4K, 16K, or 32K — those blocks cannot go into the Default Pool. Mixing different block sizes in a single pool would make buffer management far too complicated. Instead, Oracle maintains a separate pool in the SGA for each non-standard block size. For example, if you have a 16K-block tablespace, you must set DB_16K_CACHE_SIZE to give that pool some memory — otherwise Oracle has nowhere to cache those blocks.",
+    poolNonStdDesc:
+      "Oracle's default block size is 8KB. If you create a tablespace with a different block size — 2K, 4K, 16K, or 32K — those blocks cannot go into the Default Pool. Mixing different block sizes in a single pool would make buffer management far too complicated. Instead, Oracle maintains a separate pool in the SGA for each non-standard block size. For example, if you have a 16K-block tablespace, you must set DB_16K_CACHE_SIZE to give that pool some memory — otherwise Oracle has nowhere to cache those blocks.",
     poolDefaultSql: `-- Default. Cached here unless explicitly assigned\nCREATE TABLE orders (...) STORAGE (BUFFER_POOL DEFAULT);\nALTER TABLE orders STORAGE (BUFFER_POOL DEFAULT);`,
     poolKeepSql: `-- Pin small, frequently accessed tables in memory\nCREATE TABLE small_lookup (...) STORAGE (BUFFER_POOL KEEP);\nALTER TABLE small_lookup STORAGE (BUFFER_POOL KEEP);`,
     poolRecycleSql: `-- Large, rarely reused segments\nCREATE TABLE large_hist (...) STORAGE (BUFFER_POOL RECYCLE);\nALTER TABLE large_hist STORAGE (BUFFER_POOL RECYCLE);`,
 
     fullScanTitle: 'Full Table Scan and Direct Path Read',
-    fullScanP1: 'Small table full scan: blocks are inserted at the Cold End midpoint — they may be accessed again soon, so they stay in cache.',
-    fullScanP2: 'Large table full scan: for segments exceeding a threshold (DB_FILE_MULTIBLOCK_READ_COUNT × block size), Oracle performs a Direct Path Read. It reads directly into the PGA, bypassing the Buffer Cache entirely — no cache pollution.',
-    fullScanNote: 'Since 11g, Direct Path Read can be applied automatically to serial full scans. Check V$SQL_PLAN for "direct path read" wait events.',
+    fullScanP1:
+      'Small table full scan: blocks are inserted at the Cold End midpoint — they may be accessed again soon, so they stay in cache.',
+    fullScanP2:
+      'Large table full scan: for segments exceeding a threshold (DB_FILE_MULTIBLOCK_READ_COUNT × block size), Oracle performs a Direct Path Read. It reads directly into the PGA, bypassing the Buffer Cache entirely — no cache pollution.',
+    fullScanNote:
+      'Since 11g, Direct Path Read can be applied automatically to serial full scans. Check V$SQL_PLAN for "direct path read" wait events.',
 
     paramsTitle: 'Key Parameters',
     param1: 'DB_CACHE_SIZE',
-    param1Desc: 'Default Pool size. Auto-managed when ASMM is active (SGA_TARGET set).',
+    param1Desc:
+      'Default Pool size. Auto-managed when ASMM is active (SGA_TARGET set).',
     param2: 'DB_KEEP_CACHE_SIZE',
     param2Desc: 'Keep Pool size. 0 means no Keep Pool.',
     param3: 'DB_RECYCLE_CACHE_SIZE',
     param3Desc: 'Recycle Pool size. 0 means no Recycle Pool.',
     param4: 'DB_nK_CACHE_SIZE',
-    param4Desc: 'Pool size for non-standard block sizes (2K/4K/16K/32K). Only set if a tablespace with that block size exists.',
+    param4Desc:
+      'Pool size for non-standard block sizes (2K/4K/16K/32K). Only set if a tablespace with that block size exists.',
 
-    dbwnTitle: 'How Do Dirty Buffers Get Written to Disk? — The DBWn Write Flow',
-    dbwnDesc: 'Dirty buffers in the Buffer Cache are not written to disk immediately. DBWn (Database Writer) batches them and flushes at the right moment — with CKPT, LGWR, the Redo Log Buffer, and Online Redo Logs all playing a role.',
+    dbwnTitle:
+      'How Do Dirty Buffers Get Written to Disk? — The DBWn Write Flow',
+    dbwnDesc:
+      'Dirty buffers in the Buffer Cache are not written to disk immediately. DBWn (Database Writer) batches them and flushes at the right moment — with CKPT, LGWR, the Redo Log Buffer, and Online Redo Logs all playing a role.',
     dbwnSteps: [
-      { title: 'Dirty Buffers Accumulate', desc: 'When a transaction modifies a block, the corresponding buffer in the Buffer Cache becomes Dirty. Dirty buffers are added to the Dirty List (LRUW list) and wait for DBWn to write them out.' },
-      { title: 'Redo Entries Generated', desc: 'As each block is modified, a redo entry capturing the before and after image is written to the Redo Log Buffer. These entries make crash recovery possible.' },
-      { title: 'CKPT Signals DBWn', desc: 'When a checkpoint fires, the CKPT process signals DBWn to flush dirty buffers to disk. Checkpoints are triggered by log switches, the checkpoint interval timeout, or a SHUTDOWN command.' },
-      { title: 'LGWR Write-Ahead', desc: 'Before DBWn writes any dirty buffer to disk, the redo entries for those buffers must already be in the Online Redo Log files — this is the WAL (Write-Ahead Logging) guarantee. LGWR flushes the Redo Log Buffer to the Online Redo Logs first, then signals DBWn that it is safe to proceed.' },
-      { title: 'DBWn → Data Files', desc: 'Once LGWR has secured the redo, DBWn writes the dirty buffers to the Data Files. Each written buffer transitions back to Clean and becomes available for reuse.' },
-      { title: 'CKPT Updates Headers', desc: 'After DBWn finishes writing, CKPT updates the Checkpoint SCN in the Control File and in each Data File header. Any data block up to this SCN is guaranteed to be safely on disk.' },
+      {
+        ids: ['buffer-cache'] as InstanceComponentId[],
+        title: 'Dirty Buffers Accumulate',
+        desc: 'When a transaction modifies a block, the corresponding buffer in the Buffer Cache becomes Dirty. Dirty buffers are added to the Dirty List (LRUW list) and wait for DBWn to write them out.',
+      },
+      {
+        ids: ['redo-buffer'] as InstanceComponentId[],
+        title: 'Redo Entries Generated',
+        desc: 'As each block is modified, a redo entry capturing the before and after image is written to the Redo Log Buffer. These entries make crash recovery possible.',
+      },
+      {
+        ids: ['ckpt', 'dbwr'] as InstanceComponentId[],
+        title: 'CKPT Signals DBWn',
+        desc: 'When a checkpoint fires, the CKPT process signals DBWn to flush dirty buffers to disk. Checkpoints are triggered by log switches, the checkpoint interval timeout, or a SHUTDOWN command.',
+      },
+      {
+        ids: ['lgwr', 'redo-buffer', 'redo-log-file'] as InstanceComponentId[],
+        title: 'LGWR Write-Ahead',
+        desc: 'Before DBWn writes any dirty buffer to disk, the redo entries for those buffers must already be in the Online Redo Log files — this is the WAL (Write-Ahead Logging) guarantee. LGWR flushes the Redo Log Buffer to the Online Redo Logs first, then signals DBWn that it is safe to proceed.',
+      },
+      {
+        ids: ['dbwr', 'disk'] as InstanceComponentId[],
+        title: 'DBWn → Data Files',
+        desc: 'Once LGWR has secured the redo, DBWn writes the dirty buffers to the Data Files. Each written buffer transitions back to Clean and becomes available for reuse.',
+      },
+      {
+        ids: ['ckpt', 'control-file', 'disk'] as InstanceComponentId[],
+        title: 'CKPT Updates Headers',
+        desc: 'After DBWn finishes writing, CKPT updates the Checkpoint SCN in the Control File and in each Data File header. Any data block up to this SCN is guaranteed to be safely on disk.',
+      },
     ],
-    dbwnNote: 'WAL (Write-Ahead Logging): Redo first, data second. LGWR must write to the Redo Log before DBWn writes to the Data File. Only then can Oracle reconstruct any lost changes from the redo log on crash recovery.',
+    dbwnNote:
+      'WAL (Write-Ahead Logging): Redo first, data second. LGWR must write to the Redo Log before DBWn writes to the Data File. Only then can Oracle reconstruct any lost changes from the redo log on crash recovery.',
 
     summaryTitle: 'Buffer Cache Key Takeaways',
     summaryItems: [

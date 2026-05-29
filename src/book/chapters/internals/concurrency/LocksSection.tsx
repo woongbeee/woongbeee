@@ -4,11 +4,9 @@ import {
   PageContainer,
   ChapterTitle,
   SectionTitle,
-  Prose,
   InfoBox,
   Divider,
   Table,
-  AccordionSection,
   SqlBlock,
 } from '../../shared'
 
@@ -273,7 +271,7 @@ export function LocksSection() {
         ))}
       </div>
 
-      <div className="w-full max-w-2xl mx-auto my-6 rounded-xl border border-amber-100 bg-amber-50/30 p-4">
+      <div className="w-full my-6 rounded-xl border border-amber-100 bg-amber-50/30 p-4">
         <LockDiagram lang={lang} />
       </div>
 
@@ -281,16 +279,20 @@ export function LocksSection() {
 
       <SectionTitle>{t.lockTypes}</SectionTitle>
 
-      <AccordionSection title={t.dmlLocksTitle} defaultOpen>
-        <Prose>{t.dmlLocksDesc}</Prose>
+      {/* DML 락 */}
+      <div className="mb-4 rounded-2xl border-2 border-blue-200 bg-blue-50/40 p-5">
+        <p className="mb-1 font-mono text-sm font-bold text-blue-700">{t.dmlLocksTitle}</p>
+        <p className="mb-4 text-xs leading-relaxed text-muted-foreground">{t.dmlLocksDesc}</p>
 
-        <AccordionSection title={t.rowLockTitle} defaultOpen>
-          <Prose>{t.rowLockDesc}</Prose>
-        </AccordionSection>
+        <div className="mb-4 rounded-xl border border-blue-200 bg-white/70 p-4">
+          <p className="mb-1 font-mono text-xs font-bold text-blue-600">{t.rowLockTitle}</p>
+          <p className="text-xs leading-relaxed text-muted-foreground">{t.rowLockDesc}</p>
+        </div>
 
-        <AccordionSection title={t.tableLockTitle}>
-          <Prose>{t.tableLockDesc}</Prose>
-          <p className="mt-4 mb-2 text-sm font-semibold text-foreground/80">{t.tmModes}</p>
+        <div className="rounded-xl border border-blue-200 bg-white/70 p-4">
+          <p className="mb-1 font-mono text-xs font-bold text-blue-600">{t.tableLockTitle}</p>
+          <p className="mb-3 text-xs leading-relaxed text-muted-foreground">{t.tableLockDesc}</p>
+          <p className="mb-2 text-xs font-semibold text-foreground/70">{t.tmModes}</p>
           <Table
             headers={[
               lang === 'ko' ? '모드' : 'Mode',
@@ -299,12 +301,14 @@ export function LocksSection() {
             ]}
             rows={lang === 'ko' ? TM_MODES_KO : TM_MODES_EN}
           />
-        </AccordionSection>
-      </AccordionSection>
+        </div>
+      </div>
 
-      <AccordionSection title={t.ddlLocksTitle}>
-        <Prose>{t.ddlLocksDesc}</Prose>
-        <p className="mt-4 mb-2 text-sm font-semibold text-foreground/80">{t.ddlLockTypes}</p>
+      {/* DDL 락 */}
+      <div className="mb-4 rounded-2xl border-2 border-violet-200 bg-violet-50/40 p-5">
+        <p className="mb-1 font-mono text-sm font-bold text-violet-700">{t.ddlLocksTitle}</p>
+        <p className="mb-4 text-xs leading-relaxed text-muted-foreground">{t.ddlLocksDesc}</p>
+        <p className="mb-2 text-xs font-semibold text-foreground/70">{t.ddlLockTypes}</p>
         <Table
           headers={[
             lang === 'ko' ? '종류' : 'Type',
@@ -313,21 +317,23 @@ export function LocksSection() {
           ]}
           rows={lang === 'ko' ? DDL_LOCK_TYPES_KO : DDL_LOCK_TYPES_EN}
         />
-      </AccordionSection>
+      </div>
 
-      <AccordionSection title={t.systemLocksTitle}>
-        <Prose>{t.systemLocksDesc}</Prose>
-        <div className="mt-4 space-y-3">
-          <div className="rounded-lg border border-border bg-muted/30 p-3">
-            <p className="text-sm font-semibold text-foreground mb-1">Latch</p>
-            <p className="text-xs text-muted-foreground leading-relaxed">{t.latchDesc}</p>
+      {/* 시스템 락 */}
+      <div className="mb-4 rounded-2xl border-2 border-amber-200 bg-amber-50/40 p-5">
+        <p className="mb-1 font-mono text-sm font-bold text-amber-700">{t.systemLocksTitle}</p>
+        <p className="mb-4 text-xs leading-relaxed text-muted-foreground">{t.systemLocksDesc}</p>
+        <div className="space-y-3">
+          <div className="rounded-xl border border-amber-200 bg-white/70 p-4">
+            <p className="mb-1 font-mono text-xs font-bold text-amber-700">Latch</p>
+            <p className="text-xs leading-relaxed text-muted-foreground">{t.latchDesc}</p>
           </div>
-          <div className="rounded-lg border border-border bg-muted/30 p-3">
-            <p className="text-sm font-semibold text-foreground mb-1">Mutex</p>
-            <p className="text-xs text-muted-foreground leading-relaxed">{t.mutexDesc}</p>
+          <div className="rounded-xl border border-amber-200 bg-white/70 p-4">
+            <p className="mb-1 font-mono text-xs font-bold text-amber-700">Mutex</p>
+            <p className="text-xs leading-relaxed text-muted-foreground">{t.mutexDesc}</p>
           </div>
         </div>
-      </AccordionSection>
+      </div>
 
       <Divider />
 

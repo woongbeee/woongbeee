@@ -8,8 +8,9 @@ import {
   InfoBox,
   Divider,
   SqlBlock,
-  AccordionSection,
 } from '../../shared'
+import { TxTimeline } from './TxTimeline'
+import type { TxSession, TxStep } from './TxTimeline'
 
 const T = {
   ko: {
@@ -90,101 +91,59 @@ const T = {
   },
 }
 
-// 교착상태 다이어그램 (공식 문서 예시 기반)
-const DeadlockDiagram = ({ lang }: { lang: 'ko' | 'en' }) => {
+function DeadlockTimeline({ lang }: { lang: 'ko' | 'en' }) {
   const isKo = lang === 'ko'
+
+  const sessions: TxSession[] = [
+    { id: 'Transaction 1', color: '#2563eb', bgColor: '#eff6ff', borderColor: '#bfdbfe' },
+    { id: 'Transaction 2', color: '#dc2626', bgColor: '#fef2f2', borderColor: '#fecaca' },
+  ]
+
+  const steps: TxStep[] = [
+    {
+      kind: 'single', session: 'Transaction 1',
+      label: 'UPDATE employees(emp=100)',
+      sub: isKo ? '→ EMP 100 락 획득 ✓' : '→ acquires lock on EMP 100 ✓',
+    },
+    {
+      kind: 'single', session: 'Transaction 2',
+      label: 'UPDATE employees(emp=200)',
+      sub: isKo ? '→ EMP 200 락 획득 ✓' : '→ acquires lock on EMP 200 ✓',
+    },
+    {
+      kind: 'single', session: 'Transaction 1',
+      label: isKo ? 'UPDATE employees(emp=200) 시도' : 'Attempts UPDATE employees(emp=200)',
+      sub: isKo ? '→ T2가 보유 중 — 대기 ⏳' : '→ held by T2 — waiting ⏳',
+      highlight: 'warn',
+    },
+    {
+      kind: 'single', session: 'Transaction 2',
+      label: isKo ? 'UPDATE employees(emp=100) 시도' : 'Attempts UPDATE employees(emp=100)',
+      sub: isKo ? '→ T1이 보유 중 — 대기 ⏳' : '→ held by T1 — waiting ⏳',
+      highlight: 'warn',
+    },
+    {
+      kind: 'single', session: 'Transaction 1',
+      label: isKo ? '교착상태 감지 → 마지막 SQL 롤백' : 'Deadlock detected → last SQL rolled back',
+      sub: 'ORA-00060',
+      highlight: 'error',
+    },
+    {
+      kind: 'single', session: 'Transaction 2',
+      label: isKo ? '대기 해제 → 정상 진행 가능' : 'Unblocked → can now proceed',
+      sub: isKo ? '(T1의 EMP 100 락 해제됨)' : "(T1's EMP 100 lock released)",
+      highlight: 'success',
+    },
+  ]
+
+  const resultLabel = isKo
+    ? 'Oracle 자동 해결: T1의 마지막 SQL만 롤백 — 이전 변경은 유지됨'
+    : "Oracle auto-resolves: only T1's last SQL rolled back — prior changes remain"
+
   return (
-    <svg
-      viewBox="0 0 560 300"
-      className="w-full max-w-xl mx-auto"
-      aria-label="Deadlock diagram"
-    >
-      {/* T1 박스 */}
-      <rect x="20" y="60" width="160" height="100" rx="8" fill="#eff6ff" stroke="#bfdbfe" strokeWidth="2" />
-      <text x="100" y="82" fontSize="11" fill="#1d4ed8" textAnchor="middle" fontWeight="bold">
-        Transaction 1
-      </text>
-      <text x="100" y="100" fontSize="9" fill="#3b82f6" textAnchor="middle">
-        {isKo ? 'EMP 100 락 보유 ✓' : 'Holds lock on EMP 100 ✓'}
-      </text>
-      <text x="100" y="116" fontSize="9" fill="#dc2626" textAnchor="middle">
-        {isKo ? 'EMP 200 대기 중 ⏳' : 'Waiting for EMP 200 ⏳'}
-      </text>
-      <text x="100" y="132" fontSize="8" fill="#9ca3af" textAnchor="middle">
-        {isKo ? '(T2가 보유 중)' : '(held by T2)'}
-      </text>
-      <text x="100" y="150" fontSize="8" fill="#9ca3af" textAnchor="middle">
-        {isKo ? '→ ORA-00060 수신' : '→ receives ORA-00060'}
-      </text>
-
-      {/* T2 박스 */}
-      <rect x="380" y="60" width="160" height="100" rx="8" fill="#fef2f2" stroke="#fecaca" strokeWidth="2" />
-      <text x="460" y="82" fontSize="11" fill="#dc2626" textAnchor="middle" fontWeight="bold">
-        Transaction 2
-      </text>
-      <text x="460" y="100" fontSize="9" fill="#ef4444" textAnchor="middle">
-        {isKo ? 'EMP 200 락 보유 ✓' : 'Holds lock on EMP 200 ✓'}
-      </text>
-      <text x="460" y="116" fontSize="9" fill="#3b82f6" textAnchor="middle">
-        {isKo ? 'EMP 100 대기 중 ⏳' : 'Waiting for EMP 100 ⏳'}
-      </text>
-      <text x="460" y="132" fontSize="8" fill="#9ca3af" textAnchor="middle">
-        {isKo ? '(T1이 보유 중)' : '(held by T1)'}
-      </text>
-      <text x="460" y="150" fontSize="8" fill="#059669" textAnchor="middle">
-        {isKo ? '→ 정상 진행 가능' : '→ can now proceed'}
-      </text>
-
-      {/* 순환 화살표 위 */}
-      <path
-        d="M180,90 C280,30 300,30 380,90"
-        stroke="#f87171"
-        strokeWidth="1.5"
-        fill="none"
-        strokeDasharray="5,3"
-        markerEnd="url(#dead-arr1)"
-      />
-      <text x="280" y="28" fontSize="8" fill="#dc2626" textAnchor="middle">
-        {isKo ? 'T1이 T2의 EMP 200을 기다림' : "T1 waits for T2's EMP 200"}
-      </text>
-
-      {/* 순환 화살표 아래 */}
-      <path
-        d="M380,130 C300,180 280,180 180,130"
-        stroke="#60a5fa"
-        strokeWidth="1.5"
-        fill="none"
-        strokeDasharray="5,3"
-        markerEnd="url(#dead-arr2)"
-      />
-      <text x="280" y="196" fontSize="8" fill="#3b82f6" textAnchor="middle">
-        {isKo ? 'T2가 T1의 EMP 100을 기다림' : "T2 waits for T1's EMP 100"}
-      </text>
-
-      {/* 해결 설명 박스 */}
-      <rect x="140" y="215" width="280" height="70" rx="8" fill="#fef9c3" stroke="#fde68a" strokeWidth="1.5" />
-      <text x="280" y="234" fontSize="10" fill="#92400e" textAnchor="middle" fontWeight="bold">
-        {isKo ? 'Oracle 자동 해결' : 'Oracle Auto-Resolution'}
-      </text>
-      <text x="280" y="250" fontSize="9" fill="#78350f" textAnchor="middle">
-        {isKo ? 'T1의 마지막 SQL 문장만 롤백' : "T1's last SQL statement rolled back"}
-      </text>
-      <text x="280" y="264" fontSize="9" fill="#78350f" textAnchor="middle">
-        {isKo ? '→ T1 이전 변경사항은 유지됨' : '→ T1 prior changes remain in effect'}
-      </text>
-      <text x="280" y="278" fontSize="9" fill="#d97706" textAnchor="middle" fontWeight="bold">
-        ORA-00060: deadlock detected while waiting for resource
-      </text>
-
-      <defs>
-        <marker id="dead-arr1" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
-          <path d="M0,0 L0,6 L6,3 z" fill="#f87171" />
-        </marker>
-        <marker id="dead-arr2" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
-          <path d="M0,0 L0,6 L6,3 z" fill="#60a5fa" />
-        </marker>
-      </defs>
-    </svg>
+    <div className="mt-4 rounded-xl border border-red-100 bg-red-50/20 p-4">
+      <TxTimeline sessions={sessions} steps={steps} resultLabel={resultLabel} />
+    </div>
   )
 }
 
@@ -203,30 +162,11 @@ export function DeadlockSection() {
       <SectionTitle>{t.whatTitle}</SectionTitle>
       <Prose>{t.whatDesc}</Prose>
 
-      <AccordionSection title={t.officialExampleTitle} defaultOpen>
-        <Prose>{t.officialExampleDesc}</Prose>
-        <div className="mt-4 space-y-2">
-          {t.exampleSteps.map((step, i) => (
-            <div key={i} className="flex items-start gap-2">
-              <span
-                className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-[10px] font-bold ${
-                  step.includes('ORA-00060') || step.includes('교착상태') || step.includes('Deadlock')
-                    ? 'bg-red-100 text-red-600'
-                    : step.includes('정상') || step.includes('proceed')
-                    ? 'bg-green-100 text-green-600'
-                    : 'bg-blue-100 text-blue-600'
-                }`}
-              >
-                {i + 1}
-              </span>
-              <p className="text-sm text-muted-foreground leading-relaxed">{step}</p>
-            </div>
-          ))}
-        </div>
-        <div className="mt-6 w-full max-w-xl mx-auto rounded-xl border border-red-100 bg-red-50/30 p-4">
-          <DeadlockDiagram lang={lang} />
-        </div>
-      </AccordionSection>
+      <Divider />
+
+      <SectionTitle>{t.officialExampleTitle}</SectionTitle>
+      <Prose>{t.officialExampleDesc}</Prose>
+      <DeadlockTimeline lang={lang} />
 
       <Divider />
 
@@ -295,13 +235,15 @@ END;`
         ))}
       </div>
 
-      <AccordionSection title={t.noWaitTitle}>
-        <Prose>{t.noWaitDesc}</Prose>
-        <div className="mt-4">
-          <SqlBlock
-            sql={
-              lang === 'ko'
-                ? `-- NOWAIT: 행이 잠겨있으면 즉시 오류 반환
+      <Divider />
+
+      <SectionTitle>{t.noWaitTitle}</SectionTitle>
+      <Prose>{t.noWaitDesc}</Prose>
+      <div className="mt-4">
+        <SqlBlock
+          sql={
+            lang === 'ko'
+              ? `-- NOWAIT: 행이 잠겨있으면 즉시 오류 반환
 SELECT * FROM employees WHERE employee_id = 100 FOR UPDATE NOWAIT;
 -- ORA-00054: resource busy and acquire with NOWAIT specified
 
@@ -310,7 +252,7 @@ SELECT * FROM job_queue
 WHERE status = 'PENDING'
 FOR UPDATE SKIP LOCKED
 FETCH FIRST 10 ROWS ONLY;`
-                : `-- NOWAIT: return error immediately if row is locked
+              : `-- NOWAIT: return error immediately if row is locked
 SELECT * FROM employees WHERE employee_id = 100 FOR UPDATE NOWAIT;
 -- ORA-00054: resource busy and acquire with NOWAIT specified
 
@@ -319,10 +261,9 @@ SELECT * FROM job_queue
 WHERE status = 'PENDING'
 FOR UPDATE SKIP LOCKED
 FETCH FIRST 10 ROWS ONLY;`
-            }
-          />
-        </div>
-      </AccordionSection>
+          }
+        />
+      </div>
 
       <div className="mt-8">
         <InfoBox variant="tip">

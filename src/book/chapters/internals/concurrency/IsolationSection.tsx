@@ -10,6 +10,8 @@ import {
   Table,
   SqlBlock,
 } from '../../shared'
+import { TxTimeline } from './TxTimeline'
+import type { TxSession, TxStep } from './TxTimeline'
 
 const T = {
   ko: {
@@ -81,142 +83,52 @@ const T = {
   },
 }
 
-// Read Committed 쓰기 충돌 다이어그램 (공식 문서 예시: Banda)
-const ReadCommittedConflictDiagram = ({ lang }: { lang: 'ko' | 'en' }) => {
+function ReadCommittedConflictDiagram({ lang }: { lang: 'ko' | 'en' }) {
   const isKo = lang === 'ko'
-  const COL_A = 120
-  const COL_B = 420
-  const startY = 30
-
-  const steps: { y: number; session: 'A' | 'B' | 'both'; label: string; sub?: string; color: string }[] = [
-    { y: startY, session: 'both', label: isKo ? '초기 상태: Banda.salary = 6200' : 'Initial state: Banda.salary = 6200', color: '#64748b' },
-    { y: startY + 50, session: 'A', label: isKo ? 'UPDATE: salary → 7000' : 'UPDATE: salary → 7000', sub: isKo ? '(미커밋)' : '(uncommitted)', color: '#2563eb' },
-    { y: startY + 100, session: 'B', label: 'SELECT salary', sub: isKo ? '→ 6200 반환 (읽기 일관성)' : '→ returns 6200 (read consistency)', color: '#7c3aed' },
-    { y: startY + 150, session: 'B', label: isKo ? 'UPDATE: salary → 6300 시도' : 'UPDATE: salary → 6300 (attempt)', sub: isKo ? '→ Session A 완료까지 대기 ⏳' : '→ blocks until Session A finishes ⏳', color: '#dc2626' },
-    { y: startY + 200, session: 'A', label: 'COMMIT', sub: isKo ? '(salary = 7000 확정)' : '(salary = 7000 committed)', color: '#059669' },
-    { y: startY + 250, session: 'B', label: isKo ? 'UPDATE 재개: salary → 6300' : 'UPDATE resumes: salary → 6300', sub: isKo ? '(커밋된 7000 위에 덮어씀)' : '(overwrites committed 7000)', color: '#7c3aed' },
-    { y: startY + 300, session: 'B', label: 'COMMIT', sub: isKo ? '최종 salary = 6300 ← Lost Update!' : 'Final salary = 6300 ← Lost Update!', color: '#059669' },
+  const sessions: TxSession[] = [
+    { id: isKo ? 'Session A (READ COMMITTED)' : 'Session A (READ COMMITTED)', color: '#2563eb', bgColor: '#eff6ff', borderColor: '#bfdbfe' },
+    { id: isKo ? 'Session B (READ COMMITTED)' : 'Session B (READ COMMITTED)', color: '#7c3aed', bgColor: '#f5f3ff', borderColor: '#ddd6fe' },
   ]
-
+  const sA = sessions[0].id
+  const sB = sessions[1].id
+  const steps: TxStep[] = [
+    { kind: 'banner', label: isKo ? '초기 상태: Banda.salary = 6200' : 'Initial state: Banda.salary = 6200' },
+    { kind: 'single', session: sA, label: isKo ? 'UPDATE salary → 7000' : 'UPDATE salary → 7000', sub: isKo ? '(미커밋)' : '(uncommitted)' },
+    { kind: 'single', session: sB, label: 'SELECT salary', sub: isKo ? '→ 6200 반환 (읽기 일관성)' : '→ returns 6200 (read consistency)' },
+    { kind: 'single', session: sB, label: isKo ? 'UPDATE salary → 6300 시도' : 'UPDATE salary → 6300 (attempt)', sub: isKo ? '→ Session A 완료까지 대기 ⏳' : '→ blocks until Session A finishes ⏳', highlight: 'warn' },
+    { kind: 'single', session: sA, label: 'COMMIT', sub: isKo ? '(salary = 7000 확정)' : '(salary = 7000 committed)', highlight: 'success' },
+    { kind: 'single', session: sB, label: isKo ? 'UPDATE 재개: salary → 6300' : 'UPDATE resumes: salary → 6300', sub: isKo ? '(커밋된 7000 위에 덮어씀)' : '(overwrites committed 7000)', highlight: 'warn' },
+    { kind: 'single', session: sB, label: 'COMMIT', sub: isKo ? '최종 salary = 6300' : 'Final salary = 6300', highlight: 'success' },
+  ]
   return (
-    <svg viewBox="0 0 560 410" className="w-full max-w-2xl mx-auto" aria-label="Read Committed conflict diagram">
-      {/* 헤더 */}
-      <rect x="40" y="5" width="200" height="24" rx="5" fill="#eff6ff" stroke="#bfdbfe" strokeWidth="1" />
-      <text x="140" y="21" fontSize="10" fill="#1d4ed8" textAnchor="middle" fontWeight="bold">
-        Session A (READ COMMITTED)
-      </text>
-      <rect x="320" y="5" width="200" height="24" rx="5" fill="#f5f3ff" stroke="#ddd6fe" strokeWidth="1" />
-      <text x="420" y="21" fontSize="10" fill="#7c3aed" textAnchor="middle" fontWeight="bold">
-        Session B (READ COMMITTED)
-      </text>
-
-      {/* 세로 타임라인 */}
-      <line x1={COL_A} y1="34" x2={COL_A} y2="375" stroke="#bfdbfe" strokeWidth="1.5" strokeDasharray="4,3" />
-      <line x1={COL_B} y1="34" x2={COL_B} y2="375" stroke="#ddd6fe" strokeWidth="1.5" strokeDasharray="4,3" />
-
-      {steps.map((step, i) => {
-        if (step.session === 'both') {
-          return (
-            <g key={i}>
-              <rect x="100" y={step.y + 4} width="360" height="26" rx="5" fill="#f8fafc" stroke="#e2e8f0" strokeWidth="1" />
-              <text x="280" y={step.y + 21} fontSize="9" fill={step.color} textAnchor="middle" fontWeight="bold">
-                {step.label}
-              </text>
-            </g>
-          )
-        }
-        const cx = step.session === 'A' ? COL_A : COL_B
-        const rectX = step.session === 'A' ? 40 : 320
-        return (
-          <g key={i}>
-            <circle cx={cx} cy={step.y + 12} r="5" fill={step.color} />
-            <rect x={rectX} y={step.y} width="200" height={step.sub ? 32 : 22} rx="4" fill="white" stroke="#e2e8f0" strokeWidth="1" />
-            <text x={cx} y={step.y + 13} fontSize="9" fill={step.color} textAnchor="middle" fontWeight="bold">
-              {step.label}
-            </text>
-            {step.sub && (
-              <text x={cx} y={step.y + 25} fontSize="8" fill="#64748b" textAnchor="middle">
-                {step.sub}
-              </text>
-            )}
-          </g>
-        )
-      })}
-
-      {/* 결과 박스 */}
-      <rect x="100" y="378" width="360" height="26" rx="5" fill="#fee2e2" stroke="#fca5a5" strokeWidth="1.5" />
-      <text x="280" y="395" fontSize="9" fill="#dc2626" textAnchor="middle" fontWeight="bold">
-        {isKo
-          ? 'Session A의 변경(7000)이 사라짐 — Lost Update 발생!'
-          : "Session A's change (7000) is gone — Lost Update occurred!"}
-      </text>
-    </svg>
+    <TxTimeline
+      sessions={sessions}
+      steps={steps}
+      resultLabel={isKo ? 'Session A의 변경(7000)이 사라짐 — Lost Update 발생!' : "Session A's change (7000) is gone — Lost Update occurred!"}
+    />
   )
 }
 
-// Serializable ORA-08177 다이어그램 (공식 문서 예시: Hintz)
-const SerializableConflictDiagram = ({ lang }: { lang: 'ko' | 'en' }) => {
+function SerializableConflictDiagram({ lang }: { lang: 'ko' | 'en' }) {
   const isKo = lang === 'ko'
+  const sessions: TxSession[] = [
+    { id: isKo ? 'Transaction 3 (READ COMMITTED)' : 'Transaction 3 (READ COMMITTED)', color: '#d97706', bgColor: '#fffbeb', borderColor: '#fde68a' },
+    { id: isKo ? 'Transaction 4 (SERIALIZABLE)' : 'Transaction 4 (SERIALIZABLE)', color: '#7c3aed', bgColor: '#f5f3ff', borderColor: '#ddd6fe' },
+  ]
+  const s3 = sessions[0].id
+  const s4 = sessions[1].id
+  const steps: TxStep[] = [
+    { kind: 'single', session: s4, label: isKo ? 'T4 시작 (SCN 기록)' : 'T4 begins (SCN recorded)' },
+    { kind: 'single', session: s3, label: isKo ? 'Hintz.salary → 7100' : 'Hintz.salary → 7100', sub: isKo ? '(T4 시작 이후 커밋)' : '(commits after T4 began)' },
+    { kind: 'single', session: s3, label: 'COMMIT', highlight: 'success' },
+    { kind: 'single', session: s4, label: isKo ? 'Hintz.salary UPDATE 시도' : 'Attempts Hintz.salary UPDATE', sub: isKo ? '→ ORA-08177 발생!' : '→ ORA-08177 raised!', highlight: 'error' },
+  ]
   return (
-    <svg viewBox="0 0 560 280" className="w-full max-w-2xl mx-auto" aria-label="Serializable conflict diagram">
-      {/* 헤더 */}
-      <rect x="40" y="5" width="200" height="24" rx="5" fill="#fffbeb" stroke="#fde68a" strokeWidth="1" />
-      <text x="140" y="21" fontSize="10" fill="#92400e" textAnchor="middle" fontWeight="bold">
-        Transaction 3 (READ COMMITTED)
-      </text>
-      <rect x="320" y="5" width="200" height="24" rx="5" fill="#f5f3ff" stroke="#ddd6fe" strokeWidth="1" />
-      <text x="420" y="21" fontSize="10" fill="#7c3aed" textAnchor="middle" fontWeight="bold">
-        Transaction 4 (SERIALIZABLE)
-      </text>
-
-      <line x1="140" y1="34" x2="140" y2="255" stroke="#fde68a" strokeWidth="1.5" strokeDasharray="4,3" />
-      <line x1="420" y1="34" x2="420" y2="255" stroke="#ddd6fe" strokeWidth="1.5" strokeDasharray="4,3" />
-
-      {/* T4 시작 */}
-      <circle cx={420} cy={50} r="5" fill="#7c3aed" />
-      <rect x="320" y="38" width="200" height="22" rx="4" fill="white" stroke="#e2e8f0" strokeWidth="1" />
-      <text x="420" y="53" fontSize="9" fill="#7c3aed" textAnchor="middle" fontWeight="bold">
-        {isKo ? 'T4 시작 (SCN 기록)' : 'T4 begins (SCN recorded)'}
-      </text>
-
-      {/* T3 UPDATE */}
-      <circle cx={140} cy={90} r="5" fill="#d97706" />
-      <rect x="40" y="78" width="200" height="32" rx="4" fill="white" stroke="#e2e8f0" strokeWidth="1" />
-      <text x="140" y="91" fontSize="9" fill="#d97706" textAnchor="middle" fontWeight="bold">
-        {isKo ? "Hintz.salary → 7100" : "Hintz.salary → 7100"}
-      </text>
-      <text x="140" y="103" fontSize="8" fill="#64748b" textAnchor="middle">
-        {isKo ? "(T4 시작 이후 커밋)" : "(commits after T4 began)"}
-      </text>
-
-      {/* T3 COMMIT */}
-      <circle cx={140} cy={140} r="5" fill="#059669" />
-      <rect x="40" y="128" width="200" height="22" rx="4" fill="white" stroke="#e2e8f0" strokeWidth="1" />
-      <text x="140" y="143" fontSize="9" fill="#059669" textAnchor="middle" fontWeight="bold">
-        COMMIT
-      </text>
-
-      {/* T4 UPDATE 시도 */}
-      <circle cx={420} cy={180} r="5" fill="#dc2626" />
-      <rect x="320" y="168" width="200" height="32" rx="4" fill="#fef2f2" stroke="#fecaca" strokeWidth="1" />
-      <text x="420" y="181" fontSize="9" fill="#dc2626" textAnchor="middle" fontWeight="bold">
-        {isKo ? "Hintz.salary UPDATE 시도" : "Attempts Hintz.salary UPDATE"}
-      </text>
-      <text x="420" y="193" fontSize="8" fill="#9f1239" textAnchor="middle">
-        {isKo ? "→ ORA-08177 발생!" : "→ ORA-08177 raised!"}
-      </text>
-
-      {/* 오류 설명 박스 */}
-      <rect x="80" y="220" width="400" height="44" rx="8" fill="#fef2f2" stroke="#fecaca" strokeWidth="1.5" />
-      <text x="280" y="238" fontSize="10" fill="#dc2626" textAnchor="middle" fontWeight="bold">
-        ORA-08177: cannot serialize access for this transaction
-      </text>
-      <text x="280" y="256" fontSize="9" fill="#9f1239" textAnchor="middle">
-        {isKo
-          ? 'T4 시작 이후 다른 트랜잭션이 같은 행을 커밋했으므로 직렬화 위반'
-          : 'Another transaction committed the same row after T4 began — serialization violation'}
-      </text>
-    </svg>
+    <TxTimeline
+      sessions={sessions}
+      steps={steps}
+      resultLabel="ORA-08177: cannot serialize access for this transaction"
+    />
   )
 }
 
@@ -345,7 +257,7 @@ ALTER SESSION SET ISOLATION_LEVEL = READ COMMITTED;`
             {t.readCommittedConflictTitle}
           </p>
           <Prose>{t.readCommittedConflictDesc}</Prose>
-          <div className="mt-4 rounded-xl border border-violet-100 bg-violet-50/30 p-4">
+          <div className="mt-4 rounded-xl border border-violet-100 bg-violet-50/20 p-4">
             <ReadCommittedConflictDiagram lang={lang} />
           </div>
         </div>
@@ -380,7 +292,7 @@ SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
             {t.serializableExampleTitle}
           </p>
           <Prose>{t.serializableExampleDesc}</Prose>
-          <div className="mt-4 rounded-xl border border-amber-100 bg-amber-50/30 p-4">
+          <div className="mt-4 rounded-xl border border-amber-100 bg-amber-50/20 p-4">
             <SerializableConflictDiagram lang={lang} />
           </div>
         </div>

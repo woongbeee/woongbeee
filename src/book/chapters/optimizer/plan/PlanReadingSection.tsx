@@ -1,4 +1,5 @@
-import { IconPencil } from '@tabler/icons-react'
+import { useState } from 'react'
+import { IconPencil, IconChevronDown } from '@tabler/icons-react'
 import { useSimulationStore } from '@/store/simulationStore'
 import {
   PageContainer,
@@ -6,10 +7,10 @@ import {
   SectionTitle,
   Prose,
   Divider,
-  AccordionSection,
   SqlBlock,
   InfoBox,
 } from '../../shared'
+import { cn } from '@/lib/utils'
 
 const T = {
   ko: {
@@ -989,6 +990,31 @@ const EXERCISES: Exercise[] = [
   },
 ]
 
+function AnswerToggle({ label, answer }: { label: string; answer: string }) {
+  const [open, setOpen] = useState(false)
+  return (
+    <div className="mt-4 overflow-hidden rounded-xl border border-border">
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="flex w-full cursor-pointer items-center justify-between px-4 py-3 text-left hover:bg-muted/30 transition-colors"
+      >
+        <span className="font-mono text-sm font-bold text-foreground/80">{label}</span>
+        <IconChevronDown
+          size={16}
+          className={cn('text-muted-foreground transition-transform duration-200', open && 'rotate-180')}
+        />
+      </button>
+      {open && (
+        <div className="border-t border-border bg-muted/10 px-4 py-4">
+          <pre className="whitespace-pre-wrap font-mono text-xs leading-relaxed text-foreground/80">
+            {answer}
+          </pre>
+        </div>
+      )}
+    </div>
+  )
+}
+
 export function PlanReadingSection() {
   const lang = useSimulationStore((s) => s.lang)
   const t = T[lang]
@@ -1018,11 +1044,10 @@ export function PlanReadingSection() {
             lines={ex.lines}
             caption={isKo ? ex.captionKo : ex.captionEn}
           />
-          <AccordionSection title={t.answerLabel}>
-            <pre className="whitespace-pre-wrap font-mono text-xs leading-relaxed text-foreground/80">
-              {isKo ? ex.answerKo : ex.answerEn}
-            </pre>
-          </AccordionSection>
+          <AnswerToggle
+            label={t.answerLabel}
+            answer={isKo ? ex.answerKo : ex.answerEn}
+          />
         </div>
       ))}
 

@@ -9,8 +9,8 @@ import {
   Divider,
   Table,
   SqlBlock,
+  StepList,
 } from '../../shared'
-import { cn } from '@/lib/utils'
 
 const T = {
   ko: {
@@ -19,13 +19,13 @@ const T = {
     commitTitle: 'COMMIT — 변경 확정',
     commitDesc: 'COMMIT을 실행하면 Oracle은 아래 7단계를 원자적으로 수행해요.',
     commitSteps: [
-      { num: '①', title: 'SCN 생성', desc: '데이터베이스가 이 COMMIT에 대한 고유한 SCN(System Change Number, 시스템 변경 번호)을 생성해요.' },
-      { num: '②', title: 'Transaction Table 기록', desc: '내부 트랜잭션 테이블에 해당 트랜잭션이 커밋됐음을 SCN과 함께 표시해요.' },
-      { num: '③', title: 'Redo Log 기록 (LGWR)', desc: 'LGWR(Log Writer, 로그 라이터)가 Redo Log Buffer에 남은 항목을 온라인 리두 로그 파일에 기록하고 트랜잭션 SCN을 써요. 바로 이 시점부터 지속성(Durability)이 보장돼요.' },
-      { num: '④', title: '락(Lock) 해제', desc: '트랜잭션이 보유한 모든 행·테이블 락이 풀려요. 다른 세션이 이제 해당 행에 접근할 수 있어요.' },
-      { num: '⑤', title: 'SAVEPOINT 삭제', desc: '트랜잭션 내 모든 SAVEPOINT가 삭제돼요.' },
-      { num: '⑥', title: 'Commit Cleanout', desc: '변경된 블록이 아직 SGA에 있다면, ITL(Interested Transaction List) 슬롯에서 락 관련 트랜잭션 정보를 제거해요. 블록이 이미 디스크에 쓰여졌다면 다음번에 읽을 때 처리돼요.' },
-      { num: '⑦', title: '트랜잭션 완료', desc: '트랜잭션이 완료 상태로 표시돼요.' },
+      { title: 'SCN 생성', desc: '데이터베이스가 이 COMMIT에 대한 고유한 SCN(System Change Number, 시스템 변경 번호)을 생성해요.' },
+      { title: 'Transaction Table 기록', desc: '내부 트랜잭션 테이블에 해당 트랜잭션이 커밋됐음을 SCN과 함께 표시해요.' },
+      { title: 'Redo Log 기록 (LGWR)', desc: 'LGWR(Log Writer, 로그 라이터)가 Redo Log Buffer에 남은 항목을 온라인 리두 로그 파일에 기록하고 트랜잭션 SCN을 써요. 바로 이 시점부터 지속성(Durability)이 보장돼요.' },
+      { title: '락(Lock) 해제', desc: '트랜잭션이 보유한 모든 행·테이블 락이 풀려요. 다른 세션이 이제 해당 행에 접근할 수 있어요.' },
+      { title: 'SAVEPOINT 삭제', desc: '트랜잭션 내 모든 SAVEPOINT가 삭제돼요.' },
+      { title: 'Commit Cleanout', desc: '변경된 블록이 아직 SGA에 있다면, ITL(Interested Transaction List) 슬롯에서 락 관련 트랜잭션 정보를 제거해요. 블록이 이미 디스크에 쓰여졌다면 다음번에 읽을 때 처리돼요.' },
+      { title: '트랜잭션 완료', desc: '트랜잭션이 완료 상태로 표시돼요.' },
     ],
     commitNote:
       'COMMIT 자체는 데이터 블록을 디스크에 쓰지 않아요. 변경된 블록(Dirty Buffer)은 DBWn(Database Writer, 데이터베이스 라이터) 프로세스가 나중에 비동기로 써요. COMMIT 속도는 변경된 데이터 크기와 관계없고, LGWR의 디스크 I/O가 대부분의 시간을 차지해요.',
@@ -33,11 +33,11 @@ const T = {
     rollbackDesc:
       'ROLLBACK을 실행하면 Oracle은 Undo Segment에 저장된 이전 이미지(Before Image)를 역순으로 읽어서 변경을 되돌려요.',
     rollbackSteps: [
-      { num: '①', title: 'Undo 데이터 역순 읽기', desc: 'Undo Segment의 변경 항목을 최신 것부터 역순으로 읽어요.' },
-      { num: '②', title: '각 작업 역전', desc: 'INSERT → DELETE로 역전 / UPDATE → 원래 값으로 UPDATE / DELETE → INSERT로 복원' },
-      { num: '③', title: '락(Lock) 해제', desc: '트랜잭션이 보유한 모든 행·테이블 락이 풀려요.' },
-      { num: '④', title: 'SAVEPOINT 삭제', desc: '트랜잭션 내 모든 SAVEPOINT가 삭제돼요.' },
-      { num: '⑤', title: '트랜잭션 종료', desc: '트랜잭션이 종료돼요.' },
+      { title: 'Undo 데이터 역순 읽기', desc: 'Undo Segment의 변경 항목을 최신 것부터 역순으로 읽어요.' },
+      { title: '각 작업 역전', desc: 'INSERT → DELETE로 역전 / UPDATE → 원래 값으로 UPDATE / DELETE → INSERT로 복원' },
+      { title: '락(Lock) 해제', desc: '트랜잭션이 보유한 모든 행·테이블 락이 풀려요.' },
+      { title: 'SAVEPOINT 삭제', desc: '트랜잭션 내 모든 SAVEPOINT가 삭제돼요.' },
+      { title: '트랜잭션 종료', desc: '트랜잭션이 종료돼요.' },
     ],
     rollbackNote:
       'ROLLBACK은 변경 규모에 비례해서 시간이 걸려요. 대량 변경 후 ROLLBACK은 꽤 오래 걸릴 수 있어서, 작업 단위를 나눠 중간마다 COMMIT하는 패턴을 쓰기도 해요.',
@@ -72,13 +72,13 @@ const T = {
     commitTitle: 'COMMIT — Confirm Changes',
     commitDesc: 'When you issue COMMIT, Oracle executes the following 7 steps atomically.',
     commitSteps: [
-      { num: '①', title: 'Generate SCN', desc: 'The database generates a unique SCN (System Change Number) for this COMMIT.' },
-      { num: '②', title: 'Record in Transaction Table', desc: 'The internal transaction table marks this transaction as committed with its SCN.' },
-      { num: '③', title: 'Write to Redo Log (LGWR)', desc: 'LGWR (Log Writer) flushes remaining redo entries from the Redo Log Buffer to the online redo log files and records the transaction SCN. Durability is guaranteed from this point.' },
-      { num: '④', title: 'Release Locks', desc: 'All row and table locks held by the transaction are released. Other sessions can now access the affected rows.' },
-      { num: '⑤', title: 'Delete Savepoints', desc: 'All savepoints within the transaction are erased.' },
-      { num: '⑥', title: 'Commit Cleanout', desc: 'If modified blocks are still in the SGA, Oracle removes lock-related transaction information (ITL entry) from each block. If blocks were already written to disk, this cleanup happens when they are next read.' },
-      { num: '⑦', title: 'Mark Complete', desc: 'The transaction is marked as complete.' },
+      { title: 'Generate SCN', desc: 'The database generates a unique SCN (System Change Number) for this COMMIT.' },
+      { title: 'Record in Transaction Table', desc: 'The internal transaction table marks this transaction as committed with its SCN.' },
+      { title: 'Write to Redo Log (LGWR)', desc: 'LGWR (Log Writer) flushes remaining redo entries from the Redo Log Buffer to the online redo log files and records the transaction SCN. Durability is guaranteed from this point.' },
+      { title: 'Release Locks', desc: 'All row and table locks held by the transaction are released. Other sessions can now access the affected rows.' },
+      { title: 'Delete Savepoints', desc: 'All savepoints within the transaction are erased.' },
+      { title: 'Commit Cleanout', desc: 'If modified blocks are still in the SGA, Oracle removes lock-related transaction information (ITL entry) from each block. If blocks were already written to disk, this cleanup happens when they are next read.' },
+      { title: 'Mark Complete', desc: 'The transaction is marked as complete.' },
     ],
     commitNote:
       'COMMIT does not itself write data blocks to disk. Dirty buffers (modified blocks) are written asynchronously later by the DBWn (Database Writer) process. COMMIT speed is independent of the volume of changed data — LGWR disk I/O is the primary latency.',
@@ -86,11 +86,11 @@ const T = {
     rollbackDesc:
       'When you issue ROLLBACK, Oracle reads the before-images stored in the Undo Segment in reverse order to restore each change.',
     rollbackSteps: [
-      { num: '①', title: 'Read Undo Data in Reverse', desc: 'Undo Segment entries are read from newest to oldest.' },
-      { num: '②', title: 'Reverse Each Operation', desc: 'INSERT → reversed as DELETE / UPDATE → re-applied with original values / DELETE → reversed as INSERT' },
-      { num: '③', title: 'Release Locks', desc: 'All row and table locks held by the transaction are released.' },
-      { num: '④', title: 'Delete Savepoints', desc: 'All savepoints within the transaction are erased.' },
-      { num: '⑤', title: 'End Transaction', desc: 'The transaction is terminated.' },
+      { title: 'Read Undo Data in Reverse', desc: 'Undo Segment entries are read from newest to oldest.' },
+      { title: 'Reverse Each Operation', desc: 'INSERT → reversed as DELETE / UPDATE → re-applied with original values / DELETE → reversed as INSERT' },
+      { title: 'Release Locks', desc: 'All row and table locks held by the transaction are released.' },
+      { title: 'Delete Savepoints', desc: 'All savepoints within the transaction are erased.' },
+      { title: 'End Transaction', desc: 'The transaction is terminated.' },
     ],
     rollbackNote:
       'Rollback time is proportional to the volume of changes. Rolling back a large transaction can take a long time, so some patterns use intermediate COMMITs on smaller batches.',
@@ -121,31 +121,6 @@ const T = {
   },
 }
 
-const stepColors = [
-  'bg-blue-500', 'bg-indigo-500', 'bg-violet-500',
-  'bg-emerald-500', 'bg-amber-500', 'bg-orange-500', 'bg-slate-500',
-]
-
-function StepList({ steps }: { steps: { num: string; title: string; desc: string }[] }) {
-  return (
-    <div className="flex flex-col gap-3 my-4">
-      {steps.map((s, i) => (
-        <div key={i} className="flex gap-3 items-start">
-          <span className={cn(
-            'shrink-0 mt-0.5 flex h-7 w-7 items-center justify-center rounded-full font-mono text-[11px] font-black text-white',
-            stepColors[i % stepColors.length]
-          )}>
-            {i + 1}
-          </span>
-          <div className="rounded-xl border border-slate-200 bg-white px-4 py-2 flex-1 shadow-sm">
-            <p className="font-mono text-[11px] font-bold text-slate-700">{s.title}</p>
-            <p className="font-mono text-[10px] text-slate-500 mt-0.5 leading-relaxed">{s.desc}</p>
-          </div>
-        </div>
-      ))}
-    </div>
-  )
-}
 
 export function TransactionCommitRollbackSection() {
   const lang = useSimulationStore((s) => s.lang)

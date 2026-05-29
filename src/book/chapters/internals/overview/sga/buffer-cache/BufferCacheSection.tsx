@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useSimulationStore } from '@/store/simulationStore'
-import { ChapterTitle, SectionTitle, Prose, InfoBox, Divider, SubTitle, SqlBlock } from '../../../../shared'
+import { ChapterTitle, SectionTitle, Prose, InfoBox, Divider, SubTitle, SqlBlock, StepList } from '../../../../shared'
 import { cn } from '@/lib/utils'
 import { SgaPositionDiagram } from '../shared/SgaPositionDiagram'
 import { OracleInstanceMap } from '@/book/chapters/internals/shared/OracleInstanceMap'
@@ -98,36 +98,12 @@ const T = {
     dbwnTitle: 'Dirty 버퍼는 어떻게 디스크에 기록될까요? — DBWn 쓰기 흐름',
     dbwnDesc: 'Buffer Cache에 수정된 Dirty 버퍼는 즉시 디스크에 쓰이지 않아요. DBWn(Database Writer, 데이터베이스 라이터)이 적절한 시점에 일괄로 써요. 이 과정에서 CKPT(체크포인트), LGWR(로그 라이터), Redo Log Buffer, Online Redo Log가 함께 관여해요.',
     dbwnSteps: [
-      {
-        ids: ['buffer-cache'] as InstanceComponentId[],
-        label: '① Dirty 버퍼 누적',
-        desc: '트랜잭션이 블록을 수정하면 Buffer Cache 안의 해당 버퍼가 Dirty 상태가 돼요. Dirty 버퍼는 Dirty List(LRUW 리스트)에 등록되어 DBWn이 쓸 차례를 기다려요.',
-      },
-      {
-        ids: ['redo-buffer'] as InstanceComponentId[],
-        label: '② Redo 항목 생성',
-        desc: '블록 수정과 동시에 변경 내용(Before/After Image)을 담은 Redo 항목이 Redo Log Buffer에 기록돼요. 이 기록이 있어야 장애 시 복구가 가능해요.',
-      },
-      {
-        ids: ['ckpt', 'dbwr'] as InstanceComponentId[],
-        label: '③ CKPT → DBWn 신호',
-        desc: 'Checkpoint가 발생하면 CKPT(체크포인트) 프로세스가 DBWn에게 Dirty 버퍼를 디스크에 쓰도록 신호를 보내요. Checkpoint는 Log Switch·설정 시간 초과·SHUTDOWN 등에 의해 트리거돼요.',
-      },
-      {
-        ids: ['lgwr', 'redo-buffer', 'redo-log-file'] as InstanceComponentId[],
-        label: '④ LGWR Write-Ahead',
-        desc: 'DBWn이 Dirty 버퍼를 디스크에 쓰기 전, 해당 버퍼와 관련된 Redo 항목이 먼저 Online Redo Log 파일에 기록되어야 해요(WAL — Write-Ahead Logging). LGWR(로그 라이터)가 Redo Log Buffer의 내용을 Online Redo Log에 플러시한 뒤 DBWn에게 완료를 알려요.',
-      },
-      {
-        ids: ['dbwr', 'disk'] as InstanceComponentId[],
-        label: '⑤ DBWn → Data Files',
-        desc: 'LGWR가 Redo를 먼저 기록한 뒤, DBWn이 Dirty 버퍼들을 Data Files에 써요. 기록된 버퍼는 Clean 상태가 되어 재사용할 수 있어요.',
-      },
-      {
-        ids: ['ckpt', 'control-file', 'disk'] as InstanceComponentId[],
-        label: '⑥ CKPT → 헤더 갱신',
-        desc: 'DBWn 쓰기가 완료되면 CKPT가 Control File과 Data File 헤더의 Checkpoint SCN을 갱신해요. 이 SCN 이전 데이터는 디스크에 안전하게 보존되어 있다는 뜻이에요.',
-      },
+      { ids: ['buffer-cache'] as InstanceComponentId[], title: 'Dirty 버퍼 누적', desc: '트랜잭션이 블록을 수정하면 Buffer Cache 안의 해당 버퍼가 Dirty 상태가 돼요. Dirty 버퍼는 Dirty List(LRUW 리스트)에 등록되어 DBWn이 쓸 차례를 기다려요.' },
+      { ids: ['redo-buffer'] as InstanceComponentId[], title: 'Redo 항목 생성', desc: '블록 수정과 동시에 변경 내용(Before/After Image)을 담은 Redo 항목이 Redo Log Buffer에 기록돼요. 이 기록이 있어야 장애 시 복구가 가능해요.' },
+      { ids: ['ckpt', 'dbwr'] as InstanceComponentId[], title: 'CKPT → DBWn 신호', desc: 'Checkpoint가 발생하면 CKPT(체크포인트) 프로세스가 DBWn에게 Dirty 버퍼를 디스크에 쓰도록 신호를 보내요. Checkpoint는 Log Switch·설정 시간 초과·SHUTDOWN 등에 의해 트리거돼요.' },
+      { ids: ['lgwr', 'redo-buffer', 'redo-log-file'] as InstanceComponentId[], title: 'LGWR Write-Ahead', desc: 'DBWn이 Dirty 버퍼를 디스크에 쓰기 전, 해당 버퍼와 관련된 Redo 항목이 먼저 Online Redo Log 파일에 기록되어야 해요(WAL — Write-Ahead Logging). LGWR(로그 라이터)가 Redo Log Buffer의 내용을 Online Redo Log에 플러시한 뒤 DBWn에게 완료를 알려요.' },
+      { ids: ['dbwr', 'disk'] as InstanceComponentId[], title: 'DBWn → Data Files', desc: 'LGWR가 Redo를 먼저 기록한 뒤, DBWn이 Dirty 버퍼들을 Data Files에 써요. 기록된 버퍼는 Clean 상태가 되어 재사용할 수 있어요.' },
+      { ids: ['ckpt', 'control-file', 'disk'] as InstanceComponentId[], title: 'CKPT → 헤더 갱신', desc: 'DBWn 쓰기가 완료되면 CKPT가 Control File과 Data File 헤더의 Checkpoint SCN을 갱신해요. 이 SCN 이전 데이터는 디스크에 안전하게 보존되어 있다는 뜻이에요.' },
     ],
     dbwnNote: 'WAL(Write-Ahead Logging) 원칙: Redo가 먼저, 데이터가 나중. DBWn이 Data File에 쓰기 전 LGWR가 반드시 Redo Log에 먼저 기록해야 해요. 이 순서가 지켜져야만 장애 시 Redo 로그로 복구할 수 있어요.',
 
@@ -222,36 +198,12 @@ const T = {
     dbwnTitle: 'How Do Dirty Buffers Get Written to Disk? — The DBWn Write Flow',
     dbwnDesc: 'Dirty buffers in the Buffer Cache are not written to disk immediately. DBWn (Database Writer) batches them and flushes at the right moment — with CKPT, LGWR, the Redo Log Buffer, and Online Redo Logs all playing a role.',
     dbwnSteps: [
-      {
-        ids: ['buffer-cache'] as InstanceComponentId[],
-        label: '① Dirty Buffers Accumulate',
-        desc: 'When a transaction modifies a block, the corresponding buffer in the Buffer Cache becomes Dirty. Dirty buffers are added to the Dirty List (LRUW list) and wait for DBWn to write them out.',
-      },
-      {
-        ids: ['redo-buffer'] as InstanceComponentId[],
-        label: '② Redo Entries Generated',
-        desc: 'As each block is modified, a redo entry capturing the before and after image is written to the Redo Log Buffer. These entries make crash recovery possible.',
-      },
-      {
-        ids: ['ckpt', 'dbwr'] as InstanceComponentId[],
-        label: '③ CKPT Signals DBWn',
-        desc: 'When a checkpoint fires, the CKPT process signals DBWn to flush dirty buffers to disk. Checkpoints are triggered by log switches, the checkpoint interval timeout, or a SHUTDOWN command.',
-      },
-      {
-        ids: ['lgwr', 'redo-buffer', 'redo-log-file'] as InstanceComponentId[],
-        label: '④ LGWR Write-Ahead',
-        desc: 'Before DBWn writes any dirty buffer to disk, the redo entries for those buffers must already be in the Online Redo Log files — this is the WAL (Write-Ahead Logging) guarantee. LGWR flushes the Redo Log Buffer to the Online Redo Logs first, then signals DBWn that it is safe to proceed.',
-      },
-      {
-        ids: ['dbwr', 'disk'] as InstanceComponentId[],
-        label: '⑤ DBWn → Data Files',
-        desc: 'Once LGWR has secured the redo, DBWn writes the dirty buffers to the Data Files. Each written buffer transitions back to Clean and becomes available for reuse.',
-      },
-      {
-        ids: ['ckpt', 'control-file', 'disk'] as InstanceComponentId[],
-        label: '⑥ CKPT Updates Headers',
-        desc: 'After DBWn finishes writing, CKPT updates the Checkpoint SCN in the Control File and in each Data File header. Any data block up to this SCN is guaranteed to be safely on disk.',
-      },
+      { title: 'Dirty Buffers Accumulate', desc: 'When a transaction modifies a block, the corresponding buffer in the Buffer Cache becomes Dirty. Dirty buffers are added to the Dirty List (LRUW list) and wait for DBWn to write them out.' },
+      { title: 'Redo Entries Generated', desc: 'As each block is modified, a redo entry capturing the before and after image is written to the Redo Log Buffer. These entries make crash recovery possible.' },
+      { title: 'CKPT Signals DBWn', desc: 'When a checkpoint fires, the CKPT process signals DBWn to flush dirty buffers to disk. Checkpoints are triggered by log switches, the checkpoint interval timeout, or a SHUTDOWN command.' },
+      { title: 'LGWR Write-Ahead', desc: 'Before DBWn writes any dirty buffer to disk, the redo entries for those buffers must already be in the Online Redo Log files — this is the WAL (Write-Ahead Logging) guarantee. LGWR flushes the Redo Log Buffer to the Online Redo Logs first, then signals DBWn that it is safe to proceed.' },
+      { title: 'DBWn → Data Files', desc: 'Once LGWR has secured the redo, DBWn writes the dirty buffers to the Data Files. Each written buffer transitions back to Clean and becomes available for reuse.' },
+      { title: 'CKPT Updates Headers', desc: 'After DBWn finishes writing, CKPT updates the Checkpoint SCN in the Control File and in each Data File header. Any data block up to this SCN is guaranteed to be safely on disk.' },
     ],
     dbwnNote: 'WAL (Write-Ahead Logging): Redo first, data second. LGWR must write to the Redo Log before DBWn writes to the Data File. Only then can Oracle reconstruct any lost changes from the redo log on crash recovery.',
 
@@ -425,6 +377,7 @@ function BufferPoolDiagram({ lang }: { lang: 'ko' | 'en' }) {
   )
 }
 
+
 // ── DBWn Write Flow ────────────────────────────────────────────────────────
 
 function DbwnWriteFlow({ lang }: { lang: 'ko' | 'en' }) {
@@ -433,42 +386,16 @@ function DbwnWriteFlow({ lang }: { lang: 'ko' | 'en' }) {
   const step = t.dbwnSteps[activeStep]
 
   return (
-    <div className="flex gap-4">
-      {/* 왼쪽: 다이어그램 */}
-      <div className="w-[340px] shrink-0">
+    <div className="flex gap-6">
+      <div className="w-[480px] shrink-0">
         <OracleInstanceMap highlightIds={step.ids} hideClient />
       </div>
-
-      {/* 오른쪽: 스텝 버튼(세로) + 설명 */}
-      <div className="flex flex-1 flex-col gap-2">
-        {t.dbwnSteps.map((s, i) => (
-          <button
-            key={i}
-            onClick={() => setActiveStep(i)}
-            className={cn(
-              'cursor-pointer rounded-lg border px-3 py-2 text-left font-mono text-[11px] font-bold transition-all',
-              activeStep === i
-                ? 'border-blue-300 bg-blue-50 text-blue-700'
-                : 'border-border/40 bg-transparent text-muted-foreground/60 hover:border-border/70 hover:text-muted-foreground',
-            )}
-          >
-            {s.label}
-          </button>
-        ))}
-
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeStep}
-            initial={{ opacity: 0, y: 4 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -4 }}
-            transition={{ duration: 0.15 }}
-            className="mt-1 flex-1 rounded-xl border-2 border-blue-200 bg-blue-50/60 px-4 py-3"
-          >
-            <div className="mb-1.5 font-mono text-xs font-bold text-blue-700">{step.label}</div>
-            <p className="text-xs leading-relaxed text-muted-foreground">{step.desc}</p>
-          </motion.div>
-        </AnimatePresence>
+      <div className="flex-1">
+        <StepList
+          steps={t.dbwnSteps}
+          activeIndex={activeStep}
+          onStepClick={setActiveStep}
+        />
       </div>
     </div>
   )
@@ -732,9 +659,7 @@ export function SgaBufferCacheSection() {
       <SectionTitle>{t.dbwnTitle}</SectionTitle>
       <Prose>{t.dbwnDesc}</Prose>
       <DbwnWriteFlow lang={lang} />
-      <div className="mt-4">
-        <InfoBox variant="warning">{t.dbwnNote}</InfoBox>
-      </div>
+      <InfoBox variant="warning">{t.dbwnNote}</InfoBox>
 
       <Divider />
 

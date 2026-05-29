@@ -225,6 +225,57 @@ export function Divider() {
   return <div className="my-8 border-t" />
 }
 
+// ── StepList ──────────────────────────────────────────────────────────────────
+// 순서가 있는 단계를 번호 배지 + 카드로 표시. 단계별 프로세스 설명에 사용.
+const STEP_COLORS = [
+  'bg-blue-500', 'bg-indigo-500', 'bg-violet-500',
+  'bg-emerald-500', 'bg-amber-500', 'bg-orange-500', 'bg-slate-500',
+]
+
+export function StepList({
+  steps,
+  activeIndex,
+  onStepClick,
+}: {
+  steps: { title: string; desc: string }[]
+  activeIndex?: number
+  onStepClick?: (i: number) => void
+}) {
+  const interactive = onStepClick !== undefined
+  return (
+    <div className="my-4 flex flex-col gap-3">
+      {steps.map((s, i) => {
+        const isActive = activeIndex === i
+        return (
+          <div
+            key={i}
+            onClick={() => onStepClick?.(i)}
+            className={cn('flex items-start gap-3', interactive && 'cursor-pointer')}
+          >
+            <span className={cn(
+              'mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full font-mono text-[11px] font-black text-white transition-all',
+              isActive ? STEP_COLORS[i % STEP_COLORS.length] : interactive ? 'bg-slate-300' : STEP_COLORS[i % STEP_COLORS.length],
+            )}>
+              {i + 1}
+            </span>
+            <div className={cn(
+              'flex-1 rounded-xl border px-4 py-2 shadow-sm transition-all',
+              isActive
+                ? 'border-blue-300 bg-blue-50'
+                : interactive
+                ? 'border-slate-200 bg-white hover:border-slate-300'
+                : 'border-slate-200 bg-white',
+            )}>
+              <p className={cn('font-mono text-[11px] font-bold', isActive ? 'text-blue-700' : 'text-slate-700')}>{s.title}</p>
+              <p className="mt-0.5 font-mono text-[10px] leading-relaxed text-slate-500">{s.desc}</p>
+            </div>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
 // ── AccordionSection ──────────────────────────────────────────────────────────
 // 클릭하면 열리고 닫히는 섹션. title 아래 항상 border-b 표시.
 export function AccordionSection({

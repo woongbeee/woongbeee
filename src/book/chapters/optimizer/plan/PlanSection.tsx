@@ -33,12 +33,72 @@ const T = {
     readOrderTitle: '읽는 순서',
     readOrderDesc:
       '자식이 여럿이면 위에서 아래 순서로 실행됩니다. 아래 예시의 실행 순서는 ③ → ② → ① → ⓪ 입니다.',
+    explainTitle: 'EXPLAIN PLAN으로 실행 계획 생성하기',
+    explainDesc:
+      'EXPLAIN PLAN 문은 SELECT·UPDATE·INSERT·DELETE 문에 대해 옵티마이저가 선택할 실행 계획을 표시해요. 실행하면 옵티마이저가 실행 계획을 선택하고, 각 단계를 설명하는 행을 플랜 테이블에 삽입해요. EXPLAIN PLAN은 DDL이 아닌 DML 문이므로 Oracle이 변경 사항을 암묵적으로 커밋하지 않아요.',
+    planTableTitle: 'PLAN_TABLE',
+    planTableDesc:
+      'PLAN_TABLE은 EXPLAIN PLAN 결과를 저장하는 기본 출력 테이블이에요. Oracle은 SYS 스키마에 전역 임시 테이블 PLAN_TABLE$를 자동으로 생성하고, PUBLIC 권한으로 PLAN_TABLE 동의어를 만들어요. 세션마다 PLAN_TABLE의 개인 사본이 임시 테이블스페이스에 생겨요.',
+    explainSteps: [
+      'PLAN_TABLE이 스키마에 존재해야 해요. Oracle은 자동으로 생성해요.',
+      'SQL 문 앞에 EXPLAIN PLAN FOR 절을 붙여요.',
+      'DBMS_XPLAN.DISPLAY로 계획을 표시해요.',
+    ],
+    explainSql: `-- 1단계: EXPLAIN PLAN 실행
+EXPLAIN PLAN FOR
+  SELECT e.last_name, d.department_name, e.salary
+  FROM   employees e, departments d
+  WHERE  salary < 3000
+  AND    e.department_id = d.department_id
+  ORDER BY salary DESC;
+
+-- 2단계: 계획 확인
+SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY(format => 'ALL'));`,
+    explainOutputCaption: 'EXPLAIN PLAN 출력 예시',
+    explainOutput: `Plan hash value: 3556827125
+
+---------------------------------------------------------------------------
+| Id | Operation           | Name        |Rows | Bytes |Cost (%CPU)| Time     |
+---------------------------------------------------------------------------
+|  0 | SELECT STATEMENT    |             |   4 |   124 |   5  (20)| 00:00:01 |
+|  1 |  SORT ORDER BY      |             |   4 |   124 |   5  (20)| 00:00:01 |
+|* 2 |   HASH JOIN         |             |   4 |   124 |   4   (0)| 00:00:01 |
+|* 3 |    TABLE ACCESS FULL| EMPLOYEES   |   4 |    60 |   2   (0)| 00:00:01 |
+|  4 |    TABLE ACCESS FULL| DEPARTMENTS |  27 |   432 |   2   (0)| 00:00:01 |
+---------------------------------------------------------------------------
+
+Predicate Information (identified by operation id):
+---------------------------------------------------
+   2 - access("E"."DEPARTMENT_ID"="D"."DEPARTMENT_ID")
+   3 - filter("SALARY"<3000)`,
+    explainStatementId: `-- STATEMENT_ID로 특정 계획 식별
+EXPLAIN PLAN
+  SET STATEMENT_ID = 'st1' FOR
+  SELECT last_name FROM employees;
+
+-- STATEMENT_ID 지정해서 조회
+SELECT PLAN_TABLE_OUTPUT
+  FROM TABLE(DBMS_XPLAN.DISPLAY(statement_id => 'st1'));`,
+    explainNote: 'EXPLAIN PLAN은 SQL이 실제로 실행될 때의 계획이 아닌, explain 시점의 계획을 보여줘요. 바인드 변수가 있으면 실제 실행 계획과 다를 수 있어요.',
+
     xplanTitle: 'DBMS_XPLAN 패키지',
     xplanDesc:
       'DBMS_XPLAN은 Oracle이 제공하는 실행 계획 출력 전용 패키지입니다. 단순히 트리 구조만 보여주는 것이 아니라, 조회 방법과 format 옵션에 따라 추정값·실제값·조건절·컬럼 투영 정보까지 한 번에 확인할 수 있습니다.\n\n주요 함수는 두 가지입니다. DISPLAY는 EXPLAIN PLAN이 PLAN_TABLE에 저장해 둔 예상 계획을 출력합니다. SQL을 실제로 실행하지 않기 때문에 빠르게 계획을 확인할 때 사용합니다. DISPLAY_CURSOR는 실제로 실행된 SQL의 커서를 V$SQL_PLAN_STATISTICS_ALL에서 조회해 런타임 통계까지 함께 출력합니다. 이를 통해 CBO의 추정과 실제 실행 결과를 직접 비교할 수 있습니다.',
     xplanTable: [
-      ['DISPLAY', 'EXPLAIN PLAN 저장 결과 출력', '실행 전 예상 계획 확인', "format => 'BASIC +ROWS +COST'"],
-      ['DISPLAY_CURSOR', 'V$SQL_PLAN_STATISTICS_ALL 조회', '실행 후 런타임 통계 포함', "format => 'ALLSTATS LAST'"],
+      ['DISPLAY', 'PLAN_TABLE (EXPLAIN PLAN 결과)', '실행 전 예상 계획 확인', "format => 'BASIC +ROWS +COST'"],
+      ['DISPLAY_AWR', 'AWR 저장 실행 계획', 'AWR에서 과거 계획 조회', "format => 'TYPICAL'"],
+      ['DISPLAY_CURSOR', 'V$SQL_PLAN_STATISTICS_ALL', '실행 후 런타임 통계 포함', "format => 'ALLSTATS LAST'"],
+      ['DISPLAY_PLAN', 'PLAN_TABLE (다양한 형식)', 'CLOB 출력, 여러 형식 지원', "format => 'ALL'"],
+      ['DISPLAY_SQL_PLAN_BASELINE', 'SQL Plan Management', 'SQL 플랜 베이스라인 계획 표시', "format => 'TYPICAL'"],
+      ['DISPLAY_SQLSET', 'SQL Tuning Set', 'SQL Tuning Set의 실행 계획 표시', "format => 'TYPICAL'"],
+    ],
+    xplanViewsTitle: '실행 계획 관련 V$ 뷰',
+    xplanViews: [
+      ['V$SQL', '커서 통계 목록. 자식 커서마다 한 행씩 존재.'],
+      ['V$SQL_SHARED_CURSOR', '기존 커서와 공유되지 않는 이유 설명.'],
+      ['V$SQL_PLAN', '공유 SQL 영역의 모든 문장에 대한 계획 포함.'],
+      ['V$SQL_PLAN_STATISTICS', '계획 오퍼레이션의 실제 실행 통계 제공.'],
+      ['V$SQL_PLAN_STATISTICS_ALL', '메모리 사용량 포함. 계획과 실행 통계를 결합.'],
     ],
     xplanFormatTitle: 'format 옵션 조합',
     xplanFormatDesc:
@@ -242,12 +302,72 @@ SET AUTOTRACE TRACEONLY STATISTICS`,
     readOrderTitle: 'Reading Order',
     readOrderDesc:
       'When a node has multiple children, they run top-to-bottom. In the example below, the execution order is ③ → ② → ① → ⓪.',
+    explainTitle: 'Generating Execution Plans with EXPLAIN PLAN',
+    explainDesc:
+      'The EXPLAIN PLAN statement displays execution plans that the optimizer chooses for SELECT, UPDATE, INSERT, and DELETE statements. When issued, the optimizer chooses an execution plan and inserts a row describing each step into a specified plan table. EXPLAIN PLAN is a DML statement rather than DDL, so Oracle Database does not implicitly commit changes.',
+    planTableTitle: 'PLAN_TABLE',
+    planTableDesc:
+      'PLAN_TABLE is the default sample output table for EXPLAIN PLAN statement results. Oracle Database automatically creates a global temporary table PLAN_TABLE$ in the SYS schema and a PLAN_TABLE synonym with PUBLIC privileges. Every session gets its own private copy of PLAN_TABLE in its temporary tablespace.',
+    explainSteps: [
+      'A sample output table named PLAN_TABLE must exist in your schema. Oracle creates it automatically.',
+      'Include the EXPLAIN PLAN FOR clause before the SQL statement.',
+      'Display the plan using DBMS_XPLAN.DISPLAY.',
+    ],
+    explainSql: `-- Step 1: Run EXPLAIN PLAN
+EXPLAIN PLAN FOR
+  SELECT e.last_name, d.department_name, e.salary
+  FROM   employees e, departments d
+  WHERE  salary < 3000
+  AND    e.department_id = d.department_id
+  ORDER BY salary DESC;
+
+-- Step 2: Display the plan
+SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY(format => 'ALL'));`,
+    explainOutputCaption: 'Sample EXPLAIN PLAN output',
+    explainOutput: `Plan hash value: 3556827125
+
+---------------------------------------------------------------------------
+| Id | Operation           | Name        |Rows | Bytes |Cost (%CPU)| Time     |
+---------------------------------------------------------------------------
+|  0 | SELECT STATEMENT    |             |   4 |   124 |   5  (20)| 00:00:01 |
+|  1 |  SORT ORDER BY      |             |   4 |   124 |   5  (20)| 00:00:01 |
+|* 2 |   HASH JOIN         |             |   4 |   124 |   4   (0)| 00:00:01 |
+|* 3 |    TABLE ACCESS FULL| EMPLOYEES   |   4 |    60 |   2   (0)| 00:00:01 |
+|  4 |    TABLE ACCESS FULL| DEPARTMENTS |  27 |   432 |   2   (0)| 00:00:01 |
+---------------------------------------------------------------------------
+
+Predicate Information (identified by operation id):
+---------------------------------------------------
+   2 - access("E"."DEPARTMENT_ID"="D"."DEPARTMENT_ID")
+   3 - filter("SALARY"<3000)`,
+    explainStatementId: `-- Use STATEMENT_ID to identify a specific plan
+EXPLAIN PLAN
+  SET STATEMENT_ID = 'st1' FOR
+  SELECT last_name FROM employees;
+
+-- Retrieve by STATEMENT_ID
+SELECT PLAN_TABLE_OUTPUT
+  FROM TABLE(DBMS_XPLAN.DISPLAY(statement_id => 'st1'));`,
+    explainNote: 'EXPLAIN PLAN shows what plan the optimizer would have chosen at explain time — not necessarily the plan used at execution time. With bind variables, the output may not represent the real execution plan.',
+
     xplanTitle: 'The DBMS_XPLAN Package',
     xplanDesc:
       "DBMS_XPLAN is Oracle's built-in package for displaying execution plans. Beyond a simple tree view, it can show estimated statistics, actual runtime metrics, predicate details, and column projection — all in one output, depending on how you call it and which format options you choose.\n\nThe two most important functions are DISPLAY and DISPLAY_CURSOR. DISPLAY reads the plan that EXPLAIN PLAN saved into PLAN_TABLE — the SQL is not actually executed, making it a quick way to preview the optimizer's choice. DISPLAY_CURSOR queries V$SQL_PLAN_STATISTICS_ALL for a cursor that was already executed, returning runtime statistics alongside the plan so you can compare what the CBO estimated against what actually happened.",
     xplanTable: [
-      ['DISPLAY', 'Reads EXPLAIN PLAN output from PLAN_TABLE', 'Preview estimated plan without running SQL', "format => 'BASIC +ROWS +COST'"],
-      ['DISPLAY_CURSOR', 'Queries V$SQL_PLAN_STATISTICS_ALL', 'View runtime stats for an already-executed cursor', "format => 'ALLSTATS LAST'"],
+      ['DISPLAY', 'PLAN_TABLE (EXPLAIN PLAN output)', 'Preview estimated plan without running SQL', "format => 'BASIC +ROWS +COST'"],
+      ['DISPLAY_AWR', 'AWR-stored execution plans', 'Retrieve historical plans from AWR', "format => 'TYPICAL'"],
+      ['DISPLAY_CURSOR', 'V$SQL_PLAN_STATISTICS_ALL', 'View runtime stats for an already-executed cursor', "format => 'ALLSTATS LAST'"],
+      ['DISPLAY_PLAN', 'PLAN_TABLE (multiple formats)', 'CLOB output; supports multiple display formats', "format => 'ALL'"],
+      ['DISPLAY_SQL_PLAN_BASELINE', 'SQL Plan Management', 'Display execution plans for a SQL plan baseline', "format => 'TYPICAL'"],
+      ['DISPLAY_SQLSET', 'SQL Tuning Set', 'Display execution plan of a statement in a SQL tuning set', "format => 'TYPICAL'"],
+    ],
+    xplanViewsTitle: 'Plan-Related Views',
+    xplanViews: [
+      ['V$SQL', 'Lists statistics for shared SQL cursors; one row per child cursor.'],
+      ['V$SQL_SHARED_CURSOR', 'Explains why a child cursor is not shared with existing cursors.'],
+      ['V$SQL_PLAN', 'Contains the execution plan for every statement in the shared SQL area.'],
+      ['V$SQL_PLAN_STATISTICS', 'Provides actual execution statistics per plan operation.'],
+      ['V$SQL_PLAN_STATISTICS_ALL', 'Combines plan with execution statistics including memory usage.'],
     ],
     xplanFormatTitle: 'Combining format Options',
     xplanFormatDesc:
@@ -477,6 +597,41 @@ export function OptimizerPlanPage() {
         subtitle={t.subtitle}
       />
 
+      {/* ── EXPLAIN PLAN ── */}
+      <SectionTitle>{t.explainTitle}</SectionTitle>
+      <Prose>{t.explainDesc}</Prose>
+
+      <SubTitle>{t.planTableTitle}</SubTitle>
+      <Prose>{t.planTableDesc}</Prose>
+
+      <div className="my-4 flex flex-col gap-2">
+        {t.explainSteps.map((step, i) => (
+          <div key={i} className="flex items-start gap-3">
+            <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-blue-500 font-mono text-[10px] font-bold text-white">
+              {i + 1}
+            </span>
+            <p className="text-sm leading-relaxed text-muted-foreground">{step}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-4">
+        <SqlBlock sql={t.explainSql} />
+      </div>
+
+      <div className="mt-4">
+        <p className="mb-1 text-xs font-semibold text-muted-foreground">{t.explainOutputCaption}</p>
+        <pre className="overflow-x-auto rounded-xl bg-[#0f172a] px-5 py-4 font-mono text-xs leading-relaxed text-[#94a3b8]">
+          {t.explainOutput}
+        </pre>
+      </div>
+
+      <div className="mt-4">
+        <SqlBlock sql={t.explainStatementId} />
+      </div>
+
+      <InfoBox variant="note">{t.explainNote}</InfoBox>
+
       <Divider />
 
       {/* ── 5가지 정보 영역 개요 ── */}
@@ -695,6 +850,13 @@ export function OptimizerPlanPage() {
         headers={isKo ? ['함수', '데이터 소스', '용도', '대표 format'] : ['Function', 'Data Source', 'Use Case', 'Typical format']}
         rows={t.xplanTable}
       />
+
+      <SubTitle>{t.xplanViewsTitle}</SubTitle>
+      <Table
+        headers={isKo ? ['뷰', '설명'] : ['View', 'Description']}
+        rows={t.xplanViews}
+      />
+
       <SubTitle>{t.xplanFormatTitle}</SubTitle>
       <Prose>{t.xplanFormatDesc}</Prose>
       <Table

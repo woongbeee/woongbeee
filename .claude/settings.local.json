@@ -26,7 +26,10 @@
       "Bash(dir C:\\\\Users\\\\woong\\\\OneDrive\\\\Desktop\\\\oracleDataBaseSystem\\\\src\\\\book\\\\chapters\\\\internals\\\\concurrency *)",
       "Bash(dir C:\\\\Users\\\\woong\\\\OneDrive\\\\Desktop\\\\oracleDataBaseSystem\\\\src\\\\book\\\\chapters\\\\internals\\\\transaction *)",
       "PowerShell(\\(Get-Content \"C:\\\\Users\\\\woong\\\\OneDrive\\\\Desktop\\\\oracleDataBaseSystem\\\\src\\\\book\\\\chapters\\\\internals\\\\transaction\\\\TransactionSection.tsx\" | Measure-Object -Line\\).Lines)",
-      "Bash(Get-ChildItem *)"
+      "Bash(Get-ChildItem *)",
+      "Bash(dir \"C:\\\\Users\\\\woong\\\\OneDrive\\\\Desktop\\\\oracleDataBaseSystem\\\\src\\\\book\\\\chapters\\\\query-transform\")",
+      "Bash(dir /s /b \"C:\\\\Users\\\\woong\\\\OneDrive\\\\Desktop\\\\oracleDataBaseSystem\\\\src\\\\book\\\\chapters\\\\query-transform\\\\*.tsx\")",
+      "Bash(xargs sed -i 's/억제/방지/g')"
     ]
   }
 }

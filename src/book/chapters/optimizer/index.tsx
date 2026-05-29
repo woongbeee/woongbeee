@@ -6,6 +6,10 @@ import { OptimizerStatsPage } from './stats/StatsSection'
 import { OptimizerAccessPathPage } from './access-path/AccessPathSection'
 import { OptimizerPlanPage } from './plan/PlanSection'
 import { PlanReadingSection } from './plan/PlanReadingSection'
+import { OptimizerJoinOverviewPage } from './join/JoinOverviewSection'
+import { OptimizerJoinNestedLoopPage } from './join/NestedLoopSection'
+import { OptimizerJoinHashPage } from './join/HashJoinSection'
+import { OptimizerJoinSortMergePage } from './join/SortMergeSection'
 import { OptimizerSimulator } from './simulator/OptimizerSimulator'
 
 const LANDING_ITEMS = {
@@ -32,6 +36,11 @@ export function OptimizerChapterPage({ sectionId }: { sectionId: string }) {
   if (sectionId === 'optimizer-access-path')  return <OptimizerAccessPathPage />
   if (sectionId === 'optimizer-plan')         return <OptimizerPlanPage />
   if (sectionId === 'optimizer-plan-reading') return <PlanReadingSection />
+  if (sectionId === 'optimizer-join')         return <OptimizerJoinOverviewPage />
+  if (sectionId === 'optimizer-join-overview')    return <OptimizerJoinOverviewPage />
+  if (sectionId === 'optimizer-join-nested-loop') return <OptimizerJoinNestedLoopPage />
+  if (sectionId === 'optimizer-join-hash')        return <OptimizerJoinHashPage />
+  if (sectionId === 'optimizer-join-sort-merge')  return <OptimizerJoinSortMergePage />
 
   return (
     <PageContainer>

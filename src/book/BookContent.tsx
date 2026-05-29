@@ -1,4 +1,4 @@
-import { memo } from 'react'
+import { memo, useEffect, useRef } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useSimulationStore } from '@/store/simulationStore'
 import { getAdjacentSections, getSectionById } from './bookStructure.tsx'
@@ -16,6 +16,7 @@ import { QueryTransformPage } from './chapters/query-transform'
 import { SortPage } from './chapters/sort'
 import { PartitionPage } from './chapters/partition'
 import { ParallelPage } from './chapters/parallel'
+import { PageContainer, WipBanner } from './chapters/shared'
 
 interface Props {
   sectionId: string
@@ -42,6 +43,11 @@ export const BookContent = memo(function BookContent({ sectionId, onNavigate }: 
   const lang = useSimulationStore((s) => s.lang)
   const info = getSectionById(sectionId)
   const adjacent = getAdjacentSections(sectionId)
+  const scrollRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ top: 0 })
+  }, [sectionId])
 
   if (!info) return null
 
@@ -63,7 +69,7 @@ export const BookContent = memo(function BookContent({ sectionId, onNavigate }: 
       </div>
 
       {/* Content area */}
-      <div className={cn(
+      <div ref={scrollRef} className={cn(
         'min-h-0 flex-1',
         sectionId === 'optimizer-simulator' ? 'overflow-hidden' : 'overflow-x-hidden overflow-y-auto',
       )}>
@@ -127,15 +133,17 @@ export const BookContent = memo(function BookContent({ sectionId, onNavigate }: 
 
 // Route each sectionId to the right chapter page component
 function SectionRouter({ sectionId }: { sectionId: string }) {
-  if (sectionId.startsWith('intro-'))      return <IntroductionPage />
+  if (sectionId.startsWith('intro-'))       return <IntroductionPage />
   if (sectionId.startsWith('sql-basics-'))  return <SqlBasicsPage sectionId={sectionId} />
-  if (sectionId.startsWith('internals-')) return <InternalsPage sectionId={sectionId} />
-  if (sectionId.startsWith('index-'))     return <IndexChapterPage sectionId={sectionId} />
-  if (sectionId.startsWith('join-'))      return <JoinPage sectionId={sectionId} />
-  if (sectionId.startsWith('optimizer-')) return <OptimizerChapterPage sectionId={sectionId} />
-  if (sectionId.startsWith('qt-'))        return <QueryTransformPage sectionId={sectionId} />
-  if (sectionId.startsWith('sort-'))      return <SortPage sectionId={sectionId} />
-  if (sectionId.startsWith('partition-')) return <PartitionPage sectionId={sectionId} />
-  if (sectionId.startsWith('parallel-'))  return <ParallelPage sectionId={sectionId} />
+  if (sectionId.startsWith('internals-'))   return <InternalsPage sectionId={sectionId} />
+  if (sectionId.startsWith('join-'))        return <JoinPage sectionId={sectionId} />
+  if (sectionId.startsWith('index-'))       return <IndexChapterPage sectionId={sectionId} />
+  if (sectionId.startsWith('partition-'))   return <PartitionPage sectionId={sectionId} />
+  if (sectionId.startsWith('parallel-'))    return <ParallelPage sectionId={sectionId} />
+  if (sectionId.startsWith('optimizer-'))   return <OptimizerChapterPage sectionId={sectionId} />
+  // sql-tuning 챕터: 하위 섹션은 기존 라우터 재사용, 그룹 헤더는 WipBanner
+  if (sectionId.startsWith('qt-'))          return <QueryTransformPage sectionId={sectionId} />
+  if (sectionId.startsWith('sort-'))        return <SortPage sectionId={sectionId} />
+  if (sectionId.startsWith('sql-tuning-'))  return <PageContainer><WipBanner /></PageContainer>
   return null
 }

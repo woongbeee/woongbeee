@@ -8,10 +8,9 @@ import {
   IconListSearch,
   IconArrowMerge,
   IconBolt,
-  IconTransform,
-  IconArrowsSort,
   IconLayoutGrid,
   IconGitFork,
+  IconWand,
 } from '@tabler/icons-react'
 
 export interface BookSection {
@@ -271,12 +270,46 @@ export const BOOK_CHAPTERS: BookChapter[] = [
     ],
   },
   {
-    id: 'index',
+    id: 'join',
     num: 3,
+    icon: <IconArrowMerge size={15} className="text-emerald-500" />,
+    color: 'emerald',
+    title: { ko: '조인 원리와 활용', en: 'Join Principles & Usage' },
+    sections: [
+      {
+        id: 'join-overview',
+        title: { ko: '조인 개요', en: 'Join Overview' },
+      },
+      {
+        id: 'join-nested-loop',
+        title: { ko: 'Nested Loop Join', en: 'Nested Loop Join' },
+      },
+      {
+        id: 'join-hash',
+        title: { ko: 'Hash Join', en: 'Hash Join' },
+      },
+      {
+        id: 'join-sort-merge',
+        title: { ko: 'Sort Merge Join', en: 'Sort Merge Join' },
+      },
+      {
+        id: 'join-simulator',
+        title: { ko: 'Join Simulator', en: 'Join Simulator' },
+        hasSimulator: true,
+        simulatorLabel: {
+          ko: 'Join 시뮬레이터 실행',
+          en: 'Launch Join Simulator',
+        },
+      },
+    ],
+  },
+  {
+    id: 'index',
+    num: 4,
     icon: <IconListSearch size={15} className="text-violet-500" />,
     color: 'violet',
     title: {
-      ko: '인덱스 원리와 활용, 스캔 방식',
+      ko: '인덱스 원리와 활용',
       en: 'Index Internals & Scan Methods',
     },
     sections: [
@@ -352,152 +385,8 @@ export const BOOK_CHAPTERS: BookChapter[] = [
     ],
   },
   {
-    id: 'join',
-    num: 4,
-    icon: <IconArrowMerge size={15} className="text-emerald-500" />,
-    color: 'emerald',
-    title: { ko: '조인 원리와 활용', en: 'Join Principles & Usage' },
-    sections: [
-      {
-        id: 'join-overview',
-        title: { ko: '조인 개요', en: 'Join Overview' },
-      },
-      {
-        id: 'join-nested-loop',
-        title: { ko: 'Nested Loop Join', en: 'Nested Loop Join' },
-      },
-      {
-        id: 'join-hash',
-        title: { ko: 'Hash Join', en: 'Hash Join' },
-      },
-      {
-        id: 'join-sort-merge',
-        title: { ko: 'Sort Merge Join', en: 'Sort Merge Join' },
-      },
-      {
-        id: 'join-simulator',
-        title: { ko: 'Join Simulator', en: 'Join Simulator' },
-        hasSimulator: true,
-        simulatorLabel: {
-          ko: 'Join 시뮬레이터 실행',
-          en: 'Launch Join Simulator',
-        },
-      },
-    ],
-  },
-  {
-    id: 'optimizer',
-    num: 5,
-    icon: <IconBolt size={15} className="text-orange-500" />,
-    color: 'orange',
-    title: { ko: '옵티마이저 원리', en: 'Optimizer Principles' },
-    sections: [
-      {
-        id: 'optimizer-overview',
-        title: { ko: 'CBO 개요', en: 'CBO Overview' },
-      },
-      {
-        id: 'optimizer-stats',
-        title: { ko: '통계 정보와 선택도', en: 'Statistics & Selectivity' },
-      },
-      {
-        id: 'optimizer-access-path',
-        title: { ko: '액세스 패스', en: 'Access Paths' },
-      },
-      {
-        id: 'optimizer-plan',
-        title: { ko: '실행 계획', en: 'Execution Plan' },
-        children: [
-          {
-            id: 'optimizer-plan-reading',
-            title: { ko: '실행 계획 읽는 연습하기', en: 'Practice Reading Execution Plans' },
-          },
-        ],
-      },
-      {
-        id: 'optimizer-simulator',
-        title: { ko: 'Optimizer Simulator', en: 'Optimizer Simulator' },
-        hasSimulator: true,
-        simulatorLabel: {
-          ko: 'Optimizer 시뮬레이터 실행',
-          en: 'Launch Optimizer Simulator',
-        },
-      },
-    ],
-  },
-  {
-    id: 'query-transform',
-    num: 6,
-    icon: <IconTransform size={15} className="text-cyan-500" />,
-    color: 'cyan',
-    title: { ko: '쿼리 변환', en: 'Query Transformation' },
-    sections: [
-      {
-        id: 'qt-overview',
-        title: { ko: '쿼리 변환 개요', en: 'Query Transformation Overview' },
-      },
-      {
-        id: 'qt-subquery-unnesting',
-        title: { ko: '서브쿼리 Unnesting', en: 'Subquery Unnesting' },
-      },
-      {
-        id: 'qt-view-merging',
-        title: { ko: '뷰 Merging', en: 'View Merging' },
-      },
-      {
-        id: 'qt-predicate-pushdown',
-        title: { ko: 'Predicate Pushdown', en: 'Predicate Pushdown' },
-      },
-      {
-        id: 'qt-simulator',
-        title: {
-          ko: 'Query Transform Simulator',
-          en: 'Query Transform Simulator',
-        },
-        hasSimulator: true,
-        simulatorLabel: {
-          ko: '쿼리 변환 시뮬레이터 실행',
-          en: 'Launch Query Transform Simulator',
-        },
-      },
-    ],
-  },
-  {
-    id: 'sort',
-    num: 7,
-    icon: <IconArrowsSort size={15} className="text-rose-500" />,
-    color: 'rose',
-    title: { ko: '소트 튜닝', en: 'Sort Tuning' },
-    sections: [
-      {
-        id: 'sort-overview',
-        title: { ko: '소트 연산 개요', en: 'Sort Operations Overview' },
-      },
-      {
-        id: 'sort-memory',
-        title: {
-          ko: 'Sort Area와 Temp 세그먼트',
-          en: 'Sort Area & Temp Segment',
-        },
-      },
-      {
-        id: 'sort-avoid',
-        title: { ko: '소트 회피 전략', en: 'Sort Avoidance Strategies' },
-      },
-      {
-        id: 'sort-simulator',
-        title: { ko: 'Sort Simulator', en: 'Sort Simulator' },
-        hasSimulator: true,
-        simulatorLabel: {
-          ko: 'Sort 시뮬레이터 실행',
-          en: 'Launch Sort Simulator',
-        },
-      },
-    ],
-  },
-  {
     id: 'partition',
-    num: 8,
+    num: 5,
     icon: <IconLayoutGrid size={15} className="text-amber-500" />,
     color: 'amber',
     title: { ko: '파티셔닝', en: 'Partitioning' },
@@ -548,7 +437,7 @@ export const BOOK_CHAPTERS: BookChapter[] = [
   },
   {
     id: 'parallel',
-    num: 9,
+    num: 6,
     icon: <IconGitFork size={15} className="text-teal-500" />,
     color: 'teal',
     title: { ko: '병렬 처리', en: 'Parallel Processing' },
@@ -573,6 +462,152 @@ export const BOOK_CHAPTERS: BookChapter[] = [
           ko: '병렬 처리 시뮬레이터 실행',
           en: 'Launch Parallel Simulator',
         },
+      },
+    ],
+  },
+  {
+    id: 'optimizer',
+    num: 7,
+    icon: <IconBolt size={15} className="text-orange-500" />,
+    color: 'orange',
+    title: { ko: '옵티마이저', en: 'Optimizer' },
+    sections: [
+      {
+        id: 'optimizer-overview',
+        title: { ko: 'CBO 개요', en: 'CBO Overview' },
+      },
+      {
+        id: 'optimizer-stats',
+        title: { ko: '통계 정보와 선택도', en: 'Statistics & Selectivity' },
+      },
+      {
+        id: 'optimizer-access-path',
+        title: { ko: '액세스 패스', en: 'Access Paths' },
+      },
+      {
+        id: 'optimizer-plan',
+        title: { ko: '실행 계획', en: 'Execution Plan' },
+        children: [
+          {
+            id: 'optimizer-plan-reading',
+            title: { ko: '실행 계획 읽는 연습하기', en: 'Practice Reading Execution Plans' },
+          },
+        ],
+      },
+      {
+        id: 'optimizer-join',
+        title: { ko: '조인 방식 선택', en: 'Join Method Selection' },
+        children: [
+          {
+            id: 'optimizer-join-nested-loop',
+            title: { ko: 'Nested Loop Join', en: 'Nested Loop Join' },
+          },
+          {
+            id: 'optimizer-join-hash',
+            title: { ko: 'Hash Join', en: 'Hash Join' },
+          },
+          {
+            id: 'optimizer-join-sort-merge',
+            title: { ko: 'Sort Merge Join', en: 'Sort Merge Join' },
+          },
+        ],
+      },
+      {
+        id: 'optimizer-simulator',
+        title: { ko: 'Optimizer Simulator', en: 'Optimizer Simulator' },
+        hasSimulator: true,
+        simulatorLabel: {
+          ko: 'Optimizer 시뮬레이터 실행',
+          en: 'Launch Optimizer Simulator',
+        },
+      },
+    ],
+  },
+  {
+    id: 'sql-tuning',
+    num: 8,
+    icon: <IconWand size={15} className="text-rose-500" />,
+    color: 'rose',
+    title: { ko: 'SQL 튜닝', en: 'SQL Tuning' },
+    sections: [
+      {
+        id: 'sql-tuning-overview',
+        title: { ko: 'SQL 튜닝 개요', en: 'SQL Tuning Overview' },
+        hiddenInToc: true,
+      },
+      {
+        id: 'sql-tuning-query-transform',
+        title: { ko: '쿼리 변환', en: 'Query Transformation' },
+        children: [
+          {
+            id: 'qt-overview',
+            title: { ko: '쿼리 변환 개요', en: 'Query Transformation Overview' },
+          },
+          {
+            id: 'qt-or-expansion',
+            title: { ko: 'OR Expansion', en: 'OR Expansion' },
+          },
+          {
+            id: 'qt-view-merging',
+            title: { ko: 'View Merging', en: 'View Merging' },
+          },
+          {
+            id: 'qt-predicate-pushing',
+            title: { ko: 'Predicate Pushing', en: 'Predicate Pushing' },
+          },
+          {
+            id: 'qt-subquery-unnesting',
+            title: { ko: 'Subquery Unnesting', en: 'Subquery Unnesting' },
+          },
+          {
+            id: 'qt-materialized-view',
+            title: { ko: 'Query Rewrite with Materialized Views', en: 'Query Rewrite with Materialized Views' },
+          },
+          {
+            id: 'qt-star-transformation',
+            title: { ko: 'Star Transformation', en: 'Star Transformation' },
+          },
+          {
+            id: 'qt-join-factorization',
+            title: { ko: 'Join Factorization', en: 'Join Factorization' },
+          },
+          {
+            id: 'qt-simulator',
+            title: { ko: 'Query Transform Simulator', en: 'Query Transform Simulator' },
+            hasSimulator: true,
+            simulatorLabel: {
+              ko: '쿼리 변환 시뮬레이터 실행',
+              en: 'Launch Query Transform Simulator',
+            },
+          },
+        ],
+      },
+      {
+        id: 'sql-tuning-sort',
+        title: { ko: '소트 튜닝', en: 'Sort Tuning' },
+        children: [
+          {
+            id: 'sort-overview',
+            title: { ko: '소트 연산 개요', en: 'Sort Operations Overview' },
+          },
+          {
+            id: 'sort-memory',
+            title: { ko: 'Sort Area와 Temp 세그먼트', en: 'Sort Area & Temp Segment' },
+          },
+          {
+            id: 'sort-avoid',
+            title: { ko: '소트 회피 전략', en: 'Sort Avoidance Strategies' },
+          },
+          {
+            id: 'sort-simulator',
+            title: { ko: 'Sort Simulator', en: 'Sort Simulator' },
+            hasSimulator: true,
+            simulatorLabel: {
+              ko: 'Sort 시뮬레이터 실행',
+              en: 'Launch Sort Simulator',
+            },
+          },
+        ],
       },
     ],
   },

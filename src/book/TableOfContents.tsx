@@ -145,7 +145,7 @@ export function TableOfContents({ activeSectionId, onSelect, onToggle }: Props) 
       {BOOK_CHAPTERS.map((chapter) => {
         const isOpen    = !!openChapters[chapter.id]
         const hasActive = chapter.sections.some((s) => sectionContainsActive(s, activeSectionId))
-        const isReady   = chapter.num <= 3
+        const isReady   = chapter.num <= 4
         const allHidden = chapter.sections.every((s) => s.hiddenInToc)
         const hiddenSection = allHidden ? chapter.sections[0] : undefined
 

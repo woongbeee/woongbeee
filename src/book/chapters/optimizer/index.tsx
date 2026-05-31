@@ -1,6 +1,8 @@
 import { IconBolt } from '@tabler/icons-react'
 import { useSimulationStore } from '@/store/simulationStore'
 import { PageContainer, ChapterTitle, ConceptGrid } from '../shared'
+import { OptimizerFundamentalsPage } from './fundamentals/FundamentalsSection'
+import { OptimizerExecutionPlansPage } from './execution-plans/ExecutionPlansSection'
 import { OptimizerOverviewPage } from './overview/OverviewSection'
 import { OptimizerStatsPage } from './stats/StatsSection'
 import { OptimizerAccessPathPage } from './access-path/AccessPathSection'
@@ -30,6 +32,9 @@ export function OptimizerChapterPage({ sectionId }: { sectionId: string }) {
   const isKo = lang === 'ko'
 
   if (sectionId === 'optimizer-simulator') return <OptimizerSimulator />
+
+  if (sectionId.startsWith('optimizer-fundamentals'))    return <OptimizerFundamentalsPage sectionId={sectionId} />
+  if (sectionId.startsWith('optimizer-execution-plans')) return <OptimizerExecutionPlansPage sectionId={sectionId} />
 
   if (sectionId === 'optimizer-overview')     return <OptimizerOverviewPage />
   if (sectionId === 'optimizer-stats')        return <OptimizerStatsPage />

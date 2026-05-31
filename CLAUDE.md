@@ -1,4 +1,4 @@
- # CLAUDE.md
+# CLAUDE.md
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
@@ -6,7 +6,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 사용자와 상호작용하는 Dynamic Oracle 교육서. 좌측 사이드바 목차(TOC)에서 챕터를 탐색하고, 각 섹션에서 개념 설명 + 인터랙티브 애니메이션 + 챕터별 시뮬레이터를 통해 Oracle 내부를 학습한다.
 
-**챕터 구성 (num 0~9):** 오라클이란?(0) → SQL 기본 문법(1) → 오라클 내부 구조·프로세스(2) → 인덱스(3) → 조인(4) → 옵티마이저(5) → 쿼리 변환(6) → 소트 튜닝(7) → 파티셔닝(8) → 병렬 처리(9)
+**챕터 구성 (num 0~8, `bookStructure.tsx` 기준):**
+
+| num | id | 제목(ko) | 색상 |
+|-----|-----|----------|------|
+| 0 | `introduction` | 오라클이란? | `brand-navy` |
+| 1 | `sql-basics` | SQL 문법 | `brand-navy` |
+| 2 | `internals` | 오라클 내부 구조와 프로세스 | `blue` |
+| 3 | `join` | 조인 원리와 활용 | `emerald` |
+| 4 | `index` | 인덱스 원리와 활용 | `violet` |
+| 5 | `partition` | 파티셔닝 | `amber` |
+| 6 | `parallel` | 병렬 처리 | `teal` |
+| 7 | `optimizer` | 옵티마이저 | `orange` |
+| 8 | `sql-tuning` | SQL 튜닝 (쿼리 변환 + 소트 튜닝 포함) | `rose` |
 
 ## 명령어
 
@@ -18,9 +30,9 @@ npm run preview   # 빌드 결과물 미리보기
 npx prettier --write .  # 코드 포매팅 (format 스크립트 없음, 직접 실행)
 ```
 
-> 테스트 프레임워크 없음. lint는 `npm run lint`로 확인.
+테스트 프레임워크 없음. 변경 후에는 반드시 `npm run build`로 타입 오류 확인.
 
-**배포:** GitHub Pages — base path `/woongbeee/` (빌드 시 자동 적용, `vite.config.ts` 참고). `__BUILD_DATE__` 전역 변수가 빌드 시 `"YYYY-MM-DD"` 문자열로 주입된다.
+**배포:** GitHub Pages — base path `/woongbeee/` (`vite.config.ts`). `__BUILD_DATE__` 전역 변수가 빌드 시 `"YYYY-MM-DD"` 문자열로 주입된다.
 
 ## 아키텍처
 
@@ -43,11 +55,9 @@ interface Props {
 // lang은 컴포넌트 내부에서: const lang = useSimulationStore(s => s.lang)
 ```
 
-`onNavigate`는 `BookContent`에서 관리하며 Prev/Next 버튼에서 사용됨. 챕터 페이지가 내부 탐색이 필요한 경우 별도 prop으로 받는다.
-
 `bookStructure.ts`의 `BOOK_CHAPTERS`가 단일 진실 공급원(TOC 데이터). 새 섹션 추가 시 여기만 수정하면 TOC·breadcrumb·Prev/Next가 자동 반영된다.
 
-`BookSection`은 `children?: BookSection[]`을 가질 수 있어 계층 구조를 지원한다. `flattenSections()`가 재귀적 `walk()`로 children을 포함해 평탄화하므로 `getSectionById()`·`getAdjacentSections()`·Prev/Next 모두 children까지 올바르게 동작한다. **임의 깊이(n단계) 지원** — SGA 하위 섹션들(깊이 4: chapter→overview→sga→buffer-cache)과 process 하위 섹션들(깊이 4)이 실제로 동작 중이다.
+`BookSection`은 `children?: BookSection[]`을 가질 수 있어 계층 구조를 지원한다. `flattenSections()`가 재귀적 `walk()`로 children을 포함해 평탄화하므로 `getSectionById()`·`getAdjacentSections()`·Prev/Next 모두 children까지 올바르게 동작한다. **임의 깊이(n단계) 지원** — SGA 하위 섹션들(깊이 4: chapter→overview→sga→buffer-cache)이 실제로 동작 중이다.
 
 앱 첫 진입 시 활성 섹션은 `intro-overview` (Chapter 0 첫 섹션, `BookLayout.tsx`의 `useState` 초기값).
 
@@ -57,13 +67,14 @@ interface Props {
 | `intro-` | `IntroductionPage` | `src/book/chapters/introduction/IntroductionPage.tsx` |
 | `sql-basics-` | `SqlBasicsPage` | `src/book/chapters/sql-basics/index.tsx` |
 | `internals-` | `InternalsPage` | `src/book/chapters/internals/index.tsx` |
-| `index-` | `IndexChapterPage` | `src/book/chapters/index-chapter/index.tsx` |
 | `join-` | `JoinPage` | `src/book/chapters/join/index.tsx` |
+| `index-` | `IndexChapterPage` | `src/book/chapters/index-chapter/index.tsx` |
+| `partition-` | `PartitionPage` | `src/book/chapters/partition/index.tsx` |
+| `parallel-` | `ParallelPage` | `src/book/chapters/parallel/index.tsx` |
 | `optimizer-` | `OptimizerChapterPage` | `src/book/chapters/optimizer/index.tsx` |
 | `qt-` | `QueryTransformPage` | `src/book/chapters/query-transform/index.tsx` |
 | `sort-` | `SortPage` | `src/book/chapters/sort/index.tsx` |
-| `partition-` | `PartitionPage` | `src/book/chapters/partition/index.tsx` |
-| `parallel-` | `ParallelPage` | `src/book/chapters/parallel/index.tsx` |
+| `sql-tuning-` | `WipBanner` | 미구현 (챕터 래퍼 섹션, TOC 구조용) |
 
 각 챕터 페이지는 `sectionId`를 받아 내부적으로 `if/switch`로 섹션별 콘텐츠를 분기한다.
 
@@ -98,11 +109,8 @@ interface Props {
 - `currentStep / isRunning / isComplete` — 시뮬레이션 제어
 - `activeComponents: Set<string>` — OracleDiagram에서 어떤 블록을 활성화할지
 - `highlightedStep` — stepSummary 타임라인 클릭 시 해당 단계로 핀 고정 (null이면 현재 단계 따라감)
-- `dataFlowArrows` — 컴포넌트 간 애니메이션 화살표
 - `cachedQueries` — Library Cache 쿼리 목록 (최대 8개, FIFO). 3개 시드 쿼리로 초기화
 - `bufferFlushed` — `flushBuffers()` 호출 후 `true`가 되어 다음 시뮬레이션에서 반드시 Buffer Miss 발생; 시뮬레이션 완료 시 자동 `false` 리셋
-- `flushBuffers()` — DBWn+CKPT 플러시 애니메이션 단독 실행 (시뮬레이션과 무관)
-- `STEP_COMPONENTS`, `STEP_PROCESS_LABEL`, `StepSummary`, `SimulationStep` 타입도 여기에 위치
 
 `startSimulation()`은 실행 시점에 `useLangStore.getState().lang`으로 현재 언어를 가져온다.
 
@@ -118,34 +126,21 @@ Oracle CBO를 모방한 순수 TypeScript 구현:
 
 `stats.ts`의 `TABLE_STATS` 테이블 이름이 `hrSchema.ts`·`coSchema.ts`의 스키마 이름과 일치해야 CBO가 올바르게 동작한다.
 
-### 시뮬레이터 컴포넌트 (`src/components/`)
-
-Internals 시뮬레이터를 구성하는 핵심 컴포넌트들:
-- `OracleDiagram.tsx` — 인스턴스 블록 다이어그램 (activeComponents에 따라 하이라이트)
-- `QueryInput.tsx` — SQL 입력창 + `LiveLog` / `SummaryTimeline` named export
-- `OptimizerPanel.tsx` — CBO 실행 계획 3단계 시각화
-- `DataPanel.tsx` — 스키마·샘플 데이터 브라우저 (`SchemaView`, `TableView` named export)
-- `SchemaDiagram.tsx` — React Flow 기반 ERD
-- Index 챕터 전용 서브 컴포넌트들(`BTreeSection`, `BitmapSection`, `CompositeSection`, `IndexTypesOverview`)은 `src/book/chapters/index-chapter/`에 위치. `IndexPage.tsx`도 같은 폴더에 존재하지만 미사용(dead code); 실제 진입점은 `index.tsx`의 `IndexChapterPage`
-
 ### 데이터 스키마 (`src/data/`)
 
-- `types.ts` — 공유 TypeScript 인터페이스: `SchemaTable`, `Schema`, `ColumnDef`, `ForeignKey`, `RowData`. `hrSchema`·`coSchema`·`SchemaDiagram` 등이 이 타입을 공통으로 사용
+- `types.ts` — 공유 TypeScript 인터페이스: `SchemaTable`, `Schema`, `ColumnDef`, `ForeignKey`, `RowData`
 - `hrSchema.ts` — HR 스키마 7개 테이블 + 샘플 데이터
 - `coSchema.ts` — CO(Customer Orders) 스키마 5개 테이블 + 샘플 데이터
-- `largeDataGenerator.ts` — 대용량 가상 데이터 생성기 (Mulberry32 PRNG, 시드 기반). `BitmapSection` 등 Index 챕터 서브 컴포넌트에서 사용. 모듈 import 시 1회 생성 후 캐시됨
+- `largeDataGenerator.ts` — 대용량 가상 데이터 생성기 (Mulberry32 PRNG, 시드 기반). 모듈 import 시 1회 생성 후 캐시됨
 - `index.ts` — 배럴 파일. `SCHEMAS`, `SAMPLE_QUERIES`, 두 스키마, `largeDataGenerator`를 re-export
-- `dataset.ts` — 삭제됨. `hrSchema`/`coSchema`가 유일한 데이터 소스임
 
-`src/book/chapters/sql-basics/dml-more/shared.ts`는 `sql-basics` 챕터 전용 공유 헬퍼다: `Employee` / `ExampleQuery` / `ExecStep` 인터페이스, `EMPLOYEES` 샘플 데이터 배열, 섹션 간에 공통으로 쓰이는 순수 유틸 함수들이 정의되어 있다.
+`src/book/chapters/sql-basics/dml-more/shared.ts`는 `sql-basics` 챕터 전용 공유 헬퍼: `Employee` / `ExampleQuery` / `ExecStep` 인터페이스, `EMPLOYEES` 샘플 데이터, 순수 유틸 함수.
 
 ### 용어 사전 (`src/data/glossary.ts`, `src/book/GlossaryPanel.tsx`)
 
-`GlossaryTerm` 인터페이스: `term` (영문 표시명), `definition: { ko, en }`, `sectionIds: string[]` (관련 섹션 ID 목록).
+`GLOSSARY` 배열이 전체 용어 목록의 단일 진실 공급원. `GlossaryTerm` 인터페이스: `term`, `definition: { ko, en }`, `sectionIds: string[]`. 용어 추가 시 `glossary.ts`의 `GLOSSARY`에만 항목을 추가하고 `sectionIds`에 해당 섹션 ID를 나열하면 패널에 자동 반영된다.
 
-`GLOSSARY` 배열이 전체 용어 목록의 단일 진실 공급원. `getTermsForSection(sectionId)` 는 `sectionIds` 배열에 해당 섹션 ID가 포함된 용어를 필터링한다. `sortTerms()` 는 알파벳 순으로 정렬.
-
-`GlossaryPanel`은 우측 고정 사이드 패널. `GlossaryBody`는 `key={sectionId}`로 마운트되어 섹션 변경 시 검색·확장 상태가 리셋된다. 용어 추가 시 `glossary.ts`의 `GLOSSARY`에만 항목을 추가하고 `sectionIds`에 해당 섹션 ID를 나열하면 패널에 자동 반영된다.
+`GlossaryPanel`은 우측 고정 사이드 패널. `GlossaryBody`는 `key={sectionId}`로 마운트되어 섹션 변경 시 검색·확장 상태가 리셋된다.
 
 ### 챕터 내 이중 언어 문자열 패턴
 
@@ -161,217 +156,108 @@ const T = {
 
 번역이 필요한 UI 문자열은 모두 이 패턴으로 관리하며, 별도 i18n 라이브러리 없음.
 
-### 복잡한 챕터의 서브 컴포넌트 분리
+### 1페이지 = 1파일 규칙 (Page-per-File)
 
-콘텐츠가 많은 챕터(Index 등)는 섹션별 서브 컴포넌트를 챕터 폴더 안에 분리한다. 예: Index 챕터는 `src/book/chapters/index-chapter/` 안에 `BTreeSection.tsx`, `BitmapSection.tsx`, `CompositeSection.tsx`, `IndexTypesOverview.tsx`를 둔다. 챕터 페이지(`IndexChapterPage.tsx`)가 이를 import해 조합한다.
+**TOC의 트리 구조와 디렉토리 트리 구조가 일치해야 한다.** TOC에 독립 섹션 ID로 등록된 모든 페이지는 반드시 자신만의 파일을 가진다.
 
-콘텐츠가 많은 챕터는 섹션별 파일로 추가 분리된다:
+- **1개의 섹션 ID → 1개의 `.tsx` 파일.** 여러 섹션을 하나의 파일에 함수로 묶지 않는다.
+- **디렉토리 = TOC 부모 노드.** TOC에서 부모-자식 관계인 섹션들은 `parent/child/ChildSection.tsx` 형태로 디렉토리를 생성한다.
+  - 예: `optimizer-fundamentals-sql-processing` → `fundamentals/sql-processing/SqlProcessingSection.tsx`
+  - 예: `optimizer-execution-plans-intro` → `execution-plans/intro/IntroSection.tsx`
+- **라우터 파일(index.tsx / XxxSection.tsx)은 import + 분기만 담당.** T 데이터와 컴포넌트 JSX는 해당 섹션 파일로 이동한다.
+- **랜딩 페이지(부모 섹션 클릭 시 표시)는 라우터 파일 안에 인라인으로** 둔다 (내용이 ConceptGrid 수준으로 단순한 경우).
 
-- `sql-basics/` — **3개 서브폴더 구조**로 정리됨:
-  - `sql-basics/index.tsx` — 챕터 1 전체 라우터. `sectionId`를 받아 서브폴더의 컴포넌트로 분기
-  - `sql-basics/commands/` — 명령어 종류 섹션 (섹션 1.x):
-    - `DdlDmlDclSection.tsx` — 개요 (1)
-    - `DDLSection.tsx` — DDL 상세 (1.1): AccordionSection 5개, 데이터 타입·제약조건 표, `SqlBlock` 주석 포함
-    - `DMLSection.tsx` — DML 상세 (1.2): SELECT(defaultOpen)·DISTINCT·WHERE·UPDATE·DELETE 5개 AccordionSection
-    - `DCLSection.tsx` — DCL 상세 (1.3): GRANT·REVOKE·Role
-    - `TCLSection.tsx` — TCL 상세 (1.4): 트랜잭션·COMMIT·ROLLBACK·SAVEPOINT
-  - `sql-basics/dml-more/` — DML 심화 섹션 (섹션 2.x) + 공유 헬퍼:
-    - `ClausesSection.tsx`, `JoinSection.tsx`, `NullSection.tsx`, `DateSection.tsx`, `WindowFuncSection.tsx`, `MergeSection.tsx`, `RollupSection.tsx`, `PivotSection.tsx`
-    - `shared.ts` — `Employee`·`ExampleQuery`·`ExecStep` 인터페이스, `EMPLOYEES` 배열, 유틸 함수
-    - `SqlHighlight.tsx` — SQL 키워드 하이라이터. `--` 주석을 회색 이탤릭으로 처리. `shared.tsx`의 `SqlBlock`이 이를 import함
-    - `EmpRow.tsx`, `MiniSimulator.tsx`, `FunctionsSection.tsx`
-  - `ExecutionSection.tsx` (`dml-more/` 안에 파일은 있지만 섹션 3으로 독립 배치됨)
+새 섹션 추가 체크리스트:
+1. `bookStructure.tsx`의 `BOOK_CHAPTERS`에 섹션 항목 추가
+2. 해당 섹션의 디렉토리와 파일 생성 (`parent-dir/child-dir/ChildSection.tsx`)
+3. 부모 라우터 파일에 import + `sectionId === '...'` 분기 추가
+4. 파일 안에 T 객체(ko/en 번역 문자열) + export 컴포넌트 작성
 
-  **`sql-basics` TOC 구조 (현재):**
-  ```
-  1. 오라클 명령어의 종류 알아보기
-     1.1 DDL   1.2 DML   1.3 DCL   1.4 TCL
-  2. DML 더 많이 알아보기
-     2.1 ORDER BY/GROUP BY/HAVING  2.2 JOIN  2.3 NULL
-     2.4 날짜와 시간  2.5 윈도우 함수  2.6 MERGE INTO
-     2.7 ROLLUP/CUBE/GROUPING SETS  2.8 PIVOT/UNPIVOT
-  3. SQL은 어떤 순서로 실행될까?
-  ```
+### 챕터별 파일 구조
 
-- `internals/` — `shared/` 폴더에 `OracleInstanceMap.tsx`, `SimulatorSection.tsx`, `shared.tsx`(TwoColLayout, MapPanel, TourPanel) 위치. 섹션별 파일은 `overview/`, `storage/`, `update-flow/` 하위에 분리.
+각 챕터의 구체적인 섹션→파일 매핑은 해당 챕터의 `index.tsx`(또는 라우터 파일)를 직접 읽는 것이 가장 정확하다. 대표 패턴만 기록한다.
 
-  `internals/index.tsx` 라우팅:
-  - `internals-overview` → `OverviewSection`
-  - `internals-sga` → `SgaSection`
-  - `internals-sga-buffer-cache` → `SgaBufferCacheSection`
-  - `internals-sga-shared-pool` → `SharedPoolSection`
-  - `internals-sga-redo-log-buffer` → `RedoLogBufferSection`
-  - `internals-sga-large-pool` → `LargePoolSection`
-  - `internals-pga` → `PgaSection`
-  - `internals-uga` → `UgaSection`
-  - `internals-process` → `ProcessOverviewSection` (부모 섹션 클릭 시 개요로)
-  - `internals-process-overview` → `ProcessOverviewSection`
-  - `internals-process-server` → `ServerProcessSection`
-  - `internals-process-background` → `BackgroundProcessSection`
-  - `internals-storage` → `StorageSection`
-  - `internals-concurrency` → `ConcurrencySection`
-  - `internals-concurrency-mvcc` → `MvccSection`
-  - `internals-concurrency-isolation` → `IsolationSection`
-  - `internals-concurrency-locks` → `LocksSection`
-  - `internals-concurrency-deadlock` → `DeadlockSection`
-  - `internals-transaction` → `TransactionSection`
-  - `internals-transaction-overview` → `TransactionOverviewSection`
-  - `internals-transaction-acid` → `TransactionAcidSection`
-  - `internals-transaction-commit-rollback` → `TransactionCommitRollbackSection`
-  - `internals-transaction-savepoint` → `TransactionSavepointSection`
+**TOC 활성화 범위:** `TableOfContents.tsx`에서 `isReady = chapter.num <= N`으로 제어. 현재 `chapter.num <= 4` (Chapter 0·1·2·3·4)가 활성화되어 있다. 콘텐츠 완성 시 이 숫자를 올린다.
 
-  SGA 하위 4개 페이지는 `overview/sga/shared/SgaPositionDiagram.tsx`의 `SgaPositionDiagram` 공통 컴포넌트를 사용한다(`activeId: SgaComponentId` prop으로 현재 페이지의 컴포넌트를 하이라이트). `SgaComponentId` 타입에 `'large-pool'`이 포함되어 있음 (`'undo-segment'`는 제거됨).
+**`WipBanner`** — 미완성 섹션 최상단에 배치. 현재 `BitmapSection`, `CompositeSection`에 적용 중.
 
-  **`StorageSection.tsx` 구성 패턴:**
-  - 파일 상단에 `B` / `Hi` 인라인 헬퍼 컴포넌트 정의 (bold·color 강조용)
-  - `INTRO_KO` / `INTRO_EN` JSX 상수로 도입부 단락 작성 → `ChapterTitle` 아래에 직접 렌더
-  - 각 계층(Block·Extent·Segment·Tablespace)은 `AccordionSection` 안에 **전용 Diagram 컴포넌트** + `Prose` 설명 + `Table` 구성
-  - `HierarchyOverview`는 제거됨. 각 Diagram이 해당 계층의 깊이만 표현:
-    - `BlockDiagram` — 블록 내부 구조(Header/ITL/Directory/Free/RowData) 인터랙티브 클릭
-    - `PctDiagram` — PCTFREE/PCTUSED 시각화
-    - `ExtentDiagram` — 하나의 Extent 안에 Block #1~#8 나열 (Segment처럼 여러 Extent를 감싸지 않음)
-    - `SegmentDiagram` — Extent 1개→2개→4개로 성장하는 3단계 흐름 시각화
-    - `TablespaceDiagram` — USERS Tablespace 박스 안에 Segment→Extent→Block 계층 + 하단 .dbf 파일 연결
+**Internals 챕터 특이사항:**
+- `overview/sga/shared/SgaPositionDiagram.tsx`의 `SgaPositionDiagram`을 SGA 하위 4개 페이지가 공유 (`activeId: SgaComponentId` prop)
+- `StorageSection.tsx`: 각 계층(Block·Extent·Segment·Tablespace)은 `AccordionSection` 안에 전용 Diagram 컴포넌트 + `Prose` + `Table` 구조
 
-**`internals` TOC 구조 (현재):**
-```
-2. 오라클 내부 구조와 프로세스
-   2.1 오라클의 내부 구조
-       2.1.1 SGA (System Global Area)
-           2.1.1.1 Buffer Cache
-           2.1.1.2 Shared Pool      (WipBanner)
-           2.1.1.3 Redo Log Buffer  (WipBanner)
-           2.1.1.4 Large Pool
-       2.1.2 PGA (Program Global Area)
-       2.1.3 UGA (User Global Area)
-       2.1.4 프로세스
-           2.1.4.1 프로세스 개요    → ProcessOverviewSection.tsx
-           2.1.4.2 서버 프로세스    → ServerProcessSection.tsx
-           2.1.4.3 백그라운드 프로세스 → BackgroundProcessSection.tsx
-   2.2 데이터 저장 구조        → StorageSection.tsx
-   2.3 데이터 동시성과 정합성  → ConcurrencySection.tsx
-       2.3.1 MVCC              → MvccSection
-       2.3.2 트랜잭션 격리 수준 → IsolationSection
-       2.3.3 락(Lock) 메커니즘 → LocksSection
-       2.3.4 교착상태(Deadlock) → DeadlockSection
-   2.4 트랜잭션(Transaction)   → TransactionSection.tsx
-       2.4.1 트랜잭션이란?      → TransactionOverviewSection
-       2.4.2 ACID 속성         → TransactionAcidSection
-       2.4.3 COMMIT과 ROLLBACK → TransactionCommitRollbackSection
-       2.4.4 SAVEPOINT         → TransactionSavepointSection
-```
+**Index 챕터 특이사항:**
+- `ScanDiagram.tsx` (`ScanConfig` 타입) — Index Scan 방법별 페이지들이 공유하는 시각화 컴포넌트
+- `index-simulator` 섹션은 `IndexLayout` 없이 `PageContainer`로 직접 렌더링
+- `IndexPage.tsx`는 dead code — 실제 진입점은 `index.tsx`의 `IndexChapterPage`
 
-**internals 프로세스 섹션 파일 구조:**
-```
-src/book/chapters/internals/overview/process/
-  ProcessOverviewSection.tsx   — 3가지 프로세스 타입 카드 + ProcessArchDiagram SVG + 연결 방식 + BG 프로세스 표
-  ServerProcessSection.tsx     — Dedicated/Shared 개념 + DedicatedDiagram SVG + SharedDiagram SVG + 비교 표
-  BackgroundProcessSection.tsx — 인터랙티브 프로세스 선택기(7개) + CommitFlowDiagram SVG + COMMIT 단계 설명
-```
+**Optimizer 챕터 특이사항:**
+- `shared/diagrams.tsx`에 `ExplainPlanTable`, `PlanRow` 타입 등 공유 다이어그램 컴포넌트 위치
+- `OptimizerSimulator`는 `BookContent`의 `SectionRouter`에서 레이아웃 wrapper 없이 직접 렌더링
 
-**참고 문서:** Oracle 26 공식 문서 — [Process Architecture](https://docs.oracle.com/en/database/oracle/oracle-database/26/cncpt/process-architecture.html)
-
-나머지 챕터(join, sort, partition, parallel, query-transform)는 `index.tsx` 단일 파일로 구성된다.
-
-- `optimizer/` — 섹션이 독립 파일로 분리되어 있다:
-
-  **`optimizer` TOC 구조 (현재):**
-  ```
-  5. 옵티마이저 원리
-     5.1 CBO 개요          → overview/OverviewSection.tsx
-     5.2 통계 정보와 선택도 → stats/StatsSection.tsx
-     5.3 액세스 패스        → access-path/AccessPathSection.tsx
-     5.4 실행 계획          → plan/PlanSection.tsx
-         5.4.1 실행 계획 읽는 연습하기 → plan/PlanReadingSection.tsx
-     5.5 Optimizer Simulator → simulator/OptimizerSimulator.tsx
-  ```
-
-  공유 다이어그램 컴포넌트는 `shared/diagrams.tsx`에 위치 (`ExplainPlanTable`, `PlanRow` 타입 등). `OptimizerSimulator`는 `BookContent`의 `SectionRouter`에서 레이아웃 wrapper 없이 직접 렌더링된다.
-
-- `index-chapter/` — 섹션이 독립 파일로 분리되어 있다:
-
-  **`index-chapter` TOC 구조 (현재):**
-  ```
-  3. 인덱스 원리와 활용, 스캔 방식
-     3.1 인덱스란?
-     3.2 B-Tree 인덱스
-     3.3 Bitmap 인덱스                 (WipBanner 표시 중)
-     3.4 복합 & 기타 인덱스            (WipBanner 표시 중)
-     3.5 인덱스를 읽는 방법
-         3.5.1 Index Range Scan        → RangeScanSection.tsx
-         3.5.2 Index Unique Scan       → UniqueScanSection.tsx
-         3.5.3 Index Full Scan         → FullScanSection.tsx
-         3.5.4 Index Fast Full Scan    → FastFullScanSection.tsx
-         3.5.5 Index Skip Scan         → SkipScanSection.tsx
-     3.6 인덱스를 못 쓰는 케이스       → IndexUnusableSection.tsx
-     3.7 인덱스에서 테이블로 가는 법
-         3.7.1 ROWID 구조              → RowidSection.tsx
-         3.7.2 Buffer Cache 탐색       → TableAccessSection.tsx
-  ```
-
-  **공유 다이어그램 컴포넌트 (`ScanDiagram.tsx`):**
-  - Index Scan 방법별 페이지들이 공통으로 사용하는 시각화 컴포넌트
-  - `ScanConfig` 타입: `{ leaves, entryStates, blockStates, scanArrows, keyLabel, legend }`
-  - `EntryState`: `'idle' | 'visited' | 'matched' | 'skipped'` — 엔트리별 색상 결정
-  - `ScanDiagram` — Root/Branch 요약 바 + Leaf 블록 행 + 범례 렌더링
-  - `ScanStepList` export도 존재하지만 **현재 scan 섹션들에서 사용하지 않음** — 대신 아래의 numbered 블록 패턴 사용
-  - 각 Scan 페이지는 `ScanConfig`만 계산해서 넘기면 됨 (다이어그램 로직 중복 없음)
-
-  **Scan 섹션 공통 레이아웃 패턴 (`RangeScanSection.tsx` 기준):**
-  모든 scan 섹션은 동일한 구조를 따른다:
-  1. `ChapterTitle` (icon + title + subtitle)
-  2. "언제 사용되나요?" — `SectionTitle` + `Prose`
-  3. `Divider`
-  4. "작동 방식" — `SectionTitle` + numbered 블록 2개 + 인터랙티브 시각화(`ScanDiagram`) 연속 배치
-     - numbered 블록: amber `bg-amber-400` 원형 badge `1` → dashed 세로선 연결 → emerald/blue/violet `2`
-     - 시나리오 선택 버튼(있을 경우) → `ScanDiagram` → 다이어그램 범례 박스
-  5. `Divider`
-  6. "특징" — `SectionTitle` + `sm:grid-cols-3` 카드 + `InfoBox`
-  7. `Divider`
-  8. "스캔 방법이 쓰이는 때" — `SectionTitle` + `Prose` + 예시 쿼리 (`gap-3` 단일 컬럼 `SqlBlock` 목록)
-  9. 필요시 끝에 추가 `Divider` + `InfoBox` (예: Bind Variable Peeking 설명)
-
-  예시 쿼리 카드는 **`sm:grid-cols-2` 없이 단일 컬럼**으로 세로 나열한다. `FastFullScanSection`만 비교 `Table`이 추가됨.
-
-  **`IndexUnusableSection.tsx` 구성 패턴:**
-  - 8가지 인덱스 미사용 케이스를 아코디언으로 구성
-  - 각 케이스: 이유 설명 + Bad SQL / Good SQL 나란히 비교(`sm:grid-cols-2`) + 수정 팁
-  - `SqlBlock`은 `sql` prop 사용 (`code` 아님)
-  - 마지막에 핵심 원칙 요약(`InfoBox variant="warning"`) + EXPLAIN PLAN 확인 방법
-
-#### Index 챕터 레이아웃 (`IndexLayout`)
-
-`IndexChapterPage.tsx`의 `IndexLayout`은 현재 단순 스크롤 컨테이너(`h-full overflow-y-auto`)로 구성되어 있다. `index-simulator` 섹션은 `IndexLayout` 없이 `PageContainer`로 직접 렌더링된다.
-
-### TOC 활성화 상태 (`TableOfContents.tsx`)
-
-`isReady = chapter.num <= N` 조건으로 활성화된 챕터와 미완성 챕터를 구분한다. `isReady`가 `false`인 챕터는 흐린 글씨(`text-muted-foreground/30`)로 표시되고 클릭해도 hover 효과가 약하다.
-
-- **현재 활성화 범위: `chapter.num <= 3`** (Chapter 0·1·2·3)
-- 새 챕터 콘텐츠가 완성되면 이 숫자를 올려서 활성화
-- active 챕터 제목 색: `text-foreground` (갈색 `text-ios-orange-dark` 사용 안 함)
-- `WipBanner` — 콘텐츠가 아직 미완성인 섹션 최상단에 추가. 현재 `BitmapSection`, `CompositeSection`에 적용 중
+**Sort·Parallel 챕터:** 단일 `index.tsx` 파일에 모든 섹션 포함. `sql-tuning` 챕터의 하위 섹션으로 TOC에 배치됨.
 
 ### 챕터 공통 UI (`src/book/chapters/shared.tsx`)
 
-`PageContainer`, `ChapterTitle`, `SectionTitle`, `SubTitle`, `Prose`, `InfoBox`, `Table`, `ConceptGrid`, `Divider`, `SimulatorPlaceholder`, `WipBanner`, `TermPopup`, `AccordionSection`, `SqlBlock` 등 챕터 내 모든 공통 레이아웃 프리미티브. 새 챕터 콘텐츠 작성 시 이 컴포넌트들을 우선 사용한다.
+> **새 UI를 만들기 전에 반드시 이 목록을 먼저 확인하라.** SQL 코드 블록, 단계 목록, 아코디언, 표, 정보 박스 등은 모두 이미 정의되어 있다. 직접 `div`/`ul`을 만들지 말고 공통 컴포넌트를 쓴다.
 
-- `Prose` — `whitespace-pre-line` 포함. 문자열에 `\n` 넣으면 줄바꿈 렌더링됨
-- `ChapterTitle` — `icon?: ReactNode` prop 지원. Tabler 아이콘 JSX를 넘기면 제목 왼쪽에 렌더링됨. `size={36}` 권장
-- `ConceptGrid` — `icon: ReactNode` (JSX 아이콘). `size={20}` 권장
-- `AccordionSection` — 기본 접힘. `defaultOpen` prop으로 펼친 상태로 시작 가능. 버튼 hover 시 `rgba(255,243,224,0.4)` 배경(TOC hover 색과 동일), 펼쳐진 내용 영역은 배경 변경 없음
-- `InfoBox` — `variant` 별 아이콘 색상은 배경색의 **보색**으로 지정되어 있음 (`stroke={2}`). variant별 보색: `tip`→rose, `note`/`summary`→orange, `warning`→blue, `usage`→violet, `danger`→cyan
-- `SqlBlock` — `badge`/`badgeColor`/`desc` 없으면 코드 블록만, 있으면 헤더가 붙은 카드로 렌더링. 내부적으로 `SqlHighlight` 사용
-- `SqlHighlight` (`sql-basics/dml-more/SqlHighlight.tsx`) — `--` 이후를 회색 이탤릭 주석으로 처리. `shared.tsx`가 이 파일을 직접 import함 (`from './sql-basics/dml-more/SqlHighlight'`)
-- `WipBanner` — 아직 작성 중인 챕터 최상단에 표시하는 경고 배너
+모든 공통 레이아웃 프리미티브는 `src/book/chapters/shared.tsx`에 있다. 챕터 페이지에서 `import { ... } from '../../shared'`(깊이에 따라 조정)로 가져다 쓴다.
 
-`OracleInstanceMap` (`src/book/chapters/internals/shared/OracleInstanceMap.tsx`) — Internals 챕터 전용 인터랙티브 인스턴스 다이어그램. props: `highlightIds: InstanceComponentId[]`, `hideClient?: boolean`(Server Process 레이어 숨김), `horizontal?: boolean`, `callout?: string`.
+#### 컴포넌트 용도 빠른 참조
+
+| 컴포넌트 | 언제 쓰나 | 핵심 prop / 비고 |
+|----------|-----------|------|
+| `PageContainer` | 모든 페이지 최외곽 래퍼 | `mx-auto max-w-4xl` 적용 |
+| `ChapterTitle` | 페이지 최상단 제목 | `icon`(`size={36}`), `title`, `subtitle`. `mb-5` 내장 |
+| `SectionTitle` | 섹션 구분 제목 (h2) | `mt-8 mb-4` 내장 |
+| `SubTitle` | 소제목 (h3) | `mb-2` 내장 |
+| `Prose` | 본문 단락 텍스트 | `whitespace-pre-line` — `\n`으로 줄바꿈. `mb-4` 내장 |
+| `Divider` | 섹션 사이 구분선 | `my-8` 내장. `ChapterTitle` 직후에는 쓰지 않음 |
+| `InfoBox` | 참고/주의/팁 강조 박스 | `variant`: `tip`\|`note`\|`warning`\|`usage`\|`summary`\|`danger` |
+| `Table` | 행/열 데이터 표 | `headers: string[]`, `rows: string[][]`. `mb-6` 내장 |
+| `ConceptGrid` | 개념 카드 격자 (2열) | `items: { icon, title, desc }[]`. 아이콘 `size={20}`. `mb-6` 내장 |
+| `SqlBlock` | SQL/코드 블록 | `sql` prop. `badge`/`desc` 추가 시 헤더 카드 형태 |
+| `StepList` | 번호 배지가 있는 단계 목록 | `steps: { title, desc }[]`. `activeIndex`/`onStepClick`으로 인터랙티브 가능 |
+| `AccordionSection` | 클릭해서 펼치는 섹션 | `title`, `defaultOpen` prop |
+| `WipBanner` | 작성 중인 페이지 상단 경고 | 미완성 섹션에 표시 |
+| `SimulatorPlaceholder` | 시뮬레이터 예정 자리 | `label`, `color` prop |
+| `TermPopup` | 인라인 용어 팝업 | 클릭 시 말풍선. `open`/`onOpen`/`onClose` state 필요 |
+
+`OracleInstanceMap` (`src/book/chapters/internals/shared/OracleInstanceMap.tsx`) — Internals 챕터 전용. props: `highlightIds: InstanceComponentId[]`, `hideClient?`, `horizontal?`, `callout?`
+
+#### InfoBox variant 선택 기준
+
+- `tip` — 고급 내용·심화 팁 ("더 알아보기")
+- `note` — 보조 설명·조건 안내 ("참고")
+- `warning` — 흔한 실수·함정 ("주의")
+- `usage` — 적용 사례 ("어디서 사용할까?")
+- `summary` — 페이지 마지막 요약 ("핵심 정리")
+- `danger` — 데이터 손실·장애 가능성 ("위험")
+
+#### SqlBlock 사용 패턴
+
+```tsx
+{/* 단순 코드 블록 — SqlBlock 앞에 항상 div mt-4 래퍼 */}
+<div className="mt-4"><SqlBlock sql={t.mySql} /></div>
+
+{/* 레이블이 있는 카드 형태 */}
+<SqlBlock sql={t.mySql} badge="예시" badgeColor="blue" desc="설명 텍스트" />
+```
+
+`SqlHighlight` (`sql-basics/dml-more/SqlHighlight.tsx`) — `--` 이후를 회색 이탤릭 주석으로 처리. `shared.tsx`가 이 파일을 직접 import함.
+
+#### StepList 사용 예시
+
+순서가 있는 단계(실행 흐름, 작동 방식 등)를 보여줄 때 `ol/li` 대신 사용:
+```tsx
+<StepList steps={[
+  { title: '① 파싱', desc: '구문 검사 → Shared Pool 확인' },
+  { title: '② 최적화', desc: '통계 기반 실행 계획 생성' },
+]} />
+```
 
 ### 챕터 페이지 레이아웃 규칙
 
-모든 챕터 페이지는 아래 구조와 간격 규칙을 따른다. 페이지마다 레이아웃이 달라지면 안 된다.
-
-#### 페이지 기본 구조 (순서 고정)
+모든 챕터 페이지는 아래 구조와 간격 규칙을 따른다.
 
 ```
 <PageContainer>
@@ -384,12 +270,6 @@ src/book/chapters/internals/overview/process/
   <Divider />   ← 섹션 사이에만, ChapterTitle 직후에는 넣지 않음
 
   <SectionTitle>두 번째 섹션 제목</SectionTitle>
-  <Prose>설명</Prose>
-  <Table headers={...} rows={...} />
-
-  <Divider />
-
-  <SectionTitle>세 번째 섹션 제목</SectionTitle>
   ...
 
   <div className="mt-8">
@@ -398,29 +278,26 @@ src/book/chapters/internals/overview/process/
 </PageContainer>
 ```
 
-#### 컴포넌트별 내장 마진 (추가 wrapper 불필요)
+**레이아웃 규칙 요약:**
+- `<Divider />`는 섹션과 섹션 사이에만. `ChapterTitle` 직후·마지막 섹션 뒤에는 넣지 않는다.
+- `<Divider />` 바로 뒤에 `<div className="mt-N">` wrapper를 추가하지 않는다 — `SectionTitle`의 `mt-8`이 이미 충분.
+- `SectionTitle` 위에 추가 `mt-N`을 붙이지 않는다.
+- 비교가 필요한 경우 — 탭 토글이 아니라 **전체 3컬럼 표** (항목 | A | B) 사용.
 
-| 컴포넌트 | 내장 마진 | 비고 |
-|----------|-----------|------|
-| `ChapterTitle` | `mb-5` | 제목 하단 |
-| `SectionTitle` | `mt-8 mb-4` | 섹션 위아래 |
-| `SubTitle` | `mb-2` | 소제목 하단 |
-| `Prose` | `mb-4` | 단락 하단 |
-| `Divider` | `my-8` | 섹션 경계선 |
-| `ConceptGrid` | `mb-6` | 그리드 하단 |
-| `Table` | `mb-6` | 표 하단 |
-| `InfoBox` | `mt-4 mb-4` | 박스 위아래 |
+### SVG 렌더링 주의사항
 
-#### 규칙 요약
+SVG는 DOM 순서 = z-order. 인터랙티브 다이어그램에서 특정 요소가 항상 위에 표시되어야 하면 **루프 바깥으로 꺼내 마지막에 렌더**한다.
 
-- **`<Divider />`는 섹션과 섹션 사이에만** 넣는다. `ChapterTitle` 직후, 마지막 섹션 뒤에는 넣지 않는다.
-- **`<Divider />` 바로 뒤에 `<div className="mt-N">` wrapper를 추가하지 않는다.** `SectionTitle`의 `mt-8`이 이미 충분한 간격을 만든다.
-- **`SectionTitle` 위에 추가 `mt-N`을 붙이지 않는다.** 내장 `mt-8`로 통일.
-- **`SubTitle`은 `SectionTitle`보다 작은 소제목**에만 사용. 섹션 구분이 필요하면 `SectionTitle`을 쓴다.
-- **마지막 요약/정리 `InfoBox`**는 `<div className="mt-8">` wrapper 안에 넣어 페이지 하단 여백을 확보한다.
-- **`AccordionSection`으로 묶은 내용**은 내부에 `Prose`, `Table`, `SqlBlock`을 그냥 쌓으면 된다. 추가 Divider 불필요.
-- **`SqlBlock` 앞**에는 `<div className="mt-4">` wrapper를 씌워 Prose와 코드블록 사이 간격을 확보한다.
-- **`ConceptGrid` 다음 바로 `Divider`** 가 오는 경우, ConceptGrid의 `mb-6`과 Divider의 `my-8`이 겹치지 않으므로 그대로 둔다.
+SVG 레이아웃 상수는 **의존 관계 순서대로** 선언한다 — 버킷 행 위치를 먼저 계산한 뒤 외곽 박스 높이를 역산(`BC_H = (BUCK_ROWS[3] - BC_Y) + BUCK_R + padding`).
+
+**Internals 다이어그램 설계 규칙:**
+- **ROW_GAP ≥ 26px**: 행 간격이 26px 미만이면 화살표 + 레이블이 겹친다.
+- **레이블이 있는 화살표**: L자형 polyline 사용 — `<polyline points="x1,y1 midX,y1 midX,y2 x2,y2">` + 레이블을 꺾임 모서리에 배치.
+- **SGA 같은 큰 영역 레이블**: 내부 요소에 가려지므로 SVG 마지막에 흰 배경 `<rect>`와 함께 렌더:
+  ```tsx
+  <rect x={SGA_X + 4} y={SGA_Y - 8} width={32} height={14} rx={3} fill="#f0fdf4" />
+  <text x={SGA_X + 8} y={SGA_Y + 2} ...>SGA</text>
+  ```
 
 ## 코드 스타일
 
@@ -429,42 +306,11 @@ src/book/chapters/internals/overview/process/
 - CSS: Tailwind 유틸리티 클래스만 사용, 커스텀 CSS 파일 금지 (`index.css` 테마 변수 제외)
 - Path alias: `@/` → `src/`
 
-### SVG 렌더링 주의사항
-
-SVG는 DOM 순서 = z-order다. 나중에 그려진 요소가 위에 표시된다. 인터랙티브 다이어그램에서 특정 요소(Latch 태그, 하이라이트 오버레이 등)가 다른 요소 위에 항상 표시되어야 하면 **루프 바깥으로 꺼내 마지막에 렌더**한다. `{(() => { ... })()}` IIFE 패턴으로 루프 외부에서 계산이 필요한 요소를 렌더할 수 있다.
-
-SVG 레이아웃 상수는 **의존 관계 순서대로** 선언한다 — 예: 버킷 행 위치를 먼저 계산한 뒤 외곽 박스 높이를 역산(`BC_H = (BUCK_ROWS[3] - BC_Y) + BUCK_R + padding`). 고정값으로 크기를 지정하면 내부 요소가 박스를 삐져나오는 버그가 생기기 쉽다.
-
-**internals 다이어그램 설계 규칙 (프로세스 섹션에서 확립):**
-
-- **ROW_GAP ≥ 26px**: 행 간격이 26px 미만이면 화살표(8px) + 레이블 텍스트(8~9px 줄높이) = 16px 이상이 겹친다. 최소 26px 확보.
-- **박스 내 텍스트 y 간격**: 타이틀 `y + 17~19`, 서브타이틀 `y + 30~35`, 노트 `y + 44~52` (박스 높이 ~56px 기준). 줄마다 ~14~16px 간격.
-- **레이블이 있는 화살표 — L자형 polyline 사용**: 대각선 화살표에 레이블을 붙이면 선과 텍스트가 겹친다. 중간점(midX 또는 midY)을 거치는 꺾인 선(`<polyline points="x1,y1 midX,y1 midX,y2 x2,y2">`)으로 변환하고 레이블을 꺾임 모서리 위/아래에 배치한다.
-- **SGA/영역 레이블 z-order**: SGA 같은 큰 영역 레이블은 내부 요소(서버 프로세스 박스 등)가 위에 렌더링되어 가려진다. 반드시 SVG 마지막에 흰 배경 `<rect>`와 함께 렌더한다:
-  ```tsx
-  <rect x={SGA_X + 4} y={SGA_Y - 8} width={32} height={14} rx={3} fill="#f0fdf4" />
-  <text x={SGA_X + 8} y={SGA_Y + 2} ...>SGA</text>
-  ```
-- **PGA 레이블 간격**: `PGA_GAP` (서버 프로세스 박스 하단 ~ PGA 박스 상단)을 28px 이상으로 설정하고, 레이블 y는 그 중간값 + 4px에 배치한다.
-
-**internals 내부 구조 섹션 페이지 콘텐츠 패턴:**
-
-각 `overview/` 하위 섹션 (SGA, PGA, UGA, Process 등)은 아래 순서를 따른다:
-1. `ChapterTitle` (Tabler 아이콘 `size={36}` + 한/영 제목·부제목)
-2. `SectionTitle` + `ConceptGrid` 또는 개요 카드 (3~4개 핵심 개념)
-3. `Divider`
-4. 아키텍처 다이어그램: 인라인 `<svg>` 컴포넌트. 가로폭 `w-full max-w-2xl mx-auto` 컨테이너 안에 배치
-5. `Divider`
-6. 세부 설명 섹션들 (`AccordionSection` 또는 `SectionTitle` + `Prose` + `Table`)
-7. 필요 시 `InfoBox`로 핵심 요약
-
-비교가 필요한 경우(Dedicated vs Shared 등) — 탭 토글이 아니라 **전체 3컬럼 표** (항목 | A | B) 사용. 한눈에 비교 가능해야 한다.
-
 ### TypeScript 엄격 플래그 주의사항
 
-`tsconfig.app.json`에 아래 플래그가 모두 활성화되어 있다. 빌드 전 확인 필수:
+`tsconfig.app.json`에 아래 플래그가 모두 활성화되어 있다:
 - `noUnusedLocals` / `noUnusedParameters` — 사용하지 않는 변수·매개변수는 컴파일 에러
-- `erasableSyntaxOnly` — `const enum`, `namespace` 등 TypeScript 전용 문법 사용 불가. `enum` 대신 `const` 객체 + `as const` 패턴 사용
+- `erasableSyntaxOnly` — `const enum`, `namespace` 사용 불가. `enum` 대신 `const` 객체 + `as const` 패턴 사용
 - `verbatimModuleSyntax` — 타입 import는 반드시 `import type { ... }` 형태로 분리
 
 ## ESLint / Prettier
@@ -478,8 +324,8 @@ SVG 레이아웃 상수는 **의존 관계 순서대로** 선언한다 — 예: 
 - `zustand` — 전역 상태 관리
 - `@xyflow/react` — ERD React Flow 기반 그래프 렌더링 (`SchemaDiagram`)
 - `framer-motion` — 시뮬레이션 애니메이션 (화살표, 컴포넌트 하이라이트 전환)
-- `@tabler/icons-react` — **기본 아이콘 라이브러리**. 모든 챕터 페이지 아이콘은 Tabler 컬러 아이콘 사용. `ChapterTitle`은 `size={36}`, `ConceptGrid`·데이터 배열 내 아이콘은 `size={20}`, 인라인 소형 아이콘은 `size={16}`. 모두 `stroke={1.5}` 기본값 사용
-- `lucide-react` — 일부 구형 컴포넌트에서 잔존. 새 코드에서는 Tabler 사용
+- `@tabler/icons-react` — **기본 아이콘 라이브러리**. `ChapterTitle`은 `size={36}`, `ConceptGrid`·데이터 배열 내 아이콘은 `size={20}`, 인라인 소형 아이콘은 `size={16}`. 모두 `stroke={1.5}` 기본값 사용
+- `lucide-react` — 일부 구형 컴포넌트에서 잔존. **새 코드에서는 Tabler 사용**
 - `@base-ui/react` + `shadcn` — UI 컴포넌트 기반
 - `tailwindcss` v4 — CSS-first 설정 방식 (`@import "tailwindcss"` in `index.css`)
 - `react-scan` — 개발 전용 렌더링 성능 모니터. 프로덕션 빌드에 포함되지 않도록 주의
@@ -491,12 +337,12 @@ SVG 레이아웃 상수는 **의존 관계 순서대로** 선언한다 — 예: 
 - shadcn/ui 스타일: `base-nova`
 - React Flow 커스텀 오버라이드는 `index.css` 내 `.react-flow` 셀렉터에만 허용
 
-## 문장,말투,번역
-너는 20년차 베테랑 번역가야.
+## 문장·말투·번역 지침
 
-[번역 지침]
-1. 직역을 절대 금지하며, 문맥과 의역을 최우선으로 해.
-2. 산업군별 전문 용어(Terminology)가 확실하지 않다면 영어를 그대로 사용하거나 가장 대중적인 용어를 써.
-3. 영어로 된 축약어가 나올 때는 꼭 full word 를 괄호 안에 넣어줘
-4. 말투는 친근하고 친절하게, 초등학교 5학년쯤 아이를 상대로 설명한다고 생각해줘.
-5. 참고 문서들은 대부분 영어로 된 문서들인데, 원본이 영어라는 걸 눈치챌 수 없도록, 최대한 자연스러운 한국어를 구사해야해
+한국어 콘텐츠를 작성하거나 번역할 때 아래 지침을 따른다:
+
+1. 직역 금지. 문맥과 의역을 최우선으로 한다.
+2. 전문 용어가 확실하지 않으면 영어를 그대로 쓰거나 가장 대중적인 용어를 쓴다.
+3. 영어 축약어가 나올 때는 풀어쓴 명칭(full word)을 괄호 안에 함께 표기한다.
+4. 말투는 친근하고 친절하게. 초등학교 5학년 아이에게 설명하듯 쉽게 풀어 쓴다. (`~해요`, `~거예요`, `~거든요` 스타일)
+5. 원본이 영어 문서라는 사실이 드러나지 않도록 자연스러운 한국어를 구사한다.

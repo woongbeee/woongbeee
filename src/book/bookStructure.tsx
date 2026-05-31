@@ -473,6 +473,50 @@ export const BOOK_CHAPTERS: BookChapter[] = [
     title: { ko: '옵티마이저', en: 'Optimizer' },
     sections: [
       {
+        id: 'optimizer-fundamentals',
+        title: { ko: 'Query Optimizer Fundamentals', en: 'Query Optimizer Fundamentals' },
+        children: [
+          {
+            id: 'optimizer-fundamentals-sql-processing',
+            title: { ko: 'SQL 처리 과정', en: 'SQL Processing' },
+          },
+          {
+            id: 'optimizer-fundamentals-components',
+            title: { ko: '옵티마이저 구성 요소', en: 'Optimizer Components' },
+          },
+          {
+            id: 'optimizer-fundamentals-adaptive',
+            title: { ko: 'Adaptive Query Optimization', en: 'Adaptive Query Optimization' },
+          },
+          {
+            id: 'optimizer-fundamentals-approx',
+            title: { ko: 'Approximate Query Processing', en: 'Approximate Query Processing' },
+          },
+          {
+            id: 'optimizer-fundamentals-spm',
+            title: { ko: 'SQL Plan Management', en: 'SQL Plan Management' },
+          },
+        ],
+      },
+      {
+        id: 'optimizer-execution-plans',
+        title: { ko: 'Query Execution Plans', en: 'Query Execution Plans' },
+        children: [
+          {
+            id: 'optimizer-execution-plans-explain',
+            title: { ko: 'EXPLAIN PLAN 사용법', en: 'Generating Plans with EXPLAIN PLAN' },
+          },
+          {
+            id: 'optimizer-execution-plans-display',
+            title: { ko: '실행 계획 확인하기', en: 'Displaying Execution Plans' },
+          },
+          {
+            id: 'optimizer-execution-plans-compare',
+            title: { ko: '실행 계획 비교하기', en: 'Comparing Execution Plans' },
+          },
+        ],
+      },
+      {
         id: 'optimizer-overview',
         title: { ko: 'CBO 개요', en: 'CBO Overview' },
       },

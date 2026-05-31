@@ -29,7 +29,23 @@
       "Bash(Get-ChildItem *)",
       "Bash(dir \"C:\\\\Users\\\\woong\\\\OneDrive\\\\Desktop\\\\oracleDataBaseSystem\\\\src\\\\book\\\\chapters\\\\query-transform\")",
       "Bash(dir /s /b \"C:\\\\Users\\\\woong\\\\OneDrive\\\\Desktop\\\\oracleDataBaseSystem\\\\src\\\\book\\\\chapters\\\\query-transform\\\\*.tsx\")",
-      "Bash(xargs sed -i 's/억제/방지/g')"
+      "Bash(xargs sed -i 's/억제/방지/g')",
+      "Bash(python3 -c \"import PyPDF2; print\\('ok'\\)\")",
+      "Bash(python3 -c \"import pdfplumber; print\\('ok'\\)\")",
+      "Bash(pip3 list *)",
+      "Bash(pip list *)",
+      "Bash(pip3 install *)",
+      "Bash(python3 -m pip install pdfplumber reportlab)",
+      "Bash(python3 -m pip install reportlab)",
+      "Bash(python3 -c \"import reportlab; print\\('ok'\\)\")",
+      "Bash(python3 *)",
+      "Bash(ping -n 30 127.0.0.1)",
+      "Bash(taskkill /F /PID 14504 /PID 23236)",
+      "PowerShell(Stop-Process *)",
+      "Bash(ping *)",
+      "Bash(node -e ' *)",
+      "Bash(node -e \"const s=require\\('fs'\\).readFileSync\\('src/book/chapters/optimizer/fundamentals/adaptive/AdaptiveSection.tsx','utf8'\\); console.log\\(s.substring\\(s.indexOf\\('ko: {'\\), s.indexOf\\('ko: {'\\)+200\\)\\)\")",
+      "Bash(node -e \"const s=require\\('fs'\\).readFileSync\\('src/book/chapters/optimizer/execution-plans/explain/ExplainSection.tsx','utf8'\\); const lines=s.split\\('\\\\n'\\); console.log\\('total lines:', lines.length\\); lines.slice\\(-30\\).forEach\\(\\(l,i\\)=>console.log\\(lines.length-30+i+1, l\\)\\)\")"
     ]
   }
 }

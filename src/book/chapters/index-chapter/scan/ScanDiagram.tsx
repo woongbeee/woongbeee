@@ -79,16 +79,16 @@ function LeafBlockCard({
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.04, duration: 0.2 }}
-      className={`rounded-xl border-2 bg-white transition-all duration-300 ${blockBorder(blockState)}`}
+      className={`w-36 rounded-xl border-2 bg-white transition-all duration-300 ${blockBorder(blockState)}`}
     >
       {/* 헤더 */}
-      <div className="rounded-t-[10px] bg-slate-100 px-3 py-0.5 text-center font-mono text-[9px] font-bold text-slate-500">
+      <div className="rounded-t-[10px] bg-slate-100 px-3 py-1 text-center font-mono text-[10px] font-bold text-slate-500">
         LEAF {block.id}
       </div>
       {/* 컬럼 헤더 */}
-      <div className="flex border-b border-slate-100 px-2 pt-1">
-        <span className="w-12 shrink-0 font-mono text-[8px] font-bold text-slate-400">{keyLabel}</span>
-        <span className="font-mono text-[8px] font-bold text-slate-400">ROWID</span>
+      <div className="flex border-b border-slate-100 px-3 pt-1.5">
+        <span className="w-14 shrink-0 font-mono text-[9px] font-bold text-slate-400">{keyLabel}</span>
+        <span className="font-mono text-[9px] font-bold text-slate-400">ROWID</span>
       </div>
       {/* 항목 */}
       {block.entries.map((entry) => {
@@ -97,14 +97,14 @@ function LeafBlockCard({
         return (
           <div
             key={String(entry.key)}
-            className={`flex items-center gap-1 whitespace-nowrap px-2 py-0.5 transition-colors duration-200 ${c.row}`}
+            className={`flex items-center gap-1 px-3 py-1 transition-colors duration-200 ${c.row}`}
           >
-            <span className={`w-12 shrink-0 font-mono text-[10px] ${c.key}`}>{entry.key}</span>
-            <span className={`font-mono text-[9px] ${c.rowid}`}>{entry.rowid}</span>
+            <span className={`w-14 shrink-0 font-mono text-[11px] ${c.key}`}>{entry.key}</span>
+            <span className={`font-mono text-[10px] ${c.rowid}`}>{entry.rowid}</span>
           </div>
         )
       })}
-      <div className="h-1" />
+      <div className="h-1.5" />
     </motion.div>
   )
 }
@@ -116,14 +116,14 @@ export function ScanDiagram({ config, title }: { config: ScanConfig; title: stri
 
   return (
     <div className="overflow-x-auto rounded-2xl border bg-slate-50">
-      <div className="min-w-max px-6 py-5">
+      <div className="px-6 py-5">
         {/* 제목 */}
-        <p className="mb-4 font-mono text-[11px] font-bold uppercase tracking-widest text-slate-400">
+        <p className="mb-4 text-center font-mono text-[11px] font-bold uppercase tracking-widest text-slate-400">
           {title}
         </p>
 
         {/* Root/Branch 간략 표현 */}
-        <div className="mb-4 flex justify-center">
+        <div className="mb-5 flex justify-center">
           <div className="flex items-center gap-2 rounded-lg border border-amber-300 bg-amber-50 px-4 py-1.5">
             <div className="rounded bg-amber-200 px-2 py-0.5 font-mono text-[9px] font-bold text-amber-700">ROOT</div>
             <span className="text-slate-300">→</span>
@@ -134,10 +134,9 @@ export function ScanDiagram({ config, title }: { config: ScanConfig; title: stri
         </div>
 
         {/* Leaf 블록 행 */}
-        <div className="flex items-start gap-0">
+        <div className="flex flex-wrap items-center justify-center gap-0">
           {leaves.map((leaf, i) => (
             <div key={leaf.id} className="flex items-center">
-              {/* 블록 카드 */}
               <LeafBlockCard
                 block={leaf}
                 states={entryStates[leaf.id] ?? {}}
@@ -145,11 +144,21 @@ export function ScanDiagram({ config, title }: { config: ScanConfig; title: stri
                 keyLabel={keyLabel}
                 index={i}
               />
-              {/* 연결 화살표 */}
+              {/* 양방향 연결 화살표 */}
               {i < leaves.length - 1 && (
-                <div className="flex flex-col items-center px-1.5 text-slate-300">
-                  <span className="font-mono text-[9px] leading-none">←</span>
-                  <span className="font-mono text-[9px] leading-none">→</span>
+                <div className="flex w-10 shrink-0 flex-col items-center gap-0.5">
+                  <div className="flex w-full items-center">
+                    <div className="h-px flex-1 bg-slate-300" />
+                    <svg width="8" height="8" viewBox="0 0 8 8" className="shrink-0 text-slate-400">
+                      <polygon points="0,0 8,4 0,8" fill="currentColor" />
+                    </svg>
+                  </div>
+                  <div className="flex w-full items-center">
+                    <svg width="8" height="8" viewBox="0 0 8 8" className="shrink-0 text-slate-400">
+                      <polygon points="8,0 0,4 8,8" fill="currentColor" />
+                    </svg>
+                    <div className="h-px flex-1 bg-slate-300" />
+                  </div>
                 </div>
               )}
             </div>
@@ -158,7 +167,7 @@ export function ScanDiagram({ config, title }: { config: ScanConfig; title: stri
 
         {/* 범례 */}
         {legend.length > 0 && (
-          <div className="mt-4 flex flex-wrap gap-4">
+          <div className="mt-5 flex flex-wrap justify-center gap-4">
             {legend.map((item) => (
               <div key={item.label} className="flex items-center gap-1.5">
                 <div className={`h-2.5 w-2.5 rounded-full ${item.color}`} />

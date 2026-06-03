@@ -1,4 +1,4 @@
-import { useSimulationStore } from '@/store/simulationStore'
+ import { useSimulationStore } from '@/store/simulationStore'
 import {
   ChapterTitle, SectionTitle, SubTitle, Prose, InfoBox, Divider,
 } from '../../../shared'
@@ -223,116 +223,130 @@ function ComponentCard({
   )
 }
 
-// ── SVG: PGA component layout ──────────────────────────────────────────────
-
-function PgaComponentDiagram({ lang }: { lang: 'ko' | 'en' }) {
+// ── PGA 구조 다이어그램 (HTML div 기반, 가로 100% / 높이 고정) ──
+export function PgaComponentDiagram({ lang }: { lang: 'ko' | 'en' }) {
   const isKo = lang === 'ko'
-  const W = 600
-  const PAD = 16
-  const BOX_X = PAD + 12
-  const BOX_W = W - PAD * 2 - 24
-
-  // Private SQL Area
-  const PSA_Y = PAD + 40
-  const PSA_H = 110
-
-  // Two inner blocks: Persistent + Runtime
-  const INNER_Y = PSA_Y + 44
-  const INNER_H = 40
-  const INNER_W = (BOX_W - 36) / 2
-
-  // SQL Work Area
-  const WA_Y = PSA_Y + PSA_H + 12
-  const WA_H = 110
-  const WA_INNER_Y = WA_Y + 44
-  const WA_COL_W = (BOX_W - 48) / 3
-
-  // UGA
-  const UGA_Y = WA_Y + WA_H + 12
-  const UGA_H = 52
-
-  // PGA outer
-  const PGA_H = UGA_Y + UGA_H + 16 - PAD
-  const H = PGA_H + PAD + 24
 
   return (
-    <div className="overflow-x-auto rounded-xl border bg-card">
-      <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ maxWidth: W, display: 'block', margin: '0 auto' }}>
+    <div className="w-full rounded-xl border-2 border-violet-400 bg-violet-50/40 p-3">
+      {/* PGA 헤더 */}
+      <div className="mb-2 flex items-center gap-2">
+        <span className="rounded bg-violet-600 px-2 py-0.5 font-mono text-xs font-bold text-white">PGA</span>
+        <span className="font-mono text-xs text-violet-600">
+          {isKo ? '서버 프로세스 전용 메모리 — 다른 프로세스 접근 불가' : 'per-process private memory — no sharing between processes'}
+        </span>
+      </div>
 
-        {/* PGA outer */}
-        <rect x={PAD} y={PAD} width={W - PAD * 2} height={PGA_H} rx={12}
-          fill="#faf5ff" stroke="#7c3aed" strokeWidth={2} strokeDasharray="7 4" />
-        <text x={PAD + 14} y={PAD + 24} fontFamily="monospace" fontSize={12}
-          fontWeight="bold" fill="#7c3aed" letterSpacing={1}>PGA (per server process)</text>
+      {/* 3열 레이아웃 */}
+      <div className="grid grid-cols-[2fr_3fr_1.4fr] gap-2">
 
-        {/* ── Private SQL Area ── */}
-        <rect x={BOX_X} y={PSA_Y} width={BOX_W} height={PSA_H} rx={8}
-          fill="#ede9fe" stroke="#7c3aed" strokeWidth={1.5} />
-        <text x={BOX_X + 14} y={PSA_Y + 20} fontFamily="monospace" fontSize={12}
-          fontWeight="bold" fill="#5b21b6">Private SQL Area</text>
-        <text x={BOX_X + 14} y={PSA_Y + 34} fontFamily="monospace" fontSize={9.5}
-          fill="#7c3aed" opacity={0.8}>
-          {isKo ? '바인드 변수 · 실행 상태 (커서마다 1개)' : 'bind variables · execution state (1 per cursor)'}
-        </text>
-        {/* Persistent Area */}
-        <rect x={BOX_X + 14} y={INNER_Y} width={INNER_W} height={INNER_H} rx={5}
-          fill="#ddd6fe" stroke="#a78bfa" strokeWidth={1} />
-        <text x={BOX_X + 14 + INNER_W / 2} y={INNER_Y + 16} fontFamily="monospace"
-          fontSize={10} fontWeight="bold" fill="#4c1d95" textAnchor="middle">Persistent Area</text>
-        <text x={BOX_X + 14 + INNER_W / 2} y={INNER_Y + 30} fontFamily="monospace"
-          fontSize={9} fill="#6d28d9" textAnchor="middle">
-          {isKo ? 'bind vars' : 'bind vars'}
-        </text>
-        {/* Runtime Area */}
-        <rect x={BOX_X + 14 + INNER_W + 8} y={INNER_Y} width={INNER_W} height={INNER_H} rx={5}
-          fill="#ddd6fe" stroke="#a78bfa" strokeWidth={1} />
-        <text x={BOX_X + 14 + INNER_W + 8 + INNER_W / 2} y={INNER_Y + 16} fontFamily="monospace"
-          fontSize={10} fontWeight="bold" fill="#4c1d95" textAnchor="middle">Runtime Area</text>
-        <text x={BOX_X + 14 + INNER_W + 8 + INNER_W / 2} y={INNER_Y + 30} fontFamily="monospace"
-          fontSize={9} fill="#6d28d9" textAnchor="middle">
-          {isKo ? 'exec state' : 'exec state'}
-        </text>
+        {/* ── 열 1: Private SQL Area ── */}
+        <div className="flex flex-col gap-1.5 rounded-lg border-2 border-violet-300 bg-violet-100/60 p-2">
+          <div className="flex items-center gap-1.5">
+            <span className="rounded bg-violet-500 px-1.5 py-0.5 font-mono text-[10px] font-bold text-white">Private SQL Area</span>
+          </div>
+          <p className="font-mono text-[9px] text-violet-600">
+            {isKo ? '커서(Cursor) 1개당 1개 생성' : '1 per open cursor'}
+          </p>
+          <div className="flex flex-1 flex-col gap-1.5">
+            <div className="flex-1 rounded border border-violet-300 bg-violet-200/70 px-2 py-1.5">
+              <div className="font-mono text-[10px] font-bold text-violet-800">Persistent Area</div>
+              <div className="mt-0.5 font-mono text-[9px] text-violet-600">
+                {isKo ? '바인드 변수 값 저장' : 'bind variable values'}
+              </div>
+              <div className="mt-0.5 font-mono text-[8px] text-violet-400">
+                {isKo ? '커서 닫힐 때 해제' : 'freed on cursor close'}
+              </div>
+            </div>
+            <div className="flex-1 rounded border border-violet-300 bg-violet-200/70 px-2 py-1.5">
+              <div className="font-mono text-[10px] font-bold text-violet-800">Runtime Area</div>
+              <div className="mt-0.5 font-mono text-[9px] text-violet-600">
+                {isKo ? '실행 상태 · 페치 위치' : 'exec state · fetch pos'}
+              </div>
+              <div className="mt-0.5 font-mono text-[8px] text-violet-400">
+                {isKo ? 'SQL 종료 시 해제' : 'freed on SQL close'}
+              </div>
+            </div>
+          </div>
+        </div>
 
-        {/* ── SQL Work Area ── */}
-        <rect x={BOX_X} y={WA_Y} width={BOX_W} height={WA_H} rx={8}
-          fill="#eff6ff" stroke="#3b82f6" strokeWidth={1.5} />
-        <text x={BOX_X + 14} y={WA_Y + 20} fontFamily="monospace" fontSize={12}
-          fontWeight="bold" fill="#1d4ed8">SQL Work Area</text>
-        <text x={BOX_X + 14} y={WA_Y + 34} fontFamily="monospace" fontSize={9.5}
-          fill="#3b82f6" opacity={0.85}>
-          {isKo ? '메모리 집약 연산 전용 공간 · 부족 시 Temp 스필' : 'memory-intensive ops · spills to Temp if insufficient'}
-        </text>
-        {/* 3 work area blocks */}
-        {[
-          { label: 'Sort Area',         sub: isKo ? 'ORDER BY / GROUP BY' : 'ORDER BY / GROUP BY', fill: '#dbeafe', stroke: '#93c5fd' },
-          { label: 'Hash Area',         sub: isKo ? 'Hash Join'           : 'Hash Join',           fill: '#d1fae5', stroke: '#6ee7b7' },
-          { label: 'Bitmap Merge',      sub: isKo ? 'Bitmap Index 병합'   : 'Bitmap Index merge',  fill: '#fef3c7', stroke: '#fcd34d' },
-        ].map((wa, i) => {
-          const wx = BOX_X + 14 + i * (WA_COL_W + 10)
-          return (
-            <g key={wa.label}>
-              <rect x={wx} y={WA_INNER_Y} width={WA_COL_W} height={42} rx={5}
-                fill={wa.fill} stroke={wa.stroke} strokeWidth={1} />
-              <text x={wx + WA_COL_W / 2} y={WA_INNER_Y + 16} fontFamily="monospace"
-                fontSize={10} fontWeight="bold" fill="#374151" textAnchor="middle">{wa.label}</text>
-              <text x={wx + WA_COL_W / 2} y={WA_INNER_Y + 30} fontFamily="monospace"
-                fontSize={8.5} fill="#6b7280" textAnchor="middle">{wa.sub}</text>
-            </g>
-          )
-        })}
+        {/* ── 열 2: SQL Work Area ── */}
+        <div className="flex flex-col gap-1.5 rounded-lg border-2 border-blue-300 bg-blue-100/60 p-2">
+          <div className="flex items-center gap-1.5">
+            <span className="rounded bg-blue-500 px-1.5 py-0.5 font-mono text-[10px] font-bold text-white">SQL Work Area</span>
+          </div>
+          <p className="font-mono text-[9px] text-blue-600">
+            {isKo ? '메모리 집약 연산 · 부족 시 Temp 스필' : 'memory-intensive ops · spills to Temp'}
+          </p>
+          <div className="flex flex-1 flex-col gap-1.5">
+            <div className="flex-1 rounded border border-blue-300 bg-blue-200/70 px-2 py-1.5">
+              <div className="font-mono text-[10px] font-bold text-blue-800">Sort Area</div>
+              <div className="mt-0.5 font-mono text-[9px] text-blue-600">ORDER BY / GROUP BY / {isKo ? '인덱스 빌드' : 'index build'}</div>
+            </div>
+            <div className="flex-1 rounded border border-emerald-300 bg-emerald-100/70 px-2 py-1.5">
+              <div className="font-mono text-[10px] font-bold text-emerald-800">Hash Area</div>
+              <div className="mt-0.5 font-mono text-[9px] text-emerald-600">Hash Join {isKo ? 'Build Input' : 'build input'}</div>
+            </div>
+            <div className="flex-1 rounded border border-amber-300 bg-amber-100/70 px-2 py-1.5">
+              <div className="font-mono text-[10px] font-bold text-amber-800">Bitmap Merge Area</div>
+              <div className="mt-0.5 font-mono text-[9px] text-amber-600">{isKo ? 'Bitmap Index 다중 스캔 병합' : 'Bitmap Index multi-scan merge'}</div>
+            </div>
+          </div>
+        </div>
 
-        {/* ── UGA ── */}
-        <rect x={BOX_X} y={UGA_Y} width={BOX_W} height={UGA_H} rx={8}
-          fill="#f0fdfa" stroke="#10b981" strokeWidth={1.5} />
-        <text x={BOX_X + 14} y={UGA_Y + 22} fontFamily="monospace" fontSize={12}
-          fontWeight="bold" fill="#065f46">UGA (User Global Area)</text>
-        <text x={BOX_X + 14} y={UGA_Y + 38} fontFamily="monospace" fontSize={9.5}
-          fill="#10b981" opacity={0.85}>
-          {isKo
-            ? '세션 변수 · 로그인 정보 · 세션 상태  ·  Dedicated Server 모드에서 PGA 안에 위치'
-            : 'session vars · logon info · session state  ·  lives here in Dedicated Server mode'}
-        </text>
-      </svg>
+        {/* ── 열 3: UGA ── */}
+        <div className="flex flex-col gap-1.5 rounded-lg border-2 border-teal-300 bg-teal-100/60 p-2">
+          <div className="flex items-center gap-1.5">
+            <span className="rounded bg-teal-500 px-1.5 py-0.5 font-mono text-[10px] font-bold text-white">UGA</span>
+          </div>
+          <p className="font-mono text-[9px] text-teal-600">User Global Area</p>
+          <div className="flex flex-1 flex-col gap-1 font-mono text-[9px] text-teal-700">
+            <div>{isKo ? '세션 변수' : 'Session vars'}</div>
+            <div>{isKo ? '로그인 정보' : 'Logon info'}</div>
+            <div>{isKo ? '세션 상태' : 'Session state'}</div>
+            <div className="mt-1 border-t border-teal-300 pt-1 text-[8px] text-teal-500">
+              <div>▸ Dedicated: {isKo ? 'PGA 안에 위치' : 'lives in PGA'}</div>
+              <div className="mt-0.5">▸ Shared: {isKo ? 'Large Pool (SGA)으로 이동' : 'moves to Large Pool (SGA)'}</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  )
+}
+
+// ── compact PGA 요약 블록 (OracleInstanceMap 전용) ──
+// SVG는 너무 작으면 안 읽히므로 텍스트 기반 박스로 대체
+export function PgaCompactBlock({ lang }: { lang: 'ko' | 'en' }) {
+  const isKo = lang === 'ko'
+  const rows = isKo
+    ? [
+        { label: 'Private SQL Area', sub: 'Persistent · Runtime', color: 'bg-violet-100 border-violet-300 text-violet-800' },
+        { label: 'SQL Work Area',    sub: 'Sort · Hash · Bitmap', color: 'bg-blue-100 border-blue-300 text-blue-800' },
+        { label: 'UGA',              sub: '세션 변수 · 로그인',     color: 'bg-teal-100 border-teal-300 text-teal-800' },
+      ]
+    : [
+        { label: 'Private SQL Area', sub: 'Persistent · Runtime', color: 'bg-violet-100 border-violet-300 text-violet-800' },
+        { label: 'SQL Work Area',    sub: 'Sort · Hash · Bitmap', color: 'bg-blue-100 border-blue-300 text-blue-800' },
+        { label: 'UGA',              sub: 'session vars · logon',  color: 'bg-teal-100 border-teal-300 text-teal-800' },
+      ]
+  return (
+    <div className="rounded-lg border-2 border-violet-300 bg-violet-50/40 p-2">
+      <div className="mb-1.5 flex items-center gap-1.5">
+        <span className="rounded bg-violet-600 px-1.5 py-0.5 font-mono text-[9px] font-bold text-white">PGA</span>
+        <span className="font-mono text-[9px] text-violet-600">
+          {isKo ? '전용 메모리' : 'Private Memory'}
+        </span>
+      </div>
+      <div className="flex flex-col gap-1">
+        {rows.map((r) => (
+          <div key={r.label} className={cn('rounded border px-2 py-1', r.color)}>
+            <div className="font-mono text-[9px] font-bold leading-tight">{r.label}</div>
+            <div className="font-mono text-[8px] leading-tight opacity-70">{r.sub}</div>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }

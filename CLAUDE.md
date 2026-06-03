@@ -193,6 +193,9 @@ const T = {
 **Optimizer 챕터 특이사항:**
 - `shared/diagrams.tsx`에 `ExplainPlanTable`, `PlanRow` 타입 등 공유 다이어그램 컴포넌트 위치
 - `OptimizerSimulator`는 `BookContent`의 `SectionRouter`에서 레이아웃 wrapper 없이 직접 렌더링
+- `fundamentals/WhatIsOptimizerSection.tsx`가 `optimizer-fundamentals` 분기의 라우터 역할. `FundamentalsSection.tsx`는 삭제됨
+- `join/` 하위 디렉토리에 `JoinOverviewSection`, `NestedLoopSection`, `HashJoinSection`, `SortMergeSection` 위치 (`optimizer-join-*` 섹션 ID 처리)
+- `optimizer-join` 섹션 ID는 `OptimizerJoinOverviewPage`로 fallthrough됨 (랜딩 페이지 겸용)
 
 **Sort·Parallel 챕터:** 단일 `index.tsx` 파일에 모든 섹션 포함. `sql-tuning` 챕터의 하위 섹션으로 TOC에 배치됨.
 

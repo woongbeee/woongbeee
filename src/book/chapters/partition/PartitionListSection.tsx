@@ -15,11 +15,11 @@ const T = {
   ko: {
     title: 'List 파티션',
     subtitle:
-      'List 파티션은 파티션 키의 명시적인 값 목록을 기준으로 행을 분할합니다. 지역 코드, 국가, 부서 코드처럼 이산적이고 명확한 값으로 데이터를 구분할 때 사용합니다.',
+      'List 파티션은 파티션 키의 명시적인 값 목록을 기준으로 행을 분할해요. 지역 코드, 국가, 부서 코드처럼 이산적이고 명확한 값으로 데이터를 구분할 때 사용해요.',
 
     whatTitle: 'List 파티션이란?',
     whatDesc:
-      'Range 파티션이 범위(≤, <)로 행을 분류하는 것과 달리, List 파티션은 파티션 키 값이 특정 목록에 속하는지로 행을 분류합니다. 순서가 없는 이산 데이터에 적합합니다.\n\n한 파티션에 복수의 값을 지정할 수 있으며, DEFAULT 파티션으로 정의되지 않은 값을 수용할 수 있습니다.',
+      'Range 파티션이 범위(≤, <)로 행을 분류하는 것과 달리, List 파티션은 파티션 키 값이 특정 목록에 속하는지로 행을 분류해요. 순서가 없는 이산 데이터에 적합해요.\n\n한 파티션에 복수의 값을 지정할 수 있으며, DEFAULT 파티션으로 정의되지 않은 값을 수용할 수 있어요.',
 
     basicSql: `-- 지역별 List 파티션
 CREATE TABLE customers (
@@ -54,7 +54,7 @@ ALTER TABLE customers MERGE PARTITIONS p_east, p_other
 
     pruningTitle: 'Partition Pruning',
     pruningDesc:
-      'List 파티션의 Pruning은 파티션 키에 대한 등치(=) 또는 IN 조건에서 발생합니다.',
+      'List 파티션의 Pruning은 파티션 키에 대한 등치(=) 또는 IN 조건에서 발생해요.',
     pruningTable: [
       ["WHERE region = 'SEOUL'", 'PARTITION LIST SINGLE', 'p_north 1개 파티션만 접근'],
       ["WHERE region IN ('BUSAN', 'DAEGU')", 'PARTITION LIST ITERATOR', 'p_south 파티션 접근'],
@@ -64,7 +64,7 @@ ALTER TABLE customers MERGE PARTITIONS p_east, p_other
 
     maintenanceTitle: '파티션 관리 연산',
     maintenanceDesc:
-      'List 파티션은 값 목록을 수정하거나, 두 파티션을 병합(MERGE)하거나, 하나의 파티션을 여러 파티션으로 분할(SPLIT)할 수 있습니다.',
+      'List 파티션은 값 목록을 수정하거나, 두 파티션을 병합(MERGE)하거나, 하나의 파티션을 여러 파티션으로 분할(SPLIT)할 수 있어요.',
     maintenanceSql: `-- 파티션 값 목록 수정
 ALTER TABLE customers MODIFY PARTITION p_north
   ADD VALUES ('SEJONG');
@@ -78,7 +78,7 @@ ALTER TABLE customers SPLIT PARTITION p_other
   INTO (PARTITION p_jeju, PARTITION p_other);`,
 
     summary:
-      'List 파티션은 지역·국가·코드처럼 이산적인 분류 기준이 있을 때 적합합니다. DEFAULT 파티션을 정의해 예상치 못한 값에 대한 INSERT 오류를 방지하고, 필요 시 SPLIT/MERGE로 파티션 구조를 조정합니다.',
+      'List 파티션은 지역·국가·코드처럼 이산적인 분류 기준이 있을 때 적합해요. DEFAULT 파티션을 정의해서 예상치 못한 값에 대한 INSERT 오류를 방지하고, 필요 시 SPLIT/MERGE로 파티션 구조를 조정해요.',
   },
 
   en: {

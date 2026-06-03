@@ -15,15 +15,15 @@ const T = {
   ko: {
     title: 'Partition Pruning',
     subtitle:
-      'Partition Pruning은 쿼리 WHERE 조건을 분석해 무관한 파티션을 건너뛰는 최적화입니다. 대용량 테이블에서 I/O를 수십~수백 배 줄일 수 있는 파티셔닝의 핵심 기능입니다.',
+      'Partition Pruning은 쿼리 WHERE 조건을 분석해서 무관한 파티션을 건너뛰는 최적화예요. 대용량 테이블에서 I/O를 수십~수백 배 줄일 수 있는 파티셔닝의 핵심 기능이에요.',
 
     whatTitle: 'Partition Pruning이란?',
     whatDesc:
-      'WHERE 절에 파티션 키가 포함되면 Oracle은 관련 없는 파티션의 데이터 블록을 아예 읽지 않습니다. 예를 들어 12개 월별 파티션이 있는 테이블에서 특정 월만 조회하면 1/12의 I/O만 발생합니다.\n\nPruning은 SQL을 변경하지 않아도 자동으로 발생합니다. 단, 파티션 키가 WHERE 조건에 포함되어야 하며, 파티션 키 컬럼에 함수를 적용하거나 형 변환이 발생하면 Pruning이 되지 않습니다.',
+      'WHERE 절에 파티션 키가 포함되면 Oracle은 관련 없는 파티션의 데이터 블록을 아예 읽지 않아요. 예를 들어 12개 월별 파티션이 있는 테이블에서 특정 월만 조회하면 1/12의 I/O만 발생해요.\n\nPruning은 SQL을 변경하지 않아도 자동으로 발생해요. 단, 파티션 키가 WHERE 조건에 포함되어야 하며, 파티션 키 컬럼에 함수를 적용하거나 형 변환이 발생하면 Pruning이 되지 않아요.',
 
     staticTitle: 'Static Pruning',
     staticDesc:
-      'Static Pruning은 쿼리 파싱(Compile) 시점에 접근 파티션이 결정됩니다. 리터럴 값 비교, 날짜 리터럴처럼 쿼리 텍스트에서 파티션을 특정할 수 있을 때 발생합니다.',
+      'Static Pruning은 쿼리 파싱(Compile) 시점에 접근 파티션이 결정돼요. 리터럴 값 비교, 날짜 리터럴처럼 쿼리 텍스트에서 파티션을 특정할 수 있을 때 발생해요.',
     staticSql: `-- Static Pruning 예시 (리터럴 값)
 SELECT *
 FROM   sales
@@ -42,7 +42,7 @@ SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY(format => 'BASIC +PARTITION'));
 
     dynamicTitle: 'Dynamic Pruning',
     dynamicDesc:
-      'Dynamic Pruning은 실행 시점에 접근 파티션이 결정됩니다. 바인드 변수, 서브쿼리, 조인 결과처럼 컴파일 시점에 값을 알 수 없을 때 발생합니다.',
+      'Dynamic Pruning은 실행 시점에 접근 파티션이 결정돼요. 바인드 변수, 서브쿼리, 조인 결과처럼 컴파일 시점에 값을 알 수 없을 때 발생해요.',
     dynamicSql: `-- 바인드 변수 Dynamic Pruning
 SELECT *
 FROM   sales
@@ -75,7 +75,7 @@ WHERE  c.region = 'NORTH';
 
     antiTitle: 'Pruning을 방해하는 패턴',
     antiDesc:
-      '파티션 키 컬럼에 아래 패턴을 사용하면 Pruning이 발생하지 않습니다.',
+      '파티션 키 컬럼에 아래 패턴을 사용하면 Pruning이 발생하지 않아요.',
     antiTable: [
       ["TO_CHAR(sale_date, 'YYYY') = '2024'", '파티션 키에 함수 적용 → Pruning 불가. sale_date BETWEEN 조건으로 변경.'],
       ["TRUNC(sale_date) = TRUNC(SYSDATE)", 'TRUNC 함수 적용 → Pruning 불가. sale_date >= DATE 조건으로 변경.'],
@@ -84,7 +84,7 @@ WHERE  c.region = 'NORTH';
     ],
 
     summary:
-      'Partition Pruning은 파티셔닝 효과를 직접 체감할 수 있는 핵심 메커니즘입니다. 파티션 키를 WHERE 절에 포함하고, 파티션 키 컬럼에 함수나 형 변환을 피해야 합니다. 실행 계획의 Pstart/Pstop 컬럼으로 Pruning 여부를 항상 확인하세요.',
+      'Partition Pruning은 파티셔닝 효과를 직접 체감할 수 있는 핵심 메커니즘이에요. 파티션 키를 WHERE 절에 포함하고, 파티션 키 컬럼에 함수나 형 변환을 피해야 해요. 실행 계획의 Pstart/Pstop 컬럼으로 Pruning 여부를 항상 확인하세요.',
   },
 
   en: {

@@ -15,15 +15,15 @@ const T = {
   ko: {
     title: 'Composite 파티션',
     subtitle:
-      'Composite 파티션은 두 가지 파티셔닝 방식을 계층적으로 결합합니다. 부모 파티션(Range·List·Hash)과 자식 서브파티션(Range·List·Hash)을 조합해 다차원 Pruning과 병렬 처리를 동시에 달성합니다.',
+      'Composite 파티션은 두 가지 파티셔닝 방식을 계층적으로 결합해요. 부모 파티션(Range·List·Hash)과 자식 서브파티션(Range·List·Hash)을 조합해서 다차원 Pruning과 병렬 처리를 동시에 달성해요.',
 
     whatTitle: 'Composite 파티션이란?',
     whatDesc:
-      '상위 파티션 키와 하위 서브파티션 키를 각각 정의하여 데이터를 2단계로 분할합니다. 대표적인 조합은 다음과 같습니다:\n\n• Range-Hash: 날짜로 파티션 → 균등 분산을 위해 해시 서브파티션\n• Range-List: 날짜로 파티션 → 지역·코드로 서브파티션\n• List-Hash: 코드로 파티션 → 균등 분산을 위해 해시 서브파티션\n\n두 파티션 키 중 하나라도 WHERE 조건에 포함되면 해당 차원의 Pruning이 발생합니다.',
+      '상위 파티션 키와 하위 서브파티션 키를 각각 정의해서 데이터를 2단계로 분할해요. 대표적인 조합은 다음과 같아요:\n\n• Range-Hash: 날짜로 파티션 → 균등 분산을 위해 해시 서브파티션\n• Range-List: 날짜로 파티션 → 지역·코드로 서브파티션\n• List-Hash: 코드로 파티션 → 균등 분산을 위해 해시 서브파티션\n\n두 파티션 키 중 하나라도 WHERE 조건에 포함되면 해당 차원의 Pruning이 발생해요.',
 
     rangeHashTitle: 'Range-Hash 파티션',
     rangeHashDesc:
-      '날짜(Range)로 1차 분류하고, 각 날짜 파티션 내에서 해시로 균등 분산합니다. 날짜 조건 Pruning과 데이터 스큐 방지를 동시에 달성합니다.',
+      '날짜(Range)로 1차 분류하고, 각 날짜 파티션 내에서 해시로 균등 분산해요. 날짜 조건 Pruning과 데이터 스큐 방지를 동시에 달성해요.',
     rangeHashSql: `-- Range-Hash Composite 파티션
 CREATE TABLE sales_rh (
   sale_id    NUMBER,
@@ -47,7 +47,7 @@ WHERE  table_name = 'SALES_RH';`,
 
     rangeListTitle: 'Range-List 파티션',
     rangeListDesc:
-      '날짜(Range)로 1차 분류하고, 각 날짜 파티션 내에서 지역 코드(List)로 서브파티션합니다. 날짜+지역 두 조건 모두에서 Pruning이 가능합니다.',
+      '날짜(Range)로 1차 분류하고, 각 날짜 파티션 내에서 지역 코드(List)로 서브파티션해요. 날짜+지역 두 조건 모두에서 Pruning이 가능해요.',
     rangeListSql: `-- Range-List Composite 파티션
 CREATE TABLE orders_rl (
   order_id   NUMBER,
@@ -93,7 +93,7 @@ WHERE  order_date >= DATE '2024-01-01'
     ],
 
     summary:
-      'Composite 파티션은 두 차원의 Pruning과 병렬 처리를 동시에 달성합니다. SUBPARTITION TEMPLATE를 활용하면 파티션 추가 시 서브파티션 구조가 자동 적용됩니다. 두 파티션 키 중 하나라도 WHERE 조건에 포함되어야 Pruning 효과를 얻습니다.',
+      'Composite 파티션은 두 차원의 Pruning과 병렬 처리를 동시에 달성해요. SUBPARTITION TEMPLATE를 활용하면 파티션 추가 시 서브파티션 구조가 자동 적용돼요. 두 파티션 키 중 하나라도 WHERE 조건에 포함되어야 Pruning 효과를 얻을 수 있어요.',
   },
 
   en: {

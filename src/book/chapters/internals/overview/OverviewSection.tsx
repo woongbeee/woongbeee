@@ -399,24 +399,39 @@ export function OverviewSection() {
               <div className="px-5 py-3 border-b border-black/5">
                 <Prose>{lang === 'ko' ? active.descKo : active.descEn}</Prose>
               </div>
-              {/* 세부 항목 테이블 */}
+              {/* 세부 항목 — PGA는 가로 카드 그리드, 나머지는 세로 테이블 */}
               {active.details.length > 0 && (
-                <div className="flex flex-col divide-y divide-black/5">
-                  {active.details.map((row, i) => (
-                    <div key={i} className="grid grid-cols-[200px_1fr] text-xs">
-                      <div className="flex items-center border-r border-black/5 bg-black/[0.03] px-4 py-2.5">
-                        <span className="font-mono font-bold text-slate-600">
+                active.mapId === 'pga' ? (
+                  <div className="grid grid-cols-2 gap-3 p-4 sm:grid-cols-4">
+                    {active.details.map((row, i) => (
+                      <div key={i} className="rounded-lg border border-black/10 bg-white/60 px-3 py-2.5">
+                        <div className="mb-1 font-mono text-[11px] font-bold text-slate-700">
                           {lang === 'ko' ? row.termKo : row.termEn}
-                        </span>
-                      </div>
-                      <div className="flex items-center px-4 py-2.5">
-                        <span className="leading-snug text-muted-foreground">
+                        </div>
+                        <div className="text-[11px] leading-snug text-muted-foreground">
                           {lang === 'ko' ? row.descKo : row.descEn}
-                        </span>
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex flex-col divide-y divide-black/5">
+                    {active.details.map((row, i) => (
+                      <div key={i} className="grid grid-cols-[200px_1fr] text-xs">
+                        <div className="flex items-center border-r border-black/5 bg-black/[0.03] px-4 py-2.5">
+                          <span className="font-mono font-bold text-slate-600">
+                            {lang === 'ko' ? row.termKo : row.termEn}
+                          </span>
+                        </div>
+                        <div className="flex items-center px-4 py-2.5">
+                          <span className="leading-snug text-muted-foreground">
+                            {lang === 'ko' ? row.descKo : row.descEn}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )
               )}
             </motion.div>
           ) : (

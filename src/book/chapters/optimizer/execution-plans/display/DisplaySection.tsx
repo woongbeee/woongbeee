@@ -14,21 +14,21 @@ const T = {
   ko: {
     title: '실행 계획 확인하기',
     subtitle:
-      'EXPLAIN PLAN으로 계획을 저장한 뒤 DBMS_XPLAN 함수나 V$ 뷰로 조회할 수 있어요. 어떤 함수를 쓰느냐에 따라 예상 계획 vs 실제 실행 계획을 선택해서 볼 수 있습니다.',
+      'EXPLAIN PLAN으로 계획을 저장한 뒤 DBMS_XPLAN 함수나 V$ 뷰로 조회할 수 있어요. 어떤 함수를 쓰느냐에 따라 예상 계획 vs 실제 실행 계획을 선택해서 볼 수 있어요.',
     scriptsTitle: '기본 스크립트',
     scriptRows: [
       ['DBMS_XPLAN.DISPLAY', '계획 테이블 내용을 표시하는 테이블 함수. 계획 테이블 이름, STATEMENT_ID, 포맷 지정 가능.'],
-      ['utlxpls.sql', '직렬 처리에 대한 계획 테이블 출력을 표시합니다.'],
-      ['utlxplp.sql', '병렬 실행 컬럼을 포함한 계획 테이블 출력을 표시합니다.'],
+      ['utlxpls.sql', '직렬 처리에 대한 계획 테이블 출력을 표시해요.'],
+      ['utlxplp.sql', '병렬 실행 컬럼을 포함한 계획 테이블 출력을 표시해요.'],
     ],
     displayFuncsTitle: 'DBMS_XPLAN 함수 목록',
     displayFuncsRows: [
-      ['DISPLAY', 'PLAN_TABLE에 저장된 예상 계획을 표시합니다. SQL이 실제로 실행되지 않아도 돼요.', "format => 'TYPICAL'"],
-      ['DISPLAY_AWR', 'AWR에 저장된 실행 계획을 조회합니다. 과거 특정 시점의 계획을 확인할 때 사용해요.', "format => 'TYPICAL'"],
+      ['DISPLAY', 'PLAN_TABLE에 저장된 예상 계획을 표시해요. SQL이 실제로 실행되지 않아도 돼요.', "format => 'TYPICAL'"],
+      ['DISPLAY_AWR', 'AWR에 저장된 실행 계획을 조회해요. 과거 특정 시점의 계획을 확인할 때 사용해요.', "format => 'TYPICAL'"],
       ['DISPLAY_CURSOR', '실제로 실행된 SQL의 커서를 V$SQL_PLAN_STATISTICS_ALL에서 조회해요. E-Rows vs A-Rows 비교 가능.', "format => 'ALLSTATS LAST'"],
-      ['DISPLAY_PLAN', 'PLAN_TABLE 내용을 CLOB으로 반환합니다. 다양한 format 옵션 지원.', "format => 'ALL'"],
-      ['DISPLAY_SQL_PLAN_BASELINE', 'SQL Plan Management 베이스라인의 계획을 표시합니다.', "format => 'TYPICAL'"],
-      ['DISPLAY_SQLSET', 'SQL Tuning Set에 저장된 문장의 실행 계획을 표시합니다.', "format => 'TYPICAL'"],
+      ['DISPLAY_PLAN', 'PLAN_TABLE 내용을 CLOB으로 반환해요. 다양한 format 옵션을 지원해요.', "format => 'ALL'"],
+      ['DISPLAY_SQL_PLAN_BASELINE', 'SQL Plan Management 베이스라인의 계획을 표시해요.', "format => 'TYPICAL'"],
+      ['DISPLAY_SQLSET', 'SQL Tuning Set에 저장된 문장의 실행 계획을 표시해요.', "format => 'TYPICAL'"],
     ],
     displayFuncsSql: `-- DISPLAY: PLAN_TABLE의 최근 계획 표시
 SELECT PLAN_TABLE_OUTPUT FROM TABLE(DBMS_XPLAN.DISPLAY());

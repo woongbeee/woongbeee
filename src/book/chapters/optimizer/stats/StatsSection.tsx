@@ -22,7 +22,7 @@ const T = {
   ko: {
     title: '통계 정보와 선택도',
     subtitle:
-      'CBO는 DBMS_STATS 패키지로 수집된 통계를 바탕으로 비용을 추정합니다. 통계가 오래됐거나 없으면 잘못된 실행 계획이 만들어집니다.',
+      'CBO는 DBMS_STATS 패키지로 수집된 통계를 바탕으로 비용을 추정해요. 통계가 오래됐거나 없으면 잘못된 실행 계획이 만들어져요.',
     typesTitle: '통계의 종류',
     items: [
       { icon: <IconChartBar size={20} stroke={1.5} />, title: '테이블 통계', desc: '총 행 수(NUM_ROWS), 블록 수(BLOCKS), 평균 행 길이(AVG_ROW_LEN). Full Table Scan 비용 계산의 기반.' },

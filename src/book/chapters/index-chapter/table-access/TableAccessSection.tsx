@@ -1214,12 +1214,12 @@ export function TableAccessSection() {
       <div className="grid gap-3 sm:grid-cols-2">
         {t.waits.map((w, i) => (
           <div key={i} className="rounded-xl border bg-card p-4">
-            <p className="mb-2 font-mono text-[11px] font-bold text-rose-600">{w.event}</p>
-            <p className="mb-2 text-[11px] leading-snug text-muted-foreground">
+            <p className="mb-2 font-mono text-xs font-bold text-rose-600">{w.event}</p>
+            <p className="mb-2 text-xs leading-relaxed text-muted-foreground">
               <span className="font-semibold text-foreground">{isKo ? '원인: ' : 'Cause: '}</span>
               {w.cause}
             </p>
-            <p className="text-[11px] leading-snug text-muted-foreground">
+            <p className="text-xs leading-relaxed text-muted-foreground">
               <span className="font-semibold text-emerald-600">{isKo ? '대응: ' : 'Fix: '}</span>
               {w.fix}
             </p>

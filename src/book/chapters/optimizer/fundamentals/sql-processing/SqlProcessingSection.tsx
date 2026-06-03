@@ -1,14 +1,14 @@
+import { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { IconBolt } from '@tabler/icons-react'
 import { useSimulationStore } from '@/store/simulationStore'
 import {
   PageContainer,
   ChapterTitle,
   SectionTitle,
-  SubTitle,
   Prose,
   InfoBox,
   Divider,
-  Table,
   SqlBlock,
   StepList,
 } from '../../../shared'
@@ -21,40 +21,59 @@ const T = {
     stagesTitle: 'SQL 처리의 4단계',
     stagesDesc:
       '문장 종류에 따라 일부 단계가 생략되기도 하지만, 기본 흐름은 항상 이 순서예요.',
-    stageRows: [
-      ['① 파싱 (Parsing)', '구문 검사 → 의미 검사 → Shared Pool 확인. 이 SQL을 전에 본 적 있는지 확인해서 하드/소프트 파싱을 결정해요.'],
-      ['② 최적화 (Optimization)', '하드 파싱일 때만 수행돼요. DML에만 해당하고, DDL은 최적화 대상이 아니에요.'],
-      ['③ 행 소스 생성 (Row Source Generation)', '최적 실행 계획을 SQL 엔진이 실제로 실행할 수 있는 행 소스 트리(row source tree)로 변환해요.'],
-      ['④ 실행 (Execution)', 'DML에서 유일하게 반드시 거쳐야 하는 단계예요. SQL 엔진이 트리의 각 노드를 하나씩 실행하죠.'],
+    stageSteps: [
+      { title: '파싱 (Parsing)',                     desc: '구문 검사 → 의미 검사 → Shared Pool 확인. 이 SQL을 전에 본 적 있는지 확인해서 하드/소프트 파싱을 결정해요.' },
+      { title: '최적화 (Optimization)',               desc: '하드 파싱일 때만 수행돼요. DML에만 해당하고, DDL은 최적화 대상이 아니에요.' },
+      { title: '행 소스 생성 (Row Source Generation)', desc: '최적 실행 계획을 SQL 엔진이 실제로 실행할 수 있는 행 소스 트리(row source tree)로 변환해요.' },
+      { title: '실행 (Execution)',                    desc: 'DML에서 유일하게 반드시 거쳐야 하는 단계예요. SQL 엔진이 트리의 각 노드를 하나씩 실행하죠.' },
     ],
     parsingTitle: 'SQL 파싱 (SQL Parsing)',
     parsingDesc:
       '파싱의 첫 번째 할 일은 SQL 문장을 데이터베이스가 이해할 수 있는 구조로 분리하는 거예요. 애플리케이션이 파싱 호출(parse call)을 보내면, 데이터베이스는 커서(cursor)를 열어요. 커서는 파싱된 SQL과 처리 정보를 담는 전용 공간의 핸들인데, 이 공간은 PGA(Program Global Area) 안에 있어요.',
-    syntaxTitle: '구문 검사 (Syntax Check)',
-    syntaxDesc:
-      'SQL 문법이 맞는지 확인해요. 오타나 잘못된 키워드가 있으면 이 단계에서 바로 걸러진답니다.',
-    syntaxSql: `-- 구문 오류 예시: FROM을 FORM으로 오타냄
+    parseSteps: [
+      {
+        id: 'syntax',
+        label: '① 구문 검사',
+        sublabel: 'Syntax Check',
+        color: '#3b82f6', bg: '#eff6ff', border: '#93c5fd', activeBg: '#dbeafe',
+        desc: 'SQL 문법이 맞는지 확인해요. 오타나 잘못된 키워드가 있으면 이 단계에서 바로 걸러진답니다.',
+        sql: `-- 구문 오류 예시: FROM을 FORM으로 오타냄
 SQL> SELECT * FORM employees;
 SELECT * FORM employees
          *
 ERROR at line 1:
 ORA-00923: FROM keyword not found where expected`,
-    semanticTitle: '의미 검사 (Semantic Check)',
-    semanticDesc:
-      '문법은 맞아도 의미가 잘못될 수 있어요. 예를 들어 존재하지 않는 테이블 이름을 쓴 경우죠. 이 단계에서 참조한 테이블·컬럼이 실제로 있는지 확인해요.',
-    semanticSql: `-- 의미 오류 예시: 없는 테이블을 조회하려 했어요
+        hasSql: true,
+      },
+      {
+        id: 'semantic',
+        label: '② 의미 검사',
+        sublabel: 'Semantic Check',
+        color: '#8b5cf6', bg: '#f5f3ff', border: '#c4b5fd', activeBg: '#ede9fe',
+        desc: '문법은 맞아도 의미가 잘못될 수 있어요. 예를 들어 존재하지 않는 테이블 이름을 쓴 경우죠. 이 단계에서 참조한 테이블·컬럼이 실제로 있는지 확인해요.',
+        sql: `-- 의미 오류 예시: 없는 테이블을 조회하려 했어요
 SQL> SELECT * FROM nonexistent_table;
 SELECT * FROM nonexistent_table
               *
 ERROR at line 1:
 ORA-00942: table or view does not exist`,
-    sharedPoolTitle: 'Shared Pool 확인 (Shared Pool Check)',
-    sharedPoolDesc:
-      '파싱 중에 Oracle은 "이 SQL, 전에 누군가 실행한 적 있어?" 하고 Shared Pool을 뒤져봐요. 있으면 비싼 최적화 작업을 건너뛸 수 있거든요. 모든 SQL에는 해시 알고리즘으로 생성된 고유한 SQL ID가 붙는데, 이게 V$SQL.SQL_ID에 나타나는 그 값이에요.',
+        hasSql: true,
+      },
+      {
+        id: 'sharedpool',
+        label: '③ Shared Pool 확인',
+        sublabel: 'Shared Pool Check',
+        color: '#f97316', bg: '#fff7ed', border: '#fdba74', activeBg: '#ffedd5',
+        desc: '파싱 중에 Oracle은 "이 SQL, 전에 누군가 실행한 적 있어?" 하고 Shared Pool을 뒤져봐요. 있으면 비싼 최적화 작업을 건너뛸 수 있거든요. 모든 SQL에는 해시 알고리즘으로 생성된 고유한 SQL ID가 붙는데, 이게 V$SQL.SQL_ID에 나타나는 그 값이에요.',
+        sql: '',
+        hasSql: false,
+      },
+    ],
     hardSoftTitle: '하드 파싱 vs 소프트 파싱',
-    hardSoftRows: [
-      ['하드 파싱 (Hard Parse)', 'Shared Pool에 이 SQL이 없어서 처음부터 실행 계획을 새로 만들어야 해요. 이걸 라이브러리 캐시 미스(library cache miss)라고 불러요. 이때 래치(latch)라는 잠금 장치를 써야 해서 동시에 많은 하드 파싱이 일어나면 경합이 생기고 성능이 뚝 떨어질 수 있어요.'],
-      ['소프트 파싱 (Soft Parse)', 'Shared Pool에 동일한 SQL이 이미 있어서 기존 실행 계획을 그대로 재사용해요. 이걸 라이브러리 캐시 히트(library cache hit)라고 해요. 최적화와 행 소스 생성을 건너뛰니까 훨씬 빠르죠.'],
+    hardSoftDesc: 'Shared Pool에 같은 SQL이 있는지 여부가 파싱 비용을 결정해요.',
+    hardSoftSteps: [
+      { title: '하드 파싱 (Hard Parse)', desc: 'Shared Pool에 이 SQL이 없어서 처음부터 실행 계획을 새로 만들어야 해요(라이브러리 캐시 미스). 래치(latch) 잠금이 필요해 동시에 많은 하드 파싱이 일어나면 경합이 생겨 성능이 떨어질 수 있어요.' },
+      { title: '소프트 파싱 (Soft Parse)', desc: 'Shared Pool에 동일한 SQL이 이미 있어서 기존 실행 계획을 재사용해요(라이브러리 캐시 히트). 최적화와 행 소스 생성을 건너뛰니까 훨씬 빠르죠.' },
     ],
     hardSoftNote:
       '똑같은 SQL이라도 OPTIMIZER_MODE 같은 세션 설정이 다르면 하드 파싱이 강제돼요. 옵티마이저 환경(optimizer environment)이란 실행 계획 생성에 영향을 주는 세션 설정들의 총집합을 말해요.',
@@ -143,40 +162,59 @@ CREATE TABLE mytable (mycolumn INTEGER);
     stagesTitle: 'The 4 Stages of SQL Processing',
     stagesDesc:
       'Depending on the statement type, some stages may be skipped, but the basic flow always follows this order.',
-    stageRows: [
-      ['① Parsing', 'Syntax Check → Semantic Check → Shared Pool check. Determines soft vs. hard parse.'],
-      ['② Optimization', 'Performed only on hard parse. Applies to DML only — DDL is not optimized.'],
-      ['③ Row Source Generation', 'Converts the optimal plan into a row source tree the SQL engine can execute.'],
-      ['④ Execution', 'The only mandatory step in DML processing. The SQL engine executes each node in the tree.'],
+    stageSteps: [
+      { title: 'Parsing',                desc: 'Syntax Check → Semantic Check → Shared Pool check. Determines soft vs. hard parse.' },
+      { title: 'Optimization',           desc: 'Performed only on hard parse. Applies to DML only — DDL is not optimized.' },
+      { title: 'Row Source Generation', desc: 'Converts the optimal plan into a row source tree the SQL engine can execute.' },
+      { title: 'Execution',             desc: 'The only mandatory step in DML processing. The SQL engine executes each node in the tree.' },
     ],
     parsingTitle: 'SQL Parsing',
     parsingDesc:
       "Parsing splits a SQL statement into a data structure the database can process. When an app issues a parse call, Oracle opens a cursor — a handle to the session's private SQL area (in PGA) that holds the parsed SQL and processing info.",
-    syntaxTitle: 'Syntax Check',
-    syntaxDesc:
-      'Oracle checks whether the SQL statement is grammatically correct. Any statement that breaks SQL syntax rules fails immediately.',
-    syntaxSql: `-- Syntax error: FROM misspelled as FORM
+    parseSteps: [
+      {
+        id: 'syntax',
+        label: '① Syntax Check',
+        sublabel: 'Syntax Check',
+        color: '#3b82f6', bg: '#eff6ff', border: '#93c5fd', activeBg: '#dbeafe',
+        desc: 'Oracle checks whether the SQL statement is grammatically correct. Any statement that breaks SQL syntax rules fails immediately.',
+        sql: `-- Syntax error: FROM misspelled as FORM
 SQL> SELECT * FORM employees;
 SELECT * FORM employees
          *
 ERROR at line 1:
 ORA-00923: FROM keyword not found where expected`,
-    semanticTitle: 'Semantic Check',
-    semanticDesc:
-      'Even syntactically correct SQL can fail if the meaning is wrong — for example, referencing a table or column that does not exist.',
-    semanticSql: `-- Semantic error: table does not exist
+        hasSql: true,
+      },
+      {
+        id: 'semantic',
+        label: '② Semantic Check',
+        sublabel: 'Semantic Check',
+        color: '#8b5cf6', bg: '#f5f3ff', border: '#c4b5fd', activeBg: '#ede9fe',
+        desc: 'Even syntactically correct SQL can fail if the meaning is wrong — for example, referencing a table or column that does not exist.',
+        sql: `-- Semantic error: table does not exist
 SQL> SELECT * FROM nonexistent_table;
 SELECT * FROM nonexistent_table
               *
 ERROR at line 1:
 ORA-00942: table or view does not exist`,
-    sharedPoolTitle: 'Shared Pool Check',
-    sharedPoolDesc:
-      "During parsing, Oracle checks the Shared Pool to see if this SQL has been run before. If it has, expensive steps can be skipped. Every SQL gets a unique SQL ID (visible in V$SQL.SQL_ID) from a hash of the statement text.",
+        hasSql: true,
+      },
+      {
+        id: 'sharedpool',
+        label: '③ Shared Pool Check',
+        sublabel: 'Shared Pool Check',
+        color: '#f97316', bg: '#fff7ed', border: '#fdba74', activeBg: '#ffedd5',
+        desc: "During parsing, Oracle checks the Shared Pool to see if this SQL has been run before. If it has, expensive steps can be skipped. Every SQL gets a unique SQL ID (visible in V$SQL.SQL_ID) from a hash of the statement text.",
+        sql: '',
+        hasSql: false,
+      },
+    ],
     hardSoftTitle: 'Hard Parse vs Soft Parse',
-    hardSoftRows: [
-      ['Hard Parse', "The SQL isn't in the Shared Pool, so Oracle builds a fresh execution plan from scratch — a library cache miss. It needs a latch (serialization device), and too many concurrent hard parses cause contention and hurt performance."],
-      ['Soft Parse', "The SQL is already in the Shared Pool, so Oracle reuses the cached plan — a library cache hit. Optimization and row source generation are skipped, making this much faster."],
+    hardSoftDesc: 'Whether the same SQL exists in the Shared Pool determines the cost of parsing.',
+    hardSoftSteps: [
+      { title: 'Hard Parse', desc: "The SQL isn't in the Shared Pool — Oracle builds a fresh execution plan from scratch (library cache miss). A latch is required for serialization, and too many concurrent hard parses cause contention that hurts performance." },
+      { title: 'Soft Parse', desc: "The SQL is already in the Shared Pool — Oracle reuses the cached plan immediately (library cache hit). Optimization and row source generation are skipped, making this much faster." },
     ],
     hardSoftNote:
       "Even identical SQL can trigger a hard parse if the optimizer environment differs. The optimizer environment is all session settings that affect plan generation (e.g., OPTIMIZER_MODE, work area size).",
@@ -260,10 +298,123 @@ CREATE TABLE mytable (mycolumn INTEGER);
   },
 }
 
+type ParseStep = (typeof T)['ko']['parseSteps'][number]
+
+function ParsingDiagram({ steps, lang }: { steps: ParseStep[]; lang: 'ko' | 'en' }) {
+  const [activeIdx, setActiveIdx] = useState(0)
+  const active = steps[activeIdx]
+
+  return (
+    <div className="my-4 rounded-xl border-2 border-slate-200 bg-slate-50 overflow-hidden">
+      {/* Step selector row */}
+      <div className="flex">
+        {steps.map((step, i) => {
+          const isActive = activeIdx === i
+          return (
+            <button
+              key={step.id}
+              onClick={() => setActiveIdx(i)}
+              className="flex-1 flex flex-col items-center gap-1 px-3 py-3 transition-all border-b-2 focus:outline-none"
+              style={{
+                borderBottomColor: isActive ? step.color : 'transparent',
+                backgroundColor: isActive ? step.activeBg : 'transparent',
+              }}
+            >
+              <span
+                className="font-mono text-xs font-bold"
+                style={{ color: isActive ? step.color : '#94a3b8' }}
+              >
+                {step.label}
+              </span>
+              <span className="font-mono text-[9px] text-muted-foreground hidden sm:block">
+                {step.sublabel}
+              </span>
+            </button>
+          )
+        })}
+      </div>
+
+      {/* Arrow connector */}
+      <div className="flex items-center justify-center gap-1 py-2 bg-white border-b border-slate-100">
+        {steps.map((step, i) => (
+          <div key={step.id} className="flex items-center gap-1">
+            <div
+              className="h-2.5 w-2.5 rounded-full transition-all"
+              style={{ backgroundColor: activeIdx === i ? step.color : '#e2e8f0' }}
+            />
+            {i < steps.length - 1 && (
+              <span className="font-mono text-[10px] text-muted-foreground/40">→</span>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* Detail panel */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={active.id}
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -4 }}
+          transition={{ duration: 0.15 }}
+          className="p-4"
+        >
+          <div
+            className="mb-3 inline-flex items-center gap-2 rounded-lg border px-3 py-1.5"
+            style={{ borderColor: active.border, backgroundColor: active.activeBg }}
+          >
+            <span className="font-mono text-xs font-bold" style={{ color: active.color }}>
+              {active.label}
+            </span>
+          </div>
+          <p className="text-sm leading-relaxed text-foreground/80 mb-0">{active.desc}</p>
+          {active.hasSql && (
+            <div className="mt-4">
+              <SqlBlock sql={active.sql} />
+            </div>
+          )}
+          {!active.hasSql && lang === 'ko' && (
+            <div className="mt-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 font-mono text-[11px] text-amber-700">
+              💡 Shared Pool 히트 → 소프트 파싱 (최적화 건너뜀)<br />
+              💡 Shared Pool 미스 → 하드 파싱 (최적화 수행)
+            </div>
+          )}
+          {!active.hasSql && lang === 'en' && (
+            <div className="mt-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 font-mono text-[11px] text-amber-700">
+              💡 Shared Pool hit → Soft parse (optimization skipped)<br />
+              💡 Shared Pool miss → Hard parse (optimization runs)
+            </div>
+          )}
+        </motion.div>
+      </AnimatePresence>
+
+      {/* Navigation */}
+      <div className="flex items-center justify-between border-t border-slate-100 bg-white px-4 py-2">
+        <button
+          onClick={() => setActiveIdx((i) => Math.max(0, i - 1))}
+          disabled={activeIdx === 0}
+          className="font-mono text-[11px] text-muted-foreground hover:text-foreground disabled:opacity-30 transition-colors"
+        >
+          ← {lang === 'ko' ? '이전' : 'Prev'}
+        </button>
+        <span className="font-mono text-[10px] text-muted-foreground">
+          {activeIdx + 1} / {steps.length}
+        </span>
+        <button
+          onClick={() => setActiveIdx((i) => Math.min(steps.length - 1, i + 1))}
+          disabled={activeIdx === steps.length - 1}
+          className="font-mono text-[11px] text-muted-foreground hover:text-foreground disabled:opacity-30 transition-colors"
+        >
+          {lang === 'ko' ? '다음' : 'Next'} →
+        </button>
+      </div>
+    </div>
+  )
+}
+
 export function SqlProcessingSection() {
   const lang = useSimulationStore((s) => s.lang)
   const t = T[lang]
-  const isKo = lang === 'ko'
 
   return (
     <PageContainer>
@@ -275,36 +426,17 @@ export function SqlProcessingSection() {
 
       <SectionTitle>{t.stagesTitle}</SectionTitle>
       <Prose>{t.stagesDesc}</Prose>
-      <Table
-        headers={isKo ? ['단계', '설명'] : ['Stage', 'Description']}
-        rows={t.stageRows}
-      />
+      <StepList steps={t.stageSteps} />
 
       <Divider />
 
       <SectionTitle>{t.parsingTitle}</SectionTitle>
       <Prose>{t.parsingDesc}</Prose>
-
-      <SubTitle>{t.syntaxTitle}</SubTitle>
-      <Prose>{t.syntaxDesc}</Prose>
-      <div className="mt-4">
-        <SqlBlock sql={t.syntaxSql} />
-      </div>
-
-      <SubTitle>{t.semanticTitle}</SubTitle>
-      <Prose>{t.semanticDesc}</Prose>
-      <div className="mt-4">
-        <SqlBlock sql={t.semanticSql} />
-      </div>
-
-      <SubTitle>{t.sharedPoolTitle}</SubTitle>
-      <Prose>{t.sharedPoolDesc}</Prose>
+      <ParsingDiagram steps={t.parseSteps} lang={lang} />
 
       <SectionTitle>{t.hardSoftTitle}</SectionTitle>
-      <Table
-        headers={isKo ? ['파싱 유형', '설명'] : ['Parse Type', 'Description']}
-        rows={t.hardSoftRows}
-      />
+      <Prose>{t.hardSoftDesc}</Prose>
+      <StepList steps={t.hardSoftSteps} />
       <div className="mt-4">
         <InfoBox variant="note">{t.hardSoftNote}</InfoBox>
       </div>

@@ -19,7 +19,7 @@ const T = {
       '계획 비교 도구는 기준 계획(reference plan)과 임의의 테스트 계획 목록을 받아 차이점을 강조 표시합니다. 비교는 라인 단위가 아닌 논리적 비교입니다.',
     purposeTitle: '계획 비교의 목적',
     purposeDesc:
-      '계획 비교 보고서는 차이점의 원인을 식별해 사용자가 계획 재현성 문제를 분류할 수 있게 도와줍니다.',
+      '계획 비교 보고서는 차이점의 원인을 식별해서 사용자가 계획 재현성 문제를 분류할 수 있게 도와줘요.',
     purposeItems: [
       '성능이 회귀하는 쿼리의 현재 계획을 AWR에 캡처된 이전 계획과 비교하고 싶을 때',
       'SQL 계획 기준선(SQL plan baseline)이 원래 의도한 계획을 재현하는 데 실패했을 때 새 계획과 의도한 계획의 차이를 확인하고 싶을 때',
@@ -28,7 +28,7 @@ const T = {
     ],
     reportFormatTitle: '비교 보고서 포맷',
     reportFormatDesc:
-      '보고서는 요약으로 시작됩니다. COMPARE PLANS REPORT 섹션에는 보고서를 실행한 사용자와 비교된 계획 수 같은 정보가 포함됩니다.',
+      '보고서는 요약으로 시작돼요. COMPARE PLANS REPORT 섹션에는 보고서를 실행한 사용자와 비교된 계획 수 같은 정보가 포함돼요.',
     reportSample: `COMPARE PLANS REPORT
 -------------------------------------------------------------------------
   Current user           : SH
@@ -101,7 +101,7 @@ Comparison Results (1):
  1. Query block SEL$1: Transformation JOIN REMOVED FROM QUERY BLOCK occurred
     only in the reference plan (result query block: SEL$A43D1678).`,
     tutorialNote:
-      '첫 번째 쿼리(quantity_sold=43)에서는 products 테이블에 대한 Join이 제거되어 SALES 테이블만 스캔했습니다. 두 번째 쿼리(prod_min_price>200)에서는 products 테이블도 접근해야 해서 Join이 유지됐습니다.',
+      '첫 번째 쿼리(quantity_sold=43)에서는 products 테이블에 대한 Join이 제거되어 SALES 테이블만 스캔했어요. 두 번째 쿼리(prod_min_price>200)에서는 products 테이블도 접근해야 해서 Join이 유지됐어요.',
     ex8Title: 'Example 6-8: 자식 커서 계획 비교',
     ex8Sql: `VAR v_report CLOB;
 

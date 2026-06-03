@@ -1,48 +1,53 @@
-import { useState } from 'react'
-import { motion } from 'framer-motion'
 import { useSimulationStore } from '@/store/simulationStore'
 import { cn } from '@/lib/utils'
-import { Divider, InfoBox, SqlBlock } from '../../shared'
+import {
+  PageContainer,
+  ChapterTitle,
+  SectionTitle,
+  SubTitle,
+  Prose,
+  InfoBox,
+  Divider,
+  SqlBlock,
+  Table,
+} from '../../shared'
+import { IconLayersLinked } from '@tabler/icons-react'
 
 // ── Text ──────────────────────────────────────────────────────────────────────
 
 const T = {
   ko: {
+    pageTitle: '복합·특수 인덱스',
+    pageSubtitle:
+      '복합 인덱스, 함수 기반 인덱스(FBI), Reverse Key, IOT, 가시성 상태, 키 압축까지 — 상황에 맞는 인덱스 유형을 선택하는 방법을 알아봐요.',
+
     compositeTitle: '복합 인덱스 (Composite Index)',
     compositeDesc:
-      '복합 인덱스(Concatenated Index라고도 불러요)는 테이블의 여러 컬럼을 묶어서 만드는 인덱스예요. WHERE 조건에 인덱스의 첫 번째 컬럼(선두 컬럼)이 포함된 쿼리라면 검색 속도를 확 높여줄 수 있어요. 그래서 인덱스를 만들 때 컬럼 순서가 굉장히 중요합니다. 보통은 가장 자주 검색에 쓰이는 컬럼을 맨 앞에 배치해요.\n\n오라클 공식 예시: CREATE INDEX employees_ix ON employees (last_name, job_id, salary) — 세 컬럼을 모두 쓰거나, last_name만 쓰거나, last_name과 job_id를 함께 쓰는 쿼리는 이 인덱스를 탈 수 있어요. 하지만 last_name 없이 job_id만 조건으로 쓰는 쿼리는 이 인덱스를 사용하지 못해요.',
+      '복합 인덱스(Concatenated Index라고도 불러요)는 테이블의 여러 컬럼을 묶어서 만드는 인덱스예요. WHERE 조건에 인덱스의 첫 번째 컬럼(선두 컬럼)이 포함된 쿼리라면 검색 속도를 확 높여줄 수 있어요. 그래서 인덱스를 만들 때 컬럼 순서가 굉장히 중요합니다. 보통은 가장 자주 검색에 쓰이는 컬럼을 맨 앞에 배치해요.',
     orderTitle: '컬럼 순서 규칙',
+    orderIndexExample: 'CREATE INDEX emp_dept_job_ix ON employees (dept_id, job_id)',
     orderRules: [
       { rule: '선두 컬럼 포함 → Index Range Scan 가능', ok: true, example: 'WHERE dept_id = 60' },
-      { rule: '선두 컬럼 + 추가 컬럼 → 더 좁은 범위로 검색', ok: true, example: 'WHERE dept_id = 60 AND job_id = \'IT_PROG\'' },
-      { rule: '선두 컬럼 없음 → Full Table Scan (또는 Skip Scan)', ok: false, example: 'WHERE job_id = \'IT_PROG\' (dept_id 빠짐)' },
+      { rule: '선두 컬럼 + 추가 컬럼 → 더 좁은 범위로 검색', ok: true, example: "WHERE dept_id = 60 AND job_id = 'IT_PROG'" },
+      { rule: '선두 컬럼 없음 → Full Table Scan (또는 Skip Scan)', ok: false, example: "WHERE job_id = 'IT_PROG' (dept_id 빠짐)" },
       { rule: '선두 컬럼 값의 종류가 적을 때 → Skip Scan으로 가능할 수도', ok: null, example: 'WHERE salary = 9000 (DEPT_ID 값 종류가 적다면)' },
     ],
-    fbiTitle: 'FBI(Function-Based Index, 함수 기반 인덱스)',
+
+    fbiTitle: 'FBI (Function-Based Index, 함수 기반 인덱스)',
     fbiDesc:
       'FBI(Function-Based Index)는 컬럼 값을 그대로 저장하는 대신, 함수나 계산식을 적용한 결과를 인덱스에 저장하는 방식이에요. B-Tree나 Bitmap 인덱스 둘 다 만들 수 있어요. 산술 계산식, SQL 내장 함수, 직접 만든 PL/SQL 함수 등 다양한 표현식을 인덱싱할 수 있고, 쿼리에 해당 함수가 그대로 들어있을 때만 오라클이 이 인덱스를 활용해요.',
-    fbiExamples: [
-      { expr: 'UPPER(last_name)', use: '대소문자 상관없이 이름 검색', sql: "WHERE UPPER(last_name) = 'SMITH'" },
-      { expr: '12 * salary * commission_pct', use: '연간 총수입 조건으로 검색', sql: "WHERE (12 * salary * commission_pct) < 30000" },
-      { expr: 'EXTRACT(YEAR FROM hire_date)', use: '입사 연도로 검색', sql: "WHERE EXTRACT(YEAR FROM hire_date) = 2023" },
+    fbiHeaders: ['표현식', '용도', 'SQL 예시'],
+    fbiRows: [
+      ['UPPER(last_name)', '대소문자 상관없이 이름 검색', "WHERE UPPER(last_name) = 'SMITH'"],
+      ['12 * salary * commission_pct', '연간 총수입 조건으로 검색', 'WHERE (12 * salary * commission_pct) < 30000'],
+      ['EXTRACT(YEAR FROM hire_date)', '입사 연도로 검색', 'WHERE EXTRACT(YEAR FROM hire_date) = 2023'],
     ],
-    reverseTitle: 'Reverse Key Index',
-    reverseDesc:
-      'Reverse Key Index는 컬럼 순서는 그대로 두면서 인덱스 키의 바이트를 거꾸로 뒤집어 저장하는 B-Tree 인덱스예요. 예를 들어 키 값이 20이고 일반 B-Tree에서 헥사로 C1,15라면, Reverse Key Index는 이걸 15,C1로 뒤집어 저장해요.\n\n이 방식은 왜 쓸까요? 1, 2, 3처럼 순서대로 증가하는 기본 키를 계속 삽입하면, 새 데이터가 항상 B-Tree의 가장 오른쪽 블록에만 몰리면서 경합이 심해져요. 바이트를 뒤집으면 삽입 위치가 여러 Leaf 블록에 고루 분산되죠. 단, 범위 검색(Range Scan)은 사용할 수 없어요 — 뒤집어 저장하다 보니 원래의 논리적 순서가 깨지기 때문이에요.',
-    reverseDemo: [
-      { original: 20, hex: 'C1,15', reversed: '15,C1' },
-      { original: 21, hex: 'C1,16', reversed: '16,C1' },
-      { original: 22, hex: 'C1,17', reversed: '17,C1' },
-    ],
-    iotTitle: 'IOT(Index-Organized Table, 인덱스 구조 테이블)',
+
+    iotTitle: 'IOT (Index-Organized Table, 인덱스 구조 테이블)',
     iotWhat:
       'IOT(Index-Organized Table)는 테이블 자체가 B-Tree 인덱스 구조로 저장되는 특별한 테이블이에요. ' +
       '일반 힙(Heap) 테이블은 빈 자리가 있으면 거기에 행을 집어넣지만, IOT는 기본 키(Primary Key) 순서에 맞춰 정렬된 상태로 Leaf 블록에 행을 저장해요. ' +
       'B-Tree의 각 엔트리가 기본 키 컬럼뿐 아니라 나머지 컬럼 값도 함께 담고 있죠. 한마디로, 인덱스가 곧 데이터고 데이터가 곧 인덱스예요.',
-    iotVsHeap: {
-      heap: { label: '힙 테이블', steps: ['Index Leaf에서 ROWID(행 주소) 획득', 'ROWID로 Data Block 접근', '총 2번 I/O(입출력) 발생'] },
-      iot:  { label: 'IOT', steps: ['B-Tree Leaf에 데이터가 바로 저장', '추가 블록 접근 불필요', '총 1번 I/O(입출력)로 끝'] },
-    },
     iotStructTitle: '내부 구조 — Leaf 블록에 뭐가 들어있나요?',
     iotStructDesc:
       'DEPARTMENTS 테이블을 IOT로 만들면 기본 키인 DEPARTMENT_ID 순서대로 Leaf 블록에 저장돼요. ' +
@@ -71,12 +76,21 @@ const T = {
       '가상 컬럼(Virtual Column)을 정의할 수 없어요',
       '테이블 클러스터(Table Cluster)에 포함할 수 없어요',
     ],
+
+    reverseTitle: 'Reverse Key Index',
+    reverseDesc:
+      'Reverse Key Index는 컬럼 순서는 그대로 두면서 인덱스 키의 바이트를 거꾸로 뒤집어 저장하는 B-Tree 인덱스예요. 예를 들어 키 값이 20이고 일반 B-Tree에서 헥사로 C1,15라면, Reverse Key Index는 이걸 15,C1로 뒤집어 저장해요.\n\n이 방식은 왜 쓸까요? 1, 2, 3처럼 순서대로 증가하는 기본 키를 계속 삽입하면, 새 데이터가 항상 B-Tree의 가장 오른쪽 블록에만 몰리면서 경합이 심해져요. 바이트를 뒤집으면 삽입 위치가 여러 Leaf 블록에 고루 분산되죠. 단, 범위 검색(Range Scan)은 사용할 수 없어요 — 뒤집어 저장하다 보니 원래의 논리적 순서가 깨지기 때문이에요.',
+    reverseHeaders: ['원본 키', 'HEX', '역순 저장'],
+    reverseDemoRows: [['20', 'C1,15', '15,C1'], ['21', 'C1,16', '16,C1'], ['22', 'C1,17', '17,C1']],
+
     invisibleTitle: 'Invisible / Unusable Index',
+    invisibleHeaders: ['상태', '설명'],
     invisibleRows: [
-      { state: 'Usable', desc: 'CBO가 활용함 / DML 발생 시 자동으로 인덱스 유지 / 저장 공간 사용', color: 'emerald' },
-      { state: 'Unusable', desc: 'CBO가 무시함 / DML 발생해도 인덱스 유지 안 함 / 공간 차지 안 함 — 대량 데이터 적재 시 성능 향상에 활용', color: 'rose' },
-      { state: 'Invisible', desc: 'CBO가 무시함 / DML 발생 시 인덱스는 계속 유지 / 공간 사용 — 인덱스를 바로 지우기 전에 영향을 미리 테스트할 때 유용', color: 'amber' },
+      ['Usable', 'CBO가 활용함 / DML 발생 시 자동으로 인덱스 유지 / 저장 공간 사용'],
+      ['Unusable', 'CBO가 무시함 / DML 발생해도 인덱스 유지 안 함 / 공간 차지 안 함 — 대량 데이터 적재 시 성능 향상에 활용'],
+      ['Invisible', 'CBO가 무시함 / DML 발생 시 인덱스는 계속 유지 / 공간 사용 — 인덱스를 바로 지우기 전에 영향을 미리 테스트할 때 유용'],
     ],
+
     keyCompressTitle: '인덱스 키 압축 (Key / Prefix Compression)',
     keyCompressDesc: '복합 인덱스에서 앞쪽 컬럼 값이 반복될 때, 그 값을 딱 한 번만 저장하는 방식이에요. Leaf 블록 안에서 같은 선두 값이 계속 나오면 공간 낭비가 심한데, 이 압축 기법을 쓰면 공간을 크게 아끼고 블록 하나에 더 많은 인덱스 항목을 담을 수 있어 I/O 횟수도 줄어들어요.',
     keyCompressHowTitle: '압축 전/후 비교',
@@ -85,42 +99,38 @@ const T = {
     keyCompressAdvancedDesc: '기존 Prefix Compression은 "앞에서 몇 번째 컬럼까지 압축할게"라고 직접 지정해야 했어요. 반면 Advanced Compression은 블록마다 가장 효율적인 압축 방식을 오라클이 알아서 골라줘요. Unique 인덱스든 Non-unique 인덱스든 모두 지원하고, COMPRESS ADVANCED 한 줄만 추가하면 바로 활성화돼요.',
   },
   en: {
+    pageTitle: 'Composite & Special Indexes',
+    pageSubtitle:
+      'Composite indexes, Function-Based Indexes (FBI), Reverse Key, IOT, visibility states, and key compression — learn how to choose the right index type for each situation.',
+
     compositeTitle: 'Composite (Concatenated) Index',
     compositeDesc:
-      'A composite index, also called a concatenated index, is an index on multiple columns in a table. Composite indexes can speed retrieval of data for SELECT statements in which the WHERE clause references all or the leading portion of the columns in the composite index. Therefore, the order of the columns used in the definition is important. In general, the most commonly accessed columns go first.\n\nFrom the Oracle docs: CREATE INDEX employees_ix ON employees (last_name, job_id, salary) — queries that access all three columns, only last_name, or last_name and job_id use this index. Queries that do not access last_name do not use the index.',
+      'A composite index, also called a concatenated index, is an index on multiple columns in a table. Composite indexes can speed retrieval of data for SELECT statements in which the WHERE clause references all or the leading portion of the columns in the composite index. Therefore, the order of the columns used in the definition is important. In general, the most commonly accessed columns go first.',
     orderTitle: 'Column Order Rules',
+    orderIndexExample: 'CREATE INDEX emp_dept_job_ix ON employees (dept_id, job_id)',
     orderRules: [
       { rule: 'Leading column present → Index Range Scan', ok: true, example: 'WHERE dept_id = 60' },
       { rule: 'Leading + additional columns → narrower range', ok: true, example: "WHERE dept_id = 60 AND job_id = 'IT_PROG'" },
       { rule: 'No leading column → Full Table Scan (or Skip Scan)', ok: false, example: "WHERE job_id = 'IT_PROG' (no dept_id)" },
       { rule: 'Non-leading only → Skip Scan (if leading is low-cardinality)', ok: null, example: 'WHERE salary = 9000 (if DEPT_ID is low-cardinality)' },
     ],
+
     fbiTitle: 'Function-Based Index (FBI)',
     fbiDesc:
       'A function-based index computes the value of a function or expression involving one or more columns and stores it in an index. A function-based index can be either a B-tree or a bitmap index. The indexed function can be an arithmetic expression or an expression that contains a SQL function, user-defined PL/SQL function, package function, or C callout. The database uses the function-based index only when the function is included in a query.',
-    fbiExamples: [
-      { expr: 'UPPER(last_name)', use: 'Case-insensitive search', sql: "WHERE UPPER(last_name) = 'SMITH'" },
-      { expr: '12 * salary * commission_pct', use: 'Annual salary predicate', sql: "WHERE (12 * salary * commission_pct) < 30000" },
-      { expr: 'EXTRACT(YEAR FROM hire_date)', use: 'Year-based search', sql: "WHERE EXTRACT(YEAR FROM hire_date) = 2023" },
+    fbiHeaders: ['Expression', 'Use case', 'SQL Example'],
+    fbiRows: [
+      ['UPPER(last_name)', 'Case-insensitive search', "WHERE UPPER(last_name) = 'SMITH'"],
+      ['12 * salary * commission_pct', 'Annual salary predicate', 'WHERE (12 * salary * commission_pct) < 30000'],
+      ['EXTRACT(YEAR FROM hire_date)', 'Year-based search', 'WHERE EXTRACT(YEAR FROM hire_date) = 2023'],
     ],
-    reverseTitle: 'Reverse Key Index',
-    reverseDesc:
-      'A reverse key index is a type of B-tree index that physically reverses the bytes of each index key while keeping the column order. For example, if the index key is 20, and the two bytes stored in hex are C1,15 in a standard B-tree index, a reverse key index stores them as 15,C1.\n\nReversing the key solves the problem of contention for leaf blocks in the right side of a B-tree index — sequentially increasing values (1, 2, 3...) always insert into the rightmost block. Reversal distributes inserts across all leaf keys in the index. Trade-off: because the data is not sorted by column key when stored, reverse key indexes eliminate the ability to run an index range scan.',
-    reverseDemo: [
-      { original: 20, hex: 'C1,15', reversed: '15,C1' },
-      { original: 21, hex: 'C1,16', reversed: '16,C1' },
-      { original: 22, hex: 'C1,17', reversed: '17,C1' },
-    ],
+
     iotTitle: 'Index-Organized Table (IOT)',
     iotWhat:
       'An index-organized table (IOT) is a table stored in a variation of a B-tree index structure. ' +
       'In a heap-organized table, rows are inserted wherever they fit. ' +
       'In an IOT, rows are stored in a B-tree index ordered by the primary key — each leaf entry holds both the key columns and the non-key column values. ' +
       'The index is the data, and the data is the index.',
-    iotVsHeap: {
-      heap: { label: 'Heap Table', steps: ['Index Leaf → ROWID', 'Fetch Data Block by ROWID', 'Total: 2 I/Os'] },
-      iot:  { label: 'IOT', steps: ['Data in B-Tree Leaf directly', 'No extra block fetch needed', 'Total: 1 I/O'] },
-    },
     iotStructTitle: 'Internal Structure — What is inside a Leaf block?',
     iotStructDesc:
       'When DEPARTMENTS is created as an IOT, rows are stored in leaf blocks ordered by DEPARTMENT_ID. ' +
@@ -150,12 +160,21 @@ const T = {
       'Virtual columns cannot be defined',
       'Cannot be part of a table cluster',
     ],
+
+    reverseTitle: 'Reverse Key Index',
+    reverseDesc:
+      'A reverse key index is a type of B-tree index that physically reverses the bytes of each index key while keeping the column order. For example, if the index key is 20, and the two bytes stored in hex are C1,15 in a standard B-tree index, a reverse key index stores them as 15,C1.\n\nReversing the key solves the problem of contention for leaf blocks in the right side of a B-tree index — sequentially increasing values (1, 2, 3...) always insert into the rightmost block. Reversal distributes inserts across all leaf keys in the index. Trade-off: because the data is not sorted by column key when stored, reverse key indexes eliminate the ability to run an index range scan.',
+    reverseHeaders: ['Original Key', 'HEX', 'Reversed'],
+    reverseDemoRows: [['20', 'C1,15', '15,C1'], ['21', 'C1,16', '16,C1'], ['22', 'C1,17', '17,C1']],
+
     invisibleTitle: 'Invisible / Unusable Index',
+    invisibleHeaders: ['State', 'Description'],
     invisibleRows: [
-      { state: 'Usable', desc: 'Used by CBO / maintained on DML / consumes space', color: 'emerald' },
-      { state: 'Unusable', desc: 'Ignored by CBO / NOT maintained on DML / no space — use for bulk loads', color: 'rose' },
-      { state: 'Invisible', desc: 'Ignored by CBO / maintained on DML / consumes space — use to test before dropping', color: 'amber' },
+      ['Usable', 'Used by CBO / maintained on DML / consumes space'],
+      ['Unusable', 'Ignored by CBO / NOT maintained on DML / no space — use for bulk loads'],
+      ['Invisible', 'Ignored by CBO / maintained on DML / consumes space — use to test before dropping'],
     ],
+
     keyCompressTitle: 'Index Key Compression (Prefix Compression)',
     keyCompressDesc: 'Stores repeated leading column values only once per group in a Leaf block. When many index entries share the same leading value(s), key compression reduces space significantly and packs more entries per block — improving I/O efficiency.',
     keyCompressHowTitle: 'Before vs After compression',
@@ -171,235 +190,151 @@ export function CompositeSection() {
   const t = T[lang]
 
   return (
-    <div className="mx-auto max-w-6xl space-y-8 px-8 py-8">
+    <PageContainer>
+      <ChapterTitle
+        icon={<IconLayersLinked size={36} stroke={1.5} className="text-violet-500" />}
+        title={t.pageTitle}
+        subtitle={t.pageSubtitle}
+      />
 
-      {/* Composite index */}
-      <section>
-        <h2 className="mb-1 text-lg font-bold">{t.compositeTitle}</h2>
-        <p className="mb-5 max-w-3xl text-sm leading-relaxed text-muted-foreground">{t.compositeDesc}</p>
+      {/* ── Composite Index ── */}
+      <SectionTitle>{t.compositeTitle}</SectionTitle>
+      <Prose>{t.compositeDesc}</Prose>
 
-        {/* Column order rules */}
-        <h3 className="mb-3 text-sm font-bold uppercase tracking-widest text-muted-foreground">{t.orderTitle}</h3>
-        <div className="mb-6 overflow-hidden rounded-xl border">
-          {t.orderRules.map((r, i) => (
-            <div key={i} className={cn('flex items-start gap-3 border-b px-4 py-3 last:border-b-0', i % 2 === 1 ? 'bg-muted/20' : '')}>
-              <span className={cn('mt-0.5 shrink-0 text-sm',
-                r.ok === true ? 'text-emerald-500' : r.ok === false ? 'text-rose-500' : 'text-amber-500'
-              )}>
-                {r.ok === true ? '✓' : r.ok === false ? '✗' : '△'}
-              </span>
-              <div>
-                <div className="text-xs font-semibold">{r.rule}</div>
-                <div className="mt-0.5 font-mono text-[10px] text-muted-foreground">{r.example}</div>
-              </div>
+      <SubTitle>{t.orderTitle}</SubTitle>
+      <div className="mb-4">
+        <SqlBlock sql={t.orderIndexExample} />
+      </div>
+      <div className="mb-6 overflow-hidden rounded-xl border">
+        {t.orderRules.map((r, i) => (
+          <div key={i} className={cn('flex items-start gap-3 border-b px-4 py-3 last:border-b-0', i % 2 === 1 ? 'bg-muted/20' : '')}>
+            <span className={cn('mt-0.5 shrink-0 text-sm font-bold',
+              r.ok === true ? 'text-emerald-500' : r.ok === false ? 'text-rose-500' : 'text-amber-500'
+            )}>
+              {r.ok === true ? '✓' : r.ok === false ? '✗' : '△'}
+            </span>
+            <div>
+              <div className="text-xs font-semibold">{r.rule}</div>
+              <div className="mt-0.5 font-mono text-[10px] text-muted-foreground">{r.example}</div>
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
+      </div>
 
-        {/* Index on (DEPT_ID, JOB_ID) visual */}
-        <CompositeIndexVisual />
-      </section>
 
-      {/* FBI */}
-      <section>
-        <h3 className="mb-1 text-sm font-bold">{t.fbiTitle}</h3>
-        <p className="mb-4 max-w-3xl text-sm leading-relaxed text-muted-foreground">{t.fbiDesc}</p>
-        <div className="space-y-3">
-          {t.fbiExamples.map((ex, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, x: -8 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: i * 0.1 }}
-              className="grid grid-cols-[1fr_1fr_1.5fr] gap-4 rounded-xl border bg-card px-5 py-4"
-            >
-              <div>
-                <div className="mb-0.5 font-mono text-[10px] text-muted-foreground">{lang === 'ko' ? '표현식' : 'Expression'}</div>
-                <div className="font-mono text-xs font-bold text-orange-700">{ex.expr}</div>
-              </div>
-              <div>
-                <div className="mb-0.5 font-mono text-[10px] text-muted-foreground">{lang === 'ko' ? '용도' : 'Use case'}</div>
-                <div className="text-xs">{ex.use}</div>
-              </div>
-              <div>
-                <div className="mb-0.5 font-mono text-[10px] text-muted-foreground">SQL</div>
-                <div className="font-mono text-[10px] text-foreground/80">{ex.sql}</div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </section>
+      <Divider />
+
+      {/* ── FBI ── */}
+      <SectionTitle>{t.fbiTitle}</SectionTitle>
+      <Prose>{t.fbiDesc}</Prose>
+      <Table headers={t.fbiHeaders} rows={t.fbiRows} />
+
+      <Divider />
 
       {/* ── IOT ── */}
-      <section>
-        <h3 className="mb-1 text-sm font-bold">{t.iotTitle}</h3>
-        <p className="mb-4 text-sm leading-relaxed text-muted-foreground">{t.iotWhat}</p>
+      <SectionTitle>{t.iotTitle}</SectionTitle>
+      <Prose>{t.iotWhat}</Prose>
 
-        {/* Heap vs IOT I/O 비교 카드 */}
-        <div className="mb-5 grid grid-cols-2 gap-3 sm:max-w-sm">
-          {(['heap', 'iot'] as const).map((k) => {
-            const side = t.iotVsHeap[k]
-            return (
-              <div key={k} className={cn('rounded-xl border p-4',
-                k === 'iot' ? 'border-emerald-200 bg-emerald-50/60' : 'border-border bg-muted/20'
-              )}>
-                <div className={cn('mb-2 font-mono text-xs font-bold', k === 'iot' ? 'text-emerald-700' : 'text-foreground')}>
-                  {side.label}
-                </div>
-                <ul className="space-y-1">
-                  {side.steps.map((s, i) => (
-                    <li key={i} className={cn('text-[11px]', i === 2 ? 'font-bold' : 'text-muted-foreground')}>{s}</li>
-                  ))}
-                </ul>
-              </div>
-            )
-          })}
-        </div>
+      <SubTitle>{t.iotStructTitle}</SubTitle>
+      <Prose>{t.iotStructDesc}</Prose>
+      <IotStorageVisual lang={lang} />
 
-        {/* Leaf 블록 구조 시각화 */}
-        <h3 className="mb-1 text-sm font-bold uppercase tracking-widest text-muted-foreground">{t.iotStructTitle}</h3>
-        <p className="mb-3 text-sm leading-relaxed text-muted-foreground">{t.iotStructDesc}</p>
-        <IotStorageVisual lang={lang} />
-
-        {/* Overflow + Secondary Index */}
-        <div className="mt-5 grid gap-4 md:grid-cols-2">
-          <div className="rounded-xl border bg-card p-5">
-            <div className="mb-2 font-mono text-xs font-bold text-amber-700">{t.iotOverflowTitle}</div>
-            <p className="mb-3 text-[11px] leading-relaxed text-muted-foreground">{t.iotOverflowDesc}</p>
-            <div className="rounded-lg bg-muted/40 p-3 font-mono text-[10px] leading-relaxed whitespace-pre text-foreground">
-              {`CREATE TABLE orders_iot (\n  order_id     NUMBER PRIMARY KEY,\n  customer_id  NUMBER,\n  order_date   DATE,\n  description  VARCHAR2(2000)  -- 큰 컬럼\n)\nORGANIZATION INDEX\nPCTTHRESHOLD 20\nOVERFLOW SEGMENT IN overflow_ts;`}
-            </div>
-          </div>
-
-          <div className="rounded-xl border bg-card p-5">
-            <div className="mb-2 font-mono text-xs font-bold text-blue-700">{t.iotSecondaryTitle}</div>
-            <p className="mb-3 text-[11px] leading-relaxed text-muted-foreground">{t.iotSecondaryDesc}</p>
-            <div className="rounded-lg bg-muted/40 p-3 font-mono text-[10px] leading-relaxed whitespace-pre text-foreground">
-              {`-- IOT 생성\nCREATE TABLE employees_iot (\n  employee_id   NUMBER PRIMARY KEY,\n  last_name     VARCHAR2(50),\n  department_id NUMBER\n)\nORGANIZATION INDEX;\n\n-- 보조 인덱스 생성\nCREATE INDEX emp_dept_idx\n  ON employees_iot(department_id);`}
-            </div>
+      <div className="mt-5 grid gap-4 md:grid-cols-2">
+        <div className="rounded-xl border bg-card p-5">
+          <div className="mb-2 font-mono text-xs font-bold text-amber-700">{t.iotOverflowTitle}</div>
+          <p className="mb-3 text-[11px] leading-relaxed text-muted-foreground">{t.iotOverflowDesc}</p>
+          <div className="rounded-lg bg-muted/40 p-3 font-mono text-[10px] leading-relaxed whitespace-pre text-foreground">
+            {`CREATE TABLE orders_iot (\n  order_id     NUMBER PRIMARY KEY,\n  customer_id  NUMBER,\n  order_date   DATE,\n  description  VARCHAR2(2000)  -- 큰 컬럼\n)\nORGANIZATION INDEX\nPCTTHRESHOLD 20\nOVERFLOW SEGMENT IN overflow_ts;`}
           </div>
         </div>
 
-        {/* When / Limits */}
-        <div className="mt-4 grid gap-4 md:grid-cols-2">
-          <InfoBox variant="tip" title={t.iotWhenTitle}>
-            <ul className="mt-1 space-y-1">
-              {t.iotWhenItems.map((item, i) => (
-                <li key={i} className="flex items-start gap-2 text-[11px]">
-                  <span className="mt-0.5 shrink-0 font-mono text-rose-400">▸</span>{item}
-                </li>
-              ))}
-            </ul>
-          </InfoBox>
-          <InfoBox variant="warning" title={t.iotLimitTitle}>
-            <ul className="mt-1 space-y-1">
-              {t.iotLimitItems.map((item, i) => (
-                <li key={i} className="flex items-start gap-2 text-[11px]">
-                  <span className="mt-0.5 shrink-0 font-mono text-blue-400">▸</span>{item}
-                </li>
-              ))}
-            </ul>
-          </InfoBox>
+        <div className="rounded-xl border bg-card p-5">
+          <div className="mb-2 font-mono text-xs font-bold text-blue-700">{t.iotSecondaryTitle}</div>
+          <p className="mb-3 text-[11px] leading-relaxed text-muted-foreground">{t.iotSecondaryDesc}</p>
+          <div className="rounded-lg bg-muted/40 p-3 font-mono text-[10px] leading-relaxed whitespace-pre text-foreground">
+            {`-- IOT 생성\nCREATE TABLE employees_iot (\n  employee_id   NUMBER PRIMARY KEY,\n  last_name     VARCHAR2(50),\n  department_id NUMBER\n)\nORGANIZATION INDEX;\n\n-- 보조 인덱스 생성\nCREATE INDEX emp_dept_idx\n  ON employees_iot(department_id);`}
+          </div>
         </div>
-      </section>
+      </div>
+
+      <div className="mt-4 grid gap-4 md:grid-cols-2">
+        <InfoBox variant="tip" title={t.iotWhenTitle}>
+          <ul className="mt-1 space-y-1">
+            {t.iotWhenItems.map((item, i) => (
+              <li key={i} className="flex items-start gap-2 text-[11px]">
+                <span className="mt-0.5 shrink-0 font-mono text-rose-400">▸</span>{item}
+              </li>
+            ))}
+          </ul>
+        </InfoBox>
+        <InfoBox variant="warning" title={t.iotLimitTitle}>
+          <ul className="mt-1 space-y-1">
+            {t.iotLimitItems.map((item, i) => (
+              <li key={i} className="flex items-start gap-2 text-[11px]">
+                <span className="mt-0.5 shrink-0 font-mono text-blue-400">▸</span>{item}
+              </li>
+            ))}
+          </ul>
+        </InfoBox>
+      </div>
 
       <Divider />
 
       {/* ── Reverse Key ── */}
-      <section>
-        <h3 className="mb-1 text-sm font-bold">{t.reverseTitle}</h3>
-        <p className="mb-4 max-w-3xl text-sm leading-relaxed text-muted-foreground">{t.reverseDesc}</p>
-        <div className="overflow-hidden rounded-xl border sm:max-w-xs">
-          <div className="grid grid-cols-3 divide-x border-b bg-muted/40 font-mono text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-            <div className="px-3 py-2">{lang === 'ko' ? '원본 키' : 'Original Key'}</div>
-            <div className="px-3 py-2">HEX</div>
-            <div className="px-3 py-2">{lang === 'ko' ? '역순 저장' : 'Reversed'}</div>
-          </div>
-          {t.reverseDemo.map((r, i) => (
-            <div key={i} className={cn('grid grid-cols-3 divide-x font-mono text-xs', i % 2 === 1 ? 'bg-muted/20' : '')}>
-              <div className="px-3 py-2 font-bold">{r.original}</div>
-              <div className="px-3 py-2 text-muted-foreground">{r.hex}</div>
-              <div className="px-3 py-2 font-bold text-rose-700">{r.reversed}</div>
-            </div>
-          ))}
-        </div>
-      </section>
+      <SectionTitle>{t.reverseTitle}</SectionTitle>
+      <Prose>{t.reverseDesc}</Prose>
+      <div className="mb-2 sm:max-w-xs">
+        <Table headers={t.reverseHeaders} rows={t.reverseDemoRows} />
+      </div>
 
       <Divider />
 
-      {/* Invisible / Unusable */}
-      <section className="pb-4">
-        <h3 className="mb-3 text-sm font-bold uppercase tracking-widest text-muted-foreground">{t.invisibleTitle}</h3>
-        <div className="grid gap-3 md:grid-cols-3">
-          {t.invisibleRows.map((r, i) => {
-            const c = r.color === 'emerald'
-              ? 'border-emerald-200 bg-emerald-50/60'
-              : r.color === 'rose'
-              ? 'border-rose-200 bg-rose-50/60'
-              : 'border-amber-200 bg-amber-50/60'
-            const tc = r.color === 'emerald' ? 'text-emerald-700'
-              : r.color === 'rose' ? 'text-rose-700' : 'text-amber-700'
-            return (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1 }}
-                className={cn('rounded-xl border p-4', c)}
-              >
-                <div className={cn('mb-1.5 font-mono text-xs font-bold', tc)}>{r.state}</div>
-                <p className="text-[11px] leading-snug text-muted-foreground">{r.desc}</p>
-              </motion.div>
-            )
-          })}
-        </div>
-      </section>
+      {/* ── Invisible / Unusable ── */}
+      <SectionTitle>{t.invisibleTitle}</SectionTitle>
+      <Table headers={t.invisibleHeaders} rows={t.invisibleRows} />
 
       <Divider />
 
-      {/* Key Compression */}
-      <section>
-        <h2 className="mb-1 text-lg font-bold">{t.keyCompressTitle}</h2>
-        <p className="mb-5 max-w-3xl text-sm leading-relaxed text-muted-foreground">{t.keyCompressDesc}</p>
+      {/* ── Key Compression ── */}
+      <SectionTitle>{t.keyCompressTitle}</SectionTitle>
+      <Prose>{t.keyCompressDesc}</Prose>
 
-        <h3 className="mb-3 text-sm font-bold uppercase tracking-widest text-muted-foreground">{t.keyCompressHowTitle}</h3>
-        <KeyCompressionVisual lang={lang} />
+      <SubTitle>{t.keyCompressHowTitle}</SubTitle>
+      <KeyCompressionVisual lang={lang} />
 
-        <div className="mt-4">
-          <InfoBox variant="note">{t.keyCompressNote}</InfoBox>
+      <div className="mt-4">
+        <InfoBox variant="note">{t.keyCompressNote}</InfoBox>
+      </div>
+
+      <div className="mt-8">
+        <SubTitle>{t.keyCompressAdvancedTitle}</SubTitle>
+        <Prose>{t.keyCompressAdvancedDesc}</Prose>
+        <div className="grid gap-3 md:grid-cols-2">
+          <SqlBlock
+            badge="Prefix Compression"
+            badgeColor="violet"
+            desc={lang === 'ko'
+              ? '앞에서 몇 번째 컬럼까지 압축 키로 쓸지 직접 지정해요. COMPRESS만 쓰면 기본값(비고유 컬럼 전체)이 적용돼요.'
+              : 'Specify N leading columns as the prefix key. COMPRESS alone uses the default (all non-unique columns).'}
+            sql={`-- 기본값: 모든 선두 컬럼 압축\nCREATE INDEX ord_mode_stat_ix\n  ON orders(order_mode, order_status)\n  COMPRESS;\n\n-- 첫 번째 컬럼만 압축\nCREATE INDEX ord_mode_stat_ix\n  ON orders(order_mode, order_status)\n  COMPRESS 1;`}
+          />
+          <SqlBlock
+            badge="Advanced Compression"
+            badgeColor="blue"
+            desc={lang === 'ko'
+              ? '오라클이 블록마다 가장 좋은 압축 방식을 알아서 골라줘요. Unique 인덱스에도 쓸 수 있어요.'
+              : 'Oracle selects optimal compression per block automatically. Works on unique indexes too.'}
+            sql={`-- Advanced High (Oracle 12.2+, 기본값)\nCREATE INDEX hr_emp_mgr_dept_ix\n  ON hr.employees(manager_id, department_id)\n  COMPRESS ADVANCED;\n\n-- 압축 상태 확인\nSELECT compression\nFROM   dba_indexes\nWHERE  index_name = 'HR_EMP_MGR_DEPT_IX';\n-- Result: ADVANCED HIGH`}
+          />
         </div>
-
-        <div className="mt-6">
-          <h3 className="mb-1 text-sm font-bold">{t.keyCompressAdvancedTitle}</h3>
-          <p className="mb-4 text-sm leading-relaxed text-muted-foreground">{t.keyCompressAdvancedDesc}</p>
-          <div className="grid gap-3 md:grid-cols-2">
-            <SqlBlock
-              badge={lang === 'ko' ? 'Prefix Compression' : 'Prefix Compression'}
-              badgeColor="violet"
-              desc={lang === 'ko'
-                ? '앞에서 몇 번째 컬럼까지 압축 키로 쓸지 직접 지정해요. COMPRESS만 쓰면 기본값(비고유 컬럼 전체)이 적용돼요.'
-                : 'Specify N leading columns as the prefix key. COMPRESS alone uses the default (all non-unique columns).'}
-              sql={`-- 기본값: 모든 선두 컬럼 압축\nCREATE INDEX ord_mode_stat_ix\n  ON orders(order_mode, order_status)\n  COMPRESS;\n\n-- 첫 번째 컬럼만 압축\nCREATE INDEX ord_mode_stat_ix\n  ON orders(order_mode, order_status)\n  COMPRESS 1;`}
-            />
-            <SqlBlock
-              badge={lang === 'ko' ? 'Advanced Compression' : 'Advanced Compression'}
-              badgeColor="blue"
-              desc={lang === 'ko'
-                ? '오라클이 블록마다 가장 좋은 압축 방식을 알아서 골라줘요. Unique 인덱스에도 쓸 수 있어요.'
-                : 'Oracle selects optimal compression per block automatically. Works on unique indexes too.'}
-              sql={`-- Advanced High (Oracle 12.2+, 기본값)\nCREATE INDEX hr_emp_mgr_dept_ix\n  ON hr.employees(manager_id, department_id)\n  COMPRESS ADVANCED;\n\n-- 압축 상태 확인\nSELECT compression\nFROM   dba_indexes\nWHERE  index_name = 'HR_EMP_MGR_DEPT_IX';\n-- Result: ADVANCED HIGH`}
-            />
-          </div>
-        </div>
-      </section>
-    </div>
+      </div>
+    </PageContainer>
   )
 }
 
 // ── Key Compression Visual ────────────────────────────────────────────────────
 
 function KeyCompressionVisual({ lang }: { lang: 'ko' | 'en' }) {
-  // Uncompressed leaf block entries: (order_mode, order_status, rowid)
   const uncompressed = [
     { mode: 'online', status: '0', rowid: 'AAAPvCAAFAAAAFaAAa' },
     { mode: 'online', status: '0', rowid: 'AAAPvCAAFAAAAFaAAg' },
@@ -410,7 +345,6 @@ function KeyCompressionVisual({ lang }: { lang: 'ko' | 'en' }) {
     { mode: 'direct', status: '1', rowid: 'AAAPvCAAFAAAAFaAAv' },
   ]
 
-  // Groups for compressed view
   const compressedGroups = [
     {
       prefix: 'online, 0',
@@ -442,20 +376,17 @@ function KeyCompressionVisual({ lang }: { lang: 'ko' | 'en' }) {
   }
 
   const rowColors = [
-    'bg-blue-50',   // online,0
-    'bg-blue-50',
-    'bg-blue-50',
-    'bg-violet-50', // online,2
-    'bg-violet-50',
-    'bg-orange-50', // direct,0
-    'bg-rose-50',   // direct,1
+    'bg-blue-50', 'bg-blue-50', 'bg-blue-50',
+    'bg-violet-50', 'bg-violet-50',
+    'bg-orange-50',
+    'bg-rose-50',
   ]
 
   return (
     <div className="grid gap-6 md:grid-cols-2">
       {/* Left: Uncompressed */}
-      <div className="rounded-xl border overflow-hidden">
-        <div className="bg-muted/40 border-b px-4 py-2 flex items-center gap-2">
+      <div className="overflow-hidden rounded-xl border">
+        <div className="flex items-center gap-2 border-b bg-muted/40 px-4 py-2">
           <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
             {lang === 'ko' ? '압축 전 (Leaf Block)' : 'Before Compression (Leaf Block)'}
           </span>
@@ -463,7 +394,6 @@ function KeyCompressionVisual({ lang }: { lang: 'ko' | 'en' }) {
             7 × (mode + status + rowid)
           </span>
         </div>
-        {/* header row */}
         <div className="grid grid-cols-[72px_56px_1fr] divide-x border-b bg-muted/20 font-mono text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">
           <div className="px-3 py-1.5">order_mode</div>
           <div className="px-3 py-1.5">status</div>
@@ -487,8 +417,8 @@ function KeyCompressionVisual({ lang }: { lang: 'ko' | 'en' }) {
       </div>
 
       {/* Right: Compressed */}
-      <div className="rounded-xl border overflow-hidden">
-        <div className="bg-muted/40 border-b px-4 py-2 flex items-center gap-2">
+      <div className="overflow-hidden rounded-xl border">
+        <div className="flex items-center gap-2 border-b bg-muted/40 px-4 py-2">
           <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
             {lang === 'ko' ? '압축 후 (Leaf Block)' : 'After Compression (Leaf Block)'}
           </span>
@@ -501,7 +431,6 @@ function KeyCompressionVisual({ lang }: { lang: 'ko' | 'en' }) {
             const c = colorMap[grp.color]
             return (
               <div key={gi} className={cn('px-3 py-2', c.bg)}>
-                {/* Prefix row */}
                 <div className={cn('mb-1.5 flex items-center gap-2 rounded px-2 py-1 border', c.border)}>
                   <span className={cn('font-mono text-[9px] font-bold uppercase tracking-wider', c.text)}>
                     {lang === 'ko' ? '공통 접두사' : 'prefix'}
@@ -510,7 +439,6 @@ function KeyCompressionVisual({ lang }: { lang: 'ko' | 'en' }) {
                     {grp.prefix}
                   </span>
                 </div>
-                {/* ROWID entries */}
                 <div className="space-y-0.5 pl-4">
                   {grp.rowids.map((rid, ri) => (
                     <div key={ri} className="flex items-center gap-2">
@@ -537,10 +465,10 @@ function KeyCompressionVisual({ lang }: { lang: 'ko' | 'en' }) {
 
 function IotStorageVisual({ lang }: { lang: 'ko' | 'en' }) {
   const heapRows = [
-    { id: 20, name: 'Marketing',   mgr: 201, loc: 1800, block: 1, color: 'bg-blue-50' },
-    { id: 50, name: 'Shipping',    mgr: 121, loc: 1500, block: 1, color: 'bg-blue-50' },
-    { id: 30, name: 'Purchasing',  mgr: 114, loc: 1700, block: 2, color: 'bg-violet-50' },
-    { id: 60, name: 'IT',          mgr: 103, loc: 1400, block: 2, color: 'bg-violet-50' },
+    { id: 20, name: 'Marketing',   mgr: 201, loc: 1800, color: 'bg-blue-50' },
+    { id: 50, name: 'Shipping',    mgr: 121, loc: 1500, color: 'bg-blue-50' },
+    { id: 30, name: 'Purchasing',  mgr: 114, loc: 1700, color: 'bg-violet-50' },
+    { id: 60, name: 'IT',          mgr: 103, loc: 1400, color: 'bg-violet-50' },
   ]
 
   const iotLeaves = [
@@ -633,63 +561,6 @@ function IotStorageVisual({ lang }: { lang: 'ko' | 'en' }) {
             : 'To read in PK order: Block1 → Block2 (sequential I/O) · no separate PK index needed'}
         </div>
       </div>
-    </div>
-  )
-}
-
-// ── Composite Index Visual ─────────────────────────────────────────────────────
-
-function CompositeIndexVisual() {
-  const lang = useSimulationStore((s) => s.lang)
-  const entries = [
-    { dept: 10, job: 'AD_ASST', rowid: 'AAA001' },
-    { dept: 20, job: 'MK_MAN',  rowid: 'AAA002' },
-    { dept: 50, job: 'ST_MAN',  rowid: 'AAA003' },
-    { dept: 50, job: 'ST_CLERK',rowid: 'AAA004' },
-    { dept: 60, job: 'IT_PROG', rowid: 'AAA005' },
-    { dept: 60, job: 'IT_PROG', rowid: 'AAA006' },
-    { dept: 80, job: 'SA_MAN',  rowid: 'AAA007' },
-    { dept: 90, job: 'AD_PRES', rowid: 'AAA008' },
-  ]
-
-  const [hovered, setHovered] = useState<number | null>(null)
-
-  return (
-    <div className="rounded-xl border bg-muted/20 p-5">
-      <div className="mb-3 font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-        IDX_EMP_DEPT_JOB — (DEPARTMENT_ID, JOB_ID)
-      </div>
-      <div className="mb-2 grid grid-cols-[80px_100px_80px] gap-2 font-mono text-[10px] font-semibold text-muted-foreground border-b pb-2">
-        <span>DEPT_ID</span>
-        <span>JOB_ID</span>
-        <span>ROWID</span>
-      </div>
-      <div className="space-y-1">
-        {entries.map((e, i) => {
-          const leading = hovered !== null && entries[hovered].dept === e.dept
-          const full    = hovered !== null && entries[hovered].dept === e.dept && entries[hovered].job === e.job
-          return (
-            <motion.div
-              key={i}
-              onMouseEnter={() => setHovered(i)}
-              onMouseLeave={() => setHovered(null)}
-              animate={{
-                backgroundColor: full ? '#bbf7d0' : leading ? '#dbeafe' : 'transparent',
-              }}
-              className="grid cursor-pointer grid-cols-[80px_100px_80px] gap-2 rounded-lg px-2 py-1"
-            >
-              <span className="font-mono text-[11px] font-bold">{e.dept}</span>
-              <span className="font-mono text-[11px]">{e.job}</span>
-              <span className="font-mono text-[10px] text-muted-foreground">{e.rowid}</span>
-            </motion.div>
-          )
-        })}
-      </div>
-      <p className="mt-3 text-[10px] text-muted-foreground">
-        {lang === 'ko'
-          ? '파란색 = DEPT_ID만 일치 (Range Scan으로 검색 가능) · 초록색 = (DEPT_ID, JOB_ID) 둘 다 일치'
-          : 'Blue = DEPT_ID match only (Range Scan) · Green = full (DEPT_ID, JOB_ID) match'}
-      </p>
     </div>
   )
 }

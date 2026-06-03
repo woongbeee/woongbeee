@@ -4,6 +4,7 @@ import { JoinOverviewSection } from './overview/OverviewSection'
 import { JoinNestedLoopSection } from './nested-loop/NestedLoopSection'
 import { JoinHashSection } from './hash/HashJoinSection'
 import { JoinSortMergeSection } from './sort-merge/SortMergeSection'
+import { JoinSemiSection } from './semi/SemiJoinSection'
 import { JoinSimulatorSection } from './simulator/JoinSimulatorSection'
 
 export function JoinPage({ sectionId }: { sectionId: string }) {
@@ -13,6 +14,7 @@ export function JoinPage({ sectionId }: { sectionId: string }) {
   if (sectionId === 'join-nested-loop') return <JoinNestedLoopSection />
   if (sectionId === 'join-hash')        return <JoinHashSection />
   if (sectionId === 'join-sort-merge')  return <JoinSortMergeSection />
+  if (sectionId === 'join-semi')        return <JoinSemiSection />
   if (sectionId === 'join-simulator')   return <JoinSimulatorSection />
 
   return (

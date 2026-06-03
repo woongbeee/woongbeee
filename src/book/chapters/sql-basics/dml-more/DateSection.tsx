@@ -56,11 +56,11 @@ const FUNC_ITEMS: FuncItem[] = [
     name: 'SYSDATE',
     signature: 'SYSDATE',
     desc: {
-      ko: 'DB 서버의 현재 날짜와 시간을 반환합니다. 인자가 없으며, FROM DUAL과 함께 자주 사용됩니다. 시·분·초까지 포함된 DATE 타입을 반환합니다. 타임존 정보는 포함되지 않습니다.',
+      ko: 'DB 서버의 현재 날짜와 시간을 반환해요. 인자가 없으며 FROM DUAL과 함께 자주 사용돼요. 시·분·초까지 포함된 DATE 타입을 반환하고, 타임존 정보는 포함되지 않아요.',
       en: 'Returns the current date and time of the DB server. Takes no arguments and is commonly used with FROM DUAL. Returns a DATE type including hours, minutes, and seconds — without timezone information.',
     },
     dualInfo: {
-      ko: 'DUAL은 Oracle이 제공하는 특수한 1행 1열 더미 테이블입니다. 테이블 없이 함수나 표현식의 결과만 조회할 때 FROM DUAL을 사용합니다. SELECT SYSDATE FROM DUAL 처럼 실제 테이블 없이도 SQL 문법을 유지할 수 있습니다.',
+      ko: 'DUAL은 Oracle이 제공하는 특수한 1행 1열 더미 테이블이에요. 테이블 없이 함수나 표현식의 결과만 조회할 때 FROM DUAL을 사용해요. SELECT SYSDATE FROM DUAL처럼 실제 테이블 없이도 SQL 문법을 유지할 수 있어요.',
       en: 'DUAL is a special one-row, one-column dummy table provided by Oracle. Use FROM DUAL when you only need to evaluate a function or expression without querying a real table — e.g., SELECT SYSDATE FROM DUAL.',
     },
     nlsNote: {
@@ -116,7 +116,7 @@ const FUNC_ITEMS: FuncItem[] = [
       ],
     },
     note: {
-      ko: 'DATE - DATE 연산은 일(day) 단위 NUMBER를 반환합니다. 두 날짜 사이의 시간 차이를 구할 때 (date1 - date2) * 24 로 시간을, * 1440 으로 분을 얻을 수 있습니다.',
+      ko: 'DATE - DATE 연산은 일(day) 단위 NUMBER를 반환해요. 두 날짜 사이의 시간 차이를 구할 때 (date1 - date2) * 24로 시간을, * 1440으로 분을 얻을 수 있어요.',
       en: 'DATE - DATE returns a NUMBER in days. Multiply by 24 for hours, 1440 for minutes, or 86400 for seconds.',
     },
   },
@@ -128,7 +128,7 @@ const FUNC_ITEMS: FuncItem[] = [
       en: "A timezone is a region of the globe that observes the same standard time. Because the same moment corresponds to different local times in different places, international systems attach timezone information to timestamps so everyone agrees on when something happened.\n\nTimezones are expressed in two ways:\n\n① Fixed offset: '+09:00', '-05:00' — the numeric difference from UTC (Coordinated Universal Time).\n② Region name (IANA database): 'Asia/Seoul', 'America/New_York', 'Europe/London', 'UTC'. This form automatically handles Daylight Saving Time (DST) transitions.\n\nQuery the full list of timezones Oracle supports: SELECT * FROM V$TIMEZONE_NAMES.",
     },
     desc: {
-      ko: 'DB 서버의 현재 날짜·시간·소수점 이하 초(fractional seconds)와 타임존 오프셋을 포함한 TIMESTAMP WITH TIME ZONE 타입을 반환합니다. SYSDATE보다 정밀한 시각이 필요하거나, 타임존 정보가 필요한 경우에 사용합니다.',
+      ko: 'DB 서버의 현재 날짜·시간·소수점 이하 초(Fractional Seconds)와 타임존 오프셋을 포함한 TIMESTAMP WITH TIME ZONE 타입을 반환해요. SYSDATE보다 정밀한 시각이 필요하거나 타임존 정보가 필요할 때 사용해요.',
       en: 'Returns the current date, time, fractional seconds, and timezone offset as TIMESTAMP WITH TIME ZONE. Use when you need sub-second precision or timezone-aware timestamps — more precise than SYSDATE.',
     },
     example:
@@ -201,7 +201,7 @@ const FUNC_ITEMS: FuncItem[] = [
     },
     tzConvert: {
       desc: {
-        ko: 'Oracle은 세 가지 방법으로 타임존을 변환합니다. AT TIME ZONE은 기존 TIMESTAMP를 다른 시간대로 변환합니다. FROM_TZ는 타임존 정보가 없는 TIMESTAMP에 타임존을 붙입니다. SYS_EXTRACT_UTC는 어떤 타임존이든 UTC(협정 세계시)로 통일해 비교할 때 씁니다.',
+        ko: 'Oracle은 세 가지 방법으로 타임존을 변환해요. AT TIME ZONE은 기존 TIMESTAMP를 다른 시간대로 변환해요. FROM_TZ는 타임존 정보가 없는 TIMESTAMP에 타임존을 붙여요. SYS_EXTRACT_UTC는 어떤 타임존이든 UTC(협정 세계시)로 통일해서 비교할 때 써요.',
         en: 'Oracle provides three main timezone tools. AT TIME ZONE converts an existing TIMESTAMP to a different timezone. FROM_TZ attaches a timezone to a plain TIMESTAMP. SYS_EXTRACT_UTC normalizes any timestamp to UTC for comparison.',
       },
       example:
@@ -260,11 +260,11 @@ const FUNC_ITEMS: FuncItem[] = [
       ],
     },
     vsNote: {
-      ko: 'SYSDATE(DATE, 초 정밀도, 타임존 없음) vs SYSTIMESTAMP(TIMESTAMP WITH TIME ZONE, 나노초 정밀도, 타임존 포함). TIMESTAMP 산술에는 숫자 분수 대신 INTERVAL 리터럴을 사용하는 것이 권장됩니다.',
+      ko: 'SYSDATE(DATE, 초 정밀도, 타임존 없음) vs SYSTIMESTAMP(TIMESTAMP WITH TIME ZONE, 나노초 정밀도, 타임존 포함). TIMESTAMP 산술에는 숫자 분수 대신 INTERVAL 리터럴을 사용하는 걸 권장해요.',
       en: 'SYSDATE (DATE, second precision, no timezone) vs SYSTIMESTAMP (TIMESTAMP WITH TIME ZONE, nanosecond precision, with timezone). Use INTERVAL literals for TIMESTAMP arithmetic instead of numeric fractions.',
     },
     note: {
-      ko: 'SYSTIMESTAMP - SYSTIMESTAMP 는 INTERVAL DAY TO SECOND 타입을 반환합니다. 정밀한 경과 시간 측정(예: 쿼리 수행 시간)에 활용합니다.',
+      ko: 'SYSTIMESTAMP - SYSTIMESTAMP는 INTERVAL DAY TO SECOND 타입을 반환해요. 정밀한 경과 시간 측정(예: 쿼리 수행 시간)에 활용해요.',
       en: 'SYSTIMESTAMP - SYSTIMESTAMP returns an INTERVAL DAY TO SECOND. Useful for precise elapsed-time measurement such as query execution duration.',
     },
   },
@@ -272,7 +272,7 @@ const FUNC_ITEMS: FuncItem[] = [
     name: 'ADD_MONTHS',
     signature: 'ADD_MONTHS(date, n)',
     desc: {
-      ko: '날짜에 n개월을 더한 결과를 반환합니다. n이 음수이면 날짜가 이전 월로 이동합니다. 월말 처리를 자동으로 수행합니다.',
+      ko: '날짜에 n개월을 더한 결과를 반환해요. n이 음수이면 날짜가 이전 월로 이동해요. 월말 처리도 자동으로 수행해요.',
       en: 'Returns the date plus n months. A negative n moves the date to an earlier month. Automatically handles end-of-month adjustments.',
     },
     example:
@@ -284,7 +284,7 @@ const FUNC_ITEMS: FuncItem[] = [
       ['2021-07-31', '2021-10-31', '2021-06-30'],
     ],
     note: {
-      ko: '월말 날짜(예: 1월 31일)에 1개월을 더하면 2월의 마지막 날(28일 또는 29일)로 자동 조정됩니다.',
+      ko: '월말 날짜(예: 1월 31일)에 1개월을 더하면 2월의 마지막 날(28일 또는 29일)로 자동 조정돼요.',
       en: 'Adding a month to a month-end date (e.g., Jan 31) automatically adjusts to the last day of the next month (Feb 28 or 29).',
     },
   },
@@ -292,7 +292,7 @@ const FUNC_ITEMS: FuncItem[] = [
     name: 'MONTHS_BETWEEN',
     signature: 'MONTHS_BETWEEN(date1, date2)',
     desc: {
-      ko: 'date1과 date2 사이의 개월 수를 숫자로 반환합니다. date1이 date2보다 늦으면 양수, 이르면 음수를 반환합니다. 소수점이 포함될 수 있습니다.',
+      ko: 'date1과 date2 사이의 개월 수를 숫자로 반환해요. date1이 date2보다 늦으면 양수, 이르면 음수를 반환해요. 소수점이 포함될 수 있어요.',
       en: 'Returns the number of months between date1 and date2 as a number. Positive if date1 is later, negative if earlier. The result may include a decimal.',
     },
     example:
@@ -304,7 +304,7 @@ const FUNC_ITEMS: FuncItem[] = [
       ['Carol', '2021-07-31', '45',  '-9'],
     ],
     note: {
-      ko: 'date1 < date2 이면 결과가 음수입니다. 예: MONTHS_BETWEEN(hire_date, SYSDATE)는 입사일이 현재보다 과거이므로 음수를 반환합니다.',
+      ko: 'date1 < date2이면 결과가 음수예요. 예: MONTHS_BETWEEN(hire_date, SYSDATE)는 입사일이 현재보다 과거이므로 음수를 반환해요.',
       en: 'The result is negative when date1 < date2. e.g. MONTHS_BETWEEN(hire_date, SYSDATE) returns a negative value because hire_date is earlier than now.',
     },
   },
@@ -312,7 +312,7 @@ const FUNC_ITEMS: FuncItem[] = [
     name: 'TRUNC (날짜)',
     signature: 'TRUNC(date [, fmt])',
     desc: {
-      ko: "TRUNC는 '잘라내다(truncate)'의 줄임말입니다. 숫자에서는 소수점 이하를 버리듯, 날짜에서는 지정한 단위 아래의 시간 정보를 모두 제거합니다. 반올림 없이 항상 내림(버림)만 합니다.\n\n날짜를 지정한 단위(fmt)로 잘라냅니다. fmt를 생략하면 시간을 00:00:00으로 초기화합니다. TRUNC(date, 'MM')은 해당 월의 1일, TRUNC(date, 'YYYY')는 해당 연도의 1월 1일로 반환합니다.",
+      ko: "TRUNC는 '잘라내다(truncate)'의 줄임말이에요. 숫자에서 소수점 이하를 버리듯, 날짜에서는 지정한 단위 아래의 시간 정보를 모두 제거해요. 반올림 없이 항상 내림(버림)만 해요.\n\n날짜를 지정한 단위(fmt)로 잘라낼 수 있어요. fmt를 생략하면 시간을 00:00:00으로 초기화하고, TRUNC(date, 'MM')은 해당 월의 1일, TRUNC(date, 'YYYY')는 해당 연도의 1월 1일을 반환해요.",
       en: "TRUNC is short for 'truncate', meaning to cut off. Just as truncating a number drops the decimal part, truncating a date removes all time information below the specified unit — always rounding down, never up.\n\nTruncates a date to the specified unit (fmt). Omitting fmt zeros out the time portion (00:00:00). TRUNC(date, 'MM') returns the 1st of the month; TRUNC(date, 'YYYY') returns January 1st of the year.",
     },
     example:
@@ -347,7 +347,7 @@ const FUNC_ITEMS: FuncItem[] = [
       ],
     },
     note: {
-      ko: "날짜 범위 검색 시 WHERE hire_date >= TRUNC(SYSDATE, 'MM') 패턴으로 이번 달 1일부터의 데이터를 정확하게 조회할 수 있습니다.",
+      ko: "날짜 범위 검색 시 WHERE hire_date >= TRUNC(SYSDATE, 'MM') 패턴으로 이번 달 1일부터의 데이터를 정확하게 조회할 수 있어요.",
       en: "For range queries, WHERE hire_date >= TRUNC(SYSDATE, 'MM') precisely retrieves data from the first day of the current month.",
     },
   },
@@ -355,7 +355,7 @@ const FUNC_ITEMS: FuncItem[] = [
     name: 'TO_DATE',
     signature: "TO_DATE(string, 'format')",
     desc: {
-      ko: "문자열을 날짜(DATE) 타입으로 변환합니다. format은 'YYYY-MM-DD', 'YYYY/MM/DD HH24:MI:SS' 등 입력 문자열의 형식과 일치해야 합니다.",
+      ko: "문자열을 날짜(DATE) 타입으로 변환해요. format은 'YYYY-MM-DD', 'YYYY/MM/DD HH24:MI:SS' 등 입력 문자열의 형식과 일치해야 해요.",
       en: "Converts a string to a DATE type. The format must match the structure of the input string, such as 'YYYY-MM-DD' or 'YYYY/MM/DD HH24:MI:SS'.",
     },
     example:
@@ -363,7 +363,7 @@ const FUNC_ITEMS: FuncItem[] = [
     resultHeaders: ['d1', 'd2'],
     resultRows: [['2025-01-15 00:00:00', '2025-06-30 18:00:00']],
     note: {
-      ko: "NLS_DATE_FORMAT 세션 설정과 다른 형식의 문자열을 비교하면 암묵적 변환이 발생해 인덱스를 사용하지 못할 수 있습니다. 명시적으로 TO_DATE를 사용하는 것이 안전합니다.",
+      ko: "NLS_DATE_FORMAT 세션 설정과 다른 형식의 문자열을 비교하면 암묵적 변환이 발생해서 인덱스를 사용하지 못할 수 있어요. 명시적으로 TO_DATE를 사용하는 게 안전해요.",
       en: "Comparing a string whose format differs from the session's NLS_DATE_FORMAT triggers implicit conversion, which can prevent index use. Explicitly using TO_DATE is safer.",
     },
   },
@@ -371,7 +371,7 @@ const FUNC_ITEMS: FuncItem[] = [
     name: 'TO_CHAR (날짜)',
     signature: "TO_CHAR(date, 'format')",
     desc: {
-      ko: "날짜(DATE)를 지정한 형식의 문자열로 변환합니다. 'YYYY-MM-DD', 'YYYY년 MM월 DD일', 'Day' 등 다양한 포맷 마스크를 조합해 사용할 수 있습니다.",
+      ko: "날짜(DATE)를 지정한 형식의 문자열로 변환해요. 'YYYY-MM-DD', 'YYYY년 MM월 DD일', 'Day' 등 다양한 포맷 마스크를 조합해서 사용할 수 있어요.",
       en: "Converts a DATE to a string using the specified format. Supports a wide range of format masks such as 'YYYY-MM-DD', 'Month DD, YYYY', or 'Day'.",
     },
     example:
@@ -405,7 +405,7 @@ const FUNC_ITEMS: FuncItem[] = [
       ],
     },
     note: {
-      ko: "TO_CHAR 결과는 VARCHAR2 타입입니다. 날짜 비교 연산에 사용하면 문자열 비교가 되므로, 날짜 비교는 반드시 DATE 타입으로 수행하세요.",
+      ko: "TO_CHAR 결과는 VARCHAR2 타입이에요. 날짜 비교 연산에 사용하면 문자열 비교가 되므로, 날짜 비교는 반드시 DATE 타입으로 수행하세요.",
       en: "The result of TO_CHAR is VARCHAR2. Using it in date comparisons performs string comparison — always compare dates as DATE types.",
     },
   },
@@ -514,8 +514,8 @@ function ArithTable({ title, rows, lang }: { title: { ko: string; en: string }; 
 
 const T = {
   ko: {
-    chapterTitle: '날짜와 시간를 다루는 법',
-    chapterSubtitle: 'Oracle에서 날짜와 시간을 어떻게 계산하는 지 알아봅니다.',
+    chapterTitle: '날짜와 시간을 다루는 법',
+    chapterSubtitle: 'Oracle에서 날짜와 시간을 어떻게 계산하는지 알아봐요.',
     categoryLabel: '날짜 / 시간 함수',
     exampleQuery: '예시 쿼리',
     result: '실행 결과',

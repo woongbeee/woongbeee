@@ -24,7 +24,7 @@ const Hi = ({ children, color = 'blue' }: { children: React.ReactNode; color?: '
 }
 
 const INTRO_KO = (
-  <div className="space-y-3 mb-6 text-sm leading-relaxed text-muted-foreground">
+  <div className="space-y-3 mb-6 text-[14px] leading-relaxed text-muted-foreground">
     <p>
       앞 챕터에서 Oracle이 데이터를 읽을 때 <Hi color="blue">블록(Block) 단위</Hi>로 가져온다고 배웠어요.
       그렇다면 <Hi color="orange">블록 안에는 데이터가 어떤 구조로 들어 있길래</Hi> 원하는 행을 바로 찾을 수 있을까요?
@@ -41,12 +41,12 @@ const INTRO_KO = (
       이 <B>Block → Extent → Segment → Tablespace</B> 4계층이 Oracle이 저장 공간을 관리하는 방식이에요.
       각 계층은 <B>논리적 단위</B>(Oracle 내부 개념)이고, 실제 파일 시스템에는 <B>.dbf 데이터 파일</B>로만 존재해요.
     </p>
-    <p className="text-xs text-muted-foreground/70">가장 작은 단위인 Block부터 하나씩 살펴봐요.</p>
+    <p className="text-[14px] text-muted-foreground/70">가장 작은 단위인 Block부터 하나씩 살펴봐요.</p>
   </div>
 )
 
 const INTRO_EN = (
-  <div className="space-y-3 mb-6 text-sm leading-relaxed text-muted-foreground">
+  <div className="space-y-3 mb-6 text-[14px] leading-relaxed text-muted-foreground">
     <p>
       In the previous chapter you learned that Oracle always fetches data in <Hi color="blue">Block</Hi> units.
       But <Hi color="orange">what structure lives inside a Block</Hi> that lets Oracle find any row instantly?
@@ -63,7 +63,7 @@ const INTRO_EN = (
       This <B>Block → Extent → Segment → Tablespace</B> four-tier hierarchy is how Oracle manages all storage.
       The tiers are <B>logical units</B> (Oracle's internal concept) — on disk they exist only as <B>.dbf data files</B>.
     </p>
-    <p className="text-xs text-muted-foreground/70">Click each section below to explore the tiers one by one.</p>
+    <p className="text-[14px] text-muted-foreground/70">Click each section below to explore the tiers one by one.</p>
   </div>
 )
 
@@ -1013,6 +1013,296 @@ function TablespaceDiagram() {
   )
 }
 
+// ── StorageHierarchyDiagram ────────────────────────────────────────────────
+// Oracle 문서(docs.oracle.com/cncpt/logical-storage-structures) Figure 15-2 참고:
+// Tablespace → Segment → Extent → Block 의 중첩 구조,
+// Tablespace ↔ .dbf 데이터 파일 의 논리-물리 관계
+
+function StorageHierarchyDiagram() {
+  const lang = useSimulationStore((s) => s.lang)
+  const isKo = lang === 'ko'
+
+  const lbl = (ko: string, en: string) => isKo ? ko : en
+
+  // ── 색상 팔레트 ──
+  const COL = {
+    db:   { fill: '#eff6ff', stroke: '#3b82f6', text: '#1d4ed8' },
+    ts:   { fill: '#f5f3ff', stroke: '#8b5cf6', text: '#5b21b6' },
+    seg1: { fill: '#ecfdf5', stroke: '#10b981', text: '#065f46' },
+    seg2: { fill: '#fdf4ff', stroke: '#a855f7', text: '#6b21a8' },
+    ext:  { fill: '#fff7ed', stroke: '#f97316', text: '#c2410c' },
+    blk:  { fill: '#fefce8', stroke: '#eab308', text: '#854d0e' },
+    dbf:  { fill: '#f8fafc', stroke: '#64748b', text: '#334155' },
+    arrow:'#94a3b8',
+  }
+
+  // ── 캔버스 크기 ──
+  // 설계 원칙: 각 계층마다 충분한 패딩, 글자가 박스를 벗어나지 않도록 여유 확보
+  const W = 860
+  const H = 560
+
+  // ── Database 박스 (전체 캔버스 테두리) ──
+  // 상단 레이블 영역 32px 확보
+  const DB = { x: 12, y: 12, w: W - 24, h: H - 24, r: 14 }
+
+  // ── Tablespace 박스 ──
+  // DB 안에서 상단 44px(DB 레이블), 하단 120px(datafile 영역) 여백 확보
+  const TS = { x: 32, y: 56, w: W - 64, h: 340, r: 10 }
+
+  // ── Segment 1 (Table): Tablespace 안 왼쪽 절반 ──
+  // TS 안에서 상단 28px(TS 레이블), 하단 24px, 좌우 16px 여백
+  const S1 = { x: TS.x + 16, y: TS.y + 28, w: (TS.w / 2) - 24, h: TS.h - 52, r: 8 }
+
+  // ── Segment 2 (Index): Tablespace 안 오른쪽 절반 ──
+  const S2 = { x: TS.x + (TS.w / 2) + 8, y: TS.y + 28, w: (TS.w / 2) - 24, h: TS.h - 52, r: 8 }
+
+  // ── Segment 공통 내부 레이아웃 ──
+  // 각 Segment 안: 상단 28px(Segment 레이블), 하단 28px(주석), 좌우 12px 여백
+  const SEG_PAD_TOP = 30
+  const SEG_PAD_BOTTOM = 30
+  const SEG_PAD_X = 12
+
+  // ── Extent 크기 계산 ──
+  // S1: Extent 2개를 가로로 나란히 (gap 10px)
+  const EXT_H = S1.h - SEG_PAD_TOP - SEG_PAD_BOTTOM
+  const S1_EXT_W = (S1.w - SEG_PAD_X * 2 - 10) / 2
+
+  // E1A (Extent 1 in S1)
+  const E1A = {
+    x: S1.x + SEG_PAD_X,
+    y: S1.y + SEG_PAD_TOP,
+    w: S1_EXT_W,
+    h: EXT_H,
+    r: 6,
+  }
+  // E1B (Extent 2 in S1)
+  const E1B = {
+    x: E1A.x + E1A.w + 10,
+    y: E1A.y,
+    w: S1_EXT_W,
+    h: EXT_H,
+    r: 6,
+  }
+
+  // S2: Extent 1개 (S2 전체 내부)
+  const E2A = {
+    x: S2.x + SEG_PAD_X,
+    y: S2.y + SEG_PAD_TOP,
+    w: S2.w - SEG_PAD_X * 2,
+    h: EXT_H,
+    r: 6,
+  }
+
+  // ── Block 크기 ──
+  // E1A 안: 2행 × 2열 Block (레이블 22px + 블록들 + 하단 패딩 8px)
+  const EXT_LABEL_H = 36   // Extent 상단 레이블 영역
+  const EXT_PAD = 8        // Extent 내부 여백
+  const BLK_COLS = 2
+  const BLK_ROWS = 2
+  const BLK_GAP = 6
+  const BLK_W = Math.floor((E1A.w - EXT_PAD * 2 - BLK_GAP * (BLK_COLS - 1)) / BLK_COLS)
+  const BLK_H = Math.floor((E1A.h - EXT_LABEL_H - EXT_PAD - BLK_GAP * (BLK_ROWS - 1)) / BLK_ROWS)
+
+  const blksE1A = Array.from({ length: 4 }).map((_, i) => ({
+    x: E1A.x + EXT_PAD + (i % BLK_COLS) * (BLK_W + BLK_GAP),
+    y: E1A.y + EXT_LABEL_H + Math.floor(i / BLK_COLS) * (BLK_H + BLK_GAP),
+  }))
+
+  // E2A 안: 1행 × 4열 Block
+  const BLK2_COLS = 4
+  const BLK2_W = Math.floor((E2A.w - EXT_PAD * 2 - BLK_GAP * (BLK2_COLS - 1)) / BLK2_COLS)
+  const BLK2_H = E2A.h - EXT_LABEL_H - EXT_PAD
+
+  const blksE2A = Array.from({ length: 4 }).map((_, i) => ({
+    x: E2A.x + EXT_PAD + i * (BLK2_W + BLK_GAP),
+    y: E2A.y + EXT_LABEL_H,
+  }))
+
+  // ── Datafile 영역 ──
+  // Tablespace 하단 끝에서 16px 아래
+  const DBF_Y = TS.y + TS.h + 16
+  const DBF_H = 52
+  const DBF_GAP = 12
+  const DBF1 = { x: DB.x + 20, y: DBF_Y, w: (DB.w - 40 - DBF_GAP) / 2, h: DBF_H, r: 6 }
+  const DBF2 = { x: DBF1.x + DBF1.w + DBF_GAP, y: DBF_Y, w: DBF1.w, h: DBF_H, r: 6 }
+
+  // ── 화살표 ──
+  const arrowPts = [
+    { from: { x: E1A.x + E1A.w / 2, y: E1A.y + E1A.h }, to: { x: DBF1.x + DBF1.w * 0.35, y: DBF_Y } },
+    { from: { x: E1B.x + E1B.w / 2, y: E1B.y + E1B.h }, to: { x: DBF1.x + DBF1.w * 0.65, y: DBF_Y } },
+    { from: { x: E2A.x + E2A.w / 2, y: E2A.y + E2A.h }, to: { x: DBF2.x + DBF2.w / 2,    y: DBF_Y } },
+  ]
+
+  return (
+    <div className="my-6 rounded-xl border border-slate-200 bg-white p-3 shadow-sm overflow-x-auto">
+      <p className="mb-3 px-1 font-mono text-[11px] font-bold text-slate-400 uppercase tracking-wide">
+        {lbl('논리적 저장 계층 구조 — Oracle Logical Storage Hierarchy', 'Oracle Logical Storage Hierarchy')}
+      </p>
+      <svg viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ minWidth: 640 }}>
+        <defs>
+          <marker id="harr" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+            <path d="M0,0 L0,7 L7,3.5 z" fill={COL.arrow} />
+          </marker>
+        </defs>
+
+        {/* ════ Database 박스 ════ */}
+        <rect x={DB.x} y={DB.y} width={DB.w} height={DB.h} rx={DB.r}
+          fill={COL.db.fill} stroke={COL.db.stroke} strokeWidth={2} />
+        <rect x={DB.x + 12} y={DB.y + 8} width={96} height={22} rx={4} fill={COL.db.stroke} />
+        <text x={DB.x + 20} y={DB.y + 24} fontFamily="monospace" fontSize={12} fontWeight="bold" fill="white">Database</text>
+        <text x={DB.x + DB.w - 16} y={DB.y + 24} fontFamily="monospace" fontSize={11} fill={COL.db.text} textAnchor="end">
+          {lbl('논리적 최상위 단위', 'Top-level logical unit')}
+        </text>
+
+        {/* ════ Tablespace 박스 ════ */}
+        <rect x={TS.x} y={TS.y} width={TS.w} height={TS.h} rx={TS.r}
+          fill={COL.ts.fill} stroke={COL.ts.stroke} strokeWidth={2} />
+        <rect x={TS.x + 10} y={TS.y + 8} width={108} height={20} rx={4} fill={COL.ts.stroke} />
+        <text x={TS.x + 18} y={TS.y + 22} fontFamily="monospace" fontSize={11} fontWeight="bold" fill="white">TABLESPACE</text>
+        <text x={TS.x + 126} y={TS.y + 22} fontFamily="monospace" fontSize={12} fontWeight="bold" fill={COL.ts.text}>USERS</text>
+        <text x={TS.x + TS.w - 12} y={TS.y + 22} fontFamily="monospace" fontSize={11} fill={COL.ts.text} textAnchor="end">
+          {lbl('논리적 컨테이너', 'Logical container')}
+        </text>
+
+        {/* ════ Segment 1 (Table) ════ */}
+        <rect x={S1.x} y={S1.y} width={S1.w} height={S1.h} rx={S1.r}
+          fill={COL.seg1.fill} stroke={COL.seg1.stroke} strokeWidth={1.5} />
+        <rect x={S1.x + 8} y={S1.y + 6} width={76} height={20} rx={3} fill={COL.seg1.stroke} />
+        <text x={S1.x + 14} y={S1.y + 20} fontFamily="monospace" fontSize={10} fontWeight="bold" fill="white">SEGMENT</text>
+        <text x={S1.x + 92} y={S1.y + 20} fontFamily="monospace" fontSize={11} fontWeight="bold" fill={COL.seg1.text}>EMPLOYEES</text>
+        <text x={S1.x + S1.w - 10} y={S1.y + 20} fontFamily="monospace" fontSize={10} fill={COL.seg1.text} textAnchor="end">
+          {lbl('테이블 Segment', 'Table Segment')}
+        </text>
+        {/* Segment 1 하단 주석 */}
+        <text x={S1.x + S1.w / 2} y={S1.y + S1.h - 10} fontFamily="monospace" fontSize={10} fill={COL.seg1.text} textAnchor="middle">
+          {lbl('Extent는 반드시 하나의 파일 안에만 존재해요', 'Each Extent lives in exactly one datafile')}
+        </text>
+
+        {/* ════ Segment 2 (Index) ════ */}
+        <rect x={S2.x} y={S2.y} width={S2.w} height={S2.h} rx={S2.r}
+          fill={COL.seg2.fill} stroke={COL.seg2.stroke} strokeWidth={1.5} />
+        <rect x={S2.x + 8} y={S2.y + 6} width={76} height={20} rx={3} fill={COL.seg2.stroke} />
+        <text x={S2.x + 14} y={S2.y + 20} fontFamily="monospace" fontSize={10} fontWeight="bold" fill="white">SEGMENT</text>
+        <text x={S2.x + 92} y={S2.y + 20} fontFamily="monospace" fontSize={11} fontWeight="bold" fill={COL.seg2.text}>EMP_IDX</text>
+        <text x={S2.x + S2.w - 10} y={S2.y + 20} fontFamily="monospace" fontSize={10} fill={COL.seg2.text} textAnchor="end">
+          {lbl('인덱스 Segment', 'Index Segment')}
+        </text>
+        {/* Segment 2 하단 주석 */}
+        <text x={S2.x + S2.w / 2} y={S2.y + S2.h - 10} fontFamily="monospace" fontSize={10} fill={COL.seg2.text} textAnchor="middle">
+          {lbl('Segment는 여러 파일에 걸쳐질 수 있어요', 'Segment may span multiple datafiles')}
+        </text>
+
+        {/* ════ Extent 1A ════ */}
+        <rect x={E1A.x} y={E1A.y} width={E1A.w} height={E1A.h} rx={E1A.r}
+          fill={COL.ext.fill} stroke={COL.ext.stroke} strokeWidth={1.5} />
+        <text x={E1A.x + 8} y={E1A.y + 15} fontFamily="monospace" fontSize={10} fontWeight="bold" fill={COL.ext.text}>Extent 1</text>
+        <text x={E1A.x + 8} y={E1A.y + 29} fontFamily="monospace" fontSize={9} fill={COL.ext.text}>64 KB · 8 blocks</text>
+
+        {/* Extent 1A 내부 블록 4개 (2×2) */}
+        {blksE1A.map((b, i) => (
+          <g key={i}>
+            <rect x={b.x} y={b.y} width={BLK_W} height={BLK_H} rx={3}
+              fill={COL.blk.fill} stroke={COL.blk.stroke} strokeWidth={1} />
+            <text x={b.x + BLK_W / 2} y={b.y + BLK_H / 2 - 4}
+              fontFamily="monospace" fontSize={9} fontWeight="bold" fill={COL.blk.text} textAnchor="middle">Block</text>
+            <text x={b.x + BLK_W / 2} y={b.y + BLK_H / 2 + 8}
+              fontFamily="monospace" fontSize={8} fill={COL.blk.text} textAnchor="middle">8 KB</text>
+          </g>
+        ))}
+
+        {/* ════ Extent 1B ════ */}
+        <rect x={E1B.x} y={E1B.y} width={E1B.w} height={E1B.h} rx={E1B.r}
+          fill={COL.ext.fill} stroke={COL.ext.stroke} strokeWidth={1.5} />
+        <text x={E1B.x + 8} y={E1B.y + 15} fontFamily="monospace" fontSize={10} fontWeight="bold" fill={COL.ext.text}>Extent 2</text>
+        <text x={E1B.x + 8} y={E1B.y + 29} fontFamily="monospace" fontSize={9} fill={COL.ext.text}>64 KB · 8 blocks</text>
+        {/* Extent 1B: 블록 수 표시만 */}
+        <text x={E1B.x + E1B.w / 2} y={E1B.y + E1B.h / 2 + 4}
+          fontFamily="monospace" fontSize={22} fill={COL.ext.stroke} textAnchor="middle" opacity={0.5}>···</text>
+        <text x={E1B.x + E1B.w / 2} y={E1B.y + E1B.h / 2 + 22}
+          fontFamily="monospace" fontSize={10} fill={COL.ext.text} textAnchor="middle">8 Blocks</text>
+
+        {/* ════ Extent 2A ════ */}
+        <rect x={E2A.x} y={E2A.y} width={E2A.w} height={E2A.h} rx={E2A.r}
+          fill={COL.ext.fill} stroke={COL.ext.stroke} strokeWidth={1.5} />
+        <text x={E2A.x + 10} y={E2A.y + 15} fontFamily="monospace" fontSize={10} fontWeight="bold" fill={COL.ext.text}>Extent 1</text>
+        <text x={E2A.x + 10} y={E2A.y + 29} fontFamily="monospace" fontSize={9} fill={COL.ext.text}>64 KB · 8 blocks</text>
+
+        {/* Extent 2A 내부 블록 4개 (1행) */}
+        {blksE2A.map((b, i) => (
+          <g key={i}>
+            <rect x={b.x} y={b.y} width={BLK2_W} height={BLK2_H} rx={3}
+              fill={COL.blk.fill} stroke={COL.blk.stroke} strokeWidth={1} />
+            <text x={b.x + BLK2_W / 2} y={b.y + BLK2_H / 2 - 4}
+              fontFamily="monospace" fontSize={9} fontWeight="bold" fill={COL.blk.text} textAnchor="middle">Block</text>
+            <text x={b.x + BLK2_W / 2} y={b.y + BLK2_H / 2 + 8}
+              fontFamily="monospace" fontSize={8} fill={COL.blk.text} textAnchor="middle">8 KB</text>
+          </g>
+        ))}
+        {/* 블록 더 있음 표시 */}
+        <text
+          x={E2A.x + EXT_PAD + BLK2_COLS * (BLK2_W + BLK_GAP) - BLK_GAP + 14}
+          y={E2A.y + EXT_LABEL_H + BLK2_H / 2 + 4}
+          fontFamily="monospace" fontSize={14} fill={COL.ext.stroke} textAnchor="start">···</text>
+
+        {/* ════ 화살표: Extent → Datafile ════ */}
+        {arrowPts.map((a, i) => (
+          <line key={i}
+            x1={a.from.x} y1={a.from.y}
+            x2={a.to.x}   y2={a.to.y}
+            stroke={COL.arrow} strokeWidth={1.5} strokeDasharray="5 3"
+            markerEnd="url(#harr)" />
+        ))}
+
+        {/* ════ DataFile 1 ════ */}
+        <rect x={DBF1.x} y={DBF1.y} width={DBF1.w} height={DBF1.h} rx={DBF1.r}
+          fill={COL.dbf.fill} stroke={COL.dbf.stroke} strokeWidth={1.5} />
+        <text x={DBF1.x + 14} y={DBF1.y + 20} fontFamily="monospace" fontSize={11} fontWeight="bold" fill={COL.dbf.text}>
+          📄 users01.dbf
+        </text>
+        <text x={DBF1.x + 14} y={DBF1.y + 38} fontFamily="monospace" fontSize={10} fill={COL.dbf.text}>
+          {lbl('물리 데이터 파일', 'Physical datafile')}
+        </text>
+
+        {/* ════ DataFile 2 ════ */}
+        <rect x={DBF2.x} y={DBF2.y} width={DBF2.w} height={DBF2.h} rx={DBF2.r}
+          fill={COL.dbf.fill} stroke={COL.dbf.stroke} strokeWidth={1.5} />
+        <text x={DBF2.x + 14} y={DBF2.y + 20} fontFamily="monospace" fontSize={11} fontWeight="bold" fill={COL.dbf.text}>
+          📄 users02.dbf
+        </text>
+        <text x={DBF2.x + 14} y={DBF2.y + 38} fontFamily="monospace" fontSize={10} fill={COL.dbf.text}>
+          {lbl('물리 데이터 파일', 'Physical datafile')}
+        </text>
+
+        {/* ════ Tablespace ↔ Datafile 연결 브라켓 ════ */}
+        <text
+          x={(DBF1.x + DBF2.x + DBF2.w) / 2}
+          y={DBF_Y + DBF_H + 22}
+          fontFamily="monospace" fontSize={10} fill={COL.ts.text} textAnchor="middle">
+          {lbl('Tablespace = 하나 이상의 .dbf 파일로 구성', 'Tablespace = one or more .dbf files')}
+        </text>
+      </svg>
+
+      {/* ── 하단 범례 ── */}
+      <div className="mt-3 px-1 flex flex-wrap gap-x-5 gap-y-2">
+        {[
+          { color: 'bg-blue-100 border-blue-400',    label: lbl('Database', 'Database') },
+          { color: 'bg-violet-100 border-violet-400', label: lbl('Tablespace', 'Tablespace') },
+          { color: 'bg-emerald-100 border-emerald-400', label: lbl('Segment (Table)', 'Segment (Table)') },
+          { color: 'bg-purple-100 border-purple-400', label: lbl('Segment (Index)', 'Segment (Index)') },
+          { color: 'bg-orange-100 border-orange-400', label: lbl('Extent', 'Extent') },
+          { color: 'bg-yellow-100 border-yellow-400', label: lbl('Block', 'Block') },
+          { color: 'bg-slate-100 border-slate-400',  label: lbl('.dbf 데이터 파일', '.dbf Datafile') },
+        ].map((item) => (
+          <div key={item.label} className="flex items-center gap-1.5">
+            <div className={`h-3.5 w-6 rounded border ${item.color}`} />
+            <span className="font-mono text-[10px] text-slate-500">{item.label}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 // ── StorageSection ─────────────────────────────────────────────────────────
 
 const IO_POPUP_T = {
@@ -1178,6 +1468,8 @@ export function StorageSection() {
       <div className="mt-8">
         <InfoBox variant="summary">{t.infoBody}</InfoBox>
       </div>
+
+      <StorageHierarchyDiagram />
     </PageContainer>
   )
 }

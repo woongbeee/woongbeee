@@ -18,7 +18,7 @@ const T = {
       '실행 계획(execution plan)은 데이터베이스가 SQL 문장을 실행하기 위해 수행하는 연산의 순서입니다.',
     contentsTitle: '실행 계획의 구성',
     contentsDesc:
-      '실행 계획은 단독으로 잘 튜닝된 문장과 성능이 나쁜 문장을 구분하지 못합니다. 계획은 일련의 단계로 구성됩니다. 모든 단계는 데이터베이스에서 물리적으로 데이터 행을 가져오거나, 문장을 발행한 사용자를 위해 행을 준비합니다.',
+      '실행 계획은 단독으로 잘 튜닝된 문장과 성능이 나쁜 문장을 구분하지 못해요. 계획은 일련의 단계로 구성돼요. 모든 단계는 데이터베이스에서 물리적으로 데이터 행을 가져오거나, 문장을 발행한 사용자를 위해 행을 준비해요.',
     examplePlan: `-- employees와 departments 테이블을 조인하는 실행 계획 예시
 SQL_ID  g9xaqjktdhbcd, child number 0
 -------------------------------------
@@ -47,9 +47,9 @@ Predicate Information (identified by operation id):
     rowSourceTreeDesc:
       '행 소스 트리(row source tree)는 실행 계획의 핵심입니다. 트리는 다음 정보를 보여줍니다.',
     rowSourceItems: [
-      '문장이 참조하는 테이블의 조인 순서 — 위 계획에서 employees가 외부(outer) 행 소스이고 departments가 내부(inner) 행 소스입니다.',
-      '문장에서 언급된 각 테이블의 액세스 경로(access path) — 위 계획에서 employees는 인덱스 스캔, departments는 Full Table Scan을 선택했습니다.',
-      '조인 연산의 영향을 받는 테이블들의 조인 방식(join method) — 위 계획에서 Nested Loops Join을 선택했습니다.',
+      '문장이 참조하는 테이블의 조인 순서 — 위 계획에서 employees가 외부(outer) 행 소스이고 departments가 내부(inner) 행 소스예요.',
+      '문장에서 언급된 각 테이블의 액세스 경로(access path) — 위 계획에서 employees는 인덱스 스캔, departments는 Full Table Scan을 선택했어요.',
+      '조인 연산의 영향을 받는 테이블들의 조인 방식(join method) — 위 계획에서 Nested Loops Join을 선택했어요.',
       '필터, 정렬, 집계 같은 데이터 연산 — last_name이 T로 시작하는 조건 필터와 department_id 매칭.',
     ],
     additionalInfoTitle: '실행 계획에 포함되는 추가 정보',
@@ -60,24 +60,24 @@ Predicate Information (identified by operation id):
     ],
     execOrderTitle: '실행 순서 읽는 법',
     execOrderDesc:
-      '계획의 연산들은 자식에게 데이터를 요청합니다. EXPLAIN PLAN 출력에서 실행 순서는 다음과 같습니다.',
+      '계획의 연산들은 자식에게 데이터를 요청해요. EXPLAIN PLAN 출력에서 실행 순서는 다음과 같아요.',
     execOrderSteps: [
-      '자식이 없는 첫 번째 연산에서 실행이 시작됩니다 — 위 예시에서는 EMPLOYEES Full Scan (Id 3).',
-      'EMPLOYEES가 부모(Id 2)에게 데이터를 반환합니다.',
-      '다음으로 Hash Join의 다음 자식 DEPARTMENTS Full Scan (Id 4)이 실행됩니다.',
-      'DEPARTMENTS는 자식이 없으므로 부모(Id 2)에게 데이터를 반환합니다.',
-      'Hash Join이 두 테이블의 행을 결합하고 SORT ORDER BY (Id 1)로 전달합니다.',
-      '최종적으로 SELECT가 클라이언트에 데이터를 반환합니다.',
+      '자식이 없는 첫 번째 연산에서 실행이 시작돼요 — 위 예시에서는 EMPLOYEES Full Scan (Id 3).',
+      'EMPLOYEES가 부모(Id 2)에게 데이터를 반환해요.',
+      '다음으로 Hash Join의 다음 자식 DEPARTMENTS Full Scan (Id 4)이 실행돼요.',
+      'DEPARTMENTS는 자식이 없으므로 부모(Id 2)에게 데이터를 반환해요.',
+      'Hash Join이 두 테이블의 행을 결합하고 SORT ORDER BY (Id 1)로 전달해요.',
+      '최종적으로 SELECT가 클라이언트에 데이터를 반환해요.',
     ],
     execOrderNote:
-      '실행 계획은 일반적으로 아래에서 위로, 가장 깊이 들여쓰여진 연산부터 읽습니다. 들여쓰기가 같은 형제 연산은 위에서 아래 순서로 실행됩니다.',
+      '실행 계획은 일반적으로 아래에서 위로, 가장 깊이 들여쓰여진 연산부터 읽어요. 들여쓰기가 같은 형제 연산은 위에서 아래 순서로 실행돼요.',
     whyChangeTitle: '실행 계획이 변경되는 이유',
     whyChangeDesc:
-      '실행 계획은 옵티마이저의 입력이 변경됨에 따라 달라질 수 있습니다. SQL 성능 회귀를 방지하려면 SQL plan management 사용을 고려하세요.',
+      '실행 계획은 옵티마이저의 입력이 변경됨에 따라 달라질 수 있어요. SQL 성능 회귀를 방지하려면 SQL plan management 사용을 고려하세요.',
     whyChangeSchemaTitle: '다른 스키마 (Different Schemas)',
     whyChangeSchemaItems: [
       '실행 환경과 EXPLAIN PLAN 환경이 다른 데이터베이스를 사용하는 경우',
-      'EXPLAIN하는 사용자와 실행하는 사용자가 다른 경우 — 두 사용자가 같은 데이터베이스의 서로 다른 객체를 참조할 수 있음',
+      'EXPLAIN하는 사용자와 실행하는 사용자가 다른 경우 — 두 사용자가 같은 데이터베이스의 서로 다른 객체를 참조할 수 있어요.',
       '두 연산 사이에 스키마 변경(특히 인덱스 변경)이 발생한 경우',
     ],
     whyCostTitle: '다른 비용 (Different Costs)',

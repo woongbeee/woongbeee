@@ -15,11 +15,11 @@ const T = {
   ko: {
     title: 'Hash 파티션',
     subtitle:
-      'Hash 파티션은 내부 해시 함수로 파티션 키를 매핑해 행을 균등하게 분산합니다. 데이터 스큐를 방지하고 OLTP 경합을 줄이는 데 효과적입니다.',
+      'Hash 파티션은 내부 해시 함수로 파티션 키를 매핑해서 행을 균등하게 분산해요. 데이터 스큐를 방지하고 OLTP 경합을 줄이는 데 효과적이에요.',
 
     whatTitle: 'Hash 파티션이란?',
     whatDesc:
-      'Range나 List와 달리 Hash 파티션은 어떤 행이 어떤 파티션에 저장될지를 제어할 수 없습니다. Oracle의 내부 해시 함수가 파티션 키 값을 받아 파티션 번호를 결정합니다.\n\n파티션 수를 2의 거듭제곱(2, 4, 8, 16...)으로 설정하면 해시 분포가 가장 균등해집니다. 주요 사용 목적은 데이터 스큐 방지, OLTP 세그먼트 경합 감소, Partition-Wise Join 지원입니다.',
+      'Range나 List와 달리 Hash 파티션은 어떤 행이 어떤 파티션에 저장될지를 제어할 수 없어요. Oracle의 내부 해시 함수가 파티션 키 값을 받아 파티션 번호를 결정해요.\n\n파티션 수를 2의 거듭제곱(2, 4, 8, 16...)으로 설정하면 해시 분포가 가장 균등해져요. 주요 사용 목적은 데이터 스큐 방지, OLTP 세그먼트 경합 감소, Partition-Wise Join 지원이에요.',
 
     basicSql: `-- Hash 파티션 (파티션 수 지정)
 CREATE TABLE products (
@@ -60,7 +60,7 @@ ALTER TABLE products COALESCE PARTITION;`,
 
     pruningTitle: 'Partition Pruning 동작',
     pruningDesc:
-      'Hash 파티션은 범위 조건에서 Pruning이 불가하며, 등치 조건에서만 Oracle이 해시 함수를 적용해 단일 파티션을 특정할 수 있습니다.',
+      'Hash 파티션은 범위 조건에서 Pruning이 불가하며, 등치 조건에서만 Oracle이 해시 함수를 적용해서 단일 파티션을 특정할 수 있어요.',
     pruningTable: [
       ['WHERE prod_id = 1234', 'PARTITION HASH SINGLE', '해시 함수로 파티션 1개 특정'],
       ['WHERE prod_id IN (100, 200)', 'PARTITION HASH ITERATOR', '각 값에 해당하는 파티션들'],
@@ -77,7 +77,7 @@ ALTER TABLE products COALESCE PARTITION;`,
     ],
 
     summary:
-      'Hash 파티션은 데이터 스큐 방지와 OLTP 경합 감소에 효과적입니다. 단, 범위 조건에서 Pruning이 되지 않아 쿼리 패턴에서 등치 조건 위주인 경우에 적합합니다. 파티션 수는 2의 거듭제곱으로 설정하세요.',
+      'Hash 파티션은 데이터 스큐 방지와 OLTP 경합 감소에 효과적이에요. 단, 범위 조건에서 Pruning이 되지 않기 때문에 쿼리 패턴이 등치 조건 위주인 경우에 적합해요. 파티션 수는 2의 거듭제곱으로 설정하세요.',
   },
 
   en: {

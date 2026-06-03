@@ -102,22 +102,22 @@ ORDER BY dept_id, job_title`
 const T = {
   ko: {
     chapterTitle:    'PIVOT / UNPIVOT',
-    chapterSubtitle: '행을 열로, 열을 행으로 변환해 데이터를 교차 형태로 펼치거나 다시 정규화하는 Oracle 구문입니다.',
+    chapterSubtitle: '행을 열로, 열을 행으로 변환해서 데이터를 교차 형태로 펼치거나 다시 정규화하는 Oracle 구문이에요.',
     tabPivot:   'PIVOT',
     tabUnpivot: 'UNPIVOT',
 
     pivotTitle: 'PIVOT — 행을 열로 전환',
-    pivotDesc:  'PIVOT은 특정 컬럼의 값을 열 헤더로 바꿔 가로 방향으로 펼칩니다. 예를 들어 job_title 값(Engineer, Analyst …)을 열로 변환하면 부서별로 직무별 급여 합계를 한 눈에 볼 수 있습니다.',
+    pivotDesc:  'PIVOT은 특정 컬럼의 값을 열 헤더로 바꿔서 가로 방향으로 펼쳐요. 예를 들어 job_title 값(Engineer, Analyst …)을 열로 변환하면 부서별 직무별 급여 합계를 한눈에 볼 수 있어요.',
     pivotInfo:  'FOR job_title IN (...)에 나열한 값이 열 이름이 됩니다. 목록에 없는 값은 결과에서 제외됩니다.',
     beforeTitle: '변환 전 — 원본 데이터 구조',
     afterTitle:  '변환 후 — PIVOT 결과 (행 → 열)',
 
     unpivotTitle: 'UNPIVOT — 열을 행으로 전환',
-    unpivotDesc:  'UNPIVOT은 PIVOT의 반대입니다. 여러 열에 흩어진 값을 하나의 컬럼으로 세로로 쌓습니다. 가로로 넓게 퍼진 피벗 결과를 다시 정규화된 행 구조로 되돌릴 때 사용합니다.',
+    unpivotDesc:  'UNPIVOT은 PIVOT의 반대예요. 여러 열에 흩어진 값을 하나의 컬럼으로 세로로 쌓아요. 가로로 넓게 펼쳐진 피벗 결과를 다시 정규화된 행 구조로 되돌릴 때 사용해요.',
     unpivotInfo:  'UNPIVOT 절의 total_sal은 값이 담길 컬럼 이름, FOR job_title은 원래 열 이름이 들어갈 컬럼 이름, IN (...)에는 펼칠 열 목록을 나열합니다. NULL 값을 가진 열은 기본적으로 결과에서 제외됩니다.',
     unpivotBeforeTitle: '변환 전 — PIVOT 결과 (가로)',
     unpivotAfterTitle:  '변환 후 — UNPIVOT 결과 (세로)',
-    unpivotNullTip: 'NULL 열은 기본으로 제외됩니다. INCLUDE NULLS 옵션을 추가하면 NULL인 행도 포함할 수 있습니다.',
+    unpivotNullTip: 'NULL 열은 기본으로 제외돼요. INCLUDE NULLS 옵션을 추가하면 NULL인 행도 포함할 수 있어요.',
 
     comparisonTitle: 'PIVOT vs UNPIVOT',
   },

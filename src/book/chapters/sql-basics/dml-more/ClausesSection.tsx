@@ -10,9 +10,9 @@ import { ClickableSyntaxRow, SyntaxRow } from './MiniSimulator'
 const T = {
   ko: {
     chapterTitle: 'ORDER BY / GROUP BY / HAVING',
-    clausesSectionSubtitle: '데이터 조회 결과를 정렬하고, 특정 컬럼값을 기준으로 범주화하고(Grouping), 범주화 된 데이터를 필터링하는 방법을 알아봅니다.',
+    clausesSectionSubtitle: '데이터 조회 결과를 정렬하고, 특정 컬럼값을 기준으로 그룹화(Grouping)하고, 그룹화된 데이터를 필터링하는 방법을 알아봐요.',
     orderByTitle: 'ORDER BY — 결과 정렬',
-    orderByDesc: 'SELECT 결과를 하나 이상의 컬럼 기준으로 정렬합니다. ASC(오름차순, 기본값)와 DESC(내림차순)를 지정할 수 있습니다. ORDER BY는 SQL을 실행할 때, 가장 마지막에 처리됩니다.',
+    orderByDesc: 'SELECT 결과를 하나 이상의 컬럼 기준으로 정렬해요. ASC(오름차순, 기본값)와 DESC(내림차순)를 지정할 수 있어요. ORDER BY는 SQL 실행 순서에서 가장 마지막에 처리돼요.',
     orderByOps: [
       ['구문', '설명'],
       ['ORDER BY col', 'col 기준 오름차순 정렬 (ASC 기본)'],
@@ -23,7 +23,7 @@ const T = {
       ['ORDER BY col NULLS FIRST', 'NULL 값을 정렬 결과 맨 처음으로'],
     ],
     groupByTitle: 'GROUP BY — 그룹 집계',
-    groupByDesc: '같은 값을 가진 행들을 하나의 그룹으로 묶고, COUNT·SUM·AVG·MAX·MIN 같은 집계 함수를 적용합니다. GROUP BY에 쓰이지 않은 컬럼을 SELECT 절에서 쓸 때는 반드시 집계 함수와 함께 써야 합니다.',
+    groupByDesc: '같은 값을 가진 행들을 하나의 그룹으로 묶고, COUNT·SUM·AVG·MAX·MIN 같은 집계 함수를 적용해요. GROUP BY에 쓰이지 않은 컬럼을 SELECT 절에서 쓸 때는 반드시 집계 함수와 함께 써야 해요.',
     groupByOps: [
       ['집계 함수', '설명'],
       ['COUNT(*)', '그룹 내 행 수'],
@@ -31,10 +31,10 @@ const T = {
       ['SUM(col)', '그룹 내 col 합계'],
       ['MAX(col) / MIN(col)', '그룹 내 col 최댓값 / 최솟값'],
     ],
-    groupByAliasTip: 'AS로 컬럼에 별명(Alias)을 붙일 수 있습니다. 컬럼명이 길 때 유용합니다. AS 키워드를 생략하고 별명만 쓸 수도 있습니다.\nSELECT AVG(salary) avg_sal  →  결과 컬럼명이 avg_sal 로 표시됩니다.',
+    groupByAliasTip: 'AS로 컬럼에 별명(Alias)을 붙일 수 있어요. 컬럼명이 길 때 유용해요. AS 키워드를 생략하고 별명만 써도 돼요.\nSELECT AVG(salary) avg_sal  →  결과 컬럼명이 avg_sal로 표시돼요.',
     havingTitle: 'HAVING — 그룹 조건 필터',
-    havingDesc: 'WHERE는 개별 행을 필터링하지만, HAVING은 GROUP BY로 만들어진 그룹을 필터링합니다. 집계 함수 결과에 조건을 걸 때 사용합니다.',
-    havingTip: 'WHERE는 집계 전(개별 행), HAVING은 집계 후(그룹) 필터입니다. 가능하면 WHERE로 먼저 행을 줄인 뒤 GROUP BY를 실행하는 것이 성능에 유리합니다.',
+    havingDesc: 'WHERE는 개별 행을 필터링하지만, HAVING은 GROUP BY로 만들어진 그룹을 필터링해요. 집계 함수 결과에 조건을 걸 때 사용해요.',
+    havingTip: 'WHERE는 집계 전(개별 행), HAVING은 집계 후(그룹) 필터예요. 가능하면 WHERE로 먼저 행을 줄인 뒤 GROUP BY를 실행하는 게 성능에 유리해요.',
   },
   en: {
     chapterTitle: 'ORDER BY / GROUP BY / HAVING',

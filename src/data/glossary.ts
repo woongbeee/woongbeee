@@ -1,4 +1,4 @@
-// Oracle Database Glossary
+﻿// Oracle Database Glossary
 // Each term has: term (display name), definition (ko/en), tags (section IDs where it appears)
 
 export interface GlossaryTerm {
@@ -74,7 +74,7 @@ export const GLOSSARY: GlossaryTerm[] = [
       ko: '쿼리에서 리터럴 대신 사용하는 플레이스홀더(:v1 등). Library Cache 재사용을 높여 Soft Parse 비율을 향상시킴.',
       en: 'A placeholder (:v1) used instead of literals in queries. Improves Library Cache reuse and increases Soft Parse rates.',
     },
-    sectionIds: ['internals-sga', 'optimizer-overview'],
+    sectionIds: ['internals-sga'],
   },
   {
     term: 'Bitmap Index',
@@ -115,7 +115,7 @@ export const GLOSSARY: GlossaryTerm[] = [
       ko: '바인드 변수를 처음 파싱할 때만 그 값을 보고 실행 계획을 확정하는 방식. 이후 다른 값이 입력되어도 같은 계획이 재사용되므로, 분포가 극단적인 컬럼에서 잘못된 계획이 고정될 수 있음.',
       en: 'The optimizer inspects bind variable values only at first parse time and locks in a plan reused for all subsequent executions. Can cause a poor plan to be fixed for columns with skewed value distributions.',
     },
-    sectionIds: ['index-scan-range', 'optimizer-overview'],
+    sectionIds: ['index-scan-range'],
   },
 
   // ── C ──────────────────────────────────────────────────────────────────────
@@ -125,7 +125,7 @@ export const GLOSSARY: GlossaryTerm[] = [
       ko: '컬럼 내 유니크한 값의 수 또는 쿼리 결과의 예상 행 수. CBO가 실행 계획을 선택할 때 핵심 지표로 사용.',
       en: 'The number of unique values in a column, or the estimated number of rows returned by a query. A key metric for CBO plan selection.',
     },
-    sectionIds: ['optimizer-stats', 'optimizer-overview', 'index-bitmap'],
+    sectionIds: ['optimizer-stats', 'index-bitmap'],
   },
   {
     term: 'CBO',
@@ -133,7 +133,7 @@ export const GLOSSARY: GlossaryTerm[] = [
       ko: 'Cost-Based Optimizer. 테이블 통계(행 수, NDV, 블록 수 등)를 기반으로 여러 실행 계획의 비용을 추정해 가장 낮은 비용의 계획을 선택.',
       en: 'Cost-Based Optimizer. Estimates the cost of multiple execution plans using table statistics (rows, NDV, blocks) and selects the cheapest plan.',
     },
-    sectionIds: ['optimizer-overview', 'optimizer-stats', 'optimizer-plan'],
+    sectionIds: ['optimizer-stats', 'optimizer-plan'],
   },
   {
     term: 'CKPT',
@@ -314,7 +314,7 @@ export const GLOSSARY: GlossaryTerm[] = [
       ko: 'CBO가 SQL을 실행하기 위해 선택한 작업 순서(액세스 패스, 조인 방법, 정렬 등). EXPLAIN PLAN 또는 DBMS_XPLAN으로 확인 가능.',
       en: 'The sequence of operations (access paths, join methods, sorts) chosen by the CBO. Viewable via EXPLAIN PLAN or DBMS_XPLAN.',
     },
-    sectionIds: ['optimizer-plan', 'optimizer-overview'],
+    sectionIds: ['optimizer-plan'],
   },
   {
     term: 'Extent',
@@ -900,7 +900,7 @@ export const GLOSSARY: GlossaryTerm[] = [
       ko: '전체 행 중 조건을 만족하는 행의 비율(0~1). CBO가 액세스 패스 비용을 추정할 때 핵심 지표. NDV가 높을수록 선택도가 낮아짐.',
       en: 'The fraction of rows satisfying a condition (0–1). A key metric CBO uses to estimate access path cost. Higher NDV means lower selectivity.',
     },
-    sectionIds: ['optimizer-stats', 'optimizer-overview'],
+    sectionIds: ['optimizer-stats'],
   },
   {
     term: 'SGA',
@@ -956,7 +956,7 @@ export const GLOSSARY: GlossaryTerm[] = [
       ko: 'CBO가 실행 계획을 수립하는 데 사용하는 테이블·컬럼·인덱스의 분포 정보. DBMS_STATS로 수집. 부정확하면 잘못된 계획이 생성됨.',
       en: 'Distribution information about tables, columns, and indexes used by CBO for plan selection. Collected via DBMS_STATS. Stale stats lead to poor plans.',
     },
-    sectionIds: ['optimizer-stats', 'optimizer-overview'],
+    sectionIds: ['optimizer-stats'],
   },
   {
     term: 'Subquery Unnesting',

@@ -3,6 +3,7 @@ import { cn } from '@/lib/utils'
 import { useSimulationStore } from '@/store/simulationStore'
 import { SgaPositionDiagram } from '../overview/sga/shared/SgaPositionDiagram'
 import type { SgaComponentId } from '../overview/sga/shared/SgaPositionDiagram'
+import { PgaCompactBlock } from '../overview/pga/PgaSection'
 
 export type InstanceComponentId =
   | 'server-process'
@@ -254,23 +255,75 @@ export function OracleInstanceMap({ highlightIds, callout, horizontal = false, h
     </div>
   ) : null
 
+  const spHighlighted  = highlightIds.includes('server-process')
+  const pgaHighlighted = highlightIds.includes('pga')
+
+  // Server Process = 외곽 컨테이너 박스 (teal)
+  // PGA = 그 안에 내포된 violet 박스 → "SP가 PGA를 소유한다"는 관계를 색상+중첩으로 표현
   const layerClient = (
     <div
       className={cn(
-        'rounded-xl border-2 p-3 transition-all duration-300',
-        clientHighlighted
-          ? 'border-teal-400 bg-teal-50/60 shadow-sm'
+        'rounded-xl border-2 transition-all duration-300',
+        spHighlighted
+          ? 'border-teal-500 bg-teal-50 ring-2 ring-teal-300 shadow-md'
           : clientDimmed
           ? 'border-border/20 bg-muted/10'
-          : 'border-teal-200/80 bg-teal-50/20'
+          : 'border-teal-300 bg-teal-50/30'
       )}
     >
-      <SectionLabel dimmed={clientDimmed}>
-        {lang === 'ko' ? 'Server Process' : 'Server Process'}
-      </SectionLabel>
-      <div className={cn('gap-2', horizontal ? 'flex' : 'grid grid-cols-2')}>
-        <MapBlock id="server-process" highlightIds={highlightIds} className={horizontal ? 'flex-1' : ''} />
-        <MapBlock id="pga" label="PGA" sublabel="Private Workspace" highlightIds={highlightIds} className={horizontal ? 'flex-1' : ''} />
+      {/* ── Server Process 헤더 영역 ── */}
+      <div className="flex items-center justify-between px-3 pt-2.5 pb-1.5">
+        <div className="flex items-center gap-1.5">
+          {spHighlighted && (
+            <motion.span
+              className="inline-flex h-3.5 w-3.5 items-center justify-center rounded-full bg-blue-500 text-white"
+              initial={{ scale: 0 }} animate={{ scale: 1 }}
+              transition={{ type: 'spring', stiffness: 400 }}
+            >
+              <span className="text-[7px] font-bold">★</span>
+            </motion.span>
+          )}
+          <span className={cn(
+            'font-mono text-[11px] font-bold leading-tight',
+            spHighlighted ? 'text-teal-800' : clientDimmed ? 'text-muted-foreground/20' : 'text-teal-700'
+          )}>
+            Server Process
+          </span>
+        </div>
+        <span className={cn(
+          'font-mono text-[8px]',
+          clientDimmed ? 'text-muted-foreground/20' : 'text-teal-500/80'
+        )}>
+          {lang === 'ko' ? '↔ SGA 공유 접근' : '↔ shared SGA access'}
+        </span>
+      </div>
+
+      {/* ── PGA 다이어그램 — SP 내부에 내포 ── */}
+      <div className="px-3 pb-3">
+        <motion.div
+          data-component-id="pga"
+          animate={
+            pgaHighlighted
+              ? { scale: [1, 1.02, 1], transition: { repeat: Infinity, duration: 1.4, repeatDelay: 0.3 } }
+              : { scale: 1 }
+          }
+          className={cn(
+            'relative rounded-xl transition-all duration-300',
+            pgaHighlighted ? 'ring-2 ring-violet-400 shadow-md' : '',
+            clientDimmed ? 'opacity-20 pointer-events-none' : 'opacity-100'
+          )}
+        >
+          {pgaHighlighted && (
+            <motion.div
+              className="absolute -top-2 -right-2 z-10 flex h-4 w-4 items-center justify-center rounded-full bg-blue-500 text-white"
+              initial={{ scale: 0 }} animate={{ scale: 1 }}
+              transition={{ type: 'spring', stiffness: 400 }}
+            >
+              <span className="text-[8px] font-bold">★</span>
+            </motion.div>
+          )}
+          <PgaCompactBlock lang={lang} />
+        </motion.div>
       </div>
     </div>
   )

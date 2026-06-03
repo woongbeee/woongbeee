@@ -18,7 +18,7 @@ const T = {
     subtitle:
       '실제 DBMS_XPLAN 출력을 보고 스스로 해석해 본 뒤, 아코디언을 열어 정답과 비교해 보세요.',
     intro:
-      '실행 계획을 잘 읽으려면 반복 연습이 중요합니다. 아래 6개의 예제를 순서대로 풀어보세요. 각 예제마다 실행 계획 출력이 먼저 보이고, "해설 보기"를 누르면 정답을 확인할 수 있습니다.',
+      '실행 계획을 잘 읽으려면 반복 연습이 중요해요. 아래 6개의 예제를 순서대로 풀어보세요. 각 예제마다 실행 계획 출력이 먼저 보이고, "해설 보기"를 누르면 정답을 확인할 수 있어요.',
     answerLabel: '해설 보기',
   },
   en: {
@@ -111,16 +111,16 @@ const ex1AnswerKo = `■ 핵심 포인트: PR(Physical Reads) — Buffer Cache �
 첫 번째 실행: CR=1842, PR=312
 두 번째 실행: CR=1842, PR=0
 
-CR(Consistent Reads)은 두 실행 모두 1842으로 동일합니다.
+CR(Consistent Reads)은 두 실행 모두 1842으로 동일해요.
 논리적으로 읽어야 하는 블록 수는 쿼리 계획에 의해 결정되므로
-실행 횟수와 무관하게 같습니다.
+실행 횟수와 무관하게 같아요.
 
-PR은 첫 실행에서 312, 두 번째에서 0으로 줄었습니다.
+PR은 첫 실행에서 312, 두 번째에서 0으로 줄었어요.
   ORDERS (PR=305): 첫 실행 시 Buffer Cache에 없어 디스크에서 읽음
   DEPARTMENTS (PR=7): 마찬가지로 첫 실행 시 디스크 읽기
 두 번째 실행에서 PR=0인 것은 첫 실행이 해당 블록을
-Buffer Cache에 이미 적재했기 때문입니다.
-이것이 정상적인 "캐시 워밍(cache warming)" 현상입니다.
+Buffer Cache에 이미 적재했기 때문이에요.
+이것이 정상적인 "캐시 워밍(cache warming)" 현상이에요.
 
 만약 두 번째 실행에서도 PR > 0이 지속된다면?
   → Buffer Cache가 작아 다른 쿼리가 블록을 계속 교체(eviction)하는 신호
@@ -203,25 +203,25 @@ const ex2AnswerKo = `■ 핵심 포인트: E-Rows vs A-Rows — 통계 오차가
 2번 오퍼레이션 (TABLE ACCESS FULL, CUSTOMERS):
   E-Rows=500, A-Rows=3
   CBO는 grade='VIP' AND region='SEOUL' 조건으로 500행이 반환될 것으로
-  추정했지만 실제로는 단 3행만 반환되었습니다.
+  추정했지만 실제로는 단 3행만 반환되었어요.
 
-왜 이렇게 큰 차이가 났을까?
-  두 컬럼의 결합 선택도를 CBO가 독립적으로 곱해서 계산했습니다.
-  히스토그램이나 컬럼 상관관계 정보가 없으면 이런 과대 추정이 발생합니다.
+왜 이렇게 큰 차이가 났을까요?
+  두 컬럼의 결합 선택도를 CBO가 독립적으로 곱해서 계산했어요.
+  히스토그램이나 컬럼 상관관계 정보가 없으면 이런 과대 추정이 발생해요.
 
 Hash Join의 작동 방식을 되짚으면:
-  CBO는 먼저 읽는 쪽(Build Input)으로 작은 테이블을 선택합니다.
+  CBO는 먼저 읽는 쪽(Build Input)으로 작은 테이블을 선택해요.
   CUSTOMERS(추정 500행)를 Build Input → 해시 테이블 구성
   ORDERS(89000행)를 Probe Input → 해시 테이블 탐색
-  이 선택 자체는 CBO 관점에서 올바른 판단입니다.
+  이 선택 자체는 CBO 관점에서 올바른 판단이에요.
 
 문제는 CUSTOMERS가 실제로는 3행밖에 없다는 것:
   CUSTOMERS: CR=412, PR=98 → 3행을 찾기 위해 412블록을 읽음 (FTS)
   ORDERS: CR=2829, PR=30 → 89412행 전체를 읽어 3개의 해시 버킷 탐색
 
-실제 3행이라면 Nested Loop가 훨씬 유리했을 것입니다:
+실제 3행이라면 Nested Loop가 훨씬 유리했을 거예요:
   CUSTOMERS에서 3행 추출 → ORDERS 인덱스를 3번만 탐색
-  CR이 수십 수준에 그쳤을 것입니다 (현재 CR=3241 대비).
+  CR이 수십 수준에 그쳤을 거예요 (현재 CR=3241 대비).
 
 ■ 해결 방법
   1. 복합 인덱스: CREATE INDEX cust_grade_region_ix ON customers(grade, region)
@@ -296,7 +296,7 @@ Predicate Information 해석:
     access("O"."CUSTOMER_ID"=10042)          ← 인덱스 탐색 시작 범위 결정
     filter("O"."ORDER_DATE">=DATE'2024-01-01') ← 읽어온 뒤 버리는 조건
 
-인덱스 구조를 역추론할 수 있습니다:
+인덱스 구조를 역추론할 수 있어요:
   CUSTOMER_ID가 선두 컬럼 → access로 처리됨.
   ORDER_DATE는 인덱스에 없거나 선두가 아님 → filter로만 처리.
   인덱스 이름(ORD_CUST_DATE_IX)에 DATE가 포함되어 있지만
@@ -527,20 +527,20 @@ Starts 컬럼이 Nested Loop의 핵심을 보여줍니다:
 CR=84521이 발생한 구조:
   4번 INDEX RANGE SCAN: CR=83900
     20회 × 약 4195 블록씩 = 83900 CR
-    VIP 고객 1명당 인덱스를 4195 블록이나 읽고 있습니다.
-    이것이 전체 시간의 대부분(4.10초 / 4.17초)을 차지합니다.
+    VIP 고객 1명당 인덱스를 4195 블록이나 읽고 있어요.
+    이것이 전체 시간의 대부분(4.10초 / 4.17초)을 차지해요.
   5번 TABLE ACCESS: CR=200
     200 ROWID × 1블록씩 = 200 CR (비교적 작음)
 
 ORDER_DATE가 filter인 이유:
-  ADD_MONTHS(SYSDATE,-6)는 실행 시마다 달라지는 함수 결과입니다.
-  CBO는 이를 컴파일 시점에 고정할 수 없으므로 access 범위로 쓰지 못합니다.
-  실제로는 CUSTOMER_ID로 access 후 ORDER_DATE를 filter로 적용합니다.
-  이 때문에 인덱스 스캔 범위가 CUSTOMER_ID 전체가 되어 CR이 폭증합니다.
+  ADD_MONTHS(SYSDATE,-6)는 실행 시마다 달라지는 함수 결과예요.
+  CBO는 이를 컴파일 시점에 고정할 수 없으므로 access 범위로 쓰지 못해요.
+  실제로는 CUSTOMER_ID로 access 후 ORDER_DATE를 filter로 적용해요.
+  이 때문에 인덱스 스캔 범위가 CUSTOMER_ID 전체가 되어 CR이 폭증해요.
 
 ■ 최적화 방향
 
-INDEX RANGE SCAN CR=83900이 핵심 병목입니다.
+INDEX RANGE SCAN CR=83900이 핵심 병목이에요.
 인덱스를 (CUSTOMER_ID, ORDER_DATE, STATUS)로 재구성하면:
 
   1. CUSTOMER_ID → access (기존과 동일)
@@ -550,7 +550,7 @@ INDEX RANGE SCAN CR=83900이 핵심 병목입니다.
 
 예상 결과:
   Starts=200이었던 TABLE ACCESS가 사라지고
-  CR이 84521 → 수백 수준으로 급감할 것입니다.`
+  CR이 84521 → 수백 수준으로 급감할 거예요.`
 
 const ex5AnswerEn = `■ Key Point: Starts column — how many times each operation ran
 
@@ -680,8 +680,8 @@ JOIN sales_targets t
 WHERE  m.actual_amt / t.target_amt * 100 >= 80
 ORDER BY m.sale_ym, r.region_name, achieve_pct DESC;`
 
-const ex6AnswerKo = `이 실행 계획은 17개 오퍼레이션(Id 0~16)으로 구성된 복합 리포트 쿼리입니다.
-안쪽부터 바깥쪽으로, 같은 깊이에서는 위에서 아래 순서로 읽습니다.
+const ex6AnswerKo = `이 실행 계획은 17개 오퍼레이션(Id 0~16)으로 구성된 복합 리포트 쿼리예요.
+안쪽부터 바깥쪽으로, 같은 깊이에서는 위에서 아래 순서로 읽어요.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ■ STEP 1: 실행 순서 파악
@@ -695,8 +695,8 @@ const ex6AnswerKo = `이 실행 계획은 17개 오퍼레이션(Id 0~16)으로 �
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 8번 VIEW (index$_join$_002):
-  9번~11번이 만들어내는 특수 뷰입니다.
-  Oracle이 PRODUCTS 테이블 없이 두 인덱스만으로 조인한 결과입니다.
+  9번~11번이 만들어내는 특수 뷰예요.
+  Oracle이 PRODUCTS 테이블 없이 두 인덱스만으로 조인한 결과예요.
 
 9번 HASH JOIN (access: ROWID=ROWID):
   10번 PROD_CATEGORY_IX (INDEX FAST FULL SCAN): 카테고리 정보 포함 인덱스
@@ -722,7 +722,7 @@ const ex6AnswerKo = `이 실행 계획은 17개 오퍼레이션(Id 0~16)으로 �
 14번 HASH JOIN: access("OI"."ORDER_ID"="O"."ORDER_ID")
   ORDERS(124892행)와 ORDER_ITEMS(98341행) 조인.
   PW=96 — 해시 영역이 PGA를 초과해 TEMP에 96블록 기록.
-  두 대형 테이블을 조인하면서 메모리가 부족했습니다.
+  두 대형 테이블을 조인하면서 메모리가 부족했어요.
 
 13번 TABLE ACCESS FULL (CUSTOMERS): PR=72, CR=3218
   filter("CHANNEL"='ONLINE' AND "STATUS"='ACTIVE')
@@ -773,7 +773,7 @@ const ex6AnswerKo = `이 실행 계획은 17개 오퍼레이션(Id 0~16)으로 �
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 병목 1 — CR=29962 (ORDERS FTS):
-  ORDER_DATE filter로 인해 ORDERS 전체를 읽습니다.
+  ORDER_DATE filter로 인해 ORDERS 전체를 읽어요.
   파티셔닝: ORDERS를 ORDER_DATE 기준으로 Range 파티셔닝하면
   12개월치 파티션만 접근 → CR 대폭 감소.
 

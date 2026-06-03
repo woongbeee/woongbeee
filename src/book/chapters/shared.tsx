@@ -330,6 +330,7 @@ export function SqlBlock({
   activeClause,
   badge,
   badgeColor = 'blue',
+  title,
   desc,
   className,
 }: {
@@ -337,10 +338,14 @@ export function SqlBlock({
   activeClause?: string
   badge?: string
   badgeColor?: string
+  /** 헤더 한 줄 제목. badge와 함께 굵게 표시됨 */
+  title?: string
+  /** 헤더 설명 텍스트. 일반 굵기로 읽기 편하게 표시됨 */
   desc?: string
   className?: string
 }) {
-  if (!badge && !desc) {
+  const hasHeader = badge || title || desc
+  if (!hasHeader) {
     return (
       <div className={cn('overflow-x-auto rounded-xl border bg-muted/30 px-4 py-3', className)}>
         <SqlHighlight sql={sql} activeClause={activeClause} />
@@ -349,13 +354,16 @@ export function SqlBlock({
   }
   return (
     <div className={cn('rounded-xl border bg-card', className)}>
-      <div className="flex items-start gap-3 border-b px-4 py-3">
-        {badge && (
-          <span className={cn('rounded border px-2 py-0.5 font-mono text-xs font-bold', SQL_BADGE[badgeColor] ?? SQL_BADGE.blue)}>
-            {badge}
-          </span>
-        )}
-        {desc && <p className="mb-0 text-sm font-bold text-foreground/90">{desc}</p>}
+      <div className="border-b px-4 py-3">
+        <div className="flex items-center gap-2">
+          {badge && (
+            <span className={cn('shrink-0 rounded border px-2 py-0.5 font-mono text-xs font-bold', SQL_BADGE[badgeColor] ?? SQL_BADGE.blue)}>
+              {badge}
+            </span>
+          )}
+          {title && <p className="mb-0 text-xs font-bold text-foreground/90">{title}</p>}
+        </div>
+        {desc && <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">{desc}</p>}
       </div>
       <div className="overflow-x-auto rounded-b-xl bg-muted/30 px-4 py-3">
         <SqlHighlight sql={sql} activeClause={activeClause} />

@@ -19,17 +19,17 @@ const T = {
       'EXPLAIN PLAN 문장은 SQL 문장에 대해 옵티마이저가 선택한 실행 계획을 확인하게 해줍니다.',
     aboutTitle: 'EXPLAIN PLAN이란?',
     aboutDesc:
-      'EXPLAIN PLAN 문장은 SELECT, UPDATE, INSERT, DELETE 문장에 대해 옵티마이저가 선택하는 실행 계획을 표시합니다. EXPLAIN PLAN 출력은 문장이 설명(explain)되었을 때 데이터베이스가 SQL 문장을 어떻게 실행했을지 보여줍니다. 실행 환경과 설명 환경의 차이로 인해 설명된 계획이 실제 실행 계획과 다를 수 있습니다.\n\nEXPLAIN PLAN 문장은 DDL이 아닌 DML 문장입니다. 따라서 Oracle 데이터베이스는 EXPLAIN PLAN 문장이 수행한 변경 사항을 암묵적으로 커밋하지 않습니다.',
+      'EXPLAIN PLAN 문장은 SELECT, UPDATE, INSERT, DELETE 문장에 대해 옵티마이저가 선택하는 실행 계획을 표시해요. EXPLAIN PLAN 출력은 문장이 설명(explain)되었을 때 데이터베이스가 SQL 문장을 어떻게 실행했을지 보여줘요. 실행 환경과 설명 환경의 차이로 인해 설명된 계획이 실제 실행 계획과 다를 수 있어요.\n\nEXPLAIN PLAN 문장은 DDL이 아닌 DML 문장이에요. 따라서 Oracle 데이터베이스는 EXPLAIN PLAN 문장이 수행한 변경 사항을 암묵적으로 커밋하지 않아요.',
     planTableTitle: 'PLAN_TABLE',
     planTableDesc:
-      'PLAN_TABLE은 EXPLAIN PLAN 문장이 실행 계획을 설명하는 행을 삽입하는 기본 샘플 출력 테이블입니다. Oracle 데이터베이스는 SYS 스키마에 전역 임시 테이블 PLAN_TABLE$를 자동으로 생성하고, PLAN_TABLE을 동의어(synonym)로 만듭니다. PLAN_TABLE에 대한 모든 필요한 권한은 PUBLIC에 부여됩니다.',
+      'PLAN_TABLE은 EXPLAIN PLAN 문장이 실행 계획을 설명하는 행을 삽입하는 기본 샘플 출력 테이블이에요. Oracle 데이터베이스는 SYS 스키마에 전역 임시 테이블 PLAN_TABLE$를 자동으로 생성하고, PLAN_TABLE을 동의어(synonym)로 만들어요. PLAN_TABLE에 대한 모든 필요한 권한은 PUBLIC에 부여돼요.',
     planTableSql: `-- PLAN_TABLE 수동 생성 (필요한 경우)
 @$ORACLE_HOME/rdbms/admin/catplan.sql`,
     restrictionsTitle: 'EXPLAIN PLAN 제한 사항',
     restrictionsItems: [
-      'Oracle 데이터베이스는 날짜 바인드 변수의 암묵적 형변환을 수행하는 문장에 대해 EXPLAIN PLAN을 지원하지 않습니다.',
-      '바인드 변수가 있는 경우 EXPLAIN PLAN 출력이 실제 실행 계획을 나타내지 않을 수 있습니다.',
-      'TKPROF는 SQL 문장의 텍스트에서 바인드 변수의 타입을 결정할 수 없습니다. VARCHAR로 가정하며, 그렇지 않으면 오류 메시지를 출력합니다.',
+      'Oracle 데이터베이스는 날짜 바인드 변수의 암묵적 형변환을 수행하는 문장에 대해 EXPLAIN PLAN을 지원하지 않아요.',
+      '바인드 변수가 있는 경우 EXPLAIN PLAN 출력이 실제 실행 계획을 나타내지 않을 수 있어요.',
+      'TKPROF는 SQL 문장의 텍스트에서 바인드 변수의 타입을 결정할 수 없어요. VARCHAR로 가정하며, 그렇지 않으면 오류 메시지를 출력해요.',
     ],
     basicStepsTitle: 'EXPLAIN PLAN 기본 사용법',
     basicStepsDesc: 'PLAN_TABLE에 SQL 문장의 계획을 저장하려면 EXPLAIN PLAN을 사용합니다.',
@@ -65,7 +65,7 @@ Note
    - this is an adaptive plan`,
     stmtIdTitle: 'STATEMENT_ID로 여러 계획 관리하기',
     stmtIdDesc:
-      '여러 문장이 있을 때 문장 식별자(STATEMENT_ID)를 지정하면 특정 실행 계획을 식별할 수 있습니다. SET STATEMENT_ID를 사용하기 전에 해당 STATEMENT_ID의 기존 행을 제거하세요.',
+      '여러 문장이 있을 때 문장 식별자(STATEMENT_ID)를 지정하면 특정 실행 계획을 식별할 수 있어요. SET STATEMENT_ID를 사용하기 전에 해당 STATEMENT_ID의 기존 행을 제거하세요.',
     stmtIdSql: `-- Example 6-1: STATEMENT_ID 사용
 EXPLAIN PLAN
   SET STATEMENT_ID = 'st1' FOR
@@ -120,7 +120,7 @@ SELECT PLAN_TABLE_OUTPUT
 ----------------------------------------`,
     containersTitle: 'CONTAINERS 쿼리에 대한 EXPLAIN PLAN',
     containersDesc:
-      'CONTAINERS 절을 사용하면 사용자 생성 테이블/뷰와 Oracle 제공 테이블/뷰 모두를 모든 컨테이너에 걸쳐 쿼리할 수 있습니다.',
+      'CONTAINERS 절을 사용하면 사용자 생성 테이블/뷰와 Oracle 제공 테이블/뷰 모두를 모든 컨테이너에 걸쳐 쿼리할 수 있어요.',
     containersSql: `EXPLAIN PLAN FOR
   SELECT con_id, count(*)
   FROM   containers(sys.dba_tables)
@@ -148,7 +148,7 @@ Plan hash value: 891225627
       'CONTAINERS 절을 사용하는 쿼리는 기본적으로 파티셔닝됩니다. 행 7의 PX PARTITION LIST ITERATOR가 이를 나타냅니다. Pstart=1, Pstop=9는 con_id < 10 조건에서 도출됩니다.',
     customQueryTitle: 'PLAN_TABLE 직접 쿼리하기',
     customQueryDesc:
-      'STATEMENT_ID를 지정했다면 직접 SQL 스크립트를 작성해 PLAN_TABLE을 쿼리할 수 있습니다.',
+      'STATEMENT_ID를 지정했다면 직접 SQL 스크립트를 작성해 PLAN_TABLE을 쿼리할 수 있어요.',
     customQuerySql: `-- CONNECT BY로 트리 구조를 따라 계획 조회
 SELECT  cardinality "Rows",
         lpad(' ', level-1) || operation || ' ' || options || ' ' || object_name "Plan"
@@ -160,7 +160,7 @@ CONNECT BY PRIOR id = parent_id
   ORDER BY id;`,
     partitionTitle: '파티션 객체에 대한 EXPLAIN PLAN',
     partitionDesc:
-      '프루닝(pruning) 후 접근되는 파티션은 PARTITION_START와 PARTITION_STOP 컬럼에 표시됩니다. Range 파티션의 행 소스 이름은 PARTITION RANGE이고, Hash 파티션은 PARTITION HASH입니다.',
+      '프루닝(pruning) 후 접근되는 파티션은 PARTITION_START와 PARTITION_STOP 컬럼에 표시돼요. Range 파티션의 행 소스 이름은 PARTITION RANGE이고, Hash 파티션은 PARTITION HASH예요.',
     partitionSql: `-- Range 파티션 테이블 생성
 CREATE TABLE emp_range
 PARTITION BY RANGE(hire_date)
@@ -186,7 +186,7 @@ EXPLAIN PLAN FOR
       '파티션 번호를 컴파일 시점에 알 수 없을 때(바인드 변수 사용 등) PARTITION_START와 PARTITION_STOP이 KEY로 표시되며, 런타임에 결정됩니다.',
     parallelTitle: '병렬 쿼리 EXPLAIN PLAN',
     parallelDesc:
-      '병렬 쿼리 계획은 직렬 쿼리 계획과 중요한 차이가 있습니다. 병렬 계획에서는 PX 관련 행 소스들이 추가됩니다.',
+      '병렬 쿼리 계획은 직렬 쿼리 계획과 중요한 차이가 있어요. 병렬 계획에서는 PX 관련 행 소스들이 추가돼요.',
     parallelSql: `-- 병렬 쿼리 EXPLAIN PLAN 예시 (Example 6-4)
 CREATE TABLE emp2 AS SELECT * FROM employees;
 ALTER TABLE emp2 PARALLEL 2;
@@ -211,7 +211,7 @@ SELECT PLAN_TABLE_OUTPUT FROM TABLE(DBMS_XPLAN.DISPLAY());`,
 | 8 |         TABLE ACCESS FULL|EMP2  |107 | 2782  | 2  (0)  |Q1,00|PCWP |          |
 -------------------------------------------------------------------------------------`,
     parallelNote:
-      'PX BLOCK ITERATOR는 EMP2 테이블을 병렬 실행 서버들이 나눠 스캔하기 위한 분할을 나타냅니다. PX SEND/PX RECEIVE는 두 병렬 서버 집합을 연결하는 파이프입니다.',
+      'PX BLOCK ITERATOR는 EMP2 테이블을 병렬 실행 서버들이 나눠 스캔하기 위한 분할을 나타내요. PX SEND/PX RECEIVE는 두 병렬 서버 집합을 연결하는 파이프예요.',
     bitmapTitle: 'Bitmap 인덱스 계획 (Example 6-5)',
     bitmapSql: `EXPLAIN PLAN FOR
   SELECT * FROM t
@@ -246,11 +246,11 @@ FROM TABLE(DBMS_XPLAN.DISPLAY(format => 'ALL'));`,
 |   2 |   HASH GROUP BY     |                            |  11 |  77 | 4  (25)| 00:00:01 |
 |   3 |    TABLE ACCESS FULL| EMPLOYEES                  | 107 | 749 | 3   (0)| 00:00:01 |`,
     resultCacheNote:
-      'RESULT CACHE 연산은 캐시 ID(ch5r45jxt05rk0xc1brct197fp)로 식별됩니다. V$RESULT_CACHE_OBJECTS 뷰를 이 CACHE_ID로 조회해 상태를 확인할 수 있습니다.',
+      'RESULT CACHE 연산은 캐시 ID(ch5r45jxt05rk0xc1brct197fp)로 식별돼요. V$RESULT_CACHE_OBJECTS 뷰를 이 CACHE_ID로 조회해서 상태를 확인할 수 있어요.',
 
     whyChangeTitle: '실행 계획이 변경되는 이유',
     whyChangeDesc:
-      'EXPLAIN PLAN이 보여주는 계획은 explain 시점의 계획이에요. 실제 실행 시점과 환경이 다르면 계획이 달라질 수 있습니다. SQL 성능 회귀를 방지하려면 SQL Plan Management 사용을 고려하세요.',
+      'EXPLAIN PLAN이 보여주는 계획은 explain 시점의 계획이에요. 실제 실행 시점과 환경이 다르면 계획이 달라질 수 있어요. SQL 성능 회귀를 방지하려면 SQL Plan Management 사용을 고려하세요.',
     whyChangeSchemaTitle: '스키마 차이 (Different Schemas)',
     whyChangeSchemaItems: [
       '실행 환경과 EXPLAIN PLAN 환경이 다른 데이터베이스를 사용하는 경우',
@@ -531,7 +531,9 @@ export function ExplainSection() {
         <SqlBlock sql={t.basicStepsSql} />
       </div>
       <div className="mt-4">
-        <SqlBlock sql={t.basicStepsOutput} />
+        <div className="overflow-x-auto rounded-xl border bg-muted/30 px-4 py-3">
+          <pre className="font-mono text-xs leading-relaxed text-foreground/80 whitespace-pre">{t.basicStepsOutput}</pre>
+        </div>
       </div>
 
       <Divider />
@@ -545,14 +547,18 @@ export function ExplainSection() {
       <AccordionSection title={isKo ? 'Example 6-2: STATEMENT_ID ex_plan1' : 'Example 6-2: Statement ID ex_plan1'}>
         <SqlBlock sql={t.ex1Sql} />
         <div className="mt-3">
-          <SqlBlock sql={t.ex1Output} />
+          <div className="overflow-x-auto rounded-xl border bg-muted/30 px-4 py-3">
+            <pre className="font-mono text-xs leading-relaxed text-foreground/80 whitespace-pre">{t.ex1Output}</pre>
+          </div>
         </div>
       </AccordionSection>
 
       <AccordionSection title={isKo ? 'Example 6-3: BASIC 포맷 ex_plan2' : 'Example 6-3: BASIC format ex_plan2'}>
         <SqlBlock sql={t.ex2Sql} />
         <div className="mt-3">
-          <SqlBlock sql={t.ex2Output} />
+          <div className="overflow-x-auto rounded-xl border bg-muted/30 px-4 py-3">
+            <pre className="font-mono text-xs leading-relaxed text-foreground/80 whitespace-pre">{t.ex2Output}</pre>
+          </div>
         </div>
       </AccordionSection>
 
@@ -564,7 +570,9 @@ export function ExplainSection() {
         <SqlBlock sql={t.containersSql} />
       </div>
       <div className="mt-4">
-        <SqlBlock sql={t.containersOutput} />
+        <div className="overflow-x-auto rounded-xl border bg-muted/30 px-4 py-3">
+          <pre className="font-mono text-xs leading-relaxed text-foreground/80 whitespace-pre">{t.containersOutput}</pre>
+        </div>
       </div>
       <div className="mt-4">
         <InfoBox variant="note">{t.containersNote}</InfoBox>
@@ -597,7 +605,9 @@ export function ExplainSection() {
         <SqlBlock sql={t.parallelSql} />
       </div>
       <div className="mt-4">
-        <SqlBlock sql={t.parallelOutput} />
+        <div className="overflow-x-auto rounded-xl border bg-muted/30 px-4 py-3">
+          <pre className="font-mono text-xs leading-relaxed text-foreground/80 whitespace-pre">{t.parallelOutput}</pre>
+        </div>
       </div>
       <div className="mt-4">
         <InfoBox variant="note">{t.parallelNote}</InfoBox>
@@ -613,7 +623,9 @@ export function ExplainSection() {
       <AccordionSection title={t.resultCacheTitle}>
         <SqlBlock sql={t.resultCacheSql} />
         <div className="mt-3">
-          <SqlBlock sql={t.resultCacheOutput} />
+          <div className="overflow-x-auto rounded-xl border bg-muted/30 px-4 py-3">
+            <pre className="font-mono text-xs leading-relaxed text-foreground/80 whitespace-pre">{t.resultCacheOutput}</pre>
+          </div>
         </div>
         <div className="mt-4">
           <InfoBox variant="note">{t.resultCacheNote}</InfoBox>

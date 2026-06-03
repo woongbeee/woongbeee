@@ -15,11 +15,11 @@ const T = {
   ko: {
     title: 'Partition-Wise Join',
     subtitle:
-      'Partition-Wise Join은 동일한 파티션 구조를 가진 두 테이블을 조인할 때, 대응하는 파티션끼리만 조인하여 조인 비용과 메모리 사용을 대폭 줄이는 최적화입니다.',
+      'Partition-Wise Join은 동일한 파티션 구조를 가진 두 테이블을 조인할 때, 대응하는 파티션끼리만 조인해서 조인 비용과 메모리 사용을 대폭 줄이는 최적화예요.',
 
     whatTitle: 'Partition-Wise Join이란?',
     whatDesc:
-      '일반 조인은 두 테이블 전체를 대상으로 조인 연산을 수행합니다. Partition-Wise Join은 두 테이블이 동일한 파티션 키로 파티셔닝되어 있을 때, 대응하는 파티션 1번끼리, 2번끼리만 독립적으로 조인합니다.\n\n예를 들어 orders 테이블과 order_items 테이블이 모두 order_date로 Range 파티셔닝되어 있으면, 2024년 파티션끼리만, 2023년 파티션끼리만 조인합니다. 다른 파티션을 전혀 접근하지 않습니다.\n\nPartition-Wise Join의 가장 큰 장점은 대용량 Hash Join에서 Sort/Merge에 필요한 메모리와 temp 공간을 파티션 크기만큼만 사용한다는 점입니다.',
+      '일반 조인은 두 테이블 전체를 대상으로 조인 연산을 수행해요. Partition-Wise Join은 두 테이블이 동일한 파티션 키로 파티셔닝되어 있을 때, 대응하는 파티션 1번끼리, 2번끼리만 독립적으로 조인해요.\n\n예를 들어 orders 테이블과 order_items 테이블이 모두 order_date로 Range 파티셔닝되어 있으면, 2024년 파티션끼리만, 2023년 파티션끼리만 조인해요. 다른 파티션은 전혀 접근하지 않아요.\n\nPartition-Wise Join의 가장 큰 장점은 대용량 Hash Join에서 Sort/Merge에 필요한 메모리와 temp 공간을 파티션 크기만큼만 사용한다는 점이에요.',
 
     typesTitle: 'Full vs Partial Partition-Wise Join',
     typesTable: [
@@ -29,7 +29,7 @@ const T = {
 
     condTitle: 'Full PWJ 성립 조건',
     condDesc:
-      '두 테이블이 Full Partition-Wise Join으로 실행되려면 아래 조건이 모두 충족되어야 합니다.',
+      '두 테이블이 Full Partition-Wise Join으로 실행되려면 아래 조건이 모두 충족되어야 해요.',
     condTable: [
       ['동일 파티션 키', '조인 조건에 사용된 컬럼과 두 테이블의 파티션 키가 일치해야 함'],
       ['동일 파티션 수', '두 테이블의 파티션 개수가 같아야 함 (Hash의 경우 2의 거듭제곱)'],
@@ -39,7 +39,7 @@ const T = {
 
     exampleTitle: '예시: Full Partition-Wise Join',
     exampleDesc:
-      'orders와 order_items를 모두 order_date로 Range 파티셔닝한 뒤 조인하면 Full PWJ가 발생합니다.',
+      'orders와 order_items를 모두 order_date로 Range 파티셔닝한 뒤 조인하면 Full PWJ가 발생해요.',
     exampleSql: `-- 두 테이블을 동일한 파티션 구조로 생성
 CREATE TABLE orders (
   order_id   NUMBER PRIMARY KEY,
@@ -78,7 +78,7 @@ GROUP BY o.order_id, o.customer_id;`,
 
     refJoinTitle: 'Reference 파티션과 Partition-Wise Join',
     refJoinDesc:
-      'Reference 파티션을 사용하면 자식 테이블에 파티션 키 컬럼을 별도 저장하지 않아도 자동으로 동일한 파티션 구조를 가집니다. 조인 조건에 order_date가 없어도 Full PWJ가 발생합니다.',
+      'Reference 파티션을 사용하면 자식 테이블에 파티션 키 컬럼을 별도 저장하지 않아도 자동으로 동일한 파티션 구조를 가져요. 조인 조건에 order_date가 없어도 Full PWJ가 발생해요.',
     refJoinSql: `-- Reference 파티션: 자식 테이블에 order_date 불필요
 CREATE TABLE order_items_ref (
   item_id    NUMBER,
@@ -99,7 +99,7 @@ GROUP BY o.order_id, o.customer_id;`,
 
     planTitle: '실행 계획에서 PWJ 확인',
     planDesc:
-      'Partition-Wise Join은 실행 계획에 PARTITION HASH JOIN 또는 PARTITION RANGE JOIN으로 표시됩니다.',
+      'Partition-Wise Join은 실행 계획에 PARTITION HASH JOIN 또는 PARTITION RANGE JOIN으로 표시돼요.',
     planSql: `-- 실행 계획 확인
 EXPLAIN PLAN FOR
 SELECT o.order_id, SUM(i.quantity * i.unit_price)
@@ -125,7 +125,7 @@ Plan example (Full Partition-Wise Join):
 
     parallelTitle: 'PWJ와 병렬 처리',
     parallelDesc:
-      'Partition-Wise Join은 병렬 처리와 결합할 때 극대화됩니다. 각 파티션 쌍을 별도의 병렬 프로세스가 독립적으로 조인하므로, 병렬도를 높일수록 전체 처리 시간이 단축됩니다.',
+      'Partition-Wise Join은 병렬 처리와 결합할 때 효과가 극대화돼요. 각 파티션 쌍을 별도의 병렬 프로세스가 독립적으로 조인하기 때문에, 병렬도를 높일수록 전체 처리 시간이 단축돼요.',
     parallelSql: `-- 병렬 힌트와 함께 사용
 SELECT /*+ PARALLEL(o, 4) PARALLEL(i, 4) */
        o.order_id, SUM(i.quantity * i.unit_price)
@@ -143,7 +143,7 @@ GROUP BY o.order_id;`,
     ],
 
     summary:
-      'Partition-Wise Join은 동일한 파티션 구조를 가진 테이블 간 조인에서 자동으로 발생하는 최적화입니다. Reference 파티션을 활용하면 파티션 키 컬럼 중복 저장 없이 자동으로 Full PWJ를 활성화할 수 있습니다. 대용량 조인의 메모리 사용과 병렬 처리 효율을 동시에 개선하는 핵심 파티셔닝 기법입니다.',
+      'Partition-Wise Join은 동일한 파티션 구조를 가진 테이블 간 조인에서 자동으로 발생하는 최적화예요. Reference 파티션을 활용하면 파티션 키 컬럼 중복 저장 없이 자동으로 Full PWJ를 활성화할 수 있어요. 대용량 조인의 메모리 사용과 병렬 처리 효율을 동시에 개선하는 핵심 파티셔닝 기법이에요.',
   },
 
   en: {

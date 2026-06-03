@@ -143,17 +143,17 @@ ORDER BY dept_id NULLS LAST, job_title NULLS LAST`
 const T = {
   ko: {
     chapterTitle: 'ROLLUP / CUBE / GROUPING SETS / GROUPING',
-    chapterSubtitle: 'GROUP BY를 확장해 소계·총계·교차 집계를 한 번에 구하는 Oracle 집계 구문입니다.',
+    chapterSubtitle: 'GROUP BY를 확장해서 소계·총계·교차 집계를 한 번에 구하는 Oracle 집계 구문이에요.',
     tabRollup:        'ROLLUP',
     tabCube:          'CUBE',
     tabGroupingSets:  'GROUPING SETS',
     tabGrouping:      'GROUPING()',
 
     rollupTitle: 'ROLLUP — 계층적 소계',
-    rollupDesc:  'ROLLUP(A, B)는 (A, B) 상세 집계 → (A) 부서 소계 → () 전체 총계 순서로 행을 자동 추가합니다. 계층이 왼쪽에서 오른쪽으로 하나씩 제거되는 방식입니다.',
+    rollupDesc:  'ROLLUP(A, B)는 (A, B) 상세 집계 → (A) 부서 소계 → () 전체 총계 순서로 행을 자동으로 추가해요. 계층이 왼쪽에서 오른쪽으로 하나씩 제거되는 방식이에요.',
     rollupInfo:  'ROLLUP(dept_id, job_title)이 만드는 3가지 집계 수준: ① dept_id + job_title (상세) ② dept_id만 (부서 소계) ③ 전체 (총계)',
     rollupEtymTitle: 'ROLLUP이란 단어는 어디서 왔을까?',
-    rollupEtym: '"Roll up"은 영어로 "말아 올리다", "굴려 위로 합치다"는 뜻입니다. 스프레드시트에서 하위 항목들을 접어(roll up) 상위 합계를 보여주는 동작에서 유래했습니다. 세부 행들을 위로 말아 올려 소계·총계로 압축한다는 이미지입니다.',
+    rollupEtym: '"Roll up"은 영어로 "말아 올리다", "굴려 위로 합치다"는 뜻이에요. 스프레드시트에서 하위 항목들을 접어(roll up) 상위 합계를 보여주는 동작에서 유래했어요. 세부 행들을 위로 말아 올려 소계·총계로 압축한다는 이미지예요.',
     rollupUsageTitle: '실무에서 언제 쓸까?',
     rollupUsages: [
       { icon: '📊', title: '월별 매출 보고서', desc: '지역 → 팀 → 담당자 순으로 드릴다운 가능한 매출 집계표를 단 하나의 쿼리로 만들 때. GROUP BY ROLLUP(region, team, emp_id)' },
@@ -166,7 +166,7 @@ const T = {
     cubeDesc:  'CUBE(A, B)는 가능한 모든 컬럼 조합의 집계를 한꺼번에 만듭니다. (A, B) · (A) · (B) · () 네 가지 집계가 생깁니다. ROLLUP보다 더 많은 행이 생기고, BI 리포트처럼 행·열 모두 소계가 필요할 때 씁니다.',
     cubeInfo:  'CUBE(dept_id, job_title)이 만드는 4가지 집계: ① dept+job (상세) ② dept만 (부서별 합계) ③ job만 (직무별 합계) ④ 전체 총계',
     cubeEtymTitle: 'CUBE란 단어는 어디서 왔을까?',
-    cubeEtym: '"Cube"는 정육면체입니다. 2개 컬럼이면 사각형, 3개 컬럼이면 정육면체처럼 모든 면(조합)을 빠짐없이 집계한다는 뜻에서 유래했습니다. 데이터 분석에서 "OLAP 큐브"라는 개념이 여기서 나왔으며, 다차원 집계를 한 번에 계산한다는 이미지입니다.',
+    cubeEtym: '"Cube"는 정육면체예요. 2개 컬럼이면 사각형, 3개 컬럼이면 정육면체처럼 모든 면(조합)을 빠짐없이 집계한다는 뜻에서 유래했어요. 데이터 분석에서 "OLAP 큐브"라는 개념이 여기서 나왔으며, 다차원 집계를 한 번에 계산한다는 이미지예요.',
     cubeUsageTitle: '실무에서 언제 쓸까?',
     cubeUsages: [
       { icon: '📊', title: 'BI 크로스탭 리포트', desc: '행은 부서별, 열은 직무별 합계가 동시에 필요한 피벗형 보고서. CUBE 하나로 행 방향·열 방향 소계를 모두 산출.' },
@@ -176,12 +176,12 @@ const T = {
     ],
 
     groupingSetsTitle: 'GROUPING SETS — 원하는 집계 조합만 선택',
-    groupingSetsDesc:  'GROUPING SETS는 ROLLUP·CUBE처럼 자동 생성하는 대신, 원하는 집계 조합을 직접 나열합니다. 필요한 집계 수준만 골라 쓸 수 있어 불필요한 소계 행을 제거할 수 있습니다.',
-    groupingSetsInfo:  'GROUPING SETS ((dept_id), (job_title))은 부서별 합계와 직무별 합계만 만듭니다. CUBE처럼 상세(dept+job)나 전체 총계는 생성하지 않습니다.',
+    groupingSetsDesc:  'GROUPING SETS는 ROLLUP·CUBE처럼 자동으로 생성하는 대신, 원하는 집계 조합을 직접 나열해요. 필요한 집계 수준만 골라 쓸 수 있어서 불필요한 소계 행을 제거할 수 있어요.',
+    groupingSetsInfo:  'GROUPING SETS ((dept_id), (job_title))은 부서별 합계와 직무별 합계만 만들어요. CUBE처럼 상세(dept+job)나 전체 총계는 생성하지 않아요.',
     groupingSetsEqTitle: 'GROUPING SETS = 여러 GROUP BY의 UNION ALL',
-    groupingSetsEqDesc:  'GROUPING SETS는 내부적으로 각 집합을 개별 GROUP BY로 실행한 뒤 결과를 UNION ALL로 합친 것과 동일합니다. 단, GROUPING SETS는 테이블을 한 번만 스캔하므로 성능이 더 좋습니다.',
+    groupingSetsEqDesc:  'GROUPING SETS는 내부적으로 각 집합을 개별 GROUP BY로 실행한 뒤 결과를 UNION ALL로 합친 것과 동일해요. 단, GROUPING SETS는 테이블을 한 번만 스캔하기 때문에 성능이 더 좋아요.',
     groupingSetsEtymTitle: 'GROUPING SETS란 단어는 어디서 왔을까?',
-    groupingSetsEtym: '"Grouping Sets"는 말 그대로 "집계할 집합들의 묶음"입니다. ROLLUP·CUBE가 규칙에 따라 자동으로 집합을 생성하는 것과 달리, GROUPING SETS는 집계할 집합 목록을 개발자가 직접 지정합니다. 원하는 집합만 정확히 골라 실행하는 수동 방식입니다.',
+    groupingSetsEtym: '"Grouping Sets"는 말 그대로 "집계할 집합들의 묶음"이에요. ROLLUP·CUBE가 규칙에 따라 자동으로 집합을 생성하는 것과 달리, GROUPING SETS는 집계할 집합 목록을 개발자가 직접 지정해요. 원하는 집합만 정확히 골라 실행하는 수동 방식이에요.',
     groupingSetsUsageTitle: '실무에서 언제 쓸까?',
     groupingSetsUsages: [
       { icon: '🎯', title: '필요한 집계만 정확히', desc: '부서별 합계와 직무별 합계는 필요하지만, 부서+직무 상세나 전체 총계는 불필요할 때. ROLLUP·CUBE 대신 GROUPING SETS로 딱 필요한 것만 뽑음.' },
@@ -191,12 +191,12 @@ const T = {
     ],
 
     groupingTitle: 'GROUPING() — 소계 행 식별 함수',
-    groupingDesc:  'ROLLUP·CUBE·GROUPING SETS로 생성된 소계/총계 행에서 NULL은 "집계 기준에서 제외된 컬럼"을 나타냅니다. 하지만 원본 데이터에도 NULL이 있을 수 있어, NULL만 보고는 소계 행인지 실제 NULL인지 구분할 수 없습니다. GROUPING() 함수는 이 문제를 해결합니다.',
+    groupingDesc:  'ROLLUP·CUBE·GROUPING SETS로 생성된 소계/총계 행에서 NULL은 "집계 기준에서 제외된 컬럼"을 나타내요. 하지만 원본 데이터에도 NULL이 있을 수 있어서, NULL만 보고는 소계 행인지 실제 NULL인지 구분할 수 없어요. GROUPING() 함수가 이 문제를 해결해줘요.',
     groupingInfo:  'GROUPING(col)은 해당 컬럼이 집계에서 제외된(소계/총계) 경우 1, 실제 그룹 기준으로 사용된 경우 0을 반환합니다.',
     groupingCaseTitle: 'CASE와 결합해 레이블 표시',
-    groupingCaseDesc:  'GROUPING()을 CASE 식과 함께 쓰면 NULL 대신 "전체"·"소계" 같은 의미 있는 레이블로 바꿀 수 있습니다.',
-    groupingEtymTitle: 'GROUPING()이란 함수는 왜 필요할까?',
-    groupingEtym: 'ROLLUP/CUBE가 만드는 소계 행에서 집계 제외된 컬럼은 NULL로 표시됩니다. 그런데 원본 데이터에도 실제 NULL 값이 있을 수 있어 "이 NULL이 소계를 뜻하는지, 데이터가 원래 NULL인지" 구분이 불가능합니다. GROUPING()은 이 모호함을 숫자(0/1)로 명확히 해결하는 함수입니다.',
+    groupingCaseDesc:  'GROUPING()을 CASE 식과 함께 쓰면 NULL 대신 "전체"·"소계" 같은 의미 있는 레이블로 바꿀 수 있어요.',
+    groupingEtymTitle: 'GROUPING()이란 함수는 왜 필요할까요?',
+    groupingEtym: 'ROLLUP/CUBE가 만드는 소계 행에서 집계 제외된 컬럼은 NULL로 표시돼요. 그런데 원본 데이터에도 실제 NULL 값이 있을 수 있어서 "이 NULL이 소계를 뜻하는지, 데이터가 원래 NULL인지" 구분이 불가능해요. GROUPING()은 이 모호함을 숫자(0/1)로 명확히 해결해주는 함수예요.',
     groupingUsageTitle: '실무에서 언제 쓸까?',
     groupingUsages: [
       { icon: '🏷️', title: '레이블 치환', desc: 'NULL 대신 "전체", "소계", "합계" 같은 의미 있는 텍스트로 표시. CASE GROUPING(col) WHEN 1 THEN \'합계\' ELSE col END' },

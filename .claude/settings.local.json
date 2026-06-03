@@ -45,7 +45,16 @@
       "Bash(ping *)",
       "Bash(node -e ' *)",
       "Bash(node -e \"const s=require\\('fs'\\).readFileSync\\('src/book/chapters/optimizer/fundamentals/adaptive/AdaptiveSection.tsx','utf8'\\); console.log\\(s.substring\\(s.indexOf\\('ko: {'\\), s.indexOf\\('ko: {'\\)+200\\)\\)\")",
-      "Bash(node -e \"const s=require\\('fs'\\).readFileSync\\('src/book/chapters/optimizer/execution-plans/explain/ExplainSection.tsx','utf8'\\); const lines=s.split\\('\\\\n'\\); console.log\\('total lines:', lines.length\\); lines.slice\\(-30\\).forEach\\(\\(l,i\\)=>console.log\\(lines.length-30+i+1, l\\)\\)\")"
+      "Bash(node -e \"const s=require\\('fs'\\).readFileSync\\('src/book/chapters/optimizer/execution-plans/explain/ExplainSection.tsx','utf8'\\); const lines=s.split\\('\\\\n'\\); console.log\\('total lines:', lines.length\\); lines.slice\\(-30\\).forEach\\(\\(l,i\\)=>console.log\\(lines.length-30+i+1, l\\)\\)\")",
+      "Bash(Remove-Item \"C:\\\\Users\\\\woong\\\\OneDrive\\\\Desktop\\\\oracleDataBaseSystem\\\\src\\\\book\\\\chapters\\\\optimizer\\\\fundamentals\\\\FundamentalsSection.tsx\" -Force)",
+      "Bash(Remove-Item \"C:\\\\Users\\\\woong\\\\OneDrive\\\\Desktop\\\\oracleDataBaseSystem\\\\src\\\\book\\\\chapters\\\\optimizer\\\\fundamentals\\\\components\\\\ComponentsSection.tsx\" -Force)",
+      "Bash(Remove-Item \"C:\\\\Users\\\\woong\\\\OneDrive\\\\Desktop\\\\oracleDataBaseSystem\\\\src\\\\book\\\\chapters\\\\optimizer\\\\fundamentals\\\\components\" -Force)",
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "Bash(rm \"C:\\\\Users\\\\woong\\\\OneDrive\\\\Desktop\\\\oracleDataBaseSystem\\\\src\\\\book\\\\chapters\\\\optimizer\\\\overview\\\\OverviewSection.tsx\")",
+      "Bash(rmdir \"C:\\\\Users\\\\woong\\\\OneDrive\\\\Desktop\\\\oracleDataBaseSystem\\\\src\\\\book\\\\chapters\\\\optimizer\\\\overview\")",
+      "Bash(New-Item -ItemType Directory -Force \"C:\\\\Users\\\\woong\\\\OneDrive\\\\Desktop\\\\oracleDataBaseSystem\\\\src\\\\book\\\\chapters\\\\index-chapter\\\\usage\")",
+      "Bash(Out-Null)",
+      "PowerShell(New-Item *)"
     ]
   }
 }

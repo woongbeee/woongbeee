@@ -293,6 +293,10 @@ export const BOOK_CHAPTERS: BookChapter[] = [
         title: { ko: 'Sort Merge Join', en: 'Sort Merge Join' },
       },
       {
+        id: 'join-semi',
+        title: { ko: 'Semi Join & Anti Join', en: 'Semi Join & Anti Join' },
+      },
+      {
         id: 'join-simulator',
         title: { ko: 'Join Simulator', en: 'Join Simulator' },
         hasSimulator: true,
@@ -374,13 +378,8 @@ export const BOOK_CHAPTERS: BookChapter[] = [
         ],
       },
       {
-        id: 'index-simulator',
-        title: { ko: 'Index Simulator', en: 'Index Simulator' },
-        hasSimulator: true,
-        simulatorLabel: {
-          ko: 'Index 시뮬레이터 실행',
-          en: 'Launch Index Simulator',
-        },
+        id: 'index-usage',
+        title: { ko: '인덱스를 사용하는 법', en: 'How to Use Indexes' },
       },
     ],
   },
@@ -474,15 +473,11 @@ export const BOOK_CHAPTERS: BookChapter[] = [
     sections: [
       {
         id: 'optimizer-fundamentals',
-        title: { ko: 'Query Optimizer Fundamentals', en: 'Query Optimizer Fundamentals' },
+        title: { ko: '옵티마이저란?', en: 'What Is the Optimizer?' },
         children: [
           {
             id: 'optimizer-fundamentals-sql-processing',
             title: { ko: 'SQL 처리 과정', en: 'SQL Processing' },
-          },
-          {
-            id: 'optimizer-fundamentals-components',
-            title: { ko: '옵티마이저 구성 요소', en: 'Optimizer Components' },
           },
           {
             id: 'optimizer-fundamentals-adaptive',
@@ -511,14 +506,14 @@ export const BOOK_CHAPTERS: BookChapter[] = [
             title: { ko: '실행 계획 확인하기', en: 'Displaying Execution Plans' },
           },
           {
+            id: 'optimizer-execution-plans-read',
+            title: { ko: '실행 계획 읽는 법', en: 'Reading Execution Plans' },
+          },
+          {
             id: 'optimizer-execution-plans-compare',
             title: { ko: '실행 계획 비교하기', en: 'Comparing Execution Plans' },
           },
         ],
-      },
-      {
-        id: 'optimizer-overview',
-        title: { ko: 'CBO 개요', en: 'CBO Overview' },
       },
       {
         id: 'optimizer-stats',
@@ -527,16 +522,6 @@ export const BOOK_CHAPTERS: BookChapter[] = [
       {
         id: 'optimizer-access-path',
         title: { ko: '액세스 패스', en: 'Access Paths' },
-      },
-      {
-        id: 'optimizer-plan',
-        title: { ko: '실행 계획', en: 'Execution Plan' },
-        children: [
-          {
-            id: 'optimizer-plan-reading',
-            title: { ko: '실행 계획 읽는 연습하기', en: 'Practice Reading Execution Plans' },
-          },
-        ],
       },
       {
         id: 'optimizer-join',

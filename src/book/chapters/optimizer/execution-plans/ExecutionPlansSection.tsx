@@ -2,12 +2,14 @@ import {
   IconReportAnalytics,
   IconSearch,
   IconLayoutList,
+  IconListSearch,
   IconArrowsShuffle,
 } from '@tabler/icons-react'
 import { useSimulationStore } from '@/store/simulationStore'
 import { PageContainer, ChapterTitle, SectionTitle, ConceptGrid } from '../../shared'
 import { ExplainSection } from './explain/ExplainSection'
 import { DisplaySection } from './display/DisplaySection'
+import { ReadSection } from './read/ReadSection'
 import { CompareSection } from './compare/CompareSection'
 
 const LANDING_ITEMS = {
@@ -15,12 +17,17 @@ const LANDING_ITEMS = {
     {
       icon: <IconSearch size={20} stroke={1.5} />,
       title: 'EXPLAIN PLAN 사용법',
-      desc: 'SQL을 실제로 실행하지 않고 옵티마이저가 선택할 실행 계획을 PLAN_TABLE에 저장합니다. 계획이 변경되는 이유도 다룹니다.',
+      desc: 'SQL을 실제로 실행하지 않고 옵티마이저가 선택할 실행 계획을 PLAN_TABLE에 저장해요. 계획이 변경되는 이유도 다뤄요.',
     },
     {
       icon: <IconLayoutList size={20} stroke={1.5} />,
       title: '실행 계획 확인하기',
       desc: 'DISPLAY, DISPLAY_CURSOR, DISPLAY_AWR 등 DBMS_XPLAN 함수와 V$ 뷰로 계획을 조회합니다.',
+    },
+    {
+      icon: <IconListSearch size={20} stroke={1.5} />,
+      title: '실행 계획 읽는 법',
+      desc: '5가지 정보 영역(Call Statistics, Row Source Operation, Predicate, Projection, Statistics)을 읽어 성능 병목을 진단합니다.',
     },
     {
       icon: <IconArrowsShuffle size={20} stroke={1.5} />,
@@ -38,6 +45,11 @@ const LANDING_ITEMS = {
       icon: <IconLayoutList size={20} stroke={1.5} />,
       title: 'Displaying Execution Plans',
       desc: 'Display plans with DBMS_XPLAN functions (DISPLAY, DISPLAY_CURSOR, DISPLAY_AWR) and V$ views.',
+    },
+    {
+      icon: <IconListSearch size={20} stroke={1.5} />,
+      title: 'Reading Execution Plans',
+      desc: 'Interpret the five information areas (Call Statistics, Row Source Operation, Predicate, Projection, Statistics) to diagnose performance bottlenecks.',
     },
     {
       icon: <IconArrowsShuffle size={20} stroke={1.5} />,
@@ -67,6 +79,7 @@ export function OptimizerExecutionPlansPage({ sectionId }: { sectionId: string }
 
   if (sectionId === 'optimizer-execution-plans-explain') return <ExplainSection />
   if (sectionId === 'optimizer-execution-plans-display') return <DisplaySection />
+  if (sectionId === 'optimizer-execution-plans-read')    return <ReadSection />
   if (sectionId === 'optimizer-execution-plans-compare') return <CompareSection />
 
   const t = LANDING_TEXT[lang]

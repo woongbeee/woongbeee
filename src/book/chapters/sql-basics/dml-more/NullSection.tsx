@@ -40,7 +40,7 @@ const FUNC_ITEMS: FuncItem[] = [
     name: 'CASE WHEN',
     signature: 'CASE WHEN cond THEN val … ELSE val END',
     desc: {
-      ko: 'ANSI 표준 조건 표현식입니다. 조건을 위에서 아래로 순서대로 평가하고, 처음으로 TRUE가 되는 THEN 값을 반환합니다. 어떤 조건도 TRUE가 아니면 ELSE 값을 반환하고, ELSE가 없으면 NULL을 반환합니다.',
+      ko: 'ANSI 표준 조건 표현식이에요. 조건을 위에서 아래로 순서대로 평가하고, 처음으로 TRUE가 되는 THEN 값을 반환해요. 어떤 조건도 TRUE가 아니면 ELSE 값을 반환하고, ELSE가 없으면 NULL을 반환해요.',
       en: 'An ANSI standard conditional expression. Conditions are evaluated top to bottom and the first TRUE branch is returned. If no condition matches, the ELSE value is returned — or NULL if ELSE is omitted.',
     },
     example:
@@ -54,7 +54,7 @@ const FUNC_ITEMS: FuncItem[] = [
       }),
     },
     note: {
-      ko: 'DECODE와 달리 범위 조건(>=, BETWEEN), 복합 조건(AND, OR), 서브쿼리도 WHEN 절에 사용할 수 있습니다.',
+      ko: 'DECODE와 달리 범위 조건(>=, BETWEEN), 복합 조건(AND, OR), 서브쿼리도 WHEN 절에 사용할 수 있어요.',
       en: 'Unlike DECODE, the WHEN clause supports range conditions (>=, BETWEEN), compound conditions (AND, OR), and subqueries.',
     },
   },
@@ -62,7 +62,7 @@ const FUNC_ITEMS: FuncItem[] = [
     name: 'DECODE',
     signature: 'DECODE(expr, s1,r1, s2,r2, …, default)',
     desc: {
-      ko: 'Oracle 전용 조건 함수입니다. expr을 s1, s2 순서로 등치(=) 비교하여 일치하는 결과값을 반환합니다. 어떤 값과도 일치하지 않으면 default를 반환하고, default가 없으면 NULL을 반환합니다.',
+      ko: 'Oracle 전용 조건 함수예요. expr을 s1, s2 순서로 등치(=) 비교해서 일치하는 결과값을 반환해요. 어떤 값과도 일치하지 않으면 default를 반환하고, default가 없으면 NULL을 반환해요.',
       en: 'An Oracle-specific conditional function. Compares expr against s1, s2 in order using equality and returns the matching result. If no value matches, returns default — or NULL if default is omitted.',
     },
     example:
@@ -78,7 +78,7 @@ const FUNC_ITEMS: FuncItem[] = [
       }),
     },
     note: {
-      ko: 'DECODE는 등치(=) 비교만 가능합니다. 범위 조건이 필요하면 CASE WHEN을 사용하세요.',
+      ko: 'DECODE는 등치(=) 비교만 가능해요. 범위 조건이 필요하면 CASE WHEN을 사용하세요.',
       en: 'DECODE only supports equality (=) comparisons. Use CASE WHEN when you need range conditions.',
     },
   },
@@ -86,7 +86,7 @@ const FUNC_ITEMS: FuncItem[] = [
     name: 'NVL',
     signature: 'NVL(expr, replacement)',
     desc: {
-      ko: 'expr이 NULL이면 replacement를 반환하고, NULL이 아니면 expr을 그대로 반환합니다. NULL 값을 기본값으로 대체할 때 사용합니다.',
+      ko: 'expr이 NULL이면 replacement를 반환하고, NULL이 아니면 expr을 그대로 반환해요. NULL 값을 기본값으로 대체할 때 사용해요.',
       en: 'Returns replacement if expr is NULL; otherwise returns expr as-is. Used to substitute a default value for NULLs.',
     },
     example:
@@ -96,7 +96,7 @@ const FUNC_ITEMS: FuncItem[] = [
       resultRows: EMP_ROWS.map((r) => [r[1], r[4], r[4] === 'null' ? '0' : r[4]]),
     },
     note: {
-      ko: 'expr과 replacement의 데이터 타입이 같아야 합니다. 타입이 다르면 Oracle이 암묵적으로 변환하거나 오류가 발생할 수 있습니다.',
+      ko: 'expr과 replacement의 데이터 타입이 같아야 해요. 타입이 다르면 Oracle이 암묵적으로 변환하거나 오류가 발생할 수 있어요.',
       en: 'expr and replacement must be the same data type. If they differ, Oracle will attempt implicit conversion, which may cause errors.',
     },
   },
@@ -104,7 +104,7 @@ const FUNC_ITEMS: FuncItem[] = [
     name: 'NVL2',
     signature: 'NVL2(expr, not_null_val, null_val)',
     desc: {
-      ko: 'expr이 NULL이 아니면 not_null_val을, NULL이면 null_val을 반환합니다. NVL과 달리 NULL인 경우와 아닌 경우에 각각 다른 값을 지정할 수 있습니다.',
+      ko: 'expr이 NULL이 아니면 not_null_val을, NULL이면 null_val을 반환해요. NVL과 달리 NULL인 경우와 아닌 경우에 각각 다른 값을 지정할 수 있어요.',
       en: 'Returns not_null_val if expr is not NULL; returns null_val if it is. Unlike NVL, you can specify a different value for both the NULL and non-NULL cases.',
     },
     example:
@@ -114,7 +114,7 @@ const FUNC_ITEMS: FuncItem[] = [
       resultRows: EMP_ROWS.map((r) => [r[1], r[4], r[4] === 'null' ? 'Leader' : 'Member']),
     },
     note: {
-      ko: 'NVL2는 Oracle 전용 함수입니다. 표준 SQL에서는 CASE WHEN expr IS NULL THEN … ELSE … END로 동일하게 표현할 수 있습니다.',
+      ko: 'NVL2는 Oracle 전용 함수예요. 표준 SQL에서는 CASE WHEN expr IS NULL THEN … ELSE … END로 동일하게 표현할 수 있어요.',
       en: 'NVL2 is Oracle-specific. In standard SQL, the equivalent is CASE WHEN expr IS NULL THEN … ELSE … END.',
     },
   },
@@ -122,7 +122,7 @@ const FUNC_ITEMS: FuncItem[] = [
     name: 'COALESCE',
     signature: 'COALESCE(expr1, expr2, …)',
     desc: {
-      ko: '인자 목록을 왼쪽에서 오른쪽으로 순서대로 평가하여 처음으로 NULL이 아닌 값을 반환합니다. 모든 인자가 NULL이면 NULL을 반환합니다. ANSI 표준 함수이므로 Oracle 외 다른 데이터베이스에서도 동일하게 사용할 수 있습니다.\n\nNVL은 인자가 2개로 고정되어 있지만 COALESCE는 인자를 3개 이상 나열할 수 있습니다. 여러 컬럼 중 첫 번째 유효값을 골라야 하는 상황에서 NVL을 중첩하는 대신 COALESCE 하나로 간결하게 표현할 수 있습니다.',
+      ko: '인자 목록을 왼쪽에서 오른쪽으로 순서대로 평가해서 처음으로 NULL이 아닌 값을 반환해요. 모든 인자가 NULL이면 NULL을 반환해요. ANSI 표준 함수이기 때문에 Oracle 외 다른 데이터베이스에서도 동일하게 사용할 수 있어요.\n\nNVL은 인자가 2개로 고정되어 있지만 COALESCE는 인자를 3개 이상 나열할 수 있어요. 여러 컬럼 중 첫 번째 유효값을 골라야 할 때 NVL을 중첩하는 대신 COALESCE 하나로 간결하게 표현할 수 있어요.',
       en: 'Evaluates arguments left to right and returns the first non-NULL value. Returns NULL if all arguments are NULL. COALESCE is an ANSI standard function and works identically across Oracle and other databases.\n\nUnlike NVL which is limited to two arguments, COALESCE accepts any number. When you need the first valid value across multiple columns, COALESCE replaces nested NVL calls with a single, readable expression.',
     },
     example:
@@ -137,7 +137,7 @@ const FUNC_ITEMS: FuncItem[] = [
       }),
     },
     note: {
-      ko: 'NVL(NVL(a, b), c)처럼 중첩 NVL을 써야 하는 상황은 COALESCE(a, b, c)로 대체할 수 있습니다. 가독성이 높고 표준 SQL이므로 신규 코드에서는 COALESCE를 권장합니다.',
+      ko: 'NVL(NVL(a, b), c)처럼 중첩 NVL을 써야 하는 상황은 COALESCE(a, b, c)로 대체할 수 있어요. 가독성이 높고 표준 SQL이기 때문에 새로 작성하는 코드에서는 COALESCE를 권장해요.',
       en: 'Nested NVL calls like NVL(NVL(a, b), c) can be replaced by COALESCE(a, b, c). COALESCE is more readable and portable — prefer it in new code.',
     },
   },
@@ -202,8 +202,8 @@ function MiniTable({ headers, rows, highlightLast }: {
 
 const T = {
   ko: {
-    chapterTitle: 'NULL 을 다루는 법',
-    chapterSubtitle: 'NULL 처리와 조건 분기에 자주 쓰이는 CASE WHEN, DECODE, NVL, NVL2를 알아봅니다.',
+    chapterTitle: 'NULL을 다루는 법',
+    chapterSubtitle: 'NULL 처리와 조건 분기에 자주 쓰이는 CASE WHEN, DECODE, NVL, NVL2를 알아봐요.',
     categoryLabel: '조건 / NULL 처리 함수',
     exampleQuery: '예시 쿼리',
     result: '실행 결과',

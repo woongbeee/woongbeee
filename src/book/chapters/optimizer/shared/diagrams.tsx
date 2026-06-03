@@ -1,4 +1,4 @@
-import { useState } from 'react'
+﻿import { useState } from 'react'
 import { cn } from '@/lib/utils'
 
 // ── ExplainPlanTable ──────────────────────────────────────────────────────────
@@ -24,32 +24,6 @@ export interface PlanRow {
   note?: string          // 행 설명 (ko/en 분리 필요 시 상위에서 처리)
 }
 
-const OP_COLOR: Record<string, string> = {
-  'SELECT STATEMENT':            '#3b82f6',
-  'HASH JOIN':                   '#7c3aed',
-  'NESTED LOOPS':                '#7c3aed',
-  'SORT MERGE JOIN':             '#7c3aed',
-  'MERGE JOIN':                  '#7c3aed',
-  'TABLE ACCESS FULL':           '#ea580c',
-  'TABLE ACCESS BY INDEX ROWID': '#f59e0b',
-  'INDEX RANGE SCAN':            '#16a34a',
-  'INDEX UNIQUE SCAN':           '#16a34a',
-  'INDEX FULL SCAN':             '#16a34a',
-  'INDEX FAST FULL SCAN':        '#16a34a',
-  'INDEX SKIP SCAN':             '#16a34a',
-  'SORT ORDER BY':               '#0891b2',
-  'SORT GROUP BY':               '#0891b2',
-  'FILTER':                      '#64748b',
-  'VIEW':                        '#8b5cf6',
-}
-
-function opColor(op: string): string {
-  for (const key of Object.keys(OP_COLOR)) {
-    if (op.startsWith(key)) return OP_COLOR[key]
-  }
-  return '#64748b'
-}
-
 // pad a string to fixed width (right-pad with spaces)
 function rpad(s: string, n: number) { return s.padEnd(n) }
 function lpad(s: string, n: number) { return s.padStart(n) }
@@ -66,11 +40,11 @@ export function ExplainPlanTable({
   lang?: 'ko' | 'en'
 }) {
   // ── 컬럼 너비 계산 ──────────────────────────────────────────────
-  const opW   = Math.max(9, ...rows.map(r => r.depth * 2 + r.operation.length))
-  const nameW = Math.max(4, ...rows.map(r => (r.name ?? '').length))
-  const rowsW = Math.max(4, ...rows.map(r => String(r.rows ?? '').length))
-  const costW = Math.max(4, ...rows.map(r => String(r.cost ?? '').length))
-  const timeW = Math.max(8, ...rows.map(r => (r.time ?? '').length))
+  const opW   = Math.max(9,  ...rows.map(r => r.depth * 2 + r.operation.length))
+  const nameW = Math.max(4,  ...rows.map(r => (r.name ?? '').length))
+  const rowsW = Math.max(4,  ...rows.map(r => String(r.rows ?? '').length))
+  const costW = Math.max(4,  ...rows.map(r => String(r.cost ?? '').length))
+  const timeW = Math.max(8,  ...rows.map(r => (r.time ?? '').length))
 
   const statCols = showStats ? [
     { key: 'actualRows' as const, hdr: 'A-Rows', w: 6 },
@@ -81,24 +55,41 @@ export function ExplainPlanTable({
   ] : []
 
   // ── 구분선 너비 ─────────────────────────────────────────────────
-  const statW = statCols.reduce((s, c) => s + c.w + 3, 0)
+  const statW  = statCols.reduce((s, c) => s + c.w + 3, 0)
   const totalW = 4 + 3 + opW + 3 + nameW + 3 + rowsW + 3 + costW + 3 + timeW + statW + 1
-  const sep = '-'.repeat(totalW)
+  const sep    = '-'.repeat(totalW)
 
   // ── 헤더 행 ────────────────────────────────────────────────────
-  const hdrId   = rpad('Id',        4)
-  const hdrOp   = rpad('Operation', opW)
-  const hdrName = rpad('Name',      nameW)
-  const hdrRows = lpad('Rows',      rowsW)
-  const hdrCost = lpad('Cost',      costW)
-  const hdrTime = rpad('Time',      timeW)
+  const hdrId    = rpad('Id',        4)
+  const hdrOp    = rpad('Operation', opW)
+  const hdrName  = rpad('Name',      nameW)
+  const hdrRows  = lpad('Rows',      rowsW)
+  const hdrCost  = lpad('Cost',      costW)
+  const hdrTime  = rpad('Time',      timeW)
   const hdrStats = statCols.map(c => lpad(c.hdr, c.w)).join(' | ')
   const headerLine = `| ${hdrId} | ${hdrOp} | ${hdrName} | ${hdrRows} | ${hdrCost} | ${hdrTime}${statCols.length ? ' | ' + hdrStats : ''} |`
 
+  // ── 텍스트 색상 (밝은 배경 기준) ────────────────────────────────
+  const C = {
+    sep:     '#9ca3af', // gray-400
+    header:  '#374151', // gray-700
+    pipe:    '#6b7280', // gray-500
+    id:      '#374151',
+    idPred:  '#d97706', // amber-600 — * 있는 행
+    op:      '#111827', // gray-900
+    name:    '#374151',
+    rows:    '#374151',
+    cost:    '#374151',
+    time:    '#6b7280',
+    stat:    '#374151',
+  }
+
   // ── 데이터 행 렌더링 ────────────────────────────────────────────
   function renderRow(row: PlanRow) {
-    const hasPred = row.note !== undefined   // note 있는 행 = * 표시
-    const idStr   = hasPred ? `* ${lpad(String(row.id), 2)}` : `  ${lpad(String(row.id), 2)}`
+    const hasPred = row.note !== undefined
+    const idStr   = hasPred
+      ? `*${lpad(String(row.id), 3)}`
+      : ` ${lpad(String(row.id), 3)}`
     const indent  = ' '.repeat(row.depth * 2)
     const opStr   = rpad(indent + row.operation, opW)
     const nameStr = rpad(row.name ?? '', nameW)
@@ -106,45 +97,31 @@ export function ExplainPlanTable({
     const costStr = lpad(String(row.cost ?? ''), costW)
     const timeStr = rpad(row.time ?? '', timeW)
 
-    const color = opColor(row.operation)
-    const idColor   = hasPred ? '#f59e0b' : '#94a3b8'
-    const pipeColor = '#475569'
-
-    // 각 셀을 span으로 개별 컬러링
     return (
       <span key={row.id} className="block">
-        <span style={{ color: pipeColor }}>| </span>
-        <span style={{ color: idColor }}>{idStr}</span>
-        <span style={{ color: pipeColor }}> | </span>
-        <span style={{ color }} className="font-bold">{opStr}</span>
-        <span style={{ color: pipeColor }}> | </span>
-        <span style={{ color: '#94a3b8' }}>{nameStr}</span>
-        <span style={{ color: pipeColor }}> | </span>
-        <span style={{ color: '#fbbf24' }}>{rowsStr}</span>
-        <span style={{ color: pipeColor }}> | </span>
-        <span style={{ color: '#94a3b8' }}>{costStr}</span>
-        <span style={{ color: pipeColor }}> | </span>
-        <span style={{ color: '#94a3b8' }}>{timeStr}</span>
-        {statCols.length > 0 && (
-          <>
-            {statCols.map((c) => {
-              const val = row[c.key]
-              const s = lpad(val !== undefined && val !== null ? String(val) : '', c.w)
-              const statColor = c.key === 'actualRows' ? '#6ee7b7'
-                : c.key === 'cr' ? '#7dd3fc'
-                : c.key === 'pr' ? '#fca5a5'
-                : c.key === 'elapsed' ? '#94a3b8'
-                : '#64748b'
-              return (
-                <span key={c.key}>
-                  <span style={{ color: pipeColor }}> | </span>
-                  <span style={{ color: statColor }}>{s}</span>
-                </span>
-              )
-            })}
-          </>
-        )}
-        <span style={{ color: pipeColor }}> |</span>
+        <span style={{ color: C.pipe }}>|</span>
+        <span style={{ color: hasPred ? C.idPred : C.id }}>{idStr}</span>
+        <span style={{ color: C.pipe }}> | </span>
+        <span style={{ color: C.op }}>{opStr}</span>
+        <span style={{ color: C.pipe }}> | </span>
+        <span style={{ color: C.name }}>{nameStr}</span>
+        <span style={{ color: C.pipe }}> | </span>
+        <span style={{ color: C.rows }}>{rowsStr}</span>
+        <span style={{ color: C.pipe }}> | </span>
+        <span style={{ color: C.cost }}>{costStr}</span>
+        <span style={{ color: C.pipe }}> | </span>
+        <span style={{ color: C.time }}>{timeStr}</span>
+        {statCols.length > 0 && statCols.map((c) => {
+          const val = row[c.key]
+          const s = lpad(val !== undefined && val !== null ? String(val) : '', c.w)
+          return (
+            <span key={c.key}>
+              <span style={{ color: C.pipe }}> | </span>
+              <span style={{ color: C.stat }}>{s}</span>
+            </span>
+          )
+        })}
+        <span style={{ color: C.pipe }}> |</span>
       </span>
     )
   }
@@ -154,32 +131,32 @@ export function ExplainPlanTable({
   return (
     <div className="my-4">
       {caption && (
-        <p className="mb-1.5 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-400">{caption}</p>
+        <p className="mb-1.5 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500">{caption}</p>
       )}
-      <div className="overflow-x-auto rounded-xl border border-slate-200 bg-slate-900 px-4 py-3">
+      <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white px-4 py-3">
         <pre className="font-mono text-[11px] leading-relaxed">
-          <span className="block" style={{ color: '#475569' }}>{sep}</span>
-          <span className="block" style={{ color: '#64748b' }}>{headerLine}</span>
-          <span className="block" style={{ color: '#475569' }}>{sep}</span>
+          <span className="block" style={{ color: C.sep }}>{sep}</span>
+          <span className="block" style={{ color: C.header }}>{headerLine}</span>
+          <span className="block" style={{ color: C.sep }}>{sep}</span>
           {rows.map(row => renderRow(row))}
-          <span className="block" style={{ color: '#475569' }}>{sep}</span>
+          <span className="block" style={{ color: C.sep }}>{sep}</span>
         </pre>
       </div>
       {hasNotes && (() => {
         const noteRows = rows.filter(r => r.note)
         const isKo = lang === 'ko'
         return (
-          <div className="mt-4 overflow-hidden rounded-xl border border-amber-200 bg-amber-50 dark:border-amber-900/40 dark:bg-amber-950/20">
-            <div className="grid grid-cols-[3rem_5rem_1fr] border-b border-amber-200 bg-amber-100/60 dark:border-amber-900/40 dark:bg-amber-900/20">
-              <span className="px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">Id</span>
-              <span className="px-2 py-2 text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">{isKo ? '실행 순서' : 'Exec Order'}</span>
-              <span className="px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">{isKo ? '설명' : 'Description'}</span>
+          <div className="mt-4 overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
+            <div className="grid grid-cols-[3rem_5rem_1fr] border-b border-slate-200 bg-slate-100">
+              <span className="px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-slate-500">Id</span>
+              <span className="px-2 py-2 text-[10px] font-bold uppercase tracking-wider text-slate-500">{isKo ? '실행 순서' : 'Exec Order'}</span>
+              <span className="px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-slate-500">{isKo ? '설명' : 'Description'}</span>
             </div>
-            <div className="divide-y divide-amber-100 dark:divide-amber-900/30">
+            <div className="divide-y divide-slate-100">
               {noteRows.map((row, idx) => (
                 <div key={row.id} className="grid grid-cols-[3rem_5rem_1fr]">
-                  <span className="px-3 py-2.5 font-mono text-xs font-bold text-amber-500 self-start">{row.id}</span>
-                  <span className="px-2 py-2.5 font-mono text-[11px] font-semibold text-amber-600 dark:text-amber-400 self-start">
+                  <span className="px-3 py-2.5 font-mono text-xs font-bold text-amber-600 self-start">{row.id}</span>
+                  <span className="px-2 py-2.5 font-mono text-[11px] font-semibold text-slate-600 self-start">
                     {isKo ? `${noteRows.length - idx}번째` : `${noteRows.length - idx}${idx === noteRows.length - 1 ? 'st' : idx === noteRows.length - 2 ? 'nd' : idx === noteRows.length - 3 ? 'rd' : 'th'}`}
                   </span>
                   <span className="px-3 py-2.5 text-xs leading-relaxed text-foreground/70">{row.note}</span>
@@ -639,17 +616,17 @@ interface CallRow {
 const CALL_ROWS: CallRow[] = [
   {
     call: 'Parse', count: 1, cpu: '0.00', elapsed: '0.01', disk: 0, query: 0, current: 0, rows: 0,
-    noteKo: 'Parse 단계가 1번 실행되어 0.01초가 걸렸습니다. CPU 시간은 0.00초인데 경과 시간이 0.01초이므로, 실제 파싱 외에 대기가 있었음을 알 수 있습니다. Misses=1이므로 Hard Parse가 발생했습니다 — Library Cache에 기존 실행 계획이 없어 SQL을 처음부터 파싱하고 최적화한 것입니다. 바인드 변수를 사용했다면 이후 실행부터 Soft Parse로 처리되어 Parse 비용이 거의 0에 가까워집니다.',
+    noteKo: 'Parse 단계가 1번 실행되어 0.01초가 걸렸어요. CPU 시간은 0.00초인데 경과 시간이 0.01초이므로, 실제 파싱 외에 대기가 있었음을 알 수 있어요. Misses=1이므로 Hard Parse가 발생했어요 — Library Cache에 기존 실행 계획이 없어 SQL을 처음부터 파싱하고 최적화한 거예요. 바인드 변수를 사용했다면 이후 실행부터 Soft Parse로 처리되어 Parse 비용이 거의 0에 가까워져요.',
     noteEn: 'Parse ran once and took 0.01s elapsed. Since CPU time is 0.00s but elapsed is 0.01s, there was a wait beyond the parse work itself. Misses=1 confirms a Hard Parse — no existing plan was found in the Library Cache, so Oracle had to parse and optimize the SQL from scratch. Using bind variables would allow subsequent executions to Soft Parse at near-zero cost.',
   },
   {
     call: 'Execute', count: 1, cpu: '0.00', elapsed: '0.00', disk: 0, query: 0, current: 0, rows: 0,
-    noteKo: 'Execute 단계가 1번 실행되어 CPU·경과 시간 모두 0.00초입니다. SELECT 문이므로 실제 데이터 변경은 없고, 실행 엔진을 가동시켜 Fetch 단계로 제어를 넘기는 것만으로 즉시 완료됐습니다. DML이었다면 이 단계에서 실제 데이터 처리가 일어나고 cpu·elapsed 값이 높아집니다.',
+    noteKo: 'Execute 단계가 1번 실행되어 CPU·경과 시간 모두 0.00초예요. SELECT 문이므로 실제 데이터 변경은 없고, 실행 엔진을 가동시켜 Fetch 단계로 제어를 넘기는 것만으로 즉시 완료됐어요. DML이었다면 이 단계에서 실제 데이터 처리가 일어나고 cpu·elapsed 값이 높아져요.',
     noteEn: 'Execute ran once with 0.00s for both CPU and elapsed time. Since this is a SELECT, no data modification occurred — Oracle simply started the execution engine and handed control to the Fetch phase. For DML statements, this is the stage where actual data processing happens and you would see meaningful cpu and elapsed values here.',
   },
   {
     call: 'Fetch', count: 2, cpu: '0.01', elapsed: '0.03', disk: 3, query: 14, current: 0, rows: 10,
-    noteKo: 'Fetch 단계가 2번 호출되어 총 10행을 클라이언트에 반환했습니다. 논리 블록 14개(query=14)를 읽었고, 그 중 3블록(disk=3)은 Buffer Cache에 없어 디스크에서 직접 읽었습니다. 경과 시간 0.03초 중 상당 부분이 이 물리 I/O 대기입니다. disk 값이 0에 가까울수록 Buffer Cache 활용이 잘 되고 있는 것입니다.',
+    noteKo: 'Fetch 단계가 2번 호출되어 총 10행을 클라이언트에 반환했어요. 논리 블록 14개(query=14)를 읽었고, 그 중 3블록(disk=3)은 Buffer Cache에 없어 디스크에서 직접 읽었어요. 경과 시간 0.03초 중 상당 부분이 이 물리 I/O 대기예요. disk 값이 0에 가까울수록 Buffer Cache 활용이 잘 되고 있는 거예요.',
     noteEn: 'Fetch was called twice and returned 10 rows to the client in total. 14 logical blocks were read (query=14), of which 3 (disk=3) were not in the Buffer Cache and required physical disk reads. Most of the 0.03s elapsed time is attributable to that physical I/O wait. The closer disk is to 0, the better the Buffer Cache utilization.',
   },
   {
@@ -690,13 +667,13 @@ export function SqlTraceDisplay({ lang }: { lang: 'ko' | 'en' }) {
     return { callStr, countStr, cpuStr, elapsedStr, diskStr, queryStr, currentStr, rowsStr }
   }
 
-  const pipeColor = '#475569'
-  const labelColor = '#94a3b8'
-  const totalColor = '#fbbf24'
+  const pipeColor = '#6b7280'
+  const labelColor = '#374151'
+  const totalColor = '#374151'
   const phaseColors: Record<string, string> = {
-    Parse:   '#818cf8',
-    Execute: '#34d399',
-    Fetch:   '#60a5fa',
+    Parse:   '#374151',
+    Execute: '#374151',
+    Fetch:   '#374151',
   }
   const extraLines = lang === 'ko' ? CALL_EXTRA_KO : CALL_EXTRA_EN
 
@@ -705,7 +682,7 @@ export function SqlTraceDisplay({ lang }: { lang: 'ko' | 'en' }) {
       {caption && (
         <p className="mb-1 text-xs font-semibold text-muted-foreground">{caption}</p>
       )}
-      <pre className="overflow-x-auto rounded-lg bg-[#0f172a] px-5 py-4 font-mono text-xs leading-relaxed text-slate-300">
+      <pre className="overflow-x-auto rounded-lg bg-white border border-slate-200 px-5 py-4 font-mono text-xs leading-relaxed text-slate-700">
         <span style={{ color: labelColor }}>{header}</span>{'\n'}
         <span style={{ color: pipeColor }}>{divider}</span>{'\n'}
         {CALL_ROWS.map((r, i) => {
@@ -717,19 +694,19 @@ export function SqlTraceDisplay({ lang }: { lang: 'ko' | 'en' }) {
               {isTotal && <span style={{ color: pipeColor }} className="block">{divider}</span>}
               <span style={{ color: nameColor }} className={isTotal ? 'font-bold' : ''}>{f.callStr}</span>
               <span style={{ color: pipeColor }}>{' '}</span>
-              <span style={{ color: '#cbd5e1' }}>{f.countStr}</span>
+              <span style={{ color: '#374151' }}>{f.countStr}</span>
               <span style={{ color: pipeColor }}>{'  '}</span>
-              <span style={{ color: '#fde68a' }}>{f.cpuStr}</span>
+              <span style={{ color: '#374151' }}>{f.cpuStr}</span>
               <span style={{ color: pipeColor }}>{' '}</span>
-              <span style={{ color: '#6ee7b7' }}>{f.elapsedStr}</span>
+              <span style={{ color: '#374151' }}>{f.elapsedStr}</span>
               <span style={{ color: pipeColor }}>{' '}</span>
-              <span style={{ color: '#fca5a5' }}>{f.diskStr}</span>
+              <span style={{ color: '#374151' }}>{f.diskStr}</span>
               <span style={{ color: pipeColor }}>{' '}</span>
-              <span style={{ color: '#7dd3fc' }}>{f.queryStr}</span>
+              <span style={{ color: '#374151' }}>{f.queryStr}</span>
               <span style={{ color: pipeColor }}>{' '}</span>
-              <span style={{ color: '#94a3b8' }}>{f.currentStr}</span>
+              <span style={{ color: '#374151' }}>{f.currentStr}</span>
               <span style={{ color: pipeColor }}>{' '}</span>
-              <span style={{ color: '#cbd5e1' }}>{f.rowsStr}</span>
+              <span style={{ color: '#374151' }}>{f.rowsStr}</span>
             </span>
           )
         })}
@@ -739,17 +716,16 @@ export function SqlTraceDisplay({ lang }: { lang: 'ko' | 'en' }) {
         ))}
       </pre>
       {/* 단계별 설명 패널 */}
-      <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 dark:border-amber-900/40 dark:bg-amber-950/20">
-        <div className="flex items-center gap-2 border-b border-amber-200 px-4 py-2 dark:border-amber-900/40">
-          <span className="text-xs font-bold text-amber-600 dark:text-amber-400">단계별 설명</span>
+      <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50">
+        <div className="flex items-center gap-2 border-b border-slate-200 px-4 py-2">
+          <span className="text-xs font-bold text-slate-500">{lang === 'ko' ? '단계별 설명' : 'Step details'}</span>
         </div>
-        <div className="divide-y divide-amber-100 dark:divide-amber-900/30">
+        <div className="divide-y divide-slate-100">
           {CALL_ROWS.filter(r => !r.isTotal).map(r => {
             const note = lang === 'ko' ? r.noteKo : r.noteEn
-            const phaseColor: Record<string, string> = { Parse: '#818cf8', Execute: '#34d399', Fetch: '#60a5fa' }
             return (
               <div key={r.call} className="flex gap-3 px-4 py-2.5">
-                <span className="mt-0.5 shrink-0 font-mono text-xs font-bold" style={{ color: phaseColor[r.call] ?? '#94a3b8' }}>{r.call}</span>
+                <span className="mt-0.5 shrink-0 font-mono text-xs font-bold text-slate-600">{r.call}</span>
                 <span className="text-xs leading-relaxed text-foreground/70">{note}</span>
               </div>
             )
@@ -764,11 +740,11 @@ export function SqlTraceDisplay({ lang }: { lang: 'ko' | 'en' }) {
 // Row Source Operation 섹션 예시: ALLSTATS LAST 출력 (A-Rows, CR, PR, PW 포함)
 
 const RSO_ROWS_KO: PlanRow[] = [
-  { id: 0, depth: 0, operation: 'SELECT STATEMENT', rows: 85, cost: 47, time: '00:00:01', actualRows: 85, cr: 3847, pr: 312, pw: 0, elapsed: '00:00:02.14', note: '마지막으로 실행됩니다. 모든 자식 오퍼레이션의 CR·PR이 누적된 최종값을 보여줍니다. 쿼리 전체가 2.14초 걸려 85행을 반환했고, PR=312는 Buffer Cache를 벗어나 디스크에서 읽어야 했던 블록 수입니다.' },
-  { id: 1, depth: 1, operation: 'HASH JOIN', rows: 85, cost: 47, time: '00:00:01', actualRows: 85, cr: 3847, pr: 312, pw: 0, elapsed: '00:00:02.13', note: 'Id 2, 4→3의 결과를 받은 후 실행됩니다. DEPARTMENTS(11행)로 해시 테이블을 만들고 EMPLOYEES 결과(3,420행)로 Probe해 85행을 조인했습니다. E-Rows=85로 추정은 정확하나, 자식들의 CR·PR이 여기에 누적됩니다.' },
-  { id: 2, depth: 2, operation: 'TABLE ACCESS FULL', name: 'DEPARTMENTS', rows: 11, cost: 3, time: '00:00:01', actualRows: 11, cr: 8, pr: 0, pw: 0, elapsed: '00:00:00.01', note: 'Id 3보다 먼저, 위에서 아래 순서로 실행됩니다. DEPARTMENTS 전체를 스캔해 11행을 읽었습니다. E-Rows=11, A-Rows=11로 통계가 정확하고, CR=8로 논리 읽기도 적습니다. PR=0이므로 모두 Buffer Cache 히트입니다.' },
-  { id: 3, depth: 2, operation: 'TABLE ACCESS BY INDEX ROWID', name: 'EMPLOYEES', rows: 10, cost: 43, time: '00:00:01', actualRows: 3420, cr: 3839, pr: 312, pw: 0, elapsed: '00:00:02.12', note: '⚠️ Id 4의 결과(ROWID 목록)를 받아 실행됩니다. 병목 오퍼레이션. CBO는 10행을 예상(E-Rows=10)했지만 실제 3,420행(A-Rows=3,420)이 반환되었습니다. 통계 오류로 선택도를 크게 과소평가한 상태이며, ROWID마다 테이블 블록을 랜덤 읽어 CR=3,839, PR=312의 대규모 I/O가 발생했습니다.' },
-  { id: 4, depth: 3, operation: 'INDEX RANGE SCAN', name: 'EMP_NAME_IX', rows: 10, cost: 2, time: '00:00:01', actualRows: 3420, cr: 5, pr: 0, pw: 0, elapsed: '00:00:00.01', note: '가장 먼저 실행됩니다. 가장 안쪽(깊은 들여쓰기)이기 때문입니다. EMP_NAME_IX를 Range Scan해 3,420개의 ROWID를 수집해 부모(Id 3)에 전달합니다. 인덱스 탐색 자체는 CR=5로 효율적입니다.' },
+  { id: 0, depth: 0, operation: 'SELECT STATEMENT', rows: 85, cost: 47, time: '00:00:01', actualRows: 85, cr: 3847, pr: 312, pw: 0, elapsed: '00:00:02.14', note: '마지막으로 실행돼요. 모든 자식 오퍼레이션의 CR·PR이 누적된 최종값을 보여줘요. 쿼리 전체가 2.14초 걸려 85행을 반환했고, PR=312는 Buffer Cache를 벗어나 디스크에서 읽어야 했던 블록 수예요.' },
+  { id: 1, depth: 1, operation: 'HASH JOIN', rows: 85, cost: 47, time: '00:00:01', actualRows: 85, cr: 3847, pr: 312, pw: 0, elapsed: '00:00:02.13', note: 'Id 2, 4→3의 결과를 받은 후 실행돼요. DEPARTMENTS(11행)로 해시 테이블을 만들고 EMPLOYEES 결과(3,420행)로 Probe해 85행을 조인했어요. E-Rows=85로 추정은 정확하나, 자식들의 CR·PR이 여기에 누적돼요.' },
+  { id: 2, depth: 2, operation: 'TABLE ACCESS FULL', name: 'DEPARTMENTS', rows: 11, cost: 3, time: '00:00:01', actualRows: 11, cr: 8, pr: 0, pw: 0, elapsed: '00:00:00.01', note: 'Id 3보다 먼저, 위에서 아래 순서로 실행돼요. DEPARTMENTS 전체를 스캔해 11행을 읽었어요. E-Rows=11, A-Rows=11로 통계가 정확하고, CR=8로 논리 읽기도 적어요. PR=0이므로 모두 Buffer Cache 히트예요.' },
+  { id: 3, depth: 2, operation: 'TABLE ACCESS BY INDEX ROWID', name: 'EMPLOYEES', rows: 10, cost: 43, time: '00:00:01', actualRows: 3420, cr: 3839, pr: 312, pw: 0, elapsed: '00:00:02.12', note: '⚠️ Id 4의 결과(ROWID 목록)를 받아 실행돼요. 병목 오퍼레이션. CBO는 10행을 예상(E-Rows=10)했지만 실제 3,420행(A-Rows=3,420)이 반환됐어요. 통계 오류로 선택도를 크게 과소평가한 상태이며, ROWID마다 테이블 블록을 랜덤 읽어 CR=3,839, PR=312의 대규모 I/O가 발생했어요.' },
+  { id: 4, depth: 3, operation: 'INDEX RANGE SCAN', name: 'EMP_NAME_IX', rows: 10, cost: 2, time: '00:00:01', actualRows: 3420, cr: 5, pr: 0, pw: 0, elapsed: '00:00:00.01', note: '가장 먼저 실행돼요. 가장 안쪽(깊은 들여쓰기)이기 때문이에요. EMP_NAME_IX를 Range Scan해 3,420개의 ROWID를 수집해 부모(Id 3)에 전달해요. 인덱스 탐색 자체는 CR=5로 효율적이에요.' },
   { id: 5, depth: 1, operation: 'TABLE ACCESS FULL', name: 'DEPARTMENTS', rows: 11, cost: 3, time: '00:00:01', actualRows: 11, cr: 8, pr: 0, pw: 0, elapsed: '00:00:00.01' },
 ]
 
@@ -840,13 +816,13 @@ export function PredicateInfoDisplay({ lang }: { lang: 'ko' | 'en' }) {
   return (
     <div className="my-4">
       <p className="mb-1.5 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-400">{caption}</p>
-      <div className="overflow-x-auto rounded-xl border border-slate-200 bg-slate-900 px-4 py-3">
-        <pre className="font-mono text-[11px] leading-relaxed">
+      <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white px-4 py-3">
+        <pre className="font-mono text-[11px] leading-relaxed text-slate-700">
           {lines.map((line, i) =>
             line.label === '' ? (
               <span key={i} className="block">&nbsp;</span>
             ) : (
-              <span key={i} className="block" style={{ color: line.color || '#94a3b8' }}>{line.label}</span>
+              <span key={i} className="block">{line.label}</span>
             )
           )}
         </pre>
@@ -888,13 +864,13 @@ export function ColumnProjectionDisplay({ lang }: { lang: 'ko' | 'en' }) {
   return (
     <div className="my-4">
       <p className="mb-1.5 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-400">{caption}</p>
-      <div className="overflow-x-auto rounded-xl border border-slate-200 bg-slate-900 px-4 py-3">
-        <pre className="font-mono text-[11px] leading-relaxed">
+      <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white px-4 py-3">
+        <pre className="font-mono text-[11px] leading-relaxed text-slate-700">
           {lines.map((line, i) =>
             line.label === '' ? (
               <span key={i} className="block">&nbsp;</span>
             ) : (
-              <span key={i} className="block" style={{ color: line.color || '#94a3b8' }}>{line.label}</span>
+              <span key={i} className="block">{line.label}</span>
             )
           )}
         </pre>
@@ -927,14 +903,14 @@ export function StatisticsDisplay({ lang }: { lang: 'ko' | 'en' }) {
   return (
     <div className="my-4">
       <p className="mb-1.5 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-400">{caption}</p>
-      <div className="overflow-x-auto rounded-xl border border-slate-200 bg-slate-900 px-4 py-3">
+      <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white px-4 py-3">
         <table className="w-full font-mono text-[11px]">
           <tbody>
             {stats.map((s, i) => (
               <tr key={i}>
-                <td className="pr-6 py-0.5 text-right text-amber-300 w-12">{s.value}</td>
-                <td className="pr-4 py-0.5 text-slate-200">{s.name}</td>
-                <td className="py-0.5 text-slate-500 italic text-[10px]">{s.note}</td>
+                <td className="pr-6 py-0.5 text-right text-slate-700 w-12">{s.value}</td>
+                <td className="pr-4 py-0.5 text-slate-700">{s.name}</td>
+                <td className="py-0.5 text-slate-400 italic text-[10px]">{s.note}</td>
               </tr>
             ))}
           </tbody>
@@ -1022,18 +998,18 @@ export function FullPlanDisplay({ lang }: { lang: 'ko' | 'en' }) {
   ]
 
   return (
-    <div className="my-4 overflow-x-auto rounded-xl bg-[#0f172a] px-5 py-4 font-mono text-xs leading-relaxed">
+    <div className="my-4 overflow-x-auto rounded-xl border border-slate-200 bg-white px-5 py-4 font-mono text-xs leading-relaxed">
       {blocks.map((block, bi) => (
         <div key={bi} className={bi > 0 ? 'mt-5' : ''}>
           {/* 영역 레이블 */}
           <div className="mb-1.5 flex items-center gap-2">
-            <span className="inline-block h-2 w-2 rounded-full" style={{ backgroundColor: block.color }} />
-            <span className="text-[11px] font-bold" style={{ color: block.color }}>{block.label}</span>
+            <span className="inline-block h-2 w-2 rounded-full bg-slate-400" />
+            <span className="text-[11px] font-bold text-slate-500">{block.label}</span>
           </div>
           {/* 출력 내용 */}
           <div>
             {block.lines.map((line, li) => (
-              <div key={li} style={{ color: line.color || 'transparent' }} className="whitespace-pre">
+              <div key={li} className="whitespace-pre text-slate-700">
                 {line.text || ' '}
               </div>
             ))}

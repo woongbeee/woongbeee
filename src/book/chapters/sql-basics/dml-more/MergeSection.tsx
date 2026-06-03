@@ -10,7 +10,7 @@ const T = {
   ko: {
     chapterTitle: 'MERGE INTO',
     chapterSubtitle:
-      'MERGE INTO는 INSERT와 UPDATE를 한 번에 처리하는 구문입니다. 대상(Target) 테이블과 참조(Source) 테이블의 데이터를 비교해서, "있으면 UPDATE, 없으면 INSERT" 합니다. 두 개의 SQL로 나누지 않고 한 번에 처리합니다.',
+      'MERGE INTO는 INSERT와 UPDATE를 한 번에 처리하는 구문이에요. 대상(Target) 테이블과 참조(Source) 테이블의 데이터를 비교해서 "있으면 UPDATE, 없으면 INSERT"를 한 번에 처리해요.',
     structureTitle: '기본 구조',
     matchedTitle: 'WHEN MATCHED — 일치하는 행이 있을 때',
     matchedDesc:
@@ -22,7 +22,7 @@ const T = {
     exampleTitle: '예시 쿼리 1 — UPDATE + INSERT',
     example2Title: '예시 쿼리 2 — UPDATE + DELETE (WHEN MATCHED만)',
     example2Desc:
-      'WHEN MATCHED만 단독으로 써도 됩니다. UPDATE 후 DELETE WHERE 조건을 검사할 때, 조건은 UPDATE된 값을 기준으로 합니다. 아래 예시에서 emp_id=102는 salary가 5600으로 업데이트된 뒤 dept_id=99가 아니므로 유지되고, emp_id=104는 원래 dept_id=99이므로 소스에 없어 이 MERGE에서 변경되지 않습니다.',
+      'WHEN MATCHED만 단독으로 써도 돼요. UPDATE 후 DELETE WHERE 조건을 검사할 때, 조건은 UPDATE된 값을 기준으로 해요. 아래 예시에서 emp_id=102는 salary가 5600으로 업데이트된 뒤 dept_id=99가 아니므로 유지되고, emp_id=104는 원래 dept_id=99이지만 소스에 없어서 이 MERGE에서 변경되지 않아요.',
     example2MatchDesc: '일치 + dept_id=99 → UPDATE 후 DELETE',
     example2MatchKeep: '일치 + dept_id≠99 → UPDATE 유지',
     example2NoSource: '소스에 없음 → 변경 없음',
@@ -50,18 +50,18 @@ const T = {
       },
     ],
     targetLabel: '변경 대상',
-    onColumnTitle: 'ON 절 컬럼은 UPDATE/DELETE 할 수 없습니다',
+    onColumnTitle: 'ON 절 컬럼은 UPDATE/DELETE 할 수 없어요',
     onColumnDesc:
-      'ON 절에서 두 테이블을 연결하는 데 쓰인 컬럼은 WHEN MATCHED THEN UPDATE나 DELETE의 대상이 될 수 없습니다. Oracle이 행을 식별하는 기준 자체를 바꾸는 것이기 때문입니다.',
+      'ON 절에서 두 테이블을 연결하는 데 쓰인 컬럼은 WHEN MATCHED THEN UPDATE나 DELETE의 대상이 될 수 없어요. Oracle이 행을 식별하는 기준 자체를 바꾸는 것이기 때문이에요.',
     onColumnWhy:
-      '왜 그럴까요? ON 절은 "이 행이 원본과 같은 행인지" 판별하는 키입니다. 이 값을 UPDATE로 바꾸면 Oracle이 같은 행을 다시 찾을 수 없게 되므로 허용하지 않습니다.',
+      '왜 그럴까요? ON 절은 "이 행이 원본과 같은 행인지" 판별하는 키예요. 이 값을 UPDATE로 바꾸면 Oracle이 같은 행을 다시 찾을 수 없게 되므로 허용하지 않아요.',
     onColumnBadLabel: '오류 — ON 절 컬럼(emp_id)을 UPDATE 시도',
     onColumnGoodLabel: '올바른 방법 — ON 절 컬럼이 아닌 컬럼만 UPDATE',
     sqlError: 'SQL — 오류',
     sqlCorrect: 'SQL — 올바른 예',
     noteTitle: '주의사항',
     noteItems: [
-      'Oracle 9i 이상에서 지원합니다.',
+      'Oracle 9i 이상에서 지원해요.',
     ],
   },
   en: {

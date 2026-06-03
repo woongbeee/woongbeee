@@ -14,37 +14,37 @@ const T = {
   ko: {
     chapterTitle: 'DCL — Data Control Language',
     chapterSubtitle:
-      'DCL은 데이터베이스 사용자에게 권한을 부여하거나 회수하는 명령어입니다. 어떤 사용자가 어떤 테이블에 접근할 수 있는지, 어떤 작업을 수행할 수 있는지를 제어합니다. 실행 즉시 자동 COMMIT되며 ROLLBACK이 불가능합니다.',
+      'DCL은 데이터베이스 사용자에게 권한을 부여하거나 회수하는 명령어예요. 어떤 사용자가 어떤 테이블에 접근할 수 있는지, 어떤 작업을 수행할 수 있는지를 제어해요. 실행하는 즉시 자동으로 COMMIT되기 때문에 ROLLBACK이 불가능해요.',
 
     privilegeTitle: '먼저 알아두기 — 권한(Privilege)의 종류',
     privilegeDesc:
-      'Oracle의 권한은 크게 두 가지로 나뉩니다. 어떤 권한을 부여하느냐에 따라 사용자가 할 수 있는 작업 범위가 달라집니다.',
+      'Oracle의 권한은 크게 두 가지로 나뉘어요. 어떤 권한을 부여하느냐에 따라 사용자가 할 수 있는 작업 범위가 달라져요.',
     privilegeHeaders: ['종류', '설명', '예시'],
     privilegeRows: [
       [
         '시스템 권한 (System Privilege)',
-        '데이터베이스 전체에 영향을 미치는 작업 권한. DBA가 부여합니다.',
+        '데이터베이스 전체에 영향을 미치는 작업 권한이에요. DBA(Database Administrator)가 부여해요.',
         'CREATE SESSION, CREATE TABLE, CREATE VIEW',
       ],
       [
         '객체 권한 (Object Privilege)',
-        '특정 테이블·뷰·시퀀스 등 개별 객체에 대한 작업 권한입니다.',
+        '특정 테이블·뷰·시퀀스 등 개별 객체에 대한 작업 권한이에요.',
         'SELECT, INSERT, UPDATE, DELETE on 특정 테이블',
       ],
     ],
     objectPrivHeaders: ['객체 권한', '설명'],
     objectPrivRows: [
-      ['SELECT', '테이블 또는 뷰를 조회할 수 있는 권한'],
-      ['INSERT', '테이블에 새 행을 삽입할 수 있는 권한'],
-      ['UPDATE', '테이블의 기존 행을 수정할 수 있는 권한'],
-      ['DELETE', '테이블의 행을 삭제할 수 있는 권한'],
-      ['EXECUTE', '저장 프로시저나 함수를 실행할 수 있는 권한'],
-      ['ALL', 'SELECT·INSERT·UPDATE·DELETE 등 해당 객체의 모든 권한'],
+      ['SELECT', '테이블 또는 뷰를 조회할 수 있는 권한이에요'],
+      ['INSERT', '테이블에 새 행을 삽입할 수 있는 권한이에요'],
+      ['UPDATE', '테이블의 기존 행을 수정할 수 있는 권한이에요'],
+      ['DELETE', '테이블의 행을 삭제할 수 있는 권한이에요'],
+      ['EXECUTE', '저장 프로시저(Stored Procedure)나 함수를 실행할 수 있는 권한이에요'],
+      ['ALL', 'SELECT·INSERT·UPDATE·DELETE 등 해당 객체의 모든 권한이에요'],
     ],
 
     grantTitle: 'GRANT — 권한 부여',
     grantDesc:
-      '특정 사용자에게 시스템 권한 또는 객체 권한을 부여합니다. WITH GRANT OPTION을 붙이면 권한을 받은 사용자가 다른 사용자에게 동일 권한을 다시 부여할 수 있습니다.',
+      '특정 사용자에게 시스템 권한 또는 객체 권한을 부여해요. WITH GRANT OPTION을 붙이면 권한을 받은 사용자가 다른 사용자에게 동일한 권한을 다시 부여할 수도 있어요.',
     grantExample: `-- hr 사용자에게 employees 테이블 조회 권한 부여
 GRANT SELECT ON employees TO hr;
 
@@ -60,11 +60,11 @@ GRANT SELECT ON employees TO PUBLIC;
 -- hr 사용자에게 테이블 생성 시스템 권한 부여
 GRANT CREATE TABLE TO hr;`,
     grantTip:
-      'WITH GRANT OPTION은 신중하게 사용하세요. 권한을 받은 사용자가 의도치 않은 대상에게 권한을 전파할 수 있습니다. 원칙적으로는 DBA만 권한을 부여하는 것이 안전합니다.',
+      'WITH GRANT OPTION은 신중하게 사용하세요. 권한을 받은 사용자가 의도치 않은 대상에게 권한을 전파할 수 있거든요. 원칙적으로는 DBA만 권한을 부여하는 게 안전해요.',
 
     revokeTitle: 'REVOKE — 권한 회수',
     revokeDesc:
-      '이전에 부여한 권한을 회수합니다. WITH GRANT OPTION으로 부여된 경우, 회수하면 해당 사용자가 다시 부여한 권한도 연쇄적으로 회수됩니다.',
+      '이전에 부여한 권한을 회수해요. WITH GRANT OPTION으로 부여된 경우, 회수하면 해당 사용자가 다른 사람에게 다시 부여한 권한도 연쇄적으로 회수돼요.',
     revokeExample: `-- hr 사용자의 employees 테이블 조회 권한 회수
 REVOKE SELECT ON employees FROM hr;
 
@@ -76,7 +76,7 @@ REVOKE SELECT ON employees FROM PUBLIC;`,
 
     roleTitle: '역할(Role) — 권한 묶음',
     roleDesc:
-      '여러 권한을 하나의 역할(Role)로 묶어서 한 번에 부여하거나 회수할 수 있습니다. 사용자가 많을 때 개별 권한 관리보다 훨씬 편리합니다.',
+      '여러 권한을 하나의 역할(Role)로 묶어서 한 번에 부여하거나 회수할 수 있어요. 사용자가 많을 때 개별 권한 관리보다 훨씬 편리해요.',
     roleExample: `-- hr_readonly 역할 생성
 CREATE ROLE hr_readonly;
 
@@ -91,7 +91,7 @@ GRANT hr_readonly TO bob;
 -- 역할 회수
 REVOKE hr_readonly FROM alice;`,
     roleTip:
-      'Oracle은 DBA, CONNECT, RESOURCE 같은 기본 내장 역할을 제공합니다. CONNECT는 로그인 권한, RESOURCE는 테이블·시퀀스 등 객체 생성 권한 묶음입니다.',
+      'Oracle은 DBA, CONNECT, RESOURCE 같은 기본 내장 역할을 제공해요. CONNECT는 로그인 권한, RESOURCE는 테이블·시퀀스 등 객체 생성 권한 묶음이에요.',
   },
   en: {
     chapterTitle: 'DCL — Data Control Language',

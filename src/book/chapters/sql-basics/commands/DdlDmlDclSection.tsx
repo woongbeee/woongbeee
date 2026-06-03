@@ -16,8 +16,8 @@ const T = {
   ko: {
     chapterTitle: '오라클 명령어의 종류 알아보기',
     chapterSubtitle:
-      'SQL은 관계형 데이터 베이스를 다루는 표준 언어입니다. SQL의 명령어는 역할에 따라 DDL, DML, DCL, TCL 네 가지로 분류되고, 각 역할을 이해하면 오라클이 데이터를 어떻게 다루는 지 알 수 있습니다.' +
-      '각 명령어의 자세한 사용법은 앞으로 배우게되니, 여기서는 이런 뜻이구나 정도로만 읽고 넘어가면 됩니다.',
+      'SQL은 관계형 데이터베이스를 다루는 표준 언어예요. SQL 명령어는 역할에 따라 DDL, DML, DCL, TCL 네 가지로 나뉘는데, 각 역할을 이해하면 Oracle이 데이터를 어떻게 다루는지 감이 잡혀요. ' +
+      '각 명령어의 자세한 사용법은 앞으로 하나씩 배울 거니까, 여기서는 "이런 게 있구나" 정도로만 읽고 넘어가면 돼요.',
 
     overviewTitle: '명령어 종류 한눈에 보기',
     categories: [
@@ -27,7 +27,7 @@ const T = {
         color: 'violet',
         icon: <IconTable size={20} color="#7c3aed" stroke={1.5} />,
         title: '데이터 정의어',
-        desc: '테이블·인덱스·뷰 등 데이터를 어떤 형태로 저장할 지 정의하거나 변경합니다.',
+        desc: '테이블·인덱스·뷰 등 데이터를 어떤 형태로 저장할지 정의하거나 변경해요.',
         cmds: ['CREATE', 'ALTER', 'DROP', 'TRUNCATE', 'RENAME'],
       },
       {
@@ -36,7 +36,7 @@ const T = {
         color: 'blue',
         icon: <IconEdit size={20} color="#2563eb" stroke={1.5} />,
         title: '데이터 조작어',
-        desc: '테이블에 저장된 실제 데이터를 조회·삽입·수정·삭제합니다.',
+        desc: '테이블에 저장된 실제 데이터를 조회·삽입·수정·삭제해요.',
         cmds: ['SELECT', 'INSERT', 'UPDATE', 'DELETE', 'MERGE'],
       },
       {
@@ -45,7 +45,7 @@ const T = {
         color: 'emerald',
         icon: <IconShieldLock size={20} color="#059669" stroke={1.5} />,
         title: '데이터 제어어',
-        desc: '사용자에게 권한을 부여하거나 회수하여 데이터 접근을 제어하는 명령어입니다. 이 명령어로 사용자 별로 데이터 접근 권한을 다르게 부여할 수 있습니다. ',
+        desc: '사용자에게 권한을 부여하거나 회수해서 데이터 접근을 제어해요. 사용자마다 접근 권한을 다르게 설정할 수 있어요.',
         cmds: ['GRANT', 'REVOKE'],
       },
       {
@@ -54,20 +54,20 @@ const T = {
         color: 'orange',
         icon: <IconGitCommit size={20} color="#d97706" stroke={1.5} />,
         title: '트랜잭션 제어어',
-        desc: 'DML로 변경한 데이터를 확정하거나 이전 상태로 되돌립니다.',
+        desc: 'DML로 변경한 데이터를 확정하거나 이전 상태로 되돌려요.',
         cmds: ['COMMIT', 'ROLLBACK', 'SAVEPOINT'],
       },
     ],
 
-    ddlTitle: 'DDL — 데이터 정의어',
+    ddlTitle: 'DDL — 데이터 정의어 (Data Definition Language)',
     ddlDesc:
-      'DDL은 테이블, 인덱스, 뷰, 시퀀스 등 데이터를 "어떻게" 저장할 지, 데이터 구조를 정의하는 명령어 입니다. ',
+      'DDL은 테이블, 인덱스, 뷰, 시퀀스 등 데이터를 "어떻게" 저장할지, 그 구조를 정의하는 명령어예요.',
     ddlAutoCommit:
-      'Oracle에서 DDL은 실행 즉시 자동 확정(COMMIT)되기 때문에 이전 상태으로 되돌릴 수(ROLLBACK) 없습니다. DDL을 실행하기 전에 진행 중인 DML 트랜잭션을 먼저 COMMIT 또는 ROLLBACK으로 마무리하세요.',
+      'Oracle에서 DDL은 실행하는 즉시 자동으로 확정(COMMIT)돼요. 한 번 실행하면 되돌릴(ROLLBACK) 수 없으니 주의해야 해요. DDL을 실행하기 전에 진행 중인 DML 트랜잭션(Transaction)이 있다면 먼저 COMMIT 또는 ROLLBACK으로 마무리하세요.',
     ddlCmds: [
       {
         cmd: 'CREATE TABLE',
-        desc: '새 테이블을 생성합니다.',
+        desc: '새 테이블을 만들어요.',
         example: `CREATE TABLE employees (
   emp_id   NUMBER       PRIMARY KEY,
   name     VARCHAR2(50) NOT NULL,
@@ -77,7 +77,7 @@ const T = {
       },
       {
         cmd: 'ALTER TABLE',
-        desc: '기존 테이블의 구조를 변경합니다 (컬럼 추가·수정·삭제, 제약 조건 추가 등).',
+        desc: '기존 테이블의 구조를 변경해요. 컬럼 추가·수정·삭제, 제약 조건(Constraint) 추가 등을 할 수 있어요.',
         example: `-- 컬럼 추가
 ALTER TABLE employees ADD hire_date DATE;
 
@@ -89,7 +89,7 @@ ALTER TABLE employees DROP COLUMN hire_date;`,
       },
       {
         cmd: 'DROP TABLE',
-        desc: '테이블과 그 안의 모든 데이터를 영구적으로 삭제합니다.',
+        desc: '테이블과 그 안의 모든 데이터를 영구적으로 삭제해요.',
         example: `DROP TABLE employees;
 
 -- 관련 제약 조건도 함께 삭제
@@ -97,18 +97,18 @@ DROP TABLE employees CASCADE CONSTRAINTS;`,
       },
       {
         cmd: 'TRUNCATE TABLE',
-        desc: '테이블은 남겨두고, 모든 데이터만 즉시 삭제합니다. TRUNCATE로 지워진 데이터는 ROLLBACK 할 수 없습니다.',
+        desc: '테이블 구조는 남겨두고, 모든 데이터만 즉시 삭제해요. TRUNCATE로 지운 데이터는 ROLLBACK할 수 없으니 주의하세요.',
         example: `TRUNCATE TABLE employees;`,
       },
     ],
 
-    dmlTitle: 'DML — 데이터 조작어',
+    dmlTitle: 'DML — 데이터 조작어 (Data Manipulation Language)',
     dmlDesc:
-      'DML은 테이블에 저장된 실제 데이터를 읽고 쓰는 명령어입니다. DDL과 달리 자동 COMMIT되지 않으므로, 변경 사항을 확정하려면 COMMIT을, 취소하려면 ROLLBACK을 명시적으로 실행해야 합니다.',
+      'DML은 테이블에 저장된 실제 데이터를 읽고 쓰는 명령어예요. DDL과 달리 자동으로 COMMIT되지 않아요. 변경 내용을 확정하려면 COMMIT을, 취소하려면 ROLLBACK을 직접 실행해야 해요.',
     dmlCmds: [
       {
         cmd: 'INSERT',
-        desc: '테이블에 새 행을 추가합니다.',
+        desc: '테이블에 새 행을 추가해요.',
         example: `-- 전체 컬럼에 값 삽입
 INSERT INTO employees VALUES (1, 'Alice', 10, 6000);
 
@@ -118,7 +118,7 @@ VALUES (2, 'Bob', 20);`,
       },
       {
         cmd: 'UPDATE',
-        desc: '기존 행의 값을 수정합니다. WHERE 없이 실행하면 전체 행이 수정됩니다.',
+        desc: '기존 행의 값을 수정해요. WHERE 없이 실행하면 테이블의 모든 행이 수정되니 주의하세요.',
         example: `UPDATE employees
 SET    salary  = 7000,
        dept_id = 30
@@ -126,13 +126,13 @@ WHERE  emp_id  = 1;`,
       },
       {
         cmd: 'DELETE',
-        desc: '조건에 맞는 행을 삭제합니다. Undo 로그를 남기므로 ROLLBACK이 가능합니다.',
+        desc: '조건에 맞는 행을 삭제해요. Undo 로그를 남기기 때문에 ROLLBACK으로 되돌릴 수 있어요.',
         example: `DELETE FROM employees
 WHERE dept_id = 20;`,
       },
       {
         cmd: 'MERGE',
-        desc: '조건에 따라 INSERT 또는 UPDATE를 한 번에 처리하는 Upsert 구문입니다.',
+        desc: '조건에 따라 INSERT 또는 UPDATE를 한 번에 처리하는 Upsert(업서트) 구문이에요.',
         example: `MERGE INTO employees tgt
 USING new_data src ON (tgt.emp_id = src.emp_id)
 WHEN MATCHED THEN
@@ -143,13 +143,13 @@ WHEN NOT MATCHED THEN
       },
     ],
 
-    dclTitle: 'DCL — 데이터 제어어',
+    dclTitle: 'DCL — 데이터 제어어 (Data Control Language)',
     dclDesc:
-      'DCL은 사용자나 역할(Role)에게 데이터베이스 객체에 대한 권한을 부여하거나 회수합니다. Oracle에서 DCL도 DDL처럼 자동 COMMIT됩니다.',
+      'DCL은 사용자나 역할(Role)에게 데이터베이스 객체의 권한을 부여하거나 회수하는 명령어예요. Oracle에서 DCL도 DDL처럼 자동 COMMIT돼요.',
     dclCmds: [
       {
         cmd: 'GRANT',
-        desc: '특정 사용자 또는 역할에게 권한을 부여합니다.',
+        desc: '특정 사용자 또는 역할(Role)에게 권한을 부여해요.',
         example: `-- 조회 권한 부여
 GRANT SELECT ON employees TO hr_user;
 
@@ -161,38 +161,38 @@ GRANT ALL ON employees TO hr_user;`,
       },
       {
         cmd: 'REVOKE',
-        desc: '이전에 부여한 권한을 회수합니다.',
+        desc: '이전에 부여한 권한을 회수해요.',
         example: `REVOKE INSERT, UPDATE ON employees FROM hr_user;`,
       },
     ],
 
     roleTitle: '역할(Role)이란?',
     roleBody:
-      '권한을 사용자 한 명 한 명에게 일일이 부여하면 관리가 번거롭습니다. Role은 여러 권한을 하나로 묶어 놓은 "권한 묶음"입니다.\n\n' +
-      '예를 들어 HR_ROLE 이라는 Role에 employees 테이블의 SELECT·INSERT·UPDATE 권한을 미리 넣어 두면, 신규 입사자가 생길 때마다 GRANT HR_ROLE TO 사용자; 한 줄로 필요한 권한을 한꺼번에 줄 수 있습니다.\n\n' +
-      '퇴사 시에도 REVOKE HR_ROLE FROM 사용자; 한 줄로 모든 권한을 한 번에 회수할 수 있어 권한 관리가 훨씬 간편해집니다.',
+      '권한을 사용자 한 명 한 명에게 일일이 부여하면 관리가 번거롭잖아요. Role은 여러 권한을 하나로 묶어 놓은 "권한 묶음"이에요.\n\n' +
+      '예를 들어 HR_ROLE이라는 Role에 employees 테이블의 SELECT·INSERT·UPDATE 권한을 미리 담아두면, 신규 입사자가 생길 때마다 GRANT HR_ROLE TO 사용자; 한 줄로 필요한 권한을 한꺼번에 줄 수 있어요.\n\n' +
+      '퇴사할 때도 REVOKE HR_ROLE FROM 사용자; 한 줄로 모든 권한을 한 번에 회수할 수 있어서 권한 관리가 훨씬 편해져요.',
 
-    tclTitle: 'TCL — 트랜잭션 제어어',
+    tclTitle: 'TCL — 트랜잭션 제어어 (Transaction Control Language)',
     tclDesc:
-      '트랜잭션은 논리적으로 하나의 작업 단위로 묶인 DML 명령어들의 집합입니다. TCL로 트랜잭션을 확정(COMMIT)하거나 취소(ROLLBACK)할 수 있습니다.',
+      '트랜잭션(Transaction)은 논리적으로 하나의 작업 단위로 묶인 DML 명령어들의 집합이에요. TCL로 트랜잭션을 확정(COMMIT)하거나 취소(ROLLBACK)할 수 있어요.',
     tclTip:
-      'DDL(CREATE, DROP 등)이나 DCL(GRANT, REVOKE)을 실행하면 Oracle이 먼저 진행 중인 트랜잭션을 자동 COMMIT합니다. 의도치 않은 확정을 막으려면 DDL 실행 전에 트랜잭션을 명시적으로 마무리하세요.',
+      'DDL(CREATE, DROP 등)이나 DCL(GRANT, REVOKE)을 실행하면 Oracle이 진행 중인 트랜잭션을 먼저 자동으로 COMMIT해버려요. 의도치 않게 확정되는 걸 막으려면 DDL 실행 전에 트랜잭션을 명시적으로 마무리하세요.',
     tclCmds: [
       {
         cmd: 'COMMIT',
-        desc: '현재 트랜잭션의 모든 변경 사항을 데이터베이스에 영구적으로 반영합니다.',
+        desc: '현재 트랜잭션의 모든 변경 사항을 데이터베이스에 영구적으로 반영해요.',
         example: `UPDATE employees SET salary = 8000 WHERE emp_id = 1;
 COMMIT;  -- 변경 확정`,
       },
       {
         cmd: 'ROLLBACK',
-        desc: '마지막 COMMIT 이후의 모든 변경을 취소하고 이전 상태로 되돌립니다.',
+        desc: '마지막 COMMIT 이후의 모든 변경을 취소하고 이전 상태로 되돌려요.',
         example: `DELETE FROM employees WHERE dept_id = 30;
 ROLLBACK;  -- 삭제 취소`,
       },
       {
         cmd: 'SAVEPOINT',
-        desc: '트랜잭션 중간에 저장 지점을 만들어, 그 지점까지만 ROLLBACK할 수 있습니다.',
+        desc: '트랜잭션 중간에 저장 지점을 만들어서, 그 지점까지만 ROLLBACK할 수 있어요.',
         example: `INSERT INTO employees VALUES (3, 'Carol', 10, 5500);
 SAVEPOINT sp1;
 
@@ -203,31 +203,31 @@ COMMIT;`,
       },
     ],
 
-    deleteCompareTitle: 'DELETE vs TRUNCATE vs DROP — 무엇이 다를까?',
+    deleteCompareTitle: 'DELETE vs TRUNCATE vs DROP — 무엇이 다를까요?',
     deleteCompareBody:
-      '세 명령어 모두 데이터를 "지운다"는 점은 같지만, 무엇을 지우고 되돌릴 수 있는지가 다릅니다.\n\n' +
-      '• DELETE (DML) — 조건에 맞는 행만 골라서 삭제합니다. 삭제하는 행 하나하나마다 Undo 로그를 기록하기 때문에 ROLLBACK으로 되돌릴 수 있습니다. 하지만 그만큼 느릴 수 있습니다.\n\n' +
-      '• TRUNCATE (DDL) — 테이블의 모든 행을 한 번에 제거합니다. 행별 Undo 로그를 남기지 않아 DELETE보다 훨씬 빠르지만, 자동 COMMIT되므로 ROLLBACK 불가능합니다. 테이블 구조(컬럼 정의, 제약 조건)는 그대로 남습니다.\n\n' +
-      '• DROP (DDL) — 테이블 자체를 데이터베이스에서 완전히 제거합니다. 안에 있던 데이터와 테이블 구조 모두 사라집니다. 마찬가지로 ROLLBACK 불가능합니다.',
+      '세 명령어 모두 데이터를 "지운다"는 점은 같지만, 무엇을 지우고 되돌릴 수 있는지가 달라요.\n\n' +
+      '• DELETE (DML) — 조건에 맞는 행만 골라서 삭제해요. 삭제하는 행마다 Undo 로그를 기록하기 때문에 ROLLBACK으로 되돌릴 수 있어요. 하지만 그만큼 느릴 수 있어요.\n\n' +
+      '• TRUNCATE (DDL) — 테이블의 모든 행을 한 번에 제거해요. 행별 Undo 로그를 남기지 않아서 DELETE보다 훨씬 빠르지만, 자동 COMMIT되기 때문에 ROLLBACK이 불가능해요. 테이블 구조(컬럼 정의, 제약 조건)는 그대로 남아요.\n\n' +
+      '• DROP (DDL) — 테이블 자체를 데이터베이스에서 완전히 제거해요. 데이터와 테이블 구조 모두 사라져요. 마찬가지로 ROLLBACK 불가능해요.',
     undoLogTitle: 'Undo 로그란?',
     undoLogBody:
-      'Oracle이 DML(INSERT, UPDATE, DELETE)을 실행할 때, 변경 이전의 데이터를 Undo 세그먼트라는 별도 공간에 저장합니다. 이것이 Undo 로그입니다.\n\n' +
-      'Undo 로그가 있기 때문에\n' +
-      '① ROLLBACK — "아, 실수했다" 싶을 때 변경 전 상태로 되돌릴 수 있고,\n' +
-      '② 읽기 일관성 — 내가 수정 중인 데이터를 다른 사용자가 조회하면 수정 전 값을 보여줄 수 있습니다.\n\n' +
-      'TRUNCATE나 DROP은 Undo 로그를 남기지 않기 때문에 실행 즉시 되돌릴 방법이 없습니다. 항상 신중하게 사용하세요.',
+      'Oracle이 DML(INSERT, UPDATE, DELETE)을 실행할 때, 변경하기 이전의 데이터를 Undo 세그먼트(Undo Segment)라는 별도 공간에 저장해 둬요. 이게 바로 Undo 로그예요.\n\n' +
+      'Undo 로그 덕분에 두 가지가 가능해요.\n' +
+      '① ROLLBACK — "아, 실수했다" 싶을 때 변경 전 상태로 되돌릴 수 있어요.\n' +
+      '② 읽기 일관성 — 내가 수정 중인 데이터를 다른 사용자가 조회하면 수정 전 값을 보여줄 수 있어요.\n\n' +
+      'TRUNCATE나 DROP은 Undo 로그를 남기지 않기 때문에 실행 즉시 되돌릴 방법이 없어요. 항상 신중하게 사용하세요.',
 
     summaryTitle: '핵심 정리',
     summaryRows: [
-      ['분류', '역할', '주요 명령어', 'Auto COMMIT'],
-      ['DDL', '구조 정의', 'CREATE, ALTER, DROP, TRUNCATE', 'O (즉시)'],
+      ['분류', '역할', '주요 명령어', '자동 COMMIT'],
+      ['DDL', '구조 정의', 'CREATE, ALTER, DROP, TRUNCATE', '예 (즉시)'],
       [
         'DML',
         '데이터 조작',
         'SELECT, INSERT, UPDATE, DELETE, MERGE',
-        'X (명시 필요)',
+        '아니요 (직접 실행 필요)',
       ],
-      ['DCL', '권한 제어', 'GRANT, REVOKE', 'O (즉시)'],
+      ['DCL', '권한 제어', 'GRANT, REVOKE', '예 (즉시)'],
       ['TCL', '트랜잭션 제어', 'COMMIT, ROLLBACK, SAVEPOINT', '—'],
     ],
   },

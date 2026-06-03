@@ -12,9 +12,9 @@ import { ClickableSyntaxRow, SyntaxRow } from '../dml-more/MiniSimulator'
 
 const T = {
   ko: {
-    chapterTitle: 'DML - Data Manipulation Language',
+    chapterTitle: 'DML — Data Manipulation Language',
     chapterSubtitle:
-      '데이터를 조회·수정·삭제하는 가장 기본적인 명령어인 SELECT, FROM, WHERE, UPDATE, DELETE 를 알아봅니다.',
+      '데이터를 조회·수정·삭제하는 가장 기본적인 명령어인 SELECT, FROM, WHERE, UPDATE, DELETE를 알아봐요.',
     clauseTitle: '핵심 절(Clause) 정리',
     clauses: [
       {
@@ -22,53 +22,53 @@ const T = {
         color: 'blue',
         icon: <IconPlayerPlay size={16} color="#2563eb" stroke={1.5} />,
         title: '컬럼 선택',
-        desc: '조회할 컬럼명을 적습니다. 여러개의 컬럼명을 적을 때는 쉼표로 연결합니다. *는 전체 컬럼을 조회합니다.',
+        desc: '조회할 컬럼명을 적어요. 여러 컬럼을 적을 때는 쉼표로 연결하고, *를 쓰면 전체 컬럼을 조회해요.',
       },
       {
         kw: 'FROM',
         color: 'violet',
         icon: <IconTable size={16} color="#7c3aed" stroke={1.5} />,
         title: '테이블 지정',
-        desc: '데이터를 가져올 테이블(또는 뷰)을 지정합니다.',
+        desc: '데이터를 가져올 테이블(또는 뷰)을 지정해요.',
       },
       {
         kw: 'WHERE',
         color: 'orange',
         icon: <IconFilter size={16} color="#d97706" stroke={1.5} />,
         title: '데이터 필터',
-        desc: 'FROM절에 지정한 테이블에서 어떤 행을 가져올 지 조건을 적습니다.',
+        desc: 'FROM 절에 지정한 테이블에서 어떤 행을 가져올지 조건을 적어요.',
       },
       {
         kw: 'UPDATE',
         color: 'amber',
         icon: <IconEdit size={16} color="#b45309" stroke={1.5} />,
         title: '데이터 수정',
-        desc: '테이블에 저장되어 있던 데이터를 수정하는 명령어 입니다.',
+        desc: '테이블에 저장된 데이터를 수정하는 명령어예요.',
       },
       {
         kw: 'DELETE',
         color: 'rose',
         icon: <IconTrash size={16} color="#e11d48" stroke={1.5} />,
         title: '데이터 삭제',
-        desc: '테이블에 저장되어 있던 데이터를 삭제하는 명령어 입니다.',
+        desc: '테이블에 저장된 데이터를 삭제하는 명령어예요.',
       },
     ],
     selectTitle: 'SELECT — 데이터 조회',
     selectDesc:
-      '가장 자주 사용하는 구문으로, 데이터를 조회하는 명령어 입니다. SELECT 뒤에 컬럼명, FROM 뒤에 테이블명, WHERE 절에 조건을 적어 원하는 데이터를 조회합니다.',
+      '가장 자주 쓰는 구문이에요. SELECT 뒤에 컬럼명, FROM 뒤에 테이블명, WHERE 절에 조건을 적어서 원하는 데이터를 조회해요.',
     distinctTitle: 'DISTINCT — 중복 제거',
     distinctDesc:
-      'SELECT DISTINCT는 결과에서 중복된 행을 제거합니다. 여러 컬럼을 지정하면 해당 컬럼의 조합이 동일한 행을 중복으로 처리합니다.',
+      'SELECT DISTINCT는 결과에서 중복된 행을 제거해줘요. 여러 컬럼을 지정하면 해당 컬럼 조합이 동일한 행을 중복으로 처리해요.',
     distinctTip:
-      'DISTINCT는 결과 집합 전체에 Sort 또는 Hash 연산을 수행하므로 대용량 테이블에서는 성능 비용이 발생합니다. 꼭 필요할 때만 사용하고, 가능하면 WHERE로 먼저 행을 줄이세요.',
+      'DISTINCT는 결과 전체에 Sort 또는 Hash 연산을 수행하기 때문에 대용량 테이블에서는 성능 비용이 발생해요. 꼭 필요할 때만 쓰고, 가능하면 WHERE로 먼저 행을 줄이세요.',
     distinctOps: [
       ['구문', '설명'],
-      ['SELECT DISTINCT col', 'col 값이 같은 행을 중복으로 처리'],
-      ['SELECT DISTINCT col1, col2', 'col1+col2 두 값이 모두 같은 행을 중복으로 처리'],
+      ['SELECT DISTINCT col', 'col 값이 같은 행을 중복으로 처리해요'],
+      ['SELECT DISTINCT col1, col2', 'col1과 col2 두 값이 모두 같은 행을 중복으로 처리해요'],
     ],
     whereTitle: 'WHERE — 행 필터링',
     whereDesc:
-      'WHERE 절에는 어떤 데이터를 가져올 지, 조건을 적을 수 있습니다. 비교 연산자(=, >, <, !=)와 논리 연산자(AND, OR, NOT), LIKE, IN, BETWEEN을 사용해 조건을 기술합니다.',
+      'WHERE 절에는 어떤 데이터를 가져올지 조건을 적어요. 비교 연산자(=, >, <, !=)와 논리 연산자(AND, OR, NOT), LIKE, IN, BETWEEN을 사용해서 조건을 기술해요.',
     whereOps: [
       ['연산자', '의미', '예시'],
       ['=', '같음', 'dept_id = 10'],
@@ -76,24 +76,24 @@ const T = {
       ['> / >= / < / <=', '크기 비교', 'salary >= 7000'],
       ['BETWEEN a AND b', '범위 설정 (a 이상 b 이하)', 'salary BETWEEN 5000 AND 7500'],
       ['NOT BETWEEN a AND b', 'BETWEEN 범위 밖', 'salary NOT BETWEEN 5000 AND 7500'],
-      ['LIKE', '패턴 매칭 (% : 임의문자)', "last_name LIKE 'K%'"],
+      ['LIKE', '패턴 매칭 (% : 임의 문자)', "last_name LIKE 'K%'"],
       ['IN (a, b, …)', '목록 중 하나', 'dept_id IN (10, 20)'],
-      ['IS NULL / IS NOT NULL', 'NULL 여부', 'manager_id IS NULL'],
+      ['IS NULL / IS NOT NULL', 'NULL 여부 확인', 'manager_id IS NULL'],
       ['AND', '적힌 조건 모두 참', 'dept_id = 20 AND salary >= 5500'],
       ['OR', '적힌 조건들 중 하나라도 참', 'dept_id = 10 OR dept_id = 30'],
     ],
     whereNullTip:
-      '값이 없음을 나타내는 특수한 상태입니다. 0이나 빈 문자열(\'\')과는 다릅니다. NULL과의 비교는 항상 UNKNOWN이 되므로, = NULL이나 != NULL은 동작하지 않습니다. NULL 여부를 확인할 때는 반드시 IS NULL / IS NOT NULL을 사용하세요.',
+      "NULL은 값이 없음을 나타내는 특수한 상태예요. 0이나 빈 문자열('')과는 달라요. NULL과의 비교는 항상 UNKNOWN이 되기 때문에 = NULL이나 != NULL은 동작하지 않아요. NULL 여부를 확인할 때는 반드시 IS NULL / IS NOT NULL을 사용하세요.",
     updateTitle: 'UPDATE — 데이터 수정',
     updateDesc:
-      'UPDATE는 기존 행의 값을 바꿉니다. SET 절에 값을 수정할 컬럼명과 수정할 값을 적고, WHERE절에 수정하려는 데이터의 조건을 기술합니다.',
+      'UPDATE는 기존 행의 값을 바꿔요. SET 절에 수정할 컬럼명과 새 값을 적고, WHERE 절에 수정하려는 행의 조건을 기술해요.',
     updateWarning:
-      'WHERE 절 없이 UPDATE를 실행하면 테이블 전체 행이 수정됩니다. 항상 먼저 SELECT로 대상 행을 확인하세요.',
+      'WHERE 절 없이 UPDATE를 실행하면 테이블의 모든 행이 수정돼요. 항상 먼저 SELECT로 대상 행을 확인한 뒤 실행하세요.',
     deleteTitle: 'DELETE — 데이터 삭제',
     deleteDesc:
-      'WHERE 절에 조건을 기술해서 선택된 행을 삭제할 수 있습니다. WHERE절을 쓰지 않으면 전체 행이 삭제됩니다.',
+      'WHERE 절에 조건을 기술해서 해당하는 행을 삭제해요. WHERE 절을 쓰지 않으면 테이블의 전체 행이 삭제되니 주의하세요.',
     deleteTip:
-      'DELETE는 행 단위로 Undo 로그를 남겨 느릴 수 있습니다.(하지만 ROLLBACK이 가능합니다.) 전체 삭제라면 TRUNCATE TABLE이 훨씬 빠릅니다.\n\nTRUNCATE는 "잘라내다"는 뜻으로, TRUNCATE TABLE은 테이블의 모든 행을 한 번에 제거하는 DDL 명령입니다. DELETE와 달리 행별 Undo 로그를 남기지 않아 매우 빠르지만, ROLLBACK이 불가능합니다.',
+      'DELETE는 행 단위로 Undo 로그를 남기기 때문에 느릴 수 있어요. (대신 ROLLBACK이 가능해요.) 전체 행을 지워야 한다면 TRUNCATE TABLE이 훨씬 빨라요.\n\nTRUNCATE는 "잘라내다"는 뜻이에요. TRUNCATE TABLE은 테이블의 모든 행을 한 번에 제거하는 DDL 명령이에요. DELETE와 달리 행별 Undo 로그를 남기지 않아서 매우 빠르지만, ROLLBACK은 불가능해요.',
   },
   en: {
     chapterTitle: 'Core Syntax — SELECT / FROM / WHERE',

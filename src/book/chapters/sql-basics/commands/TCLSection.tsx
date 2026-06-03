@@ -14,24 +14,24 @@ const T = {
   ko: {
     chapterTitle: 'TCL — Transaction Control Language',
     chapterSubtitle:
-      'TCL은 DML(INSERT·UPDATE·DELETE)로 변경한 데이터를 확정하거나 이전 상태로 되돌리는 명령어입니다. 트랜잭션 단위로 데이터의 일관성을 보장합니다.',
+      'TCL은 DML(INSERT·UPDATE·DELETE)로 변경한 데이터를 확정하거나 이전 상태로 되돌리는 명령어예요. 트랜잭션(Transaction) 단위로 데이터의 일관성을 보장해줘요.',
 
     txTitle: '먼저 알아두기 — 트랜잭션(Transaction)이란?',
     txDesc:
-      '트랜잭션은 "하나의 작업 단위"입니다. 은행 이체를 예로 들면, A 계좌에서 출금하고 B 계좌에 입금하는 두 작업은 반드시 함께 성공하거나 함께 실패해야 합니다. 어느 하나만 성공하면 데이터가 망가집니다.\n\n트랜잭션은 이런 상황에서 데이터 무결성을 지키기 위해 존재합니다.',
+      '트랜잭션은 "하나의 작업 단위"예요. 은행 이체를 예로 들면, A 계좌에서 출금하고 B 계좌에 입금하는 두 작업은 반드시 함께 성공하거나 함께 실패해야 해요. 어느 하나만 성공하면 데이터가 망가지거든요.\n\n트랜잭션은 이런 상황에서 데이터 무결성(Integrity)을 지키기 위해 존재해요.',
     txPropHeaders: ['특성', '설명'],
     txPropRows: [
-      ['Atomicity (원자성)', '트랜잭션 내 모든 작업이 전부 성공하거나 전부 실패해야 합니다.'],
-      ['Consistency (일관성)', '트랜잭션 전후로 데이터베이스는 항상 일관된 상태를 유지해야 합니다.'],
-      ['Isolation (격리성)', '동시에 실행 중인 트랜잭션은 서로의 중간 상태를 볼 수 없습니다.'],
-      ['Durability (지속성)', 'COMMIT된 데이터는 장애가 발생해도 영구적으로 보존됩니다.'],
+      ['Atomicity (원자성)', '트랜잭션 안의 모든 작업이 전부 성공하거나 전부 실패해야 해요.'],
+      ['Consistency (일관성)', '트랜잭션 전후로 데이터베이스는 항상 일관된 상태를 유지해야 해요.'],
+      ['Isolation (격리성)', '동시에 실행 중인 트랜잭션은 서로의 중간 상태를 볼 수 없어요.'],
+      ['Durability (지속성)', 'COMMIT된 데이터는 장애가 발생해도 영구적으로 보존돼요.'],
     ],
     txNote:
-      'Oracle에서 트랜잭션은 첫 번째 DML 실행 시 자동으로 시작됩니다. COMMIT 또는 ROLLBACK이 실행되면 트랜잭션이 종료되고 다음 DML에서 새 트랜잭션이 시작됩니다.\n\nDDL(CREATE·ALTER·DROP 등)은 실행 시 자동 COMMIT되며, 이 때 진행 중이던 트랜잭션도 함께 COMMIT됩니다.',
+      'Oracle에서 트랜잭션은 첫 번째 DML이 실행되는 순간 자동으로 시작돼요. COMMIT 또는 ROLLBACK이 실행되면 트랜잭션이 종료되고, 다음 DML에서 새 트랜잭션이 시작돼요.\n\nDDL(CREATE·ALTER·DROP 등)은 실행 시 자동 COMMIT되는데, 이때 진행 중이던 트랜잭션도 함께 COMMIT돼요.',
 
     commitTitle: 'COMMIT — 변경 확정',
     commitDesc:
-      '현재 트랜잭션에서 DML로 변경한 내용을 데이터베이스에 영구적으로 저장합니다. COMMIT 이후에는 ROLLBACK으로 되돌릴 수 없습니다.',
+      '현재 트랜잭션에서 DML로 변경한 내용을 데이터베이스에 영구적으로 저장해요. COMMIT 이후에는 ROLLBACK으로 되돌릴 수 없어요.',
     commitExample: `-- 신규 직원 삽입
 INSERT INTO employees (emp_id, name, salary)
 VALUES (101, 'Alice', 6000);
@@ -42,11 +42,11 @@ UPDATE employees SET salary = 7000 WHERE emp_id = 55;
 -- 두 변경 사항을 모두 영구 저장
 COMMIT;`,
     commitTip:
-      '자동 COMMIT(AUTOCOMMIT ON) 환경에서는 DML 하나마다 즉시 COMMIT됩니다. 실수로 잘못된 데이터를 저장하면 되돌릴 수 없으니, 운영 환경에서는 AUTOCOMMIT을 끄고 직접 COMMIT하는 것이 안전합니다.',
+      '자동 COMMIT(AUTOCOMMIT ON) 환경에서는 DML 하나마다 즉시 COMMIT돼요. 실수로 잘못된 데이터를 저장하면 되돌릴 수 없으니, 운영 환경에서는 AUTOCOMMIT을 끄고 직접 COMMIT하는 게 안전해요.',
 
     rollbackTitle: 'ROLLBACK — 변경 취소',
     rollbackDesc:
-      'COMMIT되지 않은 DML 변경 사항을 모두 취소하고 마지막 COMMIT 시점으로 되돌립니다. SAVEPOINT를 지정한 경우 해당 지점까지만 되돌릴 수도 있습니다.',
+      'COMMIT되지 않은 DML 변경 사항을 모두 취소하고 마지막 COMMIT 시점으로 되돌려요. SAVEPOINT를 설정한 경우 해당 지점까지만 되돌릴 수도 있어요.',
     rollbackExample: `-- 실수로 잘못된 급여 업데이트
 UPDATE employees SET salary = 0 WHERE dept_id = 10;
 
@@ -63,7 +63,7 @@ ROLLBACK TO before_update;`,
 
     savepointTitle: 'SAVEPOINT — 중간 저장점',
     savepointDesc:
-      '트랜잭션 도중 중간 복구 지점을 만들어 둡니다. 문제가 생겼을 때 트랜잭션 전체를 롤백하지 않고 특정 지점까지만 되돌릴 수 있어 복잡한 작업에서 유용합니다.',
+      '트랜잭션 도중 중간 복구 지점을 만들어 둬요. 문제가 생겼을 때 트랜잭션 전체를 롤백하지 않고 특정 지점까지만 되돌릴 수 있어서, 복잡한 작업에서 아주 유용해요.',
     savepointExample: `-- 1단계: 부서 추가
 INSERT INTO departments (dept_id, name) VALUES (90, 'AI팀');
 SAVEPOINT after_dept;      -- 부서 추가 후 저장점
@@ -84,13 +84,13 @@ UPDATE employees SET salary = 5000 WHERE emp_id = 201;
 -- 전체 확정
 COMMIT;`,
     savepointTip:
-      'SAVEPOINT 이름은 트랜잭션 내에서 고유해야 합니다. 같은 이름으로 다시 SAVEPOINT를 설정하면 이전 저장점이 덮어씌워집니다.',
+      'SAVEPOINT 이름은 트랜잭션 안에서 고유해야 해요. 같은 이름으로 다시 SAVEPOINT를 설정하면 이전 저장점이 덮어씌워져요.',
 
     compareTitle: 'COMMIT vs ROLLBACK 비교',
     compareHeaders: ['구분', 'COMMIT', 'ROLLBACK'],
     compareRows: [
       ['효과', '변경 사항 영구 저장', '변경 사항 전부 취소'],
-      ['이후 복구', '불가 (영구 확정)', '가능 (이전 COMMIT 상태로)'],
+      ['이후 복구', '불가능 (영구 확정)', '가능 (이전 COMMIT 상태로)'],
       ['트랜잭션', '종료 후 새 트랜잭션 시작', '종료 후 새 트랜잭션 시작'],
       ['DDL 실행 시', '자동으로 COMMIT 발생', '—'],
       ['접속 종료 시', '정상 종료 → 자동 COMMIT', '비정상 종료 → 자동 ROLLBACK'],

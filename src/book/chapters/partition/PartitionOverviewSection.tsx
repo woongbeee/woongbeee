@@ -15,36 +15,36 @@ const T = {
   ko: {
     title: '파티셔닝 개요',
     subtitle:
-      '파티셔닝은 하나의 대형 테이블이나 인덱스를 여러 개의 작은 물리적 조각(파티션)으로 나누는 기법입니다. SQL 관점에서는 여전히 하나의 테이블처럼 보이지만, 내부적으로는 파티션 단위로 독립 관리됩니다.',
+      '파티셔닝은 하나의 대형 테이블이나 인덱스를 여러 개의 작은 물리적 조각(파티션)으로 나누는 기법이에요. SQL 관점에서는 여전히 하나의 테이블처럼 보이지만, 내부적으로는 파티션 단위로 독립 관리돼요.',
 
     whatTitle: '파티셔닝이란?',
     whatDesc:
-      '대용량 테이블을 단일 세그먼트로 관리하면 DML 경합, 백업 시간, 불필요한 I/O 등 여러 문제가 생깁니다. 파티셔닝은 이 테이블을 파티션 키(Partition Key)에 따라 여러 세그먼트로 분할합니다.\n\n각 파티션은 고유한 이름과 독립적인 물리 저장 속성을 가집니다. Oracle은 SQL 수행 시 관련 파티션만 접근(Partition Pruning)하므로 대용량 테이블에서도 효율적인 쿼리가 가능합니다.',
+      '대용량 테이블을 단일 세그먼트로 관리하면 DML 경합, 백업 시간, 불필요한 I/O 등 여러 문제가 생겨요. 파티셔닝은 이 테이블을 파티션 키(Partition Key)에 따라 여러 세그먼트로 분할해요.\n\n각 파티션은 고유한 이름과 독립적인 물리 저장 속성을 가져요. Oracle은 SQL 수행 시 관련 파티션만 접근(Partition Pruning)하기 때문에 대용량 테이블에서도 효율적인 쿼리가 가능해요.',
 
     benefitsTitle: '파티셔닝의 이점',
     benefits: [
       {
         icon: <span className="text-xl">⚡</span>,
         title: '쿼리 성능 향상',
-        desc: 'Partition Pruning으로 관련 파티션만 스캔해 I/O를 대폭 절감합니다.',
+        desc: 'Partition Pruning으로 관련 파티션만 스캔해서 I/O를 대폭 절감해요.',
         color: 'blue',
       },
       {
         icon: <span className="text-xl">🔧</span>,
         title: '관리 편의성',
-        desc: '파티션 단위로 데이터 로드, 삭제, 이동, 백업이 가능해 작업 부담이 줄어듭니다.',
+        desc: '파티션 단위로 데이터 로드, 삭제, 이동, 백업이 가능해서 작업 부담이 줄어들어요.',
         color: 'orange',
       },
       {
         icon: <span className="text-xl">🔀</span>,
         title: '병렬 처리',
-        desc: '파티션별 병렬 쿼리와 Partition-Wise Join으로 처리 속도를 높입니다.',
+        desc: '파티션별 병렬 쿼리와 Partition-Wise Join으로 처리 속도를 높여요.',
         color: 'tip',
       },
       {
         icon: <span className="text-xl">📦</span>,
         title: '데이터 아카이빙',
-        desc: '오래된 파티션을 DROP 또는 Exchange로 빠르게 아카이빙할 수 있습니다.',
+        desc: '오래된 파티션을 DROP 또는 Exchange로 빠르게 아카이빙할 수 있어요.',
         color: 'warning',
       },
     ],
@@ -52,10 +52,10 @@ const T = {
     keyConceptTitle: '핵심 개념',
     partitionKey: '파티션 키(Partition Key)',
     partitionKeyDesc:
-      '각 행이 어느 파티션에 저장될지를 결정하는 컬럼 또는 컬럼 집합입니다. 파티션 키는 파티셔닝 방식(Range, List, Hash 등)과 함께 정의됩니다.',
+      '각 행이 어느 파티션에 저장될지를 결정하는 컬럼 또는 컬럼 집합이에요. 파티션 키는 파티셔닝 방식(Range, List, Hash 등)과 함께 정의돼요.',
     partitionPruning: 'Partition Pruning',
     partitionPruningDesc:
-      'WHERE 조건에 파티션 키가 포함되면 Oracle은 조건과 무관한 파티션을 자동으로 제외합니다. 실행 계획에서 PARTITION RANGE SINGLE 또는 PARTITION LIST SINGLE 등으로 확인됩니다.',
+      'WHERE 조건에 파티션 키가 포함되면 Oracle은 조건과 무관한 파티션을 자동으로 제외해요. 실행 계획에서 PARTITION RANGE SINGLE 또는 PARTITION LIST SINGLE 등으로 확인할 수 있어요.',
 
     strategiesTitle: '파티셔닝 전략 비교',
     strategiesTable: [
@@ -69,9 +69,9 @@ const T = {
 
     whenTitle: '파티셔닝 적용 기준',
     whenDesc:
-      'Oracle은 일반적으로 2GB 이상의 테이블, 또는 이력 데이터를 주기적으로 삭제·아카이빙해야 하는 테이블에 파티셔닝을 권장합니다.\n\n파티셔닝은 테이블 크기가 아니라 데이터 관리 방식과 쿼리 패턴에 따라 결정합니다. 파티션 키가 쿼리 WHERE 조건에 자주 등장하지 않으면 Pruning 효과를 얻지 못합니다.',
+      'Oracle은 일반적으로 2GB 이상의 테이블, 또는 이력 데이터를 주기적으로 삭제·아카이빙해야 하는 테이블에 파티셔닝을 권장해요.\n\n파티셔닝은 테이블 크기가 아니라 데이터 관리 방식과 쿼리 패턴에 따라 결정해요. 파티션 키가 쿼리 WHERE 조건에 자주 등장하지 않으면 Pruning 효과를 얻지 못해요.',
     summary:
-      '파티셔닝은 대용량 테이블의 성능과 관리성을 동시에 해결하는 핵심 기법입니다. 파티션 키 선택과 파티셔닝 전략이 쿼리 성능에 직결되므로, 데이터 특성과 쿼리 패턴을 먼저 분석한 뒤 전략을 선택합니다.',
+      '파티셔닝은 대용량 테이블의 성능과 관리성을 동시에 해결하는 핵심 기법이에요. 파티션 키 선택과 파티셔닝 전략이 쿼리 성능에 직결되기 때문에, 데이터 특성과 쿼리 패턴을 먼저 분석한 뒤 전략을 선택해요.',
   },
 
   en: {

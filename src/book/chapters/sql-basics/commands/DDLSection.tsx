@@ -14,11 +14,11 @@ const T = {
   ko: {
     chapterTitle: 'DDL — Data Definition Language',
     chapterSubtitle:
-      'DDL은 테이블·인덱스·뷰·시퀀스 등 데이터베이스 객체의 구조를 정의하거나 변경하는 명령어입니다. 실행 즉시 자동 COMMIT되므로 ROLLBACK이 불가능합니다. 의도치 않은 데이터 확정을 막으려면 DDL 전에 트랜잭션을 명시적으로 마무리 해야합니다.',
+      'DDL은 테이블·인덱스·뷰·시퀀스 등 데이터베이스 객체의 구조를 정의하거나 변경하는 명령어예요. 실행하는 즉시 자동으로 COMMIT되기 때문에 ROLLBACK이 불가능해요. 의도치 않게 확정되는 걸 막으려면 DDL 실행 전에 트랜잭션을 명시적으로 마무리해야 해요.',
 
     createTitle: 'CREATE TABLE — 테이블 생성',
     createDesc:
-      '위에서 살펴본 데이터 타입과 제약 조건을 조합해 테이블을 정의합니다.',
+      '아래에서 살펴본 데이터 타입과 제약 조건을 조합해서 테이블을 정의해요.',
     dataTypeTitle: '주요 데이터 타입',
     dataTypeHeaders: ['타입', '설명', '예시'],
     dataTypeRows: [
@@ -43,29 +43,29 @@ const T = {
       ['BLOB', '대용량 바이너리 (이미지, 파일 등)', '첨부파일'],
     ],
     varcharVsChar:
-      "VARCHAR2(10)에 'Hi'를 저장하면 실제로 2바이트만 사용합니다. 반면 CHAR(10)에 'Hi'를 저장하면 나머지 8자리를 공백으로 채워 항상 10바이트를 사용합니다.\n\n" +
-      "따라서 길이가 일정한 값(성별 코드 'M'/'F', 국가 코드 'KR' 등)에는 CHAR를, 길이가 제각각인 이름·이메일·주소 등에는 VARCHAR2를 사용하는 것이 일반적입니다.\n\n" +
-      '주의: CHAR 컬럼에서 비교 시 Oracle은 공백을 무시하고 같다고 판단하지만, VARCHAR2와 CHAR를 혼용 비교할 때는 공백 처리 방식이 달라 예상치 못한 결과가 나올 수 있습니다.',
+      "VARCHAR2(10)에 'Hi'를 저장하면 실제로 2바이트만 사용해요. 반면 CHAR(10)에 'Hi'를 저장하면 나머지 8자리를 공백으로 채워서 항상 10바이트를 사용하게 돼요.\n\n" +
+      "그래서 길이가 일정한 값(성별 코드 'M'/'F', 국가 코드 'KR' 등)에는 CHAR를, 길이가 제각각인 이름·이메일·주소 등에는 VARCHAR2를 쓰는 게 일반적이에요.\n\n" +
+      '주의: CHAR 컬럼을 비교할 때 Oracle은 공백을 무시하고 같다고 판단하지만, VARCHAR2와 CHAR를 섞어 비교하면 공백 처리 방식이 달라서 예상치 못한 결과가 나올 수 있어요.',
     prerequisiteDesc:
-      'DDL 명령어를 공부하기 전에, 컬럼에 지정할 수 있는 데이터 타입과 제약 조건에 대해 먼저 알아봅니다. \n 개발 지식이 있지 않다면 어렵게 느껴질 수도 있습니다만, 앞으로 테이블을 생성하거나 컬럼을 추가하는 명령어와 함께 사용되는 걸 보면 자연스럽게 이해할 수 있으니 가볍게 개념을 이해하세요.',
+      'DDL 명령어를 공부하기 전에, 컬럼에 지정할 수 있는 데이터 타입과 제약 조건에 대해 먼저 알아볼게요. 개발 경험이 없다면 처음에 좀 낯설 수 있지만, 앞으로 테이블을 만들거나 컬럼을 추가하는 명령어와 함께 쓰는 걸 보면 자연스럽게 이해될 거예요. 지금은 가볍게 읽고 넘어가세요.',
     prerequisiteTitle: '먼저 알아두기 — 데이터 타입 & 제약 조건',
     constraintTitle: '제약 조건 (Constraint)',
     constraintDesc:
-      '제약 조건은 컬럼에 저장될 수 있는 값의 규칙을 정의합니다. 잘못된 데이터가 들어오는 것을 데이터베이스 레벨에서 원천 차단합니다.',
+      '제약 조건은 컬럼에 저장될 수 있는 값의 규칙을 정의해요. 잘못된 데이터가 들어오는 걸 데이터베이스 레벨에서 원천 차단해줘요.',
     constraintHeaders: ['제약 조건', '의미'],
     constraintRows: [
       [
         'PRIMARY KEY',
-        '행을 고유하게 식별하는 컬럼. NOT NULL + UNIQUE 조합. 테이블당 하나',
+        '행을 고유하게 식별하는 컬럼이에요. NOT NULL + UNIQUE의 조합이고, 테이블당 하나만 지정할 수 있어요.',
       ],
-      ['NOT NULL', 'NULL 값 금지. 반드시 값이 있어야 함'],
-      ['UNIQUE', '같은 값 중복 금지 (NULL은 여러 개 허용)'],
+      ['NOT NULL', 'NULL 값을 금지해요. 반드시 값이 있어야 해요.'],
+      ['UNIQUE', '같은 값의 중복을 금지해요. (NULL은 여러 개 허용)'],
       [
         'FOREIGN KEY … REFERENCES',
-        '다른 테이블의 PRIMARY KEY를 참조. 참조 무결성 보장',
+        '다른 테이블의 PRIMARY KEY를 참조해요. 참조 무결성(Referential Integrity)을 보장해줘요.',
       ],
-      ['CHECK', '지정한 조건을 만족하는 값만 허용'],
-      ['DEFAULT', '값을 지정하지 않을 때 자동으로 채울 기본값'],
+      ['CHECK', '지정한 조건을 만족하는 값만 허용해요.'],
+      ['DEFAULT', '값을 지정하지 않을 때 자동으로 채울 기본값이에요.'],
     ],
     createExample: `CREATE TABLE employees (
   emp_id    NUMBER(6)     PRIMARY KEY,    -- 숫자 6자리, 행을 고유하게 식별하는 키
@@ -79,7 +79,7 @@ const T = {
 
     alterTitle: 'ALTER TABLE — 테이블 구조 변경',
     alterDesc:
-      '이미 운영 중인 테이블의 구조를 바꿀 때 사용합니다. 데이터를 그대로 유지하면서 컬럼을 추가·수정·삭제하거나 제약 조건을 추가·삭제할 수 있습니다.',
+      '이미 운영 중인 테이블의 구조를 바꿀 때 사용해요. 기존 데이터를 그대로 유지하면서 컬럼을 추가·수정·삭제하거나 제약 조건을 추가·삭제할 수 있어요.',
     alterExample: `-- employees 테이블에 phone 컬럼 추가
 ALTER TABLE employees ADD phone VARCHAR2(20);
 
@@ -98,18 +98,18 @@ ALTER TABLE employees ADD CONSTRAINT chk_salary CHECK (salary > 0);
 -- 제약 조건 삭제
 ALTER TABLE employees DROP CONSTRAINT chk_salary;`,
     alterTip:
-      'NOT NULL 제약 조건 추가 시, 기존 행에 이미 NULL 값이 있으면 에러가 발생합니다. 먼저 UPDATE로 NULL을 채운 뒤 제약 조건을 추가하세요.',
+      'NOT NULL 제약 조건을 추가할 때, 기존 행에 이미 NULL 값이 있으면 에러가 발생해요. 먼저 UPDATE로 NULL을 채운 뒤 제약 조건을 추가하세요.',
 
-    dropTruncateTitle: 'DROP vs TRUNCATE — 무엇이 다를까?',
+    dropTruncateTitle: 'DROP vs TRUNCATE — 무엇이 다를까요?',
     dropTruncateDesc:
-      '둘 다 DDL이라 자동 COMMIT되지만, 지우는 대상이 다릅니다.',
+      '둘 다 DDL이라 자동 COMMIT되지만, 지우는 대상이 달라요.',
     dropTruncateHeaders: ['구분', 'DROP TABLE', 'TRUNCATE TABLE'],
     dropTruncateRows: [
       ['지우는 대상', '테이블 구조 + 데이터 모두', '데이터만 (구조는 유지)'],
-      ['ROLLBACK', '불가', '불가'],
+      ['ROLLBACK', '불가능', '불가능'],
       ['속도', '빠름', '매우 빠름 (Undo 로그 없음)'],
       ['WHERE 조건', '없음', '없음 (전체 삭제만 가능)'],
-      ['재사용', '테이블 없어짐 (다시 CREATE 필요)', '빈 테이블 그대로 남음'],
+      ['실행 후', '테이블이 사라짐 (다시 CREATE 필요)', '빈 테이블이 그대로 남음'],
     ],
     dropExample: `-- employees 테이블 완전 삭제 (데이터와 구조 모두 사라짐, 복구 불가)
 DROP TABLE employees;
@@ -121,16 +121,16 @@ TRUNCATE TABLE employees;`,
 
     otherTitle: '그 밖의 DDL',
     otherDesc:
-      '테이블 외에도 인덱스·뷰·시퀀스 등 다양한 객체를 DDL로 생성·삭제할 수 있습니다.',
+      '테이블 외에도 인덱스·뷰·시퀀스 등 다양한 객체를 DDL로 생성하고 삭제할 수 있어요.',
     otherPreview:
-      '인덱스·뷰·시퀀스는 이후 챕터에서 훨씬 자세히 다룹니다. 지금은 "이런 객체도 DDL로 만든다"는 정도만 알고 넘어가세요.\n\n' +
-      '• 인덱스(Index) — 책의 색인처럼, 특정 컬럼 값으로 행을 빠르게 찾을 수 있게 해주는 구조입니다. 없어도 조회는 되지만, 테이블이 클수록 속도 차이가 크게 납니다.\n' +
-      '• 뷰(View) — 복잡한 SELECT 쿼리에 이름을 붙여 저장한 것입니다. 실제 데이터를 따로 저장하지 않고, 조회할 때마다 원본 테이블을 읽습니다.\n' +
-      '• 시퀀스(Sequence) — 1, 2, 3… 처럼 자동으로 증가하는 숫자를 만들어 주는 객체입니다. PRIMARY KEY 값을 자동으로 채번할 때 주로 씁니다.',
+      '인덱스·뷰·시퀀스는 이후 챕터에서 훨씬 자세히 다룰 거예요. 지금은 "이런 객체도 DDL로 만드는구나" 정도만 알고 넘어가세요.\n\n' +
+      '• 인덱스(Index) — 책의 색인처럼, 특정 컬럼 값으로 행을 빠르게 찾을 수 있게 해주는 구조예요. 없어도 조회는 되지만, 테이블이 클수록 속도 차이가 크게 나요.\n' +
+      '• 뷰(View) — 복잡한 SELECT 쿼리에 이름을 붙여 저장한 거예요. 실제 데이터를 따로 저장하지 않고, 조회할 때마다 원본 테이블을 읽어요.\n' +
+      '• 시퀀스(Sequence) — 1, 2, 3… 처럼 자동으로 증가하는 숫자를 만들어 주는 객체예요. PRIMARY KEY 값을 자동으로 채번할 때 주로 써요.',
     otherExamples: [
       {
         cmd: 'CREATE INDEX',
-        desc: '조회 성능 향상을 위한 인덱스를 생성합니다.',
+        desc: '조회 성능 향상을 위한 인덱스를 생성해요.',
         example: `-- name 컬럼에 단일 인덱스 생성 — 이름으로 검색할 때 속도 향상
 CREATE INDEX idx_emp_name ON employees(name);
 
@@ -139,7 +139,7 @@ CREATE INDEX idx_emp_dept_sal ON employees(dept_id, salary);`,
       },
       {
         cmd: 'CREATE VIEW',
-        desc: '자주 쓰는 복잡한 쿼리를 뷰로 저장해 테이블처럼 조회합니다.',
+        desc: '자주 쓰는 복잡한 쿼리를 뷰로 저장해서 테이블처럼 조회할 수 있어요.',
         example: `-- 급여 8000 이상인 직원만 보여주는 뷰를 생성
 CREATE VIEW v_high_earners AS
   SELECT emp_id, name, salary
@@ -151,7 +151,7 @@ SELECT * FROM v_high_earners;`,
       },
       {
         cmd: 'CREATE SEQUENCE',
-        desc: '자동 증가하는 숫자를 생성합니다. 주로 PRIMARY KEY 값 채번에 사용합니다.',
+        desc: '자동으로 증가하는 숫자를 생성해줘요. 주로 PRIMARY KEY 값을 자동으로 채번할 때 사용해요.',
         example: `-- 1부터 시작해서 1씩 증가하는 시퀀스 생성
 CREATE SEQUENCE emp_seq
   START WITH 1
@@ -164,7 +164,7 @@ VALUES (emp_seq.NEXTVAL, 'Alice');`,
       },
       {
         cmd: 'RENAME',
-        desc: '테이블·뷰·시퀀스의 이름을 변경합니다.',
+        desc: '테이블·뷰·시퀀스의 이름을 변경해요.',
         example: `RENAME employees TO staff;`,
       },
     ],

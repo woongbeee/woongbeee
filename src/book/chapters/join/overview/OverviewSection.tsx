@@ -1,4 +1,10 @@
-import { IconArrowMerge, IconBolt } from '@tabler/icons-react'
+import { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import {
+  IconArrowMerge, IconBolt,
+  IconArrowsJoin, IconArrowBarToLeft, IconArrowBarToRight,
+  IconArrowsHorizontal, IconGridDots,
+} from '@tabler/icons-react'
 import { useSimulationStore } from '@/store/simulationStore'
 import {
   PageContainer,
@@ -8,6 +14,7 @@ import {
   Divider,
 } from '../../shared'
 import { cn } from '@/lib/utils'
+import { JoinAnimator, type JoinType } from '../shared/JoinAnimator'
 
 const T = {
   ko: {
@@ -42,6 +49,24 @@ const T = {
         desc: '양쪽 데이터 집합을 조인 키로 정렬한 뒤 병합해요. 비등치(범위) 조인이나 이미 정렬된 데이터에서 특히 유리해요.',
       },
     ],
+
+    joinSimTitle: 'SQL JOIN 종류 시뮬레이션',
+    joinSimSubtitle: '조인 종류를 선택하면 테이블 결합 과정을 단계별로 확인할 수 있어요.',
+    joinTypes: [
+      { key: 'inner' as JoinType, icon: <IconArrowsJoin size={14} />,        label: 'INNER JOIN'       },
+      { key: 'left'  as JoinType, icon: <IconArrowBarToLeft size={14} />,    label: 'LEFT OUTER'       },
+      { key: 'right' as JoinType, icon: <IconArrowBarToRight size={14} />,   label: 'RIGHT OUTER'      },
+      { key: 'full'  as JoinType, icon: <IconArrowsHorizontal size={14} />,  label: 'FULL OUTER'       },
+      { key: 'cross' as JoinType, icon: <IconGridDots size={14} />,          label: 'CROSS JOIN'       },
+    ],
+    joinQueryDesc: {
+      inner: 'employees와 departments 테이블에서 dept_id가 같은 행만 반환해요.',
+      left:  'employees 테이블의 모든 행을 가져오고, 일치하는 departments 행을 결합해요. 일치하는 부서가 없으면 NULL로 채워요.',
+      right: 'departments 테이블의 모든 행을 가져오고, 일치하는 employees 행을 결합해요. 소속 직원이 없는 부서도 포함돼요.',
+      full:  '양쪽 테이블의 모든 행을 가져와요. 일치하지 않는 쪽은 NULL로 채워요.',
+      cross: '모든 행의 조합(카테시안 곱)을 반환해요. ON 조건이 없어요.',
+    },
+    joinRowCount: (n: number) => `${n}개 행 반환`,
   },
   en: {
     title: 'Join Principles & Usage',
@@ -75,12 +100,39 @@ const T = {
         desc: 'Sorts both datasets on the join key, then merges them sequentially. Especially efficient for non-equijoins (range conditions) or pre-sorted data.',
       },
     ],
+
+    joinSimTitle: 'SQL JOIN Type Simulation',
+    joinSimSubtitle: 'Select a join type to see the table-combining process step by step.',
+    joinTypes: [
+      { key: 'inner' as JoinType, icon: <IconArrowsJoin size={14} />,        label: 'INNER JOIN'       },
+      { key: 'left'  as JoinType, icon: <IconArrowBarToLeft size={14} />,    label: 'LEFT OUTER'       },
+      { key: 'right' as JoinType, icon: <IconArrowBarToRight size={14} />,   label: 'RIGHT OUTER'      },
+      { key: 'full'  as JoinType, icon: <IconArrowsHorizontal size={14} />,  label: 'FULL OUTER'       },
+      { key: 'cross' as JoinType, icon: <IconGridDots size={14} />,          label: 'CROSS JOIN'       },
+    ],
+    joinQueryDesc: {
+      inner: 'Returns only rows where dept_id matches in both employees and departments.',
+      left:  'Returns all rows from employees, joined with matching departments rows. Non-matching departments columns are NULL.',
+      right: 'Returns all rows from departments, joined with matching employees rows. Departments with no employees are included.',
+      full:  'Returns all rows from both tables. Non-matching rows on either side are filled with NULL.',
+      cross: 'Returns every combination of rows (Cartesian product). No ON condition.',
+    },
+    joinRowCount: (n: number) => `${n} row${n === 1 ? '' : 's'} returned`,
   },
+}
+
+const JOIN_TAB_COLOR: Record<JoinType, { active: string; inactive: string }> = {
+  inner: { active: 'border-emerald-400 bg-emerald-50 text-emerald-700',  inactive: 'border-border text-muted-foreground hover:bg-muted/40' },
+  left:  { active: 'border-blue-400 bg-blue-50 text-blue-700',           inactive: 'border-border text-muted-foreground hover:bg-muted/40' },
+  right: { active: 'border-violet-400 bg-violet-50 text-violet-700',     inactive: 'border-border text-muted-foreground hover:bg-muted/40' },
+  full:  { active: 'border-amber-400 bg-amber-50 text-amber-700',        inactive: 'border-border text-muted-foreground hover:bg-muted/40' },
+  cross: { active: 'border-rose-400 bg-rose-50 text-rose-700',           inactive: 'border-border text-muted-foreground hover:bg-muted/40' },
 }
 
 export function JoinOverviewSection() {
   const lang = useSimulationStore((s) => s.lang)
   const t = T[lang]
+  const [activeJoin, setActiveJoin] = useState<JoinType>('inner')
 
   return (
     <PageContainer>
@@ -109,6 +161,49 @@ export function JoinOverviewSection() {
             <p className="text-xs leading-relaxed text-muted-foreground">{item.desc}</p>
           </div>
         ))}
+      </div>
+
+      <Divider />
+
+      <SectionTitle>{t.joinSimTitle}</SectionTitle>
+      <p className="mb-4 text-sm text-muted-foreground">{t.joinSimSubtitle}</p>
+
+      {/* JOIN type tab switcher */}
+      <div className="mb-4 flex flex-wrap gap-2">
+        {t.joinTypes.map((jt) => {
+          const isActive = activeJoin === jt.key
+          return (
+            <button
+              key={jt.key}
+              onClick={() => setActiveJoin(jt.key)}
+              className={cn(
+                'flex items-center gap-1.5 rounded-lg border px-3 py-1.5 font-mono text-xs font-bold transition-all',
+                isActive ? JOIN_TAB_COLOR[jt.key].active : JOIN_TAB_COLOR[jt.key].inactive,
+              )}
+            >
+              {jt.icon}
+              {jt.label}
+            </button>
+          )
+        })}
+      </div>
+
+      <div className="rounded-xl border bg-muted/30 p-4">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeJoin}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
+            transition={{ duration: 0.18 }}
+          >
+            <JoinAnimator
+              type={activeJoin}
+              joinRowCount={t.joinRowCount}
+              queryDesc={t.joinQueryDesc[activeJoin]}
+            />
+          </motion.div>
+        </AnimatePresence>
       </div>
     </PageContainer>
   )

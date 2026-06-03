@@ -8,6 +8,8 @@ import {
   Prose,
   InfoBox,
   Divider,
+  SqlBlock,
+  StepList,
 } from '../../shared'
 import { IconFingerprintScan } from '@tabler/icons-react'
 
@@ -100,10 +102,10 @@ WHERE  ROWID NOT IN (
 
     indexTitle: 'B-Tree 인덱스에서 ROWID가 쓰이는 순서',
     indexSteps: [
-      { n: 1, desc: 'Root → Branch → Leaf 블록을 차례로 읽으며 인덱스 키값을 비교해요' },
-      { n: 2, desc: 'Leaf 블록에서 찾는 키값과 일치하는 ROWID(행 식별자)를 가져와요' },
-      { n: 3, desc: 'ROWID(Object# + File# + Block# + Row#)로 테이블 블록에 바로 접근해요' },
-      { n: 4, desc: '블록 안의 Row Directory에서 슬롯 번호로 실제 행 데이터를 찾아 반환해요' },
+      { title: 'Root → Branch → Leaf 탐색', desc: 'Root → Branch → Leaf 블록을 차례로 읽으며 인덱스 키값을 비교해요' },
+      { title: 'ROWID 획득', desc: 'Leaf 블록에서 찾는 키값과 일치하는 ROWID(행 식별자)를 가져와요' },
+      { title: '테이블 블록 직접 접근', desc: 'ROWID(Object# + File# + Block# + Row#)로 테이블 블록에 바로 접근해요' },
+      { title: '행 데이터 반환', desc: '블록 안의 Row Directory에서 슬롯 번호로 실제 행 데이터를 찾아 반환해요' },
     ],
     indexNote:
       '인덱스를 타더라도 Leaf에서 ROWID(행 식별자)를 꺼낸 뒤 테이블 블록을 읽는 단계(Table Access by Index ROWID)가 반드시 필요해요. ' +
@@ -195,10 +197,10 @@ WHERE  ROWID NOT IN (
 
     indexTitle: 'How ROWID Is Used in a B-Tree Index Lookup',
     indexSteps: [
-      { n: 1, desc: 'Traverse Root → Branch → Leaf blocks, comparing index key values at each level' },
-      { n: 2, desc: 'Find the matching key in the Leaf block and retrieve its ROWID' },
-      { n: 3, desc: 'Use ROWID (Object# + File# + Block# + Row#) to jump directly to the table block' },
-      { n: 4, desc: 'Read the block\'s Row Directory, find the slot, and return the row data' },
+      { title: 'Root → Branch → Leaf traversal', desc: 'Traverse Root → Branch → Leaf blocks, comparing index key values at each level' },
+      { title: 'Retrieve ROWID', desc: 'Find the matching key in the Leaf block and retrieve its ROWID' },
+      { title: 'Jump to table block', desc: 'Use ROWID (Object# + File# + Block# + Row#) to jump directly to the table block' },
+      { title: 'Return row data', desc: "Read the block's Row Directory, find the slot, and return the row data" },
     ],
     indexNote:
       'Even when Oracle uses an index, it must still visit the table block after finding the ROWID in the Leaf (Table Access by Index ROWID). ' +
@@ -354,11 +356,7 @@ export function RowidSection() {
       <SectionTitle>{t.exampleTitle}</SectionTitle>
       <Prose>{t.exampleDesc}</Prose>
 
-      {/* SQL 예시 */}
-      <div className="rounded-xl border bg-slate-900 px-4 py-3">
-        <p className="mb-2 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500">SQL</p>
-        <pre className="overflow-x-auto font-mono text-[12px] leading-relaxed text-slate-100">{t.exampleSql}</pre>
-      </div>
+      <div className="mt-4"><SqlBlock sql={t.exampleSql} /></div>
 
       <Divider />
 
@@ -366,32 +364,14 @@ export function RowidSection() {
       <SectionTitle>{t.usageTitle}</SectionTitle>
       <Prose>{t.usageDesc}</Prose>
 
-      <div className="mb-4 rounded-xl border bg-slate-900 px-4 py-3">
-        <p className="mb-2 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500">SQL</p>
-        <pre className="overflow-x-auto font-mono text-[12px] leading-relaxed text-slate-100">{t.usageSql}</pre>
-      </div>
+      <div className="mt-4 mb-4"><SqlBlock sql={t.usageSql} /></div>
       <InfoBox variant="warning">{t.usageTip}</InfoBox>
 
       <Divider />
 
       {/* B-Tree 인덱스에서 ROWID 흐름 */}
       <SectionTitle>{t.indexTitle}</SectionTitle>
-      <div className="mb-4 space-y-2">
-        {t.indexSteps.map((step, i) => (
-          <motion.div
-            key={i}
-            initial={{ opacity: 0, x: -8 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: i * 0.07 }}
-            className="flex items-start gap-3 rounded-xl border bg-card px-4 py-3"
-          >
-            <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-violet-100 font-mono text-[11px] font-bold text-violet-700">
-              {step.n}
-            </span>
-            <p className="text-sm leading-relaxed text-muted-foreground">{step.desc}</p>
-          </motion.div>
-        ))}
-      </div>
+      <StepList steps={t.indexSteps} />
       <InfoBox variant="tip">{t.indexNote}</InfoBox>
     </PageContainer>
   )

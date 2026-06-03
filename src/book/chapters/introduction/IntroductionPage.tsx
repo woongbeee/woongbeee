@@ -13,27 +13,28 @@ const T = {
 
     whatIsDbTitle: '데이터베이스란 무엇인가?',
     whatIsDb:
-      '데이터베이스(Database)는 정보를 체계적으로 저장하고 빠르게 찾아볼 수 있게 해주는 소프트웨어입니다.\n\n' +
-      '쇼핑몰의 상품 목록, 은행의 계좌 잔액, 병원의 환자 기록 — 이 모든 정보가 데이터베이스에 저장됩니다. 단순히 파일에 저장하는 것과 다르게, 데이터베이스는 수백만 건의 정보를 동시에 수천 명이 안전하게 읽고 쓸 수 있도록 설계되어 있습니다.\n\n' +
-      '관계형 데이터베이스(RDBMS)는 그 중에서도 데이터를 표(Table) 형태로 저장하고, SQL이라는 표준 언어로 다루는 방식입니다. Oracle, MySQL, PostgreSQL, SQL Server 모두 RDBMS입니다.',
-    whatIsDbNote: 'RDBMS(Relational Database Management System)는 데이터를 행(Row)과 열(Column)로 이루어진 표(Table) 형태로 저장하고, 테이블 간의 관계(Relation)를 정의해 데이터를 연결·관리하는 시스템입니다. DB라고 부르는 것들 중 많은 수가 사실 RDBMS이며, 이 교재에서 "데이터베이스"라고 하면 관계형 데이터베이스(RDBMS)를 의미합니다.',
+      '데이터베이스(Database)는 정보를 체계적으로 저장하고 빠르게 찾아볼 수 있게 해주는 소프트웨어예요.\n\n' +
+      '쇼핑몰 상품 목록, 은행 계좌 잔액, 병원 환자 기록 — 이런 정보들이 모두 데이터베이스에 들어있거든요. 그냥 파일에 저장하는 것과는 달리, 데이터베이스는 수백만 건의 정보를 수천 명이 동시에 안전하게 읽고 쓸 수 있도록 만들어져 있어요.\n\n' +
+      '관계형 데이터베이스(RDBMS, Relational Database Management System)는 그 중에서도 데이터를 표(Table) 형태로 저장하고, SQL(Structured Query Language)이라는 표준 언어로 다루는 방식이에요. Oracle, MySQL, PostgreSQL, SQL Server가 모두 RDBMS랍니다.',
+    whatIsDbNote: 'RDBMS(Relational Database Management System)는 데이터를 행(Row)과 열(Column)로 이루어진 표(Table) 형태로 저장하고, 테이블 사이의 관계(Relation)를 정의해서 데이터를 서로 연결하고 관리하는 시스템이에요. 흔히 "DB"라고 부르는 것들의 대부분이 사실 RDBMS랍니다. 이 교재에서 "데이터베이스"라고 하면 관계형 데이터베이스(RDBMS)를 가리키는 거예요.',
 
     nameTitle: '"오라클"이라는 이름의 뜻',
     nameSub: '신탁(神託) — 신이 내리는 답',
     nameBody:
-      '1977년 래리 앨리슨(Larry Ellison), 밥 마이너(Bob Miner), 에드 오츠(Ed Oates) 세 명이 회사를 창업했을 때, 첫 번째 고객은 CIA였습니다. 그 프로젝트의 코드명이 바로 "Oracle"이었습니다.\n\n' +
-      '"Oracle"은 고대 그리스·로마에서 신의 뜻을 전달하는 신탁(oracle)에서 따왔습니다. 어떤 질문이든 정확한 답을 내려주는 존재 — "당신이 어떤 데이터를 물어봐도 Oracle이 정확하게 답해준다"는 뜻을 담고 있습니다.\n\n' +
-      '그 이름처럼, Oracle은 수십 년간 기업이 가진 가장 복잡한 질문들에 답해왔습니다.',
+      '1977년, 래리 앨리슨(Larry Ellison), 밥 마이너(Bob Miner), 에드 오츠(Ed Oates) 세 명이 회사를 창업했을 때 첫 번째 고객이 CIA였어요. 그때 맡은 프로젝트의 코드명이 바로 "Oracle"이었답니다.\n\n' +
+      '"Oracle"은 고대 그리스·로마에서 신의 뜻을 전달하는 신탁(oracle)에서 따온 말이에요. 어떤 질문이든 정확한 답을 내려주는 존재라는 뜻이죠. "당신이 어떤 데이터를 물어봐도 Oracle이 딱 맞는 답을 알려준다"는 의미를 담고 있는 거예요.\n\n' +
+      '그 이름처럼, Oracle은 수십 년 동안 기업들이 가진 가장 어렵고 복잡한 질문들에 답해왔어요.',
 
     historyTitle: '오라클의 역사',
     historyItems: [
-      { year: '1977', text: '래리 앨리슨이 관계형 DB 논문(IBM Edgar Codd)을 읽고 창업. CIA 프로젝트 "Oracle" 수주' },
+      { year: '1977', text: '래리 앨리슨이 IBM의 에드거 코드(Edgar Codd) 관계형 DB 논문을 읽고 창업. CIA 프로젝트 "Oracle" 수주' },
       { year: '1979', text: 'Oracle Version 2 출시 — 세계 최초의 상용 SQL 관계형 데이터베이스' },
-      { year: '1992', text: 'Oracle 7 출시. 스토어드 프로시저, 트리거 등 엔터프라이즈 기능 완성' },
-      { year: '2001', text: 'Oracle 9i — 인터넷(i) 시대를 위한 XML, Java 통합' },
-      { year: '2013', text: 'Oracle 12c — 멀티테넌트(클라우드) 아키텍처 도입' },
-      { year: '2018', text: 'Oracle 18c부터 연 1회 정기 릴리즈 정책으로 전환' },
-      { year: '2023', text: 'Oracle 23ai — AI Vector Search 등 AI 기능 전면 통합. 46년의 역사' },
+      { year: '1992', text: 'Oracle 7 출시. 저장 프로시저(Stored Procedure), 트리거(Trigger) 등 기업용 기능 완성' },
+      { year: '2001', text: 'Oracle 9i — 인터넷(Internet) 시대에 맞춰 XML, Java 통합' },
+      { year: '2013', text: 'Oracle 12c — 멀티테넌트(Multitenant, 클라우드) 아키텍처 도입' },
+      { year: '2018', text: 'Oracle 18c부터 연 1회 정기 릴리즈(Release) 정책으로 전환' },
+      { year: '2023', text: 'Oracle 23ai — AI 벡터 검색(AI Vector Search) 등 AI 기능 전면 통합. 46년의 역사' },
+      { year: '2025', text: 'Oracle 26ai — AI 에이전트(Agent) 워크플로우, 통합 하이브리드 벡터 검색(Unified Hybrid Vector Search), JSON·그래프·관계형 데이터 통합 모델 등 AI 네이티브(AI-Native) 기능 전면 강화. 장기 지원(LTS) 릴리즈' },
     ],
 
     strengthTitle: '다른 DB와 무엇이 다른가?',
@@ -42,47 +43,47 @@ const T = {
       {
         icon: <IconBolt size={20} color="#d97706" stroke={1.5} />,
         title: '압도적인 성능',
-        desc: '수억 건의 레코드를 실시간으로 처리하는 비용 기반 옵티마이저(CBO)가 있어서, 복잡한 쿼리를 자동으로 최적화합니다.',
+        desc: '수억 건의 데이터를 실시간으로 처리하는 비용 기반 옵티마이저(CBO, Cost-Based Optimizer)가 복잡한 쿼리를 자동으로 최적화해줘요.',
         color: 'orange',
       },
       {
         icon: <IconLock size={20} color="#2563eb" stroke={1.5} />,
-        title: '엔터프라이즈급 신뢰성',
-        desc: 'MVCC 읽기 일관성, Undo 로그 기반 ROLLBACK, RAC 클러스터. 은행·거래소가 신뢰하는 수준의 데이터 안전성.',
+        title: '기업급 신뢰성',
+        desc: 'MVCC(Multi-Version Concurrency Control) 읽기 일관성, Undo 로그 기반 ROLLBACK, RAC(Real Application Clusters) 클러스터. 은행과 거래소가 믿고 쓰는 수준이에요.',
         color: 'blue',
       },
       {
         icon: <IconTrendingUp size={20} color="#059669" stroke={1.5} />,
         title: '무한 확장성',
-        desc: 'Real Application Clusters(RAC)로 수십 대 서버를 하나처럼 운영. 파티셔닝으로 테라바이트 데이터를 분산 관리.',
+        desc: 'RAC(Real Application Clusters)로 서버 수십 대를 하나처럼 운영할 수 있어요. 파티셔닝(Partitioning)으로 테라바이트급 데이터도 분산 관리할 수 있답니다.',
         color: 'emerald',
       },
       {
         icon: <IconPuzzle size={20} color="#7c3aed" stroke={1.5} />,
         title: '풍부한 내장 기능',
-        desc: '윈도우 함수·분석 함수·PIVOT·MERGE·계층 쿼리(CONNECT BY) 등 Oracle만의 강력한 SQL 확장 기능.',
+        desc: '윈도우 함수·분석 함수·PIVOT·MERGE·계층 쿼리(CONNECT BY) 등 Oracle만의 강력한 SQL 확장 기능들이 가득해요.',
         color: 'violet',
       },
       {
         icon: <IconShield size={20} color="#e11d48" stroke={1.5} />,
         title: '보안·감사',
-        desc: '세분화된 접근 제어, Virtual Private Database(VPD), 감사 로그. 금융·의료·공공기관 컴플라이언스 요구사항 충족.',
+        desc: '세밀한 접근 권한 제어, VPD(Virtual Private Database), 감사 로그(Audit Log)로 금융·의료·공공기관의 컴플라이언스(Compliance) 요건을 충족해요.',
         color: 'rose',
       },
       {
         icon: <IconCloud size={20} color="#06b6d4" stroke={1.5} />,
         title: '클라우드 통합',
-        desc: 'Oracle Cloud Infrastructure(OCI) + Autonomous Database — 자가 튜닝·자가 보안·자가 패치 완전 자동화.',
+        desc: 'OCI(Oracle Cloud Infrastructure) + Autonomous Database — 자동 튜닝·자동 보안·자동 패치까지 완전히 자동화되어 있어요.',
         color: 'cyan',
       },
     ],
 
     whyLearnTitle: '왜 Oracle을 배워야 할까?',
     whyLearnItems: [
-      { icon: <IconBriefcase size={20} color="#2563eb" stroke={1.5} />, text: '국내 대기업·금융사·공공기관의 핵심 시스템 대부분이 Oracle 기반입니다.' },
-      { icon: <IconCoin size={20} color="#d97706" stroke={1.5} />, text: 'Oracle DBA·개발자는 높은 연봉과 시장 수요를 유지하고 있습니다.' },
-      { icon: <IconBrain size={20} color="#7c3aed" stroke={1.5} />, text: 'Oracle 내부 원리(옵티마이저, 인덱스, 트랜잭션)를 이해하면 다른 DB도 쉽게 배울 수 있습니다.' },
-      { icon: <IconCertificate size={20} color="#059669" stroke={1.5} />, text: 'OCA·OCP 자격증은 취업과 커리어 전환에 실질적으로 도움이 됩니다.' },
+      { icon: <IconBriefcase size={20} color="#2563eb" stroke={1.5} />, text: '국내 대기업·금융사·공공기관의 핵심 시스템 대부분이 Oracle 기반이에요.' },
+      { icon: <IconCoin size={20} color="#d97706" stroke={1.5} />, text: 'Oracle DBA(Database Administrator)·개발자는 높은 연봉과 꾸준한 수요를 자랑해요.' },
+      { icon: <IconBrain size={20} color="#7c3aed" stroke={1.5} />, text: 'Oracle 내부 원리(옵티마이저, 인덱스, 트랜잭션)를 이해하면 다른 DB도 훨씬 쉽게 배울 수 있어요.' },
+      { icon: <IconCertificate size={20} color="#059669" stroke={1.5} />, text: 'OCA(Oracle Certified Associate)·OCP(Oracle Certified Professional) 자격증은 취업과 커리어 전환에 실질적인 도움이 돼요.' },
     ],
 
     usersTitle: '어떤 회사들이 Oracle을 쓰고 있을까?',
@@ -91,34 +92,34 @@ const T = {
       {
         org: '삼성·현대·LG',
         category: '제조·대기업',
-        reason: 'ERP(SAP, Oracle E-Business Suite) 백엔드로 Oracle DB. 수천만 건의 거래·재고·인사 데이터를 실시간 처리.',
+        reason: 'ERP(Enterprise Resource Planning) 시스템(SAP, Oracle E-Business Suite)의 백엔드로 Oracle DB를 써요. 수천만 건의 거래·재고·인사 데이터를 실시간으로 처리하거든요.',
         color: 'blue',
       },
       {
         org: '국민은행·우리은행·하나은행',
         category: '금융·은행',
-        reason: '계좌이체·결제·대출 등 금융 트랜잭션의 무결성과 24/7 무중단 운영을 위해 Oracle RAC 클러스터 운영.',
+        reason: '계좌이체·결제·대출 같은 금융 트랜잭션(Transaction)의 무결성과 24시간 무중단 운영을 위해 Oracle RAC(Real Application Clusters) 클러스터를 운영해요.',
         color: 'emerald',
       },
       {
         org: 'Amazon',
         category: '글로벌 IT',
-        reason: '오라클에서 자체 DB로 대규모 마이그레이션 진행 중임에도, 수년간 Oracle을 핵심 DB로 운영한 대표 사례.',
+        reason: '지금은 자체 DB로 대규모 마이그레이션(Migration)을 진행 중이지만, 수년간 Oracle을 핵심 DB로 운영했던 대표적인 사례예요.',
         color: 'orange',
       },
       {
         org: '건강보험심사평가원·국세청',
         category: '공공·의료',
-        reason: '국민 전체의 의료기록·세금 데이터를 안전하게 보관하고 정확하게 처리하기 위한 엔터프라이즈 신뢰성 필요.',
+        reason: '국민 전체의 의료 기록과 세금 데이터를 안전하게 보관하고 정확하게 처리하려면 기업급 신뢰성이 꼭 필요하거든요.',
         color: 'violet',
       },
     ],
 
     closingTitle: '이 책으로 무엇을 배우게 될까?',
     closing:
-      '이 교재는 Oracle의 표면(SQL 문법)에서 시작해 내부 구조(인스턴스·SGA·PGA)와 성능 최적화(옵티마이저·인덱스·파티셔닝)까지 단계적으로 안내합니다.\n\n' +
-      '단순히 SQL을 외우는 것이 아니라, Oracle이 쿼리를 어떻게 처리하는지 — 그 원리를 이해하는 것이 목표입니다. 원리를 알면 느린 쿼리의 이유를 찾을 수 있고, 더 나은 설계를 할 수 있습니다.\n\n' +
-      '자, 이제 시작해봅시다.',
+      '이 교재는 Oracle의 겉모습(SQL 문법)에서 시작해서, 내부 구조(인스턴스·SGA·PGA)와 성능 최적화(옵티마이저·인덱스·파티셔닝)까지 차근차근 안내해줄 거예요.\n\n' +
+      '그냥 SQL을 외우는 게 목표가 아니에요. Oracle이 쿼리를 어떻게 처리하는지, 그 원리를 이해하는 게 진짜 목표예요. 원리를 알면 쿼리가 느린 이유를 찾을 수 있고, 더 좋은 설계를 할 수 있거든요.\n\n' +
+      '자, 이제 시작해봐요!',
   },
 
   en: {
@@ -148,6 +149,7 @@ const T = {
       { year: '2013', text: 'Oracle 12c — multitenant (cloud) architecture introduced' },
       { year: '2018', text: 'Oracle 18c begins annual release cadence' },
       { year: '2023', text: 'Oracle 23ai — AI Vector Search and deep AI integration across the platform' },
+      { year: '2025', text: 'Oracle 26ai — AI-native LTS release: agentic AI workflows, Unified Hybrid Vector Search, unified relational/JSON/graph data model, and SQL Firewall built-in' },
     ],
 
     strengthTitle: 'How is Oracle different?',

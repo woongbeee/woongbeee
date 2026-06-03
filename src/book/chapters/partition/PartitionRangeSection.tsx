@@ -15,11 +15,11 @@ const T = {
   ko: {
     title: 'Range / Interval 파티션',
     subtitle:
-      'Range 파티션은 파티션 키의 값 범위를 기준으로 행을 분할합니다. Interval 파티션은 Range의 확장으로, 지정한 간격마다 파티션을 자동 생성합니다.',
+      'Range 파티션은 파티션 키의 값 범위를 기준으로 행을 분할해요. Interval 파티션은 Range의 확장으로, 지정한 간격마다 파티션을 자동 생성해요.',
 
     rangeTitle: 'Range 파티션',
     rangeDesc:
-      '각 파티션은 VALUES LESS THAN 절로 상한값을 정의합니다. 마지막 파티션에는 MAXVALUE를 지정해 상한을 벗어나는 행을 수용합니다. 날짜 컬럼을 파티션 키로 쓰는 것이 가장 일반적입니다.',
+      '각 파티션은 VALUES LESS THAN 절로 상한값을 정의해요. 마지막 파티션에는 MAXVALUE를 지정해서 상한을 벗어나는 행을 수용해요. 날짜 컬럼을 파티션 키로 쓰는 것이 가장 일반적이에요.',
     rangeSql: `-- 연도별 Range 파티션
 CREATE TABLE sales (
   sale_id    NUMBER,
@@ -52,7 +52,7 @@ ALTER TABLE sales DROP PARTITION sales_2022;`,
 
     intervalTitle: 'Interval 파티션',
     intervalDesc:
-      'Oracle 11g에서 도입된 Interval 파티션은 Range의 확장입니다. 전환점(Transition Point) 이후로 데이터가 들어오면 지정된 간격(Interval)마다 파티션을 자동으로 생성합니다. 이미 정의된 파티션 범위를 벗어나는 데이터가 INSERT될 때 새 파티션이 자동 추가됩니다.',
+      'Oracle 11g에서 도입된 Interval 파티션은 Range의 확장이에요. 전환점(Transition Point) 이후로 데이터가 들어오면 지정된 간격(Interval)마다 파티션을 자동으로 생성해요. 이미 정의된 파티션 범위를 벗어나는 데이터가 INSERT될 때 새 파티션이 자동으로 추가돼요.',
     intervalSql: `-- 월별 Interval 파티션
 CREATE TABLE orders (
   order_id    NUMBER,
@@ -89,7 +89,7 @@ INTERVAL (NUMTODSINTERVAL(1, 'DAY'))
 
     pruningTitle: 'Partition Pruning 예시',
     pruningDesc:
-      'Range 파티션에서 Pruning이 동작하려면 WHERE 절에 파티션 키가 포함되어야 합니다. 실행 계획의 Pstart/Pstop 컬럼에서 접근하는 파티션 번호를 확인할 수 있습니다.',
+      'Range 파티션에서 Pruning이 동작하려면 WHERE 절에 파티션 키가 포함되어야 해요. 실행 계획의 Pstart/Pstop 컬럼에서 접근하는 파티션 번호를 확인할 수 있어요.',
     pruningTable: [
       ["WHERE sale_date = DATE '2023-06-15'", 'PARTITION RANGE SINGLE', 'sales_2023 파티션 1개만 접근'],
       ["WHERE sale_date >= DATE '2023-01-01' AND sale_date < DATE '2024-01-01'", 'PARTITION RANGE SINGLE', '단일 파티션'],
@@ -98,7 +98,7 @@ INTERVAL (NUMTODSINTERVAL(1, 'DAY'))
     ],
 
     summary:
-      'Range 파티션은 날짜·숫자 범위 데이터에 가장 적합합니다. 파티션 수가 예측 가능하면 Range를, 날짜 데이터가 지속적으로 유입되는 경우에는 관리 부담이 적은 Interval 파티션을 선택합니다.',
+      'Range 파티션은 날짜·숫자 범위 데이터에 가장 적합해요. 파티션 수가 예측 가능하면 Range를, 날짜 데이터가 지속적으로 유입되는 경우에는 관리 부담이 적은 Interval 파티션을 선택해요.',
   },
 
   en: {

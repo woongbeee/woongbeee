@@ -1,5 +1,4 @@
-import { useSimulationStore } from '@/store/simulationStore'
-import { PageContainer, ChapterTitle, SimulatorPlaceholder } from '../shared'
+
 import { IndexTypesOverview } from './composite/IndexTypesOverview'
 import { BTreeSection } from './btree/BTreeSection'
 import { RowidSection } from './table-access/RowidSection'
@@ -12,19 +11,7 @@ import { SkipScanSection } from './scan/SkipScanSection'
 import { IndexUnusableSection } from './unusable/IndexUnusableSection'
 import { BitmapSection } from './bitmap/BitmapSection'
 import { CompositeSection } from './composite/CompositeSection'
-
-const T = {
-  ko: {
-    chapterTitle: '인덱스 원리와 활용, 스캔 방식',
-    chapterSubtitle: 'Oracle 인덱스의 종류와 내부 구조, 스캔 알고리즘을 인터랙티브 시각화로 학습합니다.',
-    simDesc: '인덱스 스캔 시뮬레이터 — SQL 쿼리를 입력해 어떤 인덱스 스캔이 수행되는지 직접 확인하세요.',
-  },
-  en: {
-    chapterTitle: 'Index Internals & Scan Methods',
-    chapterSubtitle: 'Learn Oracle index types, internal structure, and scan algorithms through interactive visualizations.',
-    simDesc: 'Index Scan Simulator — Enter a SQL query to see which index scans are performed.',
-  },
-}
+import { IndexUsageSection } from './usage/IndexUsageSection'
 
 // ── Layout wrapper: main content (left, scrollable) + glossary panel (right) ──
 
@@ -39,9 +26,6 @@ function IndexLayout({ children }: { children: React.ReactNode }) {
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export function IndexChapterPage({ sectionId }: { sectionId: string }) {
-  const lang = useSimulationStore((s) => s.lang)
-  const t = T[lang]
-
   if (sectionId === 'index-overview') {
     return (
       <IndexLayout>
@@ -87,12 +71,11 @@ export function IndexChapterPage({ sectionId }: { sectionId: string }) {
     )
   }
 
-  if (sectionId === 'index-simulator') {
+  if (sectionId === 'index-usage') {
     return (
-      <PageContainer>
-        <ChapterTitle icon="🔍" title="Index Simulator" subtitle={t.simDesc} />
-        <SimulatorPlaceholder label="Index Simulator" color="violet" />
-      </PageContainer>
+      <IndexLayout>
+        <IndexUsageSection />
+      </IndexLayout>
     )
   }
 

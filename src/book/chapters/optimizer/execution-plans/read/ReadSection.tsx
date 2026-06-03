@@ -10,7 +10,7 @@ import {
   Divider,
   Table,
   SqlBlock,
-} from '../../shared'
+} from '../../../shared'
 import {
   SqlTraceDisplay,
   RowSourceOperationDisplay,
@@ -18,25 +18,24 @@ import {
   ColumnProjectionDisplay,
   StatisticsDisplay,
   FullPlanDisplay,
-} from '../shared/diagrams'
+} from '../../shared/diagrams'
 
 const T = {
   ko: {
-    title: '실행 계획',
+    title: '실행 계획 읽는 법',
     subtitle:
-      'Oracle이 SQL을 실제로 어떤 순서와 방법으로 실행할지를 기록한 문서입니다. 실행 계획을 읽으면 성능 문제의 원인을 정확히 진단할 수 있습니다.',
+      'Oracle이 SQL을 실제로 어떤 순서와 방법으로 실행할지를 기록한 문서예요. 실행 계획을 읽으면 성능 문제의 원인을 정확히 진단할 수 있어요.',
 
-    // ── 실행 계획이란 ──
     whatTitle: '실행 계획이란?',
     whatDesc:
-      'SQL을 실행하기 전, CBO(Cost-Based Optimizer)는 가능한 실행 방법을 탐색하고 가장 비용이 낮은 방법을 선택합니다. 이 선택 결과를 트리 형태로 기록한 것이 실행 계획입니다.\n\n실행 계획의 각 줄은 하나의 Row Source Operation입니다. 트리 구조이며, 들여쓰기가 가장 깊은 자식 노드부터 실행되어 결과를 부모에게 전달합니다.',
+      'SQL을 실행하기 전, CBO(Cost-Based Optimizer)는 가능한 실행 방법을 탐색하고 가장 비용이 낮은 방법을 선택해요. 이 선택 결과를 트리 형태로 기록한 것이 실행 계획이에요.\n\n실행 계획의 각 줄은 하나의 Row Source Operation이에요. 트리 구조이며, 들여쓰기가 가장 깊은 자식 노드부터 실행되어 결과를 부모에게 전달해요.',
     readOrderTitle: '읽는 순서',
     readOrderDesc:
-      '자식이 여럿이면 위에서 아래 순서로 실행됩니다. 아래 예시의 실행 순서는 ③ → ② → ① → ⓪ 입니다.',
+      '자식이 여럿이면 위에서 아래 순서로 실행돼요. 아래 예시의 실행 순서는 ③ → ② → ① → ⓪ 이에요.',
 
     areasTitle: '실행 계획에서 볼 수 있는 5가지 정보 영역',
     areasDesc:
-      '실행 계획은 하나의 출력이 아니라 다섯 가지 정보 영역의 조합입니다. 조회 방법에 따라 볼 수 있는 영역이 달라집니다.',
+      '실행 계획은 하나의 출력이 아니라 다섯 가지 정보 영역의 조합이에요. 조회 방법에 따라 볼 수 있는 영역이 달라져요.',
     areasTable: [
       ['①', 'Call Statistics', 'TKPROF가 raw trace 파일을 포맷팅해 보여주는 단계별 호출 통계. Parse·Execute·Fetch 각각의 CPU, 경과 시간, I/O 횟수를 확인.'],
       ['②', 'Row Source Operation', '실제 실행 후 오퍼레이션별 런타임 통계. 추정값(E-Rows)과 실제값(A-Rows)을 비교해 병목을 찾음.'],
@@ -45,10 +44,9 @@ const T = {
       ['⑤', 'Statistics', '쿼리 전체의 누적 실행 통계. 논리 읽기·물리 읽기·정렬 횟수 등을 한눈에 파악.'],
     ],
 
-    // ── ① Call Statistics (TKPROF) ──
     sqlTraceTitle: '① Call Statistics',
     sqlTraceDesc:
-      'TKPROF(Transient Kernel Profiler)는 Oracle이 생성하는 raw SQL Trace 파일(.trc)을 사람이 읽기 좋은 형태로 포맷팅해 주는 유틸리티입니다. TKPROF 출력의 핵심은 Call Statistics — SQL 실행의 세 단계(Parse, Execute, Fetch)별로 CPU 시간, 경과 시간, 디스크 I/O, 논리 읽기를 테이블로 정리해 보여줍니다.\n\n이 영역은 ⑤ Statistics(SET AUTOTRACE로 조회하는 세션 전체 누적 통계)와 다릅니다. Statistics가 쿼리 하나의 합계라면, Call Statistics는 Parse·Execute·Fetch 각 단계를 분리해 어느 단계에서 비용이 발생하는지 명확히 보여줍니다.',
+      'TKPROF(Transient Kernel Profiler)는 Oracle이 생성하는 raw SQL Trace 파일(.trc)을 사람이 읽기 좋은 형태로 포맷팅해 주는 유틸리티예요. TKPROF 출력의 핵심은 Call Statistics — SQL 실행의 세 단계(Parse, Execute, Fetch)별로 CPU 시간, 경과 시간, 디스크 I/O, 논리 읽기를 테이블로 정리해 보여줘요.\n\n이 영역은 ⑤ Statistics(SET AUTOTRACE로 조회하는 세션 전체 누적 통계)와 달라요. Statistics가 쿼리 하나의 합계라면, Call Statistics는 Parse·Execute·Fetch 각 단계를 분리해서 어느 단계에서 비용이 발생하는지 명확히 보여줘요.',
     sqlTraceSql: `-- 1단계: SQL Trace 활성화
 ALTER SESSION SET sql_trace = TRUE;
 
@@ -64,29 +62,28 @@ ALTER SESSION SET sql_trace = FALSE;
 -- 4단계: OS에서 TKPROF로 .trc 파일 포맷팅
 -- tkprof <trace_file>.trc output.txt sys=no`,
     sqlTraceCols: [
-      ['call', 'SQL 실행의 세 단계를 나타냅니다.\n\nParse — SQL을 파싱하고 CBO가 실행 계획을 수립하는 단계\nExecute — 계획대로 데이터를 실제로 처리하는 단계\nFetch — 처리 결과를 클라이언트로 인출하는 단계'],
-      ['count', '해당 단계가 몇 번 호출되었는지를 나타냅니다.\n\nSoft Parse는 Library Cache에서 기존 계획을 재사용하므로 비용이 낮습니다. Hard Parse(Misses in library cache ≥ 1)는 계획을 새로 수립하므로 비용이 크며, 반복되면 성능에 큰 영향을 줍니다.'],
-      ['cpu', '해당 단계에서 실제 CPU를 점유한 시간(초)입니다.\n\nParse cpu가 높다면 바인드 변수를 사용하지 않아 Hard Parse가 반복되고 있을 가능성이 큽니다.'],
-      ['elapsed', '해당 단계의 실제 경과 시간(초)입니다.\n\ncpu보다 elapsed가 훨씬 크다면 CPU를 쓰지 않고 무언가를 기다리고 있다는 뜻입니다. Lock 경합·디스크 I/O 대기 등 Wait Event를 확인하세요.'],
-      ['disk', 'Buffer Cache에 없어 디스크(데이터 파일)에서 직접 읽어야 했던 블록 수입니다(Physical Reads).\n\n첫 실행 후에도 disk가 높게 유지된다면 Buffer Cache 적중률이 낮거나 인덱스 활용이 부족한 것입니다.'],
-      ['query', 'Consistent Read(CR) 수입니다.\n\nOracle은 쿼리 시작 시점의 스냅샷 기준으로 데이터를 읽어 읽기 일관성을 보장합니다. 다른 트랜잭션이 해당 블록을 변경 중이라면 Undo 세그먼트에서 변경 이전 버전을 재구성해 읽으므로, 논리적으로 읽은 블록 수가 더 많아질 수 있습니다.'],
-      ['current', 'Current Read 수입니다.\n\n블록의 가장 최신 버전을 직접 읽는 방식으로, INSERT·UPDATE·DELETE 같은 DML이 데이터를 변경할 때 사용합니다. 순수 SELECT에서는 일반적으로 0입니다.'],
-      ['rows', '해당 단계에서 처리한 행 수입니다.\n\nFetch rows — 클라이언트에 실제로 반환된 결과 행 수\nExecute rows — DML이 처리한 행 수'],
+      ['call', 'SQL 실행의 세 단계를 나타내요.\n\nParse — SQL을 파싱하고 CBO가 실행 계획을 수립하는 단계\nExecute — 계획대로 데이터를 실제로 처리하는 단계\nFetch — 처리 결과를 클라이언트로 인출하는 단계'],
+      ['count', '해당 단계가 몇 번 호출되었는지를 나타내요.\n\nSoft Parse는 Library Cache에서 기존 계획을 재사용하므로 비용이 낮아요. Hard Parse(Misses in library cache ≥ 1)는 계획을 새로 수립하므로 비용이 크며, 반복되면 성능에 큰 영향을 줘요.'],
+      ['cpu', '해당 단계에서 실제 CPU를 점유한 시간(초)이에요.\n\nParse cpu가 높다면 바인드 변수를 사용하지 않아 Hard Parse가 반복되고 있을 가능성이 커요.'],
+      ['elapsed', '해당 단계의 실제 경과 시간(초)이에요.\n\ncpu보다 elapsed가 훨씬 크다면 CPU를 쓰지 않고 무언가를 기다리고 있다는 뜻이에요. Lock 경합·디스크 I/O 대기 등 Wait Event를 확인하세요.'],
+      ['disk', 'Buffer Cache에 없어 디스크(데이터 파일)에서 직접 읽어야 했던 블록 수예요(Physical Reads).\n\n첫 실행 후에도 disk가 높게 유지된다면 Buffer Cache 적중률이 낮거나 인덱스 활용이 부족한 거예요.'],
+      ['query', 'Consistent Read(CR) 수예요.\n\nOracle은 쿼리 시작 시점의 스냅샷 기준으로 데이터를 읽어 읽기 일관성을 보장해요. 다른 트랜잭션이 해당 블록을 변경 중이라면 Undo 세그먼트에서 변경 이전 버전을 재구성해서 읽으므로, 논리적으로 읽은 블록 수가 더 많아질 수 있어요.'],
+      ['current', 'Current Read 수예요.\n\n블록의 가장 최신 버전을 직접 읽는 방식으로, INSERT·UPDATE·DELETE 같은 DML이 데이터를 변경할 때 사용해요. 순수 SELECT에서는 일반적으로 0이에요.'],
+      ['rows', '해당 단계에서 처리한 행 수예요.\n\nFetch rows — 클라이언트에 실제로 반환된 결과 행 수\nExecute rows — DML이 처리한 행 수'],
     ],
     sqlTraceExtraTitle: '부가 정보 항목',
     sqlTraceExtraCols: [
-      ['Misses in library cache\nduring parse', 'Parse 단계에서 Library Cache에 실행 계획이 없어 Hard Parse가 발생한 횟수입니다.\n\n1 이상이면 Hard Parse가 발생했음을 의미하며, 바인드 변수 미사용이 주원인입니다.'],
-      ['Optimizer mode', 'SQL 실행에 사용된 옵티마이저 모드입니다.\n\nALL_ROWS — 전체 처리량 최적화 (기본값)\nFIRST_ROWS — 첫 번째 결과의 응답속도 최적화'],
-      ['Parsing user id', 'SQL을 파싱한 사용자의 내부 ID입니다.\n\n어떤 계정이 이 SQL을 실행했는지 추적할 때 사용합니다.'],
+      ['Misses in library cache\nduring parse', 'Parse 단계에서 Library Cache에 실행 계획이 없어 Hard Parse가 발생한 횟수예요.\n\n1 이상이면 Hard Parse가 발생했음을 의미하며, 바인드 변수 미사용이 주원인이에요.'],
+      ['Optimizer mode', 'SQL 실행에 사용된 옵티마이저 모드예요.\n\nALL_ROWS — 전체 처리량 최적화 (기본값)\nFIRST_ROWS — 첫 번째 결과의 응답속도 최적화'],
+      ['Parsing user id', 'SQL을 파싱한 사용자의 내부 ID예요.\n\n어떤 계정이 이 SQL을 실행했는지 추적할 때 사용해요.'],
     ],
     sqlTraceAnalysis: 'Call Statistics로 성능 분석하기',
     sqlTraceAnalysisDesc:
-      'Parse cpu가 높으면 바인드 변수 미사용으로 Hard Parse가 반복되는 신호입니다. elapsed가 cpu보다 훨씬 크면 Lock 대기나 I/O 대기 등 Wait Event가 발생하고 있음을 의미합니다. Fetch disk가 높으면 Buffer Cache에서 처리되지 못하고 디스크 읽기가 발생한 것이므로 인덱스 활용이나 캐시 크기를 검토합니다.',
+      'Parse cpu가 높으면 바인드 변수 미사용으로 Hard Parse가 반복되는 신호예요. elapsed가 cpu보다 훨씬 크면 Lock 대기나 I/O 대기 등 Wait Event가 발생하고 있음을 의미해요. Fetch disk가 높으면 Buffer Cache에서 처리되지 못하고 디스크 읽기가 발생한 거이므로 인덱스 활용이나 캐시 크기를 검토해요.',
 
-    // ── ② Row Source Operation ──
     rsoTitle: '② Row Source Operation',
     rsoDesc:
-      '실제 실행 후 각 오퍼레이션의 런타임 정보를 수집한 결과입니다. DBMS_XPLAN.DISPLAY_CURSOR(format => \'ALLSTATS LAST\')로 조회하며, SQL 실행 시 /*+ gather_plan_statistics */ 힌트를 붙여야 합니다.\n\n추정값(E-Rows)과 실제값(A-Rows, CR, PR)을 비교해 CBO 추정 오류와 I/O 병목을 정확히 찾을 수 있습니다.',
+      '실제 실행 후 각 오퍼레이션의 런타임 정보를 수집한 결과예요. DBMS_XPLAN.DISPLAY_CURSOR(format => \'ALLSTATS LAST\')로 조회하며, SQL 실행 시 /*+ gather_plan_statistics */ 힌트를 붙여야 해요.\n\n추정값(E-Rows)과 실제값(A-Rows, CR, PR)을 비교해서 CBO 추정 오류와 I/O 병목을 정확히 찾을 수 있어요.',
     rsoCursorSql: `-- 힌트를 붙여 실행
 SELECT /*+ gather_plan_statistics */
        e.employee_id, d.department_name
@@ -124,10 +121,9 @@ SELECT * FROM TABLE(
       ['PR > 0', '물리 읽기 발생. Buffer Cache 미스. 첫 실행 후 사라지지 않으면 캐시 크기 검토.', 'Buffer Cache 히트율 확인'],
     ],
 
-    // ── ③ Predicate Information ──
     predTitle: '③ Predicate Information',
     predDesc:
-      '실행 계획에서 Id에 * 표시가 붙은 오퍼레이션이 어떤 조건으로 데이터를 필터링 또는 접근하는지 보여줍니다. access와 filter 두 종류가 있으며, 인덱스 활용 여부를 판단하는 핵심 정보입니다.',
+      '실행 계획에서 Id에 * 표시가 붙은 오퍼레이션이 어떤 조건으로 데이터를 필터링 또는 접근하는지 보여줘요. access와 filter 두 종류가 있으며, 인덱스 활용 여부를 판단하는 핵심 정보예요.',
     predSql: `SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY(
   format => 'BASIC +ROWS +PREDICATE'
 ));
@@ -142,9 +138,8 @@ SELECT * FROM TABLE(
     ],
     predAnalysis: 'Predicate Information으로 성능 분석하기',
     predAnalysisDesc:
-      'filter 조건이 많을수록 인덱스를 탄 후에도 버려지는 행이 많다는 뜻입니다. 함수 적용(UPPER(col) = ...), 묵시적 형 변환(숫자 컬럼에 문자 비교), LIKE \'%...\' 패턴은 access 조건이 될 수 없으므로 filter로 처리됩니다.',
+      "filter 조건이 많을수록 인덱스를 탄 후에도 버려지는 행이 많다는 뜻이에요. 함수 적용(UPPER(col) = ...), 묵시적 형 변환(숫자 컬럼에 문자 비교), LIKE '%...' 패턴은 access 조건이 될 수 없으므로 filter로 처리돼요.",
 
-    // ── ④ Column Projection ──
     projTitle: '④ Column Projection',
     projDesc:
       '각 오퍼레이션이 처리 후 다음 단계로 전달하는 컬럼 목록과 데이터 타입·길이를 보여줍니다. +PROJECTION 포맷을 사용합니다.\n\nSELECT에서 실제로 필요한 컬럼만 전달되는지 확인하는 데 사용합니다. 불필요한 컬럼이 많으면 데이터 전달 비용이 늘어납니다.',
@@ -157,12 +152,11 @@ SELECT * FROM TABLE(
     ],
     projAnalysis: 'Column Projection으로 성능 분석하기',
     projAnalysisDesc:
-      'SELECT * 사용 시 불필요한 컬럼까지 모두 전달되어 처리 비용이 늘어납니다. 또한 인덱스만으로 결과를 처리할 수 있는 경우(Index-Only Access), ROWID가 Projection에 포함되어 있으면 테이블 접근이 발생하고 있음을 확인할 수 있습니다.',
+      'SELECT * 사용 시 불필요한 컬럼까지 모두 전달되어 처리 비용이 늘어나요. 또한 인덱스만으로 결과를 처리할 수 있는 경우(Index-Only Access), ROWID가 Projection에 포함되어 있으면 테이블 접근이 발생하고 있음을 확인할 수 있어요.',
 
-    // ── ⑤ Statistics ──
     statsTitle: '⑤ Statistics',
     statsDesc:
-      'SQL*Plus의 SET AUTOTRACE 또는 V$MYSTAT으로 조회하는 세션 수준 실행 통계입니다. 오퍼레이션별 통계가 아닌 쿼리 전체의 누적 통계를 보여줍니다.',
+      'SQL*Plus의 SET AUTOTRACE 또는 V$MYSTAT으로 조회하는 세션 수준 실행 통계예요. 오퍼레이션별 통계가 아닌 쿼리 전체의 누적 통계를 보여줘요.',
     statsAutoSql: `-- SQL*Plus / SQLcl에서
 SET AUTOTRACE TRACEONLY STATISTICS
 
@@ -182,12 +176,11 @@ WHERE  e.department_id > 50;`,
     ],
     statsAnalysis: 'Statistics로 성능 분석하기',
     statsAnalysisDesc:
-      'consistent gets가 예상보다 매우 높으면 FTS 또는 인덱스 효율이 낮은 상태입니다. physical reads가 지속적으로 높으면 Buffer Cache 크기 증가를 검토합니다. sorts(disk) > 0이면 PGA 크기 조정이 필요합니다.',
+      'consistent gets가 예상보다 매우 높으면 FTS 또는 인덱스 효율이 낮은 상태예요. physical reads가 지속적으로 높으면 Buffer Cache 크기 증가를 검토해요. sorts(disk) > 0이면 PGA 크기 조정이 필요해요.',
 
-    // ── 전체 출력 예시 ──
     fullPlanTitle: '① ~ ⑤ 전체 출력 예시',
     fullPlanDesc:
-      '아래는 하나의 SQL에 대해 ① ~ ⑤ 모든 영역이 함께 출력되는 실제 예시입니다. 각 영역이 어디서 시작하고 끝나는지 한눈에 확인할 수 있습니다.',
+      '아래는 하나의 SQL에 대해 ① ~ ⑤ 모든 영역이 함께 출력되는 실제 예시예요. 각 영역이 어디서 시작하고 끝나는지 한눈에 확인할 수 있어요.',
     fullPlanSql: `-- SQL 실행 (런타임 통계 수집)
 SELECT /*+ gather_plan_statistics */
        e.employee_id, d.department_name
@@ -210,11 +203,11 @@ SELECT * FROM TABLE(
 SET AUTOTRACE TRACEONLY STATISTICS`,
 
     summary:
-      '실행 계획은 5개 정보 영역의 조합입니다. Call Statistics(TKPROF)로 Parse·Execute·Fetch 단계별 비용을 파악하고, Row Source Operation에서 E-Rows↔A-Rows·CR·PR을 비교해 병목을 찾습니다. Predicate Information으로 인덱스 활용 여부를 확인하고, Column Projection으로 불필요한 컬럼 전달을 줄입니다.',
+      '실행 계획은 5개 정보 영역의 조합이에요. Call Statistics(TKPROF)로 Parse·Execute·Fetch 단계별 비용을 파악하고, Row Source Operation에서 E-Rows↔A-Rows·CR·PR을 비교해서 병목을 찾아요. Predicate Information으로 인덱스 활용 여부를 확인하고, Column Projection으로 불필요한 컬럼 전달을 줄여요.',
   },
 
   en: {
-    title: 'Execution Plans',
+    title: 'Reading Execution Plans',
     subtitle:
       "Oracle's execution plan records how it will execute a SQL statement — which operations to run, in what order, using which access paths. Reading the plan is the starting point for any performance diagnosis.",
 
@@ -295,7 +288,7 @@ SELECT * FROM TABLE(
       ['Id', 'Unique operation identifier. An asterisk (*) means a predicate is listed in the Predicate Information section.'],
       ['Operation', 'The operation performed.\n\nHow to read: execution starts at the most-indented (innermost) operation, which passes its result up to its parent. Siblings at the same depth run top-to-bottom. In the example below, the order is ④ → ③ → ② → ① → ⓪.'],
       ['Name', 'The table or index the operation acts on.'],
-      ['Rows', 'E-Rows — the CBO\'s estimated row count before execution.'],
+      ['Rows', "E-Rows — the CBO's estimated row count before execution."],
       ['Cost', 'Relative cost the CBO assigned to this operation.'],
       ['Time', 'CBO-estimated wall-clock time for this operation (HH:MM:SS).'],
       ['A-Rows', 'Actual Rows — real rows returned. A large gap vs Rows (E-Rows) signals a statistics problem.'],
@@ -330,7 +323,7 @@ SELECT * FROM TABLE(
     ],
     predAnalysis: 'Performance Analysis with Predicate Information',
     predAnalysisDesc:
-      'A high number of filter conditions means rows are read and then discarded, wasting I/O. Common causes: applying a function to a column (UPPER(col) = ...), implicit type conversion (comparing a number column with a string literal), or LIKE \'%...\' patterns — none of these can become an access predicate.',
+      "A high number of filter conditions means rows are read and then discarded, wasting I/O. Common causes: applying a function to a column (UPPER(col) = ...), implicit type conversion (comparing a number column with a string literal), or LIKE '%...' patterns — none of these can become an access predicate.",
 
     projTitle: '④ Column Projection',
     projDesc:
@@ -428,7 +421,7 @@ function MultilineTable({ headers, rows }: { headers: string[]; rows: string[][]
   )
 }
 
-export function OptimizerPlanPage() {
+export function ReadSection() {
   const lang = useSimulationStore((s) => s.lang)
   const t = T[lang]
   const isKo = lang === 'ko'
@@ -436,7 +429,7 @@ export function OptimizerPlanPage() {
   return (
     <PageContainer className="max-w-5xl">
       <ChapterTitle
-        icon={<IconListSearch size={36} stroke={1.5} className="text-blue-500" />}
+        icon={<IconListSearch size={36} stroke={1.5} className="text-orange-500" />}
         title={t.title}
         subtitle={t.subtitle}
       />

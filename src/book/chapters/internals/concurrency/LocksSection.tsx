@@ -271,7 +271,7 @@ export function LocksSection() {
         ))}
       </div>
 
-      <div className="w-full my-6 rounded-xl border border-amber-100 bg-amber-50/30 p-4">
+      <div className="my-6">
         <LockDiagram lang={lang} />
       </div>
 

@@ -265,7 +265,7 @@ export function ConcurrencySection() {
       <SectionTitle>{t.concepts}</SectionTitle>
       <ConceptGrid items={t.conceptItems} />
 
-      <div className="w-full max-w-2xl mx-auto my-6 rounded-xl border border-blue-100 bg-blue-50/40 p-4">
+      <div className="my-6">
         <ConcurrencyOverviewDiagram lang={lang} />
       </div>
 

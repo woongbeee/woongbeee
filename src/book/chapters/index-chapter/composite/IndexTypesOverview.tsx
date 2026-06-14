@@ -1,11 +1,7 @@
 import { motion } from 'framer-motion'
 import { useSimulationStore } from '@/store/simulationStore'
 import { cn } from '@/lib/utils'
-import { SectionTitle, SubTitle, Prose, InfoBox } from '../../shared'
-
-function Divider() {
-  return <div className="my-12 border-t" />
-}
+import { SectionTitle, SubTitle, Prose, InfoBox, Divider } from '../../shared'
 
 // ── Translations ──────────────────────────────────────────────────────────────
 
@@ -13,18 +9,18 @@ const T = {
   ko: {
     whatTitle: '인덱스란?',
     whatDesc:
-      '인덱스는 테이블(또는 테이블 클러스터)에 딸려 있는 선택적인 구조예요. 원할 때 만들고, 필요 없으면 지울 수 있죠. 인덱스를 만들거나 지워도 테이블 안의 데이터에는 아무런 영향이 없어요. 그저 데이터를 더 빨리 찾을 수 있도록 도와주는 역할을 합니다.',
-    whatAnalogyTitle: '이해하기 쉬운 비유 — HR 매니저의 파일 박스',
+      '인덱스는 테이블(또는 테이블 클러스터)에 딸려 있는 선택적인 구조예요. 원할 때 만들고, 필요 없으면 지울 수 있어요. 인덱스를 만들거나 지워도 테이블 안의 데이터에는 아무런 영향이 없어요. 그저 데이터를 더 빨리 찾을 수 있도록 도와주는 역할을 해요.',
+    whatAnalogyTitle: '이해하기 쉬운 비유 — 인사 담당자의 파일 박스',
     whatAnalogyDesc:
-      '인사 담당자가 직원 폴더를 여러 개의 박스에 아무렇게나 넣어 두었다고 상상해보세요. Whalen(직원 번호 200)을 찾으려면 모든 박스를 처음부터 하나씩 뒤져야 해요. 정말 귀찮겠죠?\n\n인덱스는 바로 이 문제를 해결해줍니다. 모든 직원 번호와 그 폴더 위치를 미리 정리된 목록으로 만들어 두는 거예요:\n  ID 100 → Box 3, 1번째\n  ID 101 → Box 7, 8번째\n  ID 200 → Box 1, 10번째\n\n이제 Whalen을 찾고 싶다면 목록에서 200번을 찾아 "Box 1, 10번째"로 바로 달려가면 됩니다!',
+      '인사 담당자가 직원 폴더를 여러 개의 박스에 아무렇게나 넣어 두었다고 상상해 보세요. 200번 직원 Whalen을 찾으려면 모든 박스를 처음부터 하나씩 뒤져야 해요. 정말 귀찮겠죠?\n\n인덱스는 바로 이 문제를 해결해줘요. 모든 직원 번호와 그 폴더 위치를 미리 정리된 목록으로 만들어 두는 거예요:\n  ID 100 → Box 3, 1번째\n  ID 101 → Box 7, 8번째\n  ID 200 → Box 1, 10번째\n\n이제 Whalen을 찾고 싶다면 목록에서 200번을 찾아 "Box 1, 10번째"로 바로 달려가면 돼요!',
     whatHeapTitle: '인덱스가 없으면 어떻게 될까?',
     whatHeapDesc:
-      '인덱스가 없는 테이블에서 값을 찾으려면 Full Table Scan(테이블 전체 읽기)을 해야 해요. 예를 들어, 인덱스가 없는 hr.departments 테이블에서 location 2700을 찾으면 모든 블록의 모든 행을 처음부터 끝까지 읽어야 합니다. 데이터가 많아질수록 이 방식은 엄청나게 느려지죠.\n\n오라클의 일반 테이블은 힙(heap) 구조예요. "heap"은 그냥 빈 자리가 있으면 거기에 데이터를 넣는 방식이라서, 데이터가 논리적인 순서 없이 이리저리 흩어져 저장됩니다.',
+      '인덱스가 없는 테이블에서 값을 찾으려면 Full Table Scan(테이블 전체 읽기)을 해야 해요. 예를 들어, 인덱스가 없는 hr.departments 테이블에서 location 2700을 찾으면 모든 블록의 모든 행을 처음부터 끝까지 읽어야 해요. 데이터가 많아질수록 이 방식은 엄청나게 느려지죠.\n\n오라클의 일반 테이블은 힙(heap) 구조예요. "heap"은 그냥 빈 자리가 있으면 거기에 데이터를 넣는 방식이라서, 데이터가 논리적인 순서 없이 이리저리 흩어져 저장돼요.',
     whatPoints: [
-      { icon: '🔗', text: '테이블과 완전히 독립되어 있어요 — 인덱스를 만들거나 지워도 테이블 데이터는 전혀 바뀌지 않습니다' },
-      { icon: '⚡', text: '속도에만 영향을 줘요 — 인덱스가 있든 없든 조회 결과는 똑같고, 빠르기만 달라집니다' },
-      { icon: '🔄', text: 'DML(Data Manipulation Language, INSERT/UPDATE/DELETE)이 일어날 때마다 Oracle이 인덱스를 자동으로 갱신해줍니다' },
-      { icon: '🤖', text: 'Oracle 19c부터는 자동 인덱싱(Automated Indexing)을 지원해요 — 실제 사용 패턴을 보고 인덱스를 알아서 만들고 관리해줍니다' },
+      { icon: '🔗', text: '테이블과 완전히 독립되어 있어요 — 인덱스를 만들거나 지워도 테이블 데이터는 전혀 바뀌지 않아요' },
+      { icon: '⚡', text: '속도에만 영향을 줘요 — 인덱스가 있든 없든 조회 결과는 똑같고, 빠르기만 달라져요' },
+      { icon: '🔄', text: 'DML(Data Manipulation Language, INSERT/UPDATE/DELETE)이 일어날 때마다 Oracle이 인덱스를 자동으로 갱신해줘요' },
+      { icon: '🤖', text: 'Oracle 19c부터는 자동 인덱싱(Automated Indexing)을 지원해요 — 실제 사용 패턴을 보고 인덱스를 알아서 만들고 관리해줘요' },
     ],
 
     whenTitle: '인덱스를 만들어야 할 때',
@@ -59,7 +55,7 @@ const T = {
 
     costTitle: '인덱스를 쓰면 드는 비용',
     costItems: [
-      { icon: '💾', title: '디스크 공간', desc: '인덱스는 테이블과 별도로 저장 공간을 차지해요. 테이블과 다른 테이블스페이스에 저장할 수도 있습니다.' },
+      { icon: '💾', title: '디스크 공간', desc: '인덱스는 테이블과 별도로 저장 공간을 차지해요. 테이블과 다른 테이블스페이스에 저장할 수도 있어요.' },
       { icon: '🔄', title: 'DML(Data Manipulation Language) 오버헤드', desc: 'INSERT, UPDATE, DELETE 할 때마다 인덱스도 함께 갱신해야 해요. 인덱스가 많을수록 쓰기 속도가 느려집니다.' },
       { icon: '🧠', title: '옵티마이저(Optimizer) 부담', desc: '인덱스가 많아지면 옵티마이저가 최적의 실행 방법을 고르는 데 더 오래 걸려요.' },
     ],
@@ -84,11 +80,11 @@ const T = {
     typesTitle: '인덱스 종류 한눈에 보기',
     types: [
       { name: 'B-Tree Index',           color: 'violet',  icon: '🌲', badge: '기본값', desc: '가장 흔하게 쓰이는 인덱스예요. Root → Branch → Leaf로 이어지는 균형 잡힌 트리 구조로, 웬만한 상황에서는 이걸 쓰면 됩니다.' },
-      { name: 'Bitmap Index',           color: 'emerald', icon: '🗺️', badge: 'DW',    desc: '값의 종류가 아주 적은 컬럼에 어울려요. 비트(0/1) 연산으로 여러 조건을 한꺼번에 처리할 수 있습니다.' },
+      { name: 'Bitmap Index',           color: 'emerald', icon: '🗺️', badge: 'DW',    desc: '값의 종류가 아주 적은 컬럼에 어울려요. 비트(0/1) 연산으로 여러 조건을 한꺼번에 처리할 수 있어요.' },
       { name: 'Function-Based Index',   color: 'orange',  icon: 'ƒ',  badge: 'FBI',   desc: '함수나 표현식의 결과값을 키로 저장해요. 대소문자 구분 없이 검색할 때 자주 활용됩니다.' },
-      { name: 'Composite Index',        color: 'purple',  icon: '⊕',  badge: '복합',  desc: '컬럼 2개 이상을 묶어서 하나의 인덱스로 만들어요. WHERE 조건에 첫 번째 컬럼이 꼭 포함되어야 효과가 있습니다.' },
+      { name: 'Composite Index',        color: 'purple',  icon: '⊕',  badge: '복합',  desc: '컬럼 2개 이상을 묶어서 하나의 인덱스로 만들어요. WHERE 조건에 첫 번째 컬럼이 꼭 포함되어야 효과가 있어요.' },
       { name: 'Reverse Key Index',      color: 'rose',    icon: '↔',  badge: 'RAC',   desc: '키 값을 거꾸로 뒤집어서 저장해요. 숫자가 순서대로 증가하는 값들이 특정 블록에 몰리는 현상을 막아줍니다.' },
-      { name: 'Index-Organized Table',  color: 'amber',   icon: '⬡',  badge: 'IOT',   desc: '테이블 자체가 B-Tree 인덱스 구조로 이루어져 있어요. 기본 키로만 조회하는 테이블에 딱 맞습니다.' },
+      { name: 'Index-Organized Table',  color: 'amber',   icon: '⬡',  badge: 'IOT',   desc: '테이블 자체가 B-Tree 인덱스 구조로 이루어져 있어요. 기본 키로만 조회하는 테이블에 딱 맞아요.' },
     ],
 
   },
@@ -245,14 +241,18 @@ export function IndexTypesOverview() {
       <SectionTitle>{t.whatTitle}</SectionTitle>
       <Prose>{t.whatDesc}</Prose>
 
-      <div className="rounded-xl border border-violet-200 bg-violet-50/50 p-5">
-        <p className="mb-2 text-xs font-bold text-violet-800">{t.whatAnalogyTitle}</p>
-        <Prose className="text-[12px] text-violet-900/80 whitespace-pre-line">{t.whatAnalogyDesc}</Prose>
-      </div>
+      <InfoBox variant="tip">
+        <strong>{t.whatAnalogyTitle}</strong>
+        <br />
+        {t.whatAnalogyDesc}
+      </InfoBox>
 
-      <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50/50 p-5">
-        <p className="mb-2 text-xs font-bold text-amber-800">{t.whatHeapTitle}</p>
-        <Prose className="text-[12px] text-amber-900/80">{t.whatHeapDesc}</Prose>
+      <div className="mt-3">
+        <InfoBox variant="note">
+          <strong>{t.whatHeapTitle}</strong>
+          <br />
+          {t.whatHeapDesc}
+        </InfoBox>
       </div>
 
       <div className="mb-6 space-y-2">

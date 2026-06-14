@@ -316,7 +316,7 @@ export function MvccSection() {
       <SectionTitle>{t.crCloneTitle}</SectionTitle>
       <Prose>{t.crCloneDesc}</Prose>
 
-      <div className="w-full my-6 rounded-xl border border-blue-100 bg-blue-50/40 p-6">
+      <div className="my-6">
         <CRCloneDiagram lang={lang} />
       </div>
 

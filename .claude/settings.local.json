@@ -54,7 +54,11 @@
       "Bash(rmdir \"C:\\\\Users\\\\woong\\\\OneDrive\\\\Desktop\\\\oracleDataBaseSystem\\\\src\\\\book\\\\chapters\\\\optimizer\\\\overview\")",
       "Bash(New-Item -ItemType Directory -Force \"C:\\\\Users\\\\woong\\\\OneDrive\\\\Desktop\\\\oracleDataBaseSystem\\\\src\\\\book\\\\chapters\\\\index-chapter\\\\usage\")",
       "Bash(Out-Null)",
-      "PowerShell(New-Item *)"
+      "PowerShell(New-Item *)",
+      "Bash(claude *)",
+      "Bash(npm update *)",
+      "Bash(Select-Object -ExpandProperty Name)",
+      "Bash(Select-Object -First 20)"
     ]
   }
 }

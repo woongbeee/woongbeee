@@ -257,7 +257,7 @@ ALTER SESSION SET ISOLATION_LEVEL = READ COMMITTED;`
             {t.readCommittedConflictTitle}
           </p>
           <Prose>{t.readCommittedConflictDesc}</Prose>
-          <div className="mt-4 rounded-xl border border-violet-100 bg-violet-50/20 p-4">
+          <div className="mt-4">
             <ReadCommittedConflictDiagram lang={lang} />
           </div>
         </div>
@@ -292,7 +292,7 @@ SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
             {t.serializableExampleTitle}
           </p>
           <Prose>{t.serializableExampleDesc}</Prose>
-          <div className="mt-4 rounded-xl border border-amber-100 bg-amber-50/20 p-4">
+          <div className="mt-4">
             <SerializableConflictDiagram lang={lang} />
           </div>
         </div>

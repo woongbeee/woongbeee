@@ -8,6 +8,7 @@ import {
   InfoBox,
   Divider,
   SqlBlock,
+  StepList,
 } from '../../shared'
 import { TxTimeline } from './TxTimeline'
 import type { TxSession, TxStep } from './TxTimeline'
@@ -141,7 +142,7 @@ function DeadlockTimeline({ lang }: { lang: 'ko' | 'en' }) {
     : "Oracle auto-resolves: only T1's last SQL rolled back — prior changes remain"
 
   return (
-    <div className="mt-4 rounded-xl border border-red-100 bg-red-50/20 p-4">
+    <div className="mt-4">
       <TxTimeline sessions={sessions} steps={steps} resultLabel={resultLabel} />
     </div>
   )
@@ -224,16 +225,7 @@ END;`
       <Divider />
 
       <SectionTitle>{t.preventTitle}</SectionTitle>
-      <div className="space-y-2 mb-6">
-        {t.preventItems.map((item, i) => (
-          <div key={i} className="flex items-start gap-2">
-            <span className="mt-1 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-blue-100 text-blue-600 text-[10px] font-bold">
-              {i + 1}
-            </span>
-            <p className="text-sm text-muted-foreground leading-relaxed">{item}</p>
-          </div>
-        ))}
-      </div>
+      <StepList steps={t.preventItems.map((item) => ({ title: item, desc: '' }))} />
 
       <Divider />
 

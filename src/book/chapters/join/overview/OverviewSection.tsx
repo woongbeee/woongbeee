@@ -19,11 +19,11 @@ import { JoinAnimator, type JoinType } from '../shared/JoinAnimator'
 const T = {
   ko: {
     title: '조인 원리와 활용',
-    subtitle: '두 개의 row source를 하나의 결과 집합으로 결합하는 세 가지 조인 알고리즘의 동작 원리를 알아봐요.',
+    subtitle: '두 개의 데이터 원본을 하나의 결과 집합으로 결합하는 세 가지 조인 알고리즘의 동작 원리를 알아봐요.',
 
     whatTitle: '조인이란?',
     whatDesc:
-      '조인은 정확히 두 개의 row source(테이블 또는 뷰)의 출력을 하나의 결과 집합으로 결합해요. 두 개보다 많은 테이블을 포함하는 쿼리에서 Oracle은 한 번에 두 개씩 조인하며, 중간 결과가 다음 조인의 한쪽 입력이 돼요.\n\n조인 조건(join condition)은 두 row source를 비교하는 표현식이에요. 조인 조건이 없으면 카테시안 조인(Cartesian join)이 발생해요 — 한 테이블의 모든 행이 다른 테이블의 모든 행과 매칭돼요.',
+      '조인은 정확히 두 개의 데이터 원본(테이블 또는 뷰)의 결과를 하나의 결과 집합으로 결합해요. 두 개보다 많은 테이블을 포함하는 쿼리에서 Oracle은 한 번에 두 개씩 조인하며, 중간 결과가 다음 조인의 한쪽 입력이 돼요.\n\n조인 조건(join condition)은 두 데이터 원본을 비교하는 표현식이에요. 조인 조건이 없으면 카테시안 조인(Cartesian join)이 발생해요 — 한 테이블의 모든 행이 다른 테이블의 모든 행과 매칭돼요.',
 
     methodsTitle: '세 가지 조인 알고리즘',
     methods: [

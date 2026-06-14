@@ -10,35 +10,35 @@ import { cn } from '@/lib/utils'
 const T = {
   ko: {
     chapterTitle: '병렬 처리',
-    chapterSubtitle: 'Oracle의 병렬 쿼리 실행 모델과 Degree of Parallelism 설정 전략을 학습합니다.',
-    simDesc: '병렬 처리 시뮬레이터 — 병렬 실행 계획을 시뮬레이션하세요.',
+    chapterSubtitle: 'Oracle의 병렬 쿼리 실행 모델과 Degree of Parallelism(병렬도) 설정 전략을 알아봐요.',
+    simDesc: '병렬 처리 시뮬레이터 — 병렬 실행 계획을 직접 시뮬레이션해 봐요.',
 
     overviewTitle: '병렬 처리 개요',
-    overviewDesc: '병렬 쿼리 실행은 하나의 SQL 문을 여러 병렬 실행 서버(PX Servers)에 나누어 처리하는 기법입니다. 주로 대용량 OLAP/데이터 웨어하우스 환경에서 사용됩니다.',
+    overviewDesc: '병렬 쿼리 실행은 하나의 SQL 문을 여러 병렬 실행 서버(PX Servers)에 나눠서 처리하는 기법이에요. 주로 대용량 OLAP(온라인 분석 처리)/데이터 웨어하우스 환경에서 사용해요.',
     overviewItems: [
-      { icon: '⚡', title: '처리 속도', desc: '대용량 집계·조인·소트를 병렬로 처리하여 속도 향상.', color: 'blue' },
-      { icon: '💾', title: '리소스 사용', desc: '병렬도만큼 CPU, I/O, 메모리 사용량이 증가합니다.', color: 'orange' },
-      { icon: '🎯', title: '적합한 쿼리', desc: 'Full Table Scan, 대용량 조인, 집계, 정렬에 효과적.', color: 'violet' },
-      { icon: '⚠', title: '주의사항', desc: 'OLTP 환경에서는 리소스 경쟁으로 오히려 성능 저하 가능.', color: 'rose' },
+      { icon: '⚡', title: '처리 속도', desc: '대용량 집계·조인·소트를 병렬로 처리해서 속도가 빨라져요.', color: 'blue' },
+      { icon: '💾', title: '리소스 사용', desc: '병렬도만큼 CPU, I/O, 메모리 사용량도 늘어나요.', color: 'orange' },
+      { icon: '🎯', title: '적합한 쿼리', desc: 'Full Table Scan(전체 테이블 읽기), 대용량 조인, 집계, 정렬에 효과적이에요.', color: 'violet' },
+      { icon: '⚠', title: '주의사항', desc: 'OLTP(온라인 트랜잭션 처리) 환경에서는 리소스 경쟁으로 오히려 성능이 떨어질 수 있어요.', color: 'rose' },
     ],
 
     dopTitle: 'Degree of Parallelism',
-    dopDesc: 'DOP(Degree of Parallelism)는 병렬로 실행할 PX 서버의 수입니다. 하나의 쿼리에서 최대 DOP×2 개의 PX 서버가 사용됩니다(프로듀서 + 컨슈머).',
+    dopDesc: 'DOP(Degree of Parallelism, 병렬도)는 병렬로 실행할 PX 서버의 수예요. 하나의 쿼리에서 최대 DOP×2개의 PX 서버가 사용돼요(프로듀서 + 컨슈머).',
     dopTable: [
-      ['PARALLEL 힌트', '/*+ PARALLEL(t, 4) */', 'DOP를 직접 지정 (권장)'],
-      ['테이블 속성', 'ALTER TABLE t PARALLEL 8', '테이블 레벨 기본 DOP 설정'],
-      ['세션 수준', 'ALTER SESSION ENABLE PARALLEL QUERY', '세션의 모든 쿼리에 자동 병렬 적용'],
-      ['자동 DOP', 'PARALLEL_DEGREE_POLICY=AUTO', 'Oracle이 자동으로 DOP 결정 (12c+)'],
+      ['PARALLEL 힌트', '/*+ PARALLEL(t, 4) */', 'DOP를 직접 지정해요 (권장)'],
+      ['테이블 속성', 'ALTER TABLE t PARALLEL 8', '테이블 레벨 기본 DOP를 설정해요'],
+      ['세션 수준', 'ALTER SESSION ENABLE PARALLEL QUERY', '세션의 모든 쿼리에 자동으로 병렬을 적용해요'],
+      ['자동 DOP', 'PARALLEL_DEGREE_POLICY=AUTO', 'Oracle이 자동으로 DOP를 결정해줘요 (12c+)'],
     ],
-    dopInfo: 'DOP는 CPU 코어 수, I/O 대역폭, 동시 접속 사용자 수를 고려하여 설정합니다. 일반적으로 DOP = CPU 코어 수 / 2 ~ CPU 코어 수 범위를 권장합니다.',
+    dopInfo: 'DOP는 CPU 코어 수, I/O 대역폭, 동시 접속 사용자 수를 고려해서 설정해요. 일반적으로 DOP = CPU 코어 수 / 2 ~ CPU 코어 수 범위를 권장해요.',
 
     coordTitle: 'QC와 PX 서버',
-    coordDesc: '병렬 쿼리에서 Query Coordinator(QC)는 PX 서버들을 조율하고 최종 결과를 취합합니다.',
+    coordDesc: '병렬 쿼리에서 Query Coordinator(QC)는 PX 서버들을 조율하고 최종 결과를 모아줘요.',
     coordTable: [
-      ['Query Coordinator (QC)', '쿼리를 분할하고 PX 서버에 분배. 최종 결과를 취합하여 클라이언트에 반환.'],
-      ['PX Server (Producer)', '데이터를 스캔하고 변환하여 Consumer PX 서버에 전달.'],
-      ['PX Server (Consumer)', 'Producer로부터 데이터를 받아 조인, 집계, 정렬 수행.'],
-      ['Distribution Method', '테이블 큐(Table Queue)를 통해 PX 서버 간 데이터 재분배.'],
+      ['Query Coordinator (QC)', '쿼리를 분할하고 PX 서버에 분배해요. 최종 결과를 모아서 클라이언트에 반환해요.'],
+      ['PX Server (Producer)', '데이터를 스캔하고 변환한 뒤, Consumer PX 서버에 전달해요.'],
+      ['PX Server (Consumer)', 'Producer에게 데이터를 받아서 조인, 집계, 정렬을 수행해요.'],
+      ['Distribution Method', '테이블 큐(Table Queue)를 통해 PX 서버 간 데이터를 재분배해요.'],
     ],
   },
   en: {

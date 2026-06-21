@@ -16,6 +16,7 @@ import { QueryTransformPage } from './chapters/query-transform'
 import { SortPage } from './chapters/sort'
 import { PartitionPage } from './chapters/partition'
 import { ParallelPage } from './chapters/parallel'
+import { DataModelingPage } from './chapters/data-modeling'
 import { PageContainer, WipBanner } from './chapters/shared'
 
 interface Props {
@@ -134,6 +135,7 @@ export const BookContent = memo(function BookContent({ sectionId, onNavigate }: 
 // Route each sectionId to the right chapter page component
 function SectionRouter({ sectionId }: { sectionId: string }) {
   if (sectionId.startsWith('intro-'))       return <IntroductionPage />
+  if (sectionId.startsWith('dm-'))          return <DataModelingPage sectionId={sectionId} />
   if (sectionId.startsWith('sql-basics-'))  return <SqlBasicsPage sectionId={sectionId} />
   if (sectionId.startsWith('internals-'))   return <InternalsPage sectionId={sectionId} />
   if (sectionId.startsWith('join-'))        return <JoinPage sectionId={sectionId} />

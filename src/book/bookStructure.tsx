@@ -11,6 +11,7 @@ import {
   IconLayoutGrid,
   IconGitFork,
   IconWand,
+  IconSitemap,
 } from '@tabler/icons-react'
 
 export interface BookSection {
@@ -50,8 +51,63 @@ export const BOOK_CHAPTERS: BookChapter[] = [
     ],
   },
   {
-    id: 'sql-basics',
+    id: 'data-modeling',
     num: 1,
+    icon: <IconSitemap size={15} className="text-indigo-500" />,
+    color: 'brand-navy',
+    title: { ko: '데이터 모델링의 이해', en: 'Understanding Data Modeling' },
+    sections: [
+      {
+        id: 'dm-overview',
+        title: { ko: '데이터 모델의 이해', en: 'Understanding Data Models' },
+      },
+      {
+        id: 'dm-entity',
+        title: { ko: 'Entity', en: 'Entity' },
+      },
+      {
+        id: 'dm-attribute',
+        title: { ko: '속성', en: 'Attribute' },
+      },
+      {
+        id: 'dm-relationship',
+        title: { ko: '관계', en: 'Relationship' },
+      },
+      {
+        id: 'dm-identifier',
+        title: { ko: '식별자', en: 'Identifier' },
+      },
+      {
+        id: 'dm-sql',
+        title: { ko: '데이터 모델과 SQL', en: 'Data Model & SQL' },
+        children: [
+          {
+            id: 'dm-sql-normalization',
+            title: { ko: '정규화', en: 'Normalization' },
+          },
+          {
+            id: 'dm-sql-join',
+            title: { ko: '관계와 조인의 이해', en: 'Relationships & Joins' },
+          },
+          {
+            id: 'dm-sql-transaction',
+            title: { ko: '모델이 표현하는 트랜잭션의 이해', en: 'Transactions in the Model' },
+          },
+          {
+            id: 'dm-sql-null',
+            title: { ko: 'Null 속성의 이해', en: 'Understanding Null Attributes' },
+          },
+          {
+            id: 'dm-sql-identifier',
+            title: { ko: '본질 식별자와 인조 식별자', en: 'Natural vs. Surrogate Identifiers' },
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'sql-basics',
+    num: 2,
     icon: <IconCode size={15} className="text-blue-600" />,
     color: 'brand-navy',
     title: { ko: 'SQL 문법', en: 'SQL Syntax Fundamentals' },
@@ -157,7 +213,7 @@ export const BOOK_CHAPTERS: BookChapter[] = [
   },
   {
     id: 'internals',
-    num: 2,
+    num: 3,
     icon: <IconCpu size={15} className="text-blue-500" />,
     color: 'blue',
     title: {
@@ -271,7 +327,7 @@ export const BOOK_CHAPTERS: BookChapter[] = [
   },
   {
     id: 'join',
-    num: 3,
+    num: 4,
     icon: <IconArrowMerge size={15} className="text-emerald-500" />,
     color: 'emerald',
     title: { ko: '조인 원리와 활용', en: 'Join Principles & Usage' },
@@ -309,7 +365,7 @@ export const BOOK_CHAPTERS: BookChapter[] = [
   },
   {
     id: 'index',
-    num: 4,
+    num: 5,
     icon: <IconListSearch size={15} className="text-violet-500" />,
     color: 'violet',
     title: {
@@ -385,7 +441,7 @@ export const BOOK_CHAPTERS: BookChapter[] = [
   },
   {
     id: 'partition',
-    num: 5,
+    num: 6,
     icon: <IconLayoutGrid size={15} className="text-amber-500" />,
     color: 'amber',
     title: { ko: '파티셔닝', en: 'Partitioning' },
@@ -436,7 +492,7 @@ export const BOOK_CHAPTERS: BookChapter[] = [
   },
   {
     id: 'parallel',
-    num: 6,
+    num: 7,
     icon: <IconGitFork size={15} className="text-teal-500" />,
     color: 'teal',
     title: { ko: '병렬 처리', en: 'Parallel Processing' },
@@ -453,20 +509,11 @@ export const BOOK_CHAPTERS: BookChapter[] = [
         id: 'parallel-coordinator',
         title: { ko: 'QC와 PX 서버', en: 'Query Coordinator & PX Servers' },
       },
-      {
-        id: 'parallel-simulator',
-        title: { ko: 'Parallel Simulator', en: 'Parallel Simulator' },
-        hasSimulator: true,
-        simulatorLabel: {
-          ko: '병렬 처리 시뮬레이터 실행',
-          en: 'Launch Parallel Simulator',
-        },
-      },
     ],
   },
   {
     id: 'optimizer',
-    num: 7,
+    num: 8,
     icon: <IconBolt size={15} className="text-orange-500" />,
     color: 'orange',
     title: { ko: '옵티마이저', en: 'Optimizer' },
@@ -554,7 +601,7 @@ export const BOOK_CHAPTERS: BookChapter[] = [
   },
   {
     id: 'sql-tuning',
-    num: 8,
+    num: 9,
     icon: <IconWand size={15} className="text-rose-500" />,
     color: 'rose',
     title: { ko: 'SQL 튜닝', en: 'SQL Tuning' },

@@ -58,7 +58,21 @@
       "Bash(claude *)",
       "Bash(npm update *)",
       "Bash(Select-Object -ExpandProperty Name)",
-      "Bash(Select-Object -First 20)"
+      "Bash(Select-Object -First 20)",
+      "Bash(node -e \"require\\('puppeteer'\\)\")",
+      "PowerShell(Get-Content *)",
+      "Bash(npm run *)",
+      "Read(//tmp/**)",
+      "Bash(node scripts/export-partition-pdf.mjs)",
+      "Bash(pkill -f \"vite\")",
+      "Bash(node scripts/merge-partition-pdf.mjs)",
+      "Bash(node -e \"require\\('pdf-lib'\\); console.log\\('ok'\\)\")",
+      "Bash(node -e \"require\\('puppeteer'\\); console.log\\('ok'\\)\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5173)",
+      "Bash(node scripts/export-query-transform-pdf.mjs)",
+      "Skill(run)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5173/)",
+      "PowerShell(Set-Location *)"
     ]
   }
 }

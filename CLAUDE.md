@@ -6,19 +6,20 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 사용자와 상호작용하는 Dynamic Oracle 교육서. 좌측 사이드바 목차(TOC)에서 챕터를 탐색하고, 각 섹션에서 개념 설명 + 인터랙티브 애니메이션 + 챕터별 시뮬레이터를 통해 Oracle 내부를 학습한다.
 
-**챕터 구성 (num 0~8, `bookStructure.tsx` 기준):**
+**챕터 구성 (num 0~9, `bookStructure.tsx` 기준):**
 
 | num | id | 제목(ko) | 색상 |
 |-----|-----|----------|------|
 | 0 | `introduction` | 오라클이란? | `brand-navy` |
-| 1 | `sql-basics` | SQL 문법 | `brand-navy` |
-| 2 | `internals` | 오라클 내부 구조와 프로세스 | `blue` |
-| 3 | `join` | 조인 원리와 활용 | `emerald` |
-| 4 | `index` | 인덱스 원리와 활용 | `violet` |
-| 5 | `partition` | 파티셔닝 | `amber` |
-| 6 | `parallel` | 병렬 처리 | `teal` |
-| 7 | `optimizer` | 옵티마이저 | `orange` |
-| 8 | `sql-tuning` | SQL 튜닝 (쿼리 변환 + 소트 튜닝 포함) | `rose` |
+| 1 | `data-modeling` | 데이터 모델링의 이해 | `brand-navy` |
+| 2 | `sql-basics` | SQL 문법 | `brand-navy` |
+| 3 | `internals` | 오라클 내부 구조와 프로세스 | `blue` |
+| 4 | `join` | 조인 원리와 활용 | `emerald` |
+| 5 | `index` | 인덱스 원리와 활용 | `violet` |
+| 6 | `partition` | 파티셔닝 | `amber` |
+| 7 | `parallel` | 병렬 처리 | `teal` |
+| 8 | `optimizer` | 옵티마이저 | `orange` |
+| 9 | `sql-tuning` | SQL 튜닝 (쿼리 변환 + 소트 튜닝 포함) | `rose` |
 
 ## 명령어
 
@@ -65,6 +66,7 @@ interface Props {
 | 접두사 | 컴포넌트 | 진입점 |
 |--------|----------|--------|
 | `intro-` | `IntroductionPage` | `src/book/chapters/introduction/IntroductionPage.tsx` |
+| `dm-` | `DataModelingPage` | `src/book/chapters/data-modeling/index.tsx` |
 | `sql-basics-` | `SqlBasicsPage` | `src/book/chapters/sql-basics/index.tsx` |
 | `internals-` | `InternalsPage` | `src/book/chapters/internals/index.tsx` |
 | `join-` | `JoinPage` | `src/book/chapters/join/index.tsx` |
@@ -177,7 +179,7 @@ const T = {
 
 각 챕터의 구체적인 섹션→파일 매핑은 해당 챕터의 `index.tsx`(또는 라우터 파일)를 직접 읽는 것이 가장 정확하다. 대표 패턴만 기록한다.
 
-**TOC 활성화 범위:** `TableOfContents.tsx`에서 `isReady = chapter.num <= N`으로 제어. 현재 `chapter.num <= 4` (Chapter 0·1·2·3·4)가 활성화되어 있다. 콘텐츠 완성 시 이 숫자를 올린다.
+**TOC 활성화 범위:** `TableOfContents.tsx`에서 `isReady = chapter.num <= N`으로 제어. 현재 `chapter.num <= 7` (Chapter 0~7)가 활성화되어 있다. 콘텐츠 완성 시 이 숫자를 올린다.
 
 **`WipBanner`** — 미완성 섹션 최상단에 배치. 현재 `BitmapSection`, `CompositeSection`에 적용 중.
 
@@ -196,6 +198,11 @@ const T = {
 - `fundamentals/WhatIsOptimizerSection.tsx`가 `optimizer-fundamentals` 분기의 라우터 역할. `FundamentalsSection.tsx`는 삭제됨
 - `join/` 하위 디렉토리에 `JoinOverviewSection`, `NestedLoopSection`, `HashJoinSection`, `SortMergeSection` 위치 (`optimizer-join-*` 섹션 ID 처리)
 - `optimizer-join` 섹션 ID는 `OptimizerJoinOverviewPage`로 fallthrough됨 (랜딩 페이지 겸용)
+
+**Data Modeling 챕터 (`src/book/chapters/data-modeling/`):**
+- 최상위 섹션(`dm-overview`, `dm-entity`, `dm-attribute`, `dm-relationship`, `dm-identifier`)은 챕터 루트에 파일
+- `dm-sql` 그룹 하위 5개 섹션은 `sql/` 서브디렉토리에 파일 (`NormalizationSection.tsx` 등)
+- `RelationshipSection.tsx`에 IE/바커 표기법 SVG 다이어그램 포함 — SVG 기호 공간 상수: `SYM=20px` (엔터티 경계 ↔ 선 끝 갭), `sym1R = E1x+EW+SYM` (왼쪽 기호 우측 끝 = 선 시작), `sym2L = E2x-SYM` (오른쪽 기호 좌측 끝 = 선 끝)
 
 **Sort·Parallel 챕터:** 단일 `index.tsx` 파일에 모든 섹션 포함. `sql-tuning` 챕터의 하위 섹션으로 TOC에 배치됨.
 
@@ -292,6 +299,8 @@ const T = {
 SVG는 DOM 순서 = z-order. 인터랙티브 다이어그램에서 특정 요소가 항상 위에 표시되어야 하면 **루프 바깥으로 꺼내 마지막에 렌더**한다.
 
 SVG 레이아웃 상수는 **의존 관계 순서대로** 선언한다 — 버킷 행 위치를 먼저 계산한 뒤 외곽 박스 높이를 역산(`BC_H = (BUCK_ROWS[3] - BC_Y) + BUCK_R + padding`).
+
+**`react-scan` SVG 오버레이 금지:** `react-scan`은 개발 서버에서 named React 컴포넌트 위에 레이블 오버레이를 렌더링한다. SVG 내부에서 `function EntityBox(...)`, `function IEEnd(...)` 같은 named 헬퍼를 `<EntityBox />` 형태로 호출하면 오버레이가 SVG 위에 겹친다. **SVG 안에서는 named 서브컴포넌트를 쓰지 말고 모든 SVG 요소를 인라인 JSX로 직접 렌더**하거나, 변수에 JSX를 할당해 `{myVar}` 형태로 삽입한다.
 
 **Internals 다이어그램 설계 규칙:**
 - **ROW_GAP ≥ 26px**: 행 간격이 26px 미만이면 화살표 + 레이블이 겹친다.

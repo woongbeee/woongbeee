@@ -6,7 +6,6 @@ import { OptimizerExecutionPlansPage } from './execution-plans/ExecutionPlansSec
 
 import { OptimizerStatsPage } from './stats/StatsSection'
 import { OptimizerAccessPathPage } from './access-path/AccessPathSection'
-import { PlanReadingSection } from './plan/PlanReadingSection'
 import { OptimizerJoinOverviewPage } from './join/JoinOverviewSection'
 import { OptimizerJoinNestedLoopPage } from './join/NestedLoopSection'
 import { OptimizerJoinHashPage } from './join/HashJoinSection'
@@ -35,11 +34,9 @@ export function OptimizerChapterPage({ sectionId }: { sectionId: string }) {
   if (sectionId.startsWith('optimizer-fundamentals'))    return <OptimizerFundamentalsPage sectionId={sectionId} />
   if (sectionId.startsWith('optimizer-execution-plans')) return <OptimizerExecutionPlansPage sectionId={sectionId} />
 
-if (sectionId === 'optimizer-stats')        return <OptimizerStatsPage />
-  if (sectionId === 'optimizer-access-path')  return <OptimizerAccessPathPage />
-  if (sectionId === 'optimizer-plan-reading') return <PlanReadingSection />
-  if (sectionId === 'optimizer-join')         return <OptimizerJoinOverviewPage />
-  if (sectionId === 'optimizer-join-overview')    return <OptimizerJoinOverviewPage />
+  if (sectionId === 'optimizer-stats')            return <OptimizerStatsPage />
+  if (sectionId === 'optimizer-access-path')      return <OptimizerAccessPathPage />
+  if (sectionId === 'optimizer-join')             return <OptimizerJoinOverviewPage />
   if (sectionId === 'optimizer-join-nested-loop') return <OptimizerJoinNestedLoopPage />
   if (sectionId === 'optimizer-join-hash')        return <OptimizerJoinHashPage />
   if (sectionId === 'optimizer-join-sort-merge')  return <OptimizerJoinSortMergePage />

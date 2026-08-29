@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Local verification / scratch artifacts (not part of the build)
+verify_*.png
+verify_*.mjs
+/*.txt

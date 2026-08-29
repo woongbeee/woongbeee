@@ -1,49 +1,37 @@
 # Codebase Concerns
 
 **Analysis Date:** 2026-08-29
+**Last updated:** 2026-08-29 — orphaned-files + optimizer-barrel cleanup applied
+(commits `86d58e7`, `5e51edb`); resolved items marked inline.
 
 This is an educational SPA (interactive Oracle textbook). There is no backend, no
 user data, no auth, and no database — so classic production risks (secrets, PII,
-SQL injection, scaling) are mostly absent. The real concerns are **dead code**,
-**stale documentation**, **incomplete chapters**, a **regex SQL "parser"** that
-only has to look plausible, and the **absence of routing / persistence / tests**.
+SQL injection, scaling) are mostly absent. The remaining concerns are **stale
+documentation**, **incomplete chapters**, a **regex SQL "parser"** that only has
+to look plausible, the **absence of routing / persistence / tests**, and an
+**in-flight design refactor** touching `theme.ts` / `index.css` / `shared.tsx`.
 
 ---
 
 ## Tech Debt
 
-### Orphaned / dead files (never imported, still compiled & shipped)
+### Orphaned / dead files
 
-**`src/components/LandingPage.tsx`** (~200 lines)
-- Issue: Zero import sites. `App.tsx` no longer has the `AppView: 'landing' | 'book'`
-  toggle that CLAUDE.md still documents — it renders `<BookLayout />` unconditionally.
-- Files: `src/components/LandingPage.tsx`, plus the now-dead `#root.landing` rule at
-  `src/index.css:142` (nothing adds the `.landing` class anymore).
-- Impact: Confuses new contributors; `tsc` and ESLint pass because the file is
-  syntactically valid and self-contained. Bundled dead weight.
-- Fix approach: Delete `LandingPage.tsx` and the `#root.landing { … }` block in
-  `src/index.css`. Update CLAUDE.md "앱 진입점 및 뷰 전환" section.
+Resolved 2026-08-29 (commit `86d58e7`): deleted `src/components/LandingPage.tsx`,
+`optimizer/plan/PlanReadingSection.tsx` (1063 lines, unreachable — superseded by
+`execution-plans/read/ReadSection`), and
+`internals/overview/sga/undo-segment/UndoSegmentSection.tsx`. Removed the dead
+`optimizer-plan-reading` import/branch and the duplicate `optimizer-join-overview`
+branch from `optimizer/index.tsx`.
 
-**`src/book/chapters/optimizer/plan/PlanReadingSection.tsx`** (1063 lines)
-- Issue: Imported and routed in `src/book/chapters/optimizer/index.tsx:9,40`
-  (`sectionId === 'optimizer-plan-reading'`), but **no `optimizer-plan-reading`
-  section ID exists in `src/book/bookStructure.tsx`**. Unreachable via navigation.
-- Impact: 1000+ lines of maintained-but-unused content. Largest single dead file.
-- Fix approach: Either register `optimizer-plan-reading` in `BOOK_CHAPTERS` or
-  delete the file + its import/branch.
-
-**`src/book/chapters/internals/overview/sga/undo-segment/UndoSegmentSection.tsx`**
-- Issue: `export function UndoSegmentSection()` is never imported. `internals/index.tsx`
-  has no `internals-sga-undo-segment` branch and `bookStructure.tsx` has no such
-  section. Its sibling SGA pages (buffer-cache, shared-pool, redo-log-buffer,
-  large-pool) are all wired; this one was left behind.
-- Impact: Dead file; `noUnusedLocals` does not catch it because it is `export`ed.
-- Fix approach: Delete, or add the section ID + router branch if the page is wanted.
-
-**`src/book/chapters/optimizer/index.tsx:42`** — `optimizer-join-overview` branch
-- Issue: Router handles `optimizer-join-overview` but only `optimizer-join`
-  (+ `-nested-loop`, `-hash`, `-sort-merge`) exist in `bookStructure.tsx`.
-  Harmless fallthrough, but signals drift between router and TOC.
+**Still open — `#root.landing` CSS block** (`src/index.css`)
+- The `#root.landing { … }` rule is dead (nothing adds the `.landing` class since
+  the landing/book toggle was removed from `App.tsx`).
+- Left in the working tree because `src/index.css` has an in-flight design-refactor
+  diff (font swap, `--color-brand-*` vars). Remove this block when committing that
+  refactor.
+- Also update the CLAUDE.md "앱 진입점 및 뷰 전환" section (still describes the
+  removed toggle).
 
 ### Stale documentation (multiple sources disagree with the code)
 
@@ -52,7 +40,6 @@ only has to look plausible, and the **absence of routing / persistence / tests**
   different order). Actual app (`bookStructure.tsx`, CLAUDE.md) is "0 Introduction,
   1 Data Modeling, 2 SQL Basics, 3 Internals, 4 Join, 5 Index, 6 Partition,
   7 Parallel, 8 Optimizer, 9 SQL Tuning".
-- References `playwright` for verification (see below) which is not installed.
 - Fix approach: Regenerate the chapter table from `BOOK_CHAPTERS`.
 
 **`CLAUDE.md`**
@@ -79,19 +66,9 @@ only has to look plausible, and the **absence of routing / persistence / tests**
 
 ### Accidentally-committed scratch files at repo root
 
-All added in commit `a83927f` ("Optimizer section in process"), none in `.gitignore`:
-
-- **`C:UserswoongOneDriveDesktopbuffer_cache_pages.txt`** (28 KB) — a Windows
-  absolute path that got collapsed into a literal filename (the `:` became a
-  fullwidth `：`, byte sequence `\357\200\272`). Contains a raw text dump of Oracle
-  documentation pages. `git` cannot even address it normally ("outside repository").
-- **`verify_01_landing.png`** (232 KB) — a one-off screenshot.
-- **`verify_storage.mjs`** — a Playwright script (`import { chromium } from 'playwright'`)
-  that cannot run: `playwright` is not installed; only `puppeteer` is
-  (`scripts/*.mjs` use `puppeteer`). Also hardcodes a machine-specific Chrome path
-  `C:/Users/woong/AppData/Local/ms-playwright/...` and `localhost:5199`.
-- Fix approach: `git rm` all three; add `verify_*.png`, `verify_*.mjs`, and
-  `*.txt` (or a `scratch/` dir) to `.gitignore`.
+Resolved 2026-08-29 (commit `86d58e7`): `git rm`'d the mangled-path
+`buffer_cache_pages.txt`, `verify_01_landing.png`, and `verify_storage.mjs`.
+`.gitignore` now excludes `verify_*.png`, `verify_*.mjs`, and root `*.txt`.
 
 ### Duplicated content: two parallel "Join" chapters
 
@@ -124,15 +101,12 @@ All added in commit `a83927f` ("Optimizer section in process"), none in `.gitign
 
 ### Dead public API surface in `src/lib/optimizer/index.ts`
 
-- `estimateJoinCost`, `generateAccessPaths`, `computeSelectivity`, `getColumnStats`,
-  `getTableStats`, `parseSQL` are re-exported from `src/lib/optimizer/index.ts:1-4`
-  but have **no consumers outside `src/lib/optimizer/`**. Only `optimize` and the
-  `OptimizerResult` type are used (by `internalsStore.ts`, `OptimizerPanel.tsx`,
-  `ExecutionPlanViewer.tsx`).
-- Impact: Implies a public API that nothing depends on; widens the refactor
-  blast-radius unnecessarily.
-- Fix approach: Trim the barrel to `optimize` + types, or document that the rest
-  is intentional future surface.
+Resolved 2026-08-29 (commit `5e51edb`): barrel trimmed to `export { optimize }`
+only. Verified `parseSQL`, `generateAccessPaths`, `estimateJoinCost`,
+`computeSelectivity`, `getTableStats`, `getColumnStats`, `TABLE_STATS`, and the
+`export type * from './types'` had zero consumers outside `src/lib/optimizer/`
+(type consumers import from `@/lib/optimizer/types` directly; folder internals use
+relative paths). Underlying functions are unchanged in their own modules.
 
 ### Incomplete `lang` store migration
 
@@ -365,12 +339,12 @@ Low overall — static SPA, no server, no secrets, no user accounts.
 - Files: `src/book/bookStructure.tsx` (`BOOK_CHAPTERS`), `src/book/BookContent.tsx`
   (`SectionRouter` prefix branches), and each chapter's `index.tsx`
   (`if (sectionId === '…')` chains).
-- Why fragile: A section ID exists in up to three places with no cross-check. The
-  current drift artifacts: `optimizer-plan-reading` and `optimizer-join-overview`
-  routed but not in the TOC; `UndoSegmentSection` file exists but no ID or route.
+- Why fragile: A section ID exists in up to three places with no cross-check.
   Add a section and forget one spot → silent blank page (`SectionRouter` /
   chapter `index.tsx` both `return null` on no match — `BookContent.tsx:135`,
-  `internals/index.tsx:50`, etc.).
+  `internals/index.tsx:50`, etc.). The known drift artifacts (`optimizer-plan-reading`,
+  `optimizer-join-overview`, `UndoSegmentSection`) were cleaned up 2026-08-29, but
+  the pattern that allowed them is unchanged.
 - Safe modification: Follow the "새 섹션 추가 체크리스트" in CLAUDE.md exactly.
 - Improvement path: A dev-time assertion that every `BOOK_CHAPTERS` leaf ID
   resolves to a non-null render, and vice-versa.
@@ -398,7 +372,6 @@ Low overall — static SPA, no server, no secrets, no user accounts.
   `src/data/glossary.ts` (1289, 150 entries),
   `src/book/chapters/sql-basics/dml-more/RollupSection.tsx` (1258),
   `src/book/chapters/index-chapter/table-access/TableAccessSection.tsx` (1250),
-  `src/book/chapters/optimizer/plan/PlanReadingSection.tsx` (1063, **dead**),
   `src/book/chapters/optimizer/shared/diagrams.tsx` (1049).
 - Why fragile: Each mixes a large bilingual `T` object, multiple SVG diagrams, and
   interactive state in one file. HMR is slow; merge conflicts are large; the
@@ -455,13 +428,6 @@ backend, no concurrent users, no data store. The only "scaling" axis is:
 - Impact: Larger bundle; potential build break on a minor bump.
 - Migration plan: Move to `devDependencies`, dynamic-import behind
   `import.meta.env.DEV`.
-
-**`playwright` referenced but absent**
-- Risk: `verify_storage.mjs` imports `playwright`; it is not in `package.json`
-  (only `puppeteer`). The script is permanently broken and misleads anyone trying
-  to run "verification".
-- Migration plan: Delete `verify_storage.mjs` or rewrite it with `puppeteer`
-  (matching `scripts/export-*.mjs`).
 
 **`lucide-react` — half-removed**
 - Risk: Removed from `package.json`, but `components.json` still says
@@ -579,3 +545,6 @@ backend, no concurrent users, no data store. The only "scaling" axis is:
 ---
 
 *Concerns audit: 2026-08-29*
+*Updated 2026-08-29: resolved "Orphaned / dead files", "Accidentally-committed
+scratch files", and "Dead public API surface" sections after cleanup commits
+`86d58e7` and `5e51edb`.*

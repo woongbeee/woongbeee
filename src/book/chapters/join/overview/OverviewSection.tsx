@@ -29,22 +29,22 @@ const T = {
     methods: [
       {
         id: 'Nested Loop Join',
-        color: 'border-blue-200 bg-blue-50/50',
-        badge: 'bg-blue-100 text-blue-700',
+        color: 'border-blue/30 bg-blue/5',
+        badge: 'bg-blue/10 text-blue',
         title: 'Nested Loop Join',
         desc: 'Outer 테이블의 각 행마다 Inner 테이블을 반복 탐색해요. Inner 테이블에 선택도 높은 인덱스가 있을 때 가장 효율적이에요.',
       },
       {
         id: 'Hash Join',
-        color: 'border-orange-200 bg-orange-50/50',
-        badge: 'bg-orange-100 text-orange-700',
+        color: 'border-amber/30 bg-amber/5',
+        badge: 'bg-amber/10 text-amber',
         title: 'Hash Join',
         desc: '작은 테이블(빌드 입력)을 해시 테이블로 PGA에 적재한 뒤, 큰 테이블(프로브 입력)을 스캔하면서 해시 키로 매칭해요. 등치(=) 조건에만 사용할 수 있어요.',
       },
       {
         id: 'Sort Merge Join',
-        color: 'border-violet-200 bg-violet-50/50',
-        badge: 'bg-violet-100 text-violet-700',
+        color: 'border-purple/30 bg-purple/5',
+        badge: 'bg-purple/10 text-purple',
         title: 'Sort Merge Join',
         desc: '양쪽 데이터 집합을 조인 키로 정렬한 뒤 병합해요. 비등치(범위) 조인이나 이미 정렬된 데이터에서 특히 유리해요.',
       },
@@ -80,22 +80,22 @@ const T = {
     methods: [
       {
         id: 'Nested Loop Join',
-        color: 'border-blue-200 bg-blue-50/50',
-        badge: 'bg-blue-100 text-blue-700',
+        color: 'border-blue/30 bg-blue/5',
+        badge: 'bg-blue/10 text-blue',
         title: 'Nested Loop Join',
         desc: 'For each row in the outer table, Oracle probes the inner table for matching rows. Most efficient when the inner table has a highly selective index.',
       },
       {
         id: 'Hash Join',
-        color: 'border-orange-200 bg-orange-50/50',
-        badge: 'bg-orange-100 text-orange-700',
+        color: 'border-amber/30 bg-amber/5',
+        badge: 'bg-amber/10 text-amber',
         title: 'Hash Join',
         desc: 'Loads the smaller table (build input) into a hash table in PGA, then scans the larger table (probe input) matching by hash key. Requires an equality (=) join condition.',
       },
       {
         id: 'Sort Merge Join',
-        color: 'border-violet-200 bg-violet-50/50',
-        badge: 'bg-violet-100 text-violet-700',
+        color: 'border-purple/30 bg-purple/5',
+        badge: 'bg-purple/10 text-purple',
         title: 'Sort Merge Join',
         desc: 'Sorts both datasets on the join key, then merges them sequentially. Especially efficient for non-equijoins (range conditions) or pre-sorted data.',
       },
@@ -122,11 +122,11 @@ const T = {
 }
 
 const JOIN_TAB_COLOR: Record<JoinType, { active: string; inactive: string }> = {
-  inner: { active: 'border-emerald-400 bg-emerald-50 text-emerald-700',  inactive: 'border-border text-muted-foreground hover:bg-muted/40' },
-  left:  { active: 'border-blue-400 bg-blue-50 text-blue-700',           inactive: 'border-border text-muted-foreground hover:bg-muted/40' },
-  right: { active: 'border-violet-400 bg-violet-50 text-violet-700',     inactive: 'border-border text-muted-foreground hover:bg-muted/40' },
-  full:  { active: 'border-amber-400 bg-amber-50 text-amber-700',        inactive: 'border-border text-muted-foreground hover:bg-muted/40' },
-  cross: { active: 'border-rose-400 bg-rose-50 text-rose-700',           inactive: 'border-border text-muted-foreground hover:bg-muted/40' },
+  inner: { active: 'border-green/50 bg-green/5 text-green',  inactive: 'border-line text-ink-2 hover:bg-rail' },
+  left:  { active: 'border-blue/50 bg-blue/5 text-blue',           inactive: 'border-line text-ink-2 hover:bg-rail' },
+  right: { active: 'border-purple/50 bg-purple/5 text-purple',     inactive: 'border-line text-ink-2 hover:bg-rail' },
+  full:  { active: 'border-amber/50 bg-amber/5 text-amber',        inactive: 'border-line text-ink-2 hover:bg-rail' },
+  cross: { active: 'border-red/50 bg-red/5 text-red',           inactive: 'border-line text-ink-2 hover:bg-rail' },
 }
 
 export function JoinOverviewSection() {
@@ -137,7 +137,7 @@ export function JoinOverviewSection() {
   return (
     <PageContainer>
       <ChapterTitle
-        icon={<IconArrowMerge size={36} stroke={1.5} className="text-emerald-500" />}
+        icon={<IconArrowMerge size={36} stroke={1.5} className="text-green" />}
         title={t.title}
         subtitle={t.subtitle}
       />
@@ -150,15 +150,15 @@ export function JoinOverviewSection() {
       <SectionTitle>{t.methodsTitle}</SectionTitle>
       <div className="mb-6 grid gap-3 sm:grid-cols-3">
         {t.methods.map((item) => (
-          <div key={item.id} className={cn('rounded-xl border-2 p-4', item.color)}>
+          <div key={item.id} className={cn('rounded-panel border-2 p-4', item.color)}>
             <div className="mb-2 flex items-center gap-2">
-              <IconBolt size={14} className="shrink-0 text-muted-foreground" />
+              <IconBolt size={14} className="shrink-0 text-ink-2" />
               <span className={cn('rounded px-1.5 py-0.5 font-mono text-[10px] font-bold', item.badge)}>
                 {item.id}
               </span>
             </div>
-            <p className="mb-1 font-mono text-xs font-bold text-foreground/80">{item.title}</p>
-            <p className="text-xs leading-relaxed text-muted-foreground">{item.desc}</p>
+            <p className="mb-1 font-mono text-xs font-bold text-ink/80">{item.title}</p>
+            <p className="text-xs leading-relaxed text-ink-2">{item.desc}</p>
           </div>
         ))}
       </div>
@@ -166,7 +166,7 @@ export function JoinOverviewSection() {
       <Divider />
 
       <SectionTitle>{t.joinSimTitle}</SectionTitle>
-      <p className="mb-4 text-sm text-muted-foreground">{t.joinSimSubtitle}</p>
+      <p className="mb-4 text-sm text-ink-2">{t.joinSimSubtitle}</p>
 
       {/* JOIN type tab switcher */}
       <div className="mb-4 flex flex-wrap gap-2">
@@ -177,7 +177,7 @@ export function JoinOverviewSection() {
               key={jt.key}
               onClick={() => setActiveJoin(jt.key)}
               className={cn(
-                'flex items-center gap-1.5 rounded-lg border px-3 py-1.5 font-mono text-xs font-bold transition-all',
+                'flex items-center gap-1.5 rounded-card border px-3 py-1.5 font-mono text-xs font-bold transition-all',
                 isActive ? JOIN_TAB_COLOR[jt.key].active : JOIN_TAB_COLOR[jt.key].inactive,
               )}
             >
@@ -188,7 +188,7 @@ export function JoinOverviewSection() {
         })}
       </div>
 
-      <div className="rounded-xl border bg-muted/30 p-4">
+      <div className="rounded-panel border bg-rail p-4">
         <AnimatePresence mode="wait">
           <motion.div
             key={activeJoin}

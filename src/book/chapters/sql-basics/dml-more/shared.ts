@@ -338,20 +338,20 @@ export const DELETE_STEPS: ExecStep[] = [
 // ── Color helpers ──────────────────────────────────────────────────────────
 
 export const STEP_COLOR: Record<string, { bg: string; text: string; border: string; dot: string }> = {
-  violet:  { bg: 'bg-violet-50',         text: 'text-violet-800',       border: 'border-violet-200',       dot: 'bg-violet-400' },
-  orange:  { bg: 'bg-ios-orange-light',  text: 'text-ios-orange-dark',  border: 'border-ios-orange/25',   dot: 'bg-ios-orange' },
-  blue:    { bg: 'bg-ios-blue-light',    text: 'text-ios-blue-dark',    border: 'border-ios-blue/20',     dot: 'bg-ios-blue' },
-  emerald: { bg: 'bg-ios-green-light',   text: 'text-ios-green-dark',   border: 'border-ios-green/20',    dot: 'bg-ios-green' },
-  rose:    { bg: 'bg-ios-red-light',     text: 'text-ios-red-dark',     border: 'border-ios-red/20',      dot: 'bg-ios-red' },
-  amber:   { bg: 'bg-amber-50',          text: 'text-amber-800',        border: 'border-amber-200',        dot: 'bg-amber-400' },
+  violet:  { bg: 'bg-purple/5',         text: 'text-purple',       border: 'border-purple/30',       dot: 'bg-purple' },
+  orange:  { bg: 'bg-amber/10',  text: 'text-amber',  border: 'border-amber/30',   dot: 'bg-amber' },
+  blue:    { bg: 'bg-blue/10',    text: 'text-blue',    border: 'border-blue/30',     dot: 'bg-blue' },
+  emerald: { bg: 'bg-green/10',   text: 'text-green',   border: 'border-green/30',    dot: 'bg-green' },
+  rose:    { bg: 'bg-red/10',     text: 'text-red',     border: 'border-red/30',      dot: 'bg-red' },
+  amber:   { bg: 'bg-amber/5',          text: 'text-amber',        border: 'border-amber/30',        dot: 'bg-amber' },
 }
 
 export const CLAUSE_COLOR: Record<string, string> = {
-  blue:   'border-ios-blue/20 bg-ios-blue-light text-ios-blue-dark',
-  violet: 'border-violet-200 bg-violet-50 text-violet-800',
-  orange: 'border-ios-orange/30 bg-ios-orange-light text-ios-orange-dark',
-  amber:  'border-amber-200 bg-amber-50 text-amber-800',
-  rose:   'border-ios-red/20 bg-ios-red-light text-ios-red-dark',
+  blue:   'border-blue/30 bg-blue/10 text-blue',
+  violet: 'border-purple/30 bg-purple/5 text-purple',
+  orange: 'border-amber/30 bg-amber/10 text-amber',
+  amber:  'border-amber/30 bg-amber/5 text-amber',
+  rose:   'border-red/30 bg-red/10 text-red',
 }
 
 // ── Example queries ────────────────────────────────────────────────────────

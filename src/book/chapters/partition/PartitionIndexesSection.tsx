@@ -167,7 +167,7 @@ export function PartitionIndexesSection() {
   return (
     <PageContainer>
       <ChapterTitle
-        icon={<IconTable size={36} stroke={1.5} className="text-amber-500" />}
+        icon={<IconTable size={36} stroke={1.5} className="text-amber" />}
         title={t.title}
         subtitle={t.subtitle}
       />

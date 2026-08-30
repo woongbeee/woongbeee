@@ -326,14 +326,14 @@ function BufferCacheAnatomyDiagram({ isKo }: { isKo: boolean }) {
 
   // 클릭 영역별 하이라이트 색
   function hl(key: AnatomyKey) {
-    return active === key ? '#fef08a' : 'transparent'
+    return active === key ? 'var(--color-amber)' : 'transparent'
   }
   function hlStroke(key: AnatomyKey) {
-    return active === key ? '#ca8a04' : 'transparent'
+    return active === key ? 'var(--color-amber)' : 'transparent'
   }
 
   return (
-    <div className="rounded-2xl border bg-slate-50 p-4">
+    <div className="rounded-panel border bg-paper-sunk p-4">
       {/* 용어 뱃지 목록 */}
       <div className="mb-3 flex flex-wrap gap-2">
         {(Object.keys(terms) as AnatomyKey[]).map(key => (
@@ -342,10 +342,10 @@ function BufferCacheAnatomyDiagram({ isKo }: { isKo: boolean }) {
             onClick={() => toggle(key)}
             className="rounded-full border px-3 py-1 font-mono text-[10px] font-semibold transition-all duration-150"
             style={{
-              background: active === key ? '#fef08a' : '#f8fafc',
-              borderColor: active === key ? '#ca8a04' : '#e2e8f0',
-              color: active === key ? '#713f12' : '#64748b',
-              boxShadow: active === key ? '0 0 0 2px #fde04755' : undefined,
+              background: active === key ? 'var(--color-amber)' : 'var(--color-paper-sunk)',
+              borderColor: active === key ? 'var(--color-amber)' : 'var(--color-rail)',
+              color: active === key ? 'var(--color-amber)' : 'var(--color-ink-2)',
+              boxShadow: active === key ? '0 0 0 2px color-mix(in srgb, var(--color-amber) 33%, transparent)' : undefined,
             }}
           >
             {terms[key].label}
@@ -357,25 +357,25 @@ function BufferCacheAnatomyDiagram({ isKo }: { isKo: boolean }) {
       <svg viewBox={`0 0 ${SVG_W} ${SVG_H}`} width="100%" style={{ display: 'block', overflow: 'visible' }}>
         <defs>
           <marker id="ana-arr" markerWidth={6} markerHeight={6} refX={5} refY={3} orient="auto">
-            <path d="M0,0 L0,6 L6,3 z" fill="#94a3b8" />
+            <path d="M0,0 L0,6 L6,3 z" fill="var(--color-ink-3)" />
           </marker>
           <marker id="ana-arr-amber" markerWidth={6} markerHeight={6} refX={5} refY={3} orient="auto">
-            <path d="M0,0 L0,6 L6,3 z" fill="#d97706" />
+            <path d="M0,0 L0,6 L6,3 z" fill="var(--color-amber)" />
           </marker>
         </defs>
 
         {/* ── Buffer Cache 외곽 박스 */}
         <rect
           x={BC_X} y={BC_Y} width={BC_W} height={BC_H}
-          fill={active === 'bufferCache' ? '#fef9c3' : '#f8fafc'}
-          stroke={active === 'bufferCache' ? '#ca8a04' : '#cbd5e1'}
+          fill={active === 'bufferCache' ? 'var(--color-amber)' : 'var(--color-paper-sunk)'}
+          stroke={active === 'bufferCache' ? 'var(--color-amber)' : 'var(--color-line)'}
           strokeWidth={active === 'bufferCache' ? 2 : 1.5}
           rx={10}
           style={{ cursor: 'pointer' }}
           onClick={() => toggle('bufferCache')}
         />
         {/* BC 레이블 — 상단 중앙, 충분한 여백 */}
-        <text x={BC_X + BC_W / 2} y={BC_Y + 18} textAnchor="middle" fontSize={9} fontFamily="monospace" fontWeight="bold" fill={active === 'bufferCache' ? '#92400e' : '#94a3b8'} style={{ cursor: 'pointer' }} onClick={() => toggle('bufferCache')}>
+        <text x={BC_X + BC_W / 2} y={BC_Y + 18} textAnchor="middle" fontSize={9} fontFamily="monospace" fontWeight="bold" fill={active === 'bufferCache' ? 'var(--color-amber)' : 'var(--color-ink-3)'} style={{ cursor: 'pointer' }} onClick={() => toggle('bufferCache')}>
           Buffer Cache (SGA)
         </text>
 
@@ -383,15 +383,15 @@ function BufferCacheAnatomyDiagram({ isKo }: { isKo: boolean }) {
 
         {/* ── Buffer Block 그리드 */}
         {/* "Buffer Blocks" 레이블 — 그리드 상단에 여백 확보 */}
-        <text x={BB_X + (BB_COLS * BB_CW) / 2} y={BB_LABEL_Y} textAnchor="middle" fontSize={8} fontFamily="monospace" fontWeight="bold" fill={active === 'bufferBlock' ? '#92400e' : '#64748b'} style={{ cursor: 'pointer' }} onClick={() => toggle('bufferBlock')}>
+        <text x={BB_X + (BB_COLS * BB_CW) / 2} y={BB_LABEL_Y} textAnchor="middle" fontSize={8} fontFamily="monospace" fontWeight="bold" fill={active === 'bufferBlock' ? 'var(--color-amber)' : 'var(--color-ink-2)'} style={{ cursor: 'pointer' }} onClick={() => toggle('bufferBlock')}>
           Buffer Blocks
         </text>
         {/* 배경 박스 — 레이블 아래부터 */}
         <rect
           x={BB_X - 6} y={BB_Y - 4}
           width={BB_COLS * BB_CW + 12} height={BB_ROWS * BB_CH + 8}
-          fill={active === 'bufferBlock' ? '#fef9c3' : '#f1f5f9'}
-          stroke={active === 'bufferBlock' ? '#ca8a04' : '#e2e8f0'}
+          fill={active === 'bufferBlock' ? 'var(--color-amber)' : 'var(--color-rail)'}
+          stroke={active === 'bufferBlock' ? 'var(--color-amber)' : 'var(--color-rail)'}
           strokeWidth={active === 'bufferBlock' ? 2 : 1}
           rx={6}
           style={{ cursor: 'pointer' }}
@@ -404,8 +404,8 @@ function BufferCacheAnatomyDiagram({ isKo }: { isKo: boolean }) {
             return (
               <rect key={`bb-${ri}-${ci}`}
                 x={bx + 2} y={by + 2} width={BB_CW - 4} height={BB_CH - 4}
-                fill={isFilled ? '#e0e7ff' : '#f8fafc'}
-                stroke={isFilled ? '#a5b4fc' : '#e2e8f0'}
+                fill={isFilled ? 'var(--color-rail)' : 'var(--color-paper-sunk)'}
+                stroke={isFilled ? 'var(--color-blue)' : 'var(--color-rail)'}
                 strokeWidth={1} rx={3}
                 style={{ cursor: 'pointer', pointerEvents: 'none' }}
               />
@@ -430,7 +430,7 @@ function BufferCacheAnatomyDiagram({ isKo }: { isKo: boolean }) {
           return (
             <line key={i}
               x1={ln.bx} y1={ln.by} x2={tx} y2={ty}
-              stroke={isHlBH || isHlBB ? '#ca8a04' : '#94a3b8'}
+              stroke={isHlBH || isHlBB ? 'var(--color-amber)' : 'var(--color-ink-3)'}
               strokeWidth={isHlBH || isHlBB ? 1.5 : 1}
               strokeDasharray="4 3"
               opacity={isHlBH || isHlBB ? 0.8 : 0.3}
@@ -448,13 +448,13 @@ function BufferCacheAnatomyDiagram({ isKo }: { isKo: boolean }) {
             <g key={`row-${ri}`}>
               {/* Bucket circle */}
               <circle cx={BUCK_X} cy={by} r={BUCK_R}
-                fill={isHlBucket ? hl('hashBucket') : '#f1f5f9'}
-                stroke={isHlBucket ? hlStroke('hashBucket') : '#94a3b8'}
+                fill={isHlBucket ? hl('hashBucket') : 'var(--color-rail)'}
+                stroke={isHlBucket ? hlStroke('hashBucket') : 'var(--color-ink-3)'}
                 strokeWidth={isHlBucket ? 2 : 1}
                 style={{ cursor: 'pointer' }}
                 onClick={() => toggle('hashBucket')}
               />
-              <text x={BUCK_X} y={by + 4} textAnchor="middle" fontSize={9} fontFamily="monospace" fontWeight="bold" fill={isHlBucket ? '#713f12' : '#64748b'} style={{ pointerEvents: 'none' }}>
+              <text x={BUCK_X} y={by + 4} textAnchor="middle" fontSize={9} fontFamily="monospace" fontWeight="bold" fill={isHlBucket ? 'var(--color-amber)' : 'var(--color-ink-2)'} style={{ pointerEvents: 'none' }}>
                 {ri}
               </text>
 
@@ -462,7 +462,7 @@ function BufferCacheAnatomyDiagram({ isKo }: { isKo: boolean }) {
               <line
                 x1={BUCK_X + BUCK_R} y1={by}
                 x2={CHAIN_START_X} y2={by}
-                stroke={isHlChain ? '#ca8a04' : '#94a3b8'}
+                stroke={isHlChain ? 'var(--color-amber)' : 'var(--color-ink-3)'}
                 strokeWidth={isHlChain ? 1.5 : 1}
                 markerEnd={isHlChain ? 'url(#ana-arr-amber)' : 'url(#ana-arr)'}
               />
@@ -481,17 +481,17 @@ function BufferCacheAnatomyDiagram({ isKo }: { isKo: boolean }) {
                       <g style={{ cursor: 'pointer' }} onClick={() => toggle('bufferHandle')}>
                         <rect
                           x={bx + BH_W / 2 - 22} y={bhY - 22} width={44} height={16}
-                          fill={active === 'bufferHandle' ? '#fef08a' : '#f0fdf4'}
-                          stroke={active === 'bufferHandle' ? '#ca8a04' : '#4ade80'}
+                          fill={active === 'bufferHandle' ? 'var(--color-amber)' : 'var(--color-rail)'}
+                          stroke={active === 'bufferHandle' ? 'var(--color-amber)' : 'var(--color-green)'}
                           strokeWidth={active === 'bufferHandle' ? 2 : 1} rx={4}
                         />
-                        <text x={bx + BH_W / 2} y={bhY - 10} textAnchor="middle" fontSize={8} fontFamily="monospace" fontWeight="bold" fill={active === 'bufferHandle' ? '#92400e' : '#16a34a'}>
+                        <text x={bx + BH_W / 2} y={bhY - 10} textAnchor="middle" fontSize={8} fontFamily="monospace" fontWeight="bold" fill={active === 'bufferHandle' ? 'var(--color-amber)' : 'var(--color-green)'}>
                           Handle
                         </text>
                         <line
                           x1={bx + BH_W / 2} y1={bhY - 6}
                           x2={bx + BH_W / 2} y2={bhY}
-                          stroke={active === 'bufferHandle' ? '#ca8a04' : '#4ade80'}
+                          stroke={active === 'bufferHandle' ? 'var(--color-amber)' : 'var(--color-green)'}
                           strokeWidth={1}
                         />
                       </g>
@@ -500,13 +500,13 @@ function BufferCacheAnatomyDiagram({ isKo }: { isKo: boolean }) {
                     {/* BH rect */}
                     <rect
                       x={bx} y={bhY} width={BH_W} height={BH_H}
-                      fill={isHlHandle ? '#fef08a' : isHlBH ? hl('bufferHeader') : isPinned ? '#dcfce7' : '#f8fafc'}
-                      stroke={isHlHandle ? '#ca8a04' : isHlBH ? hlStroke('bufferHeader') : isPinned ? '#4ade80' : '#cbd5e1'}
+                      fill={isHlHandle ? 'var(--color-amber)' : isHlBH ? hl('bufferHeader') : isPinned ? 'var(--color-rail)' : 'var(--color-paper-sunk)'}
+                      stroke={isHlHandle ? 'var(--color-amber)' : isHlBH ? hlStroke('bufferHeader') : isPinned ? 'var(--color-green)' : 'var(--color-line)'}
                       strokeWidth={isHlBH || isHlHandle ? 2 : 1} rx={4}
                       style={{ cursor: 'pointer' }}
                       onClick={() => toggle('bufferHeader')}
                     />
-                    <text x={bx + BH_W / 2} y={by + 3} textAnchor="middle" fontSize={8} fontFamily="monospace" fill={isHlBH ? '#92400e' : isPinned ? '#15803d' : '#64748b'} style={{ pointerEvents: 'none' }}>
+                    <text x={bx + BH_W / 2} y={by + 3} textAnchor="middle" fontSize={8} fontFamily="monospace" fill={isHlBH ? 'var(--color-amber)' : isPinned ? 'var(--color-green)' : 'var(--color-ink-2)'} style={{ pointerEvents: 'none' }}>
                       {isPinned ? 'BH·pin=1' : `BH·${ri}${bi}`}
                     </text>
 
@@ -515,7 +515,7 @@ function BufferCacheAnatomyDiagram({ isKo }: { isKo: boolean }) {
                       <line
                         x1={bx + BH_W} y1={by}
                         x2={bx + BH_W + BH_GAP} y2={by}
-                        stroke={isHlChain ? '#ca8a04' : '#94a3b8'}
+                        stroke={isHlChain ? 'var(--color-amber)' : 'var(--color-ink-3)'}
                         strokeWidth={isHlChain ? 1.5 : 1}
                         markerEnd={isHlChain ? 'url(#ana-arr-amber)' : 'url(#ana-arr)'}
                       />
@@ -528,7 +528,7 @@ function BufferCacheAnatomyDiagram({ isKo }: { isKo: boolean }) {
         })}
 
         {/* ── Hash Bucket 열 레이블 — 버킷 루프 이후 렌더해서 circles 위에 표시 */}
-        <text x={BUCK_X} y={FIRST_BUCK_Y - 16} textAnchor="middle" fontSize={8} fontFamily="monospace" fill="#94a3b8">Buckets</text>
+        <text x={BUCK_X} y={FIRST_BUCK_Y - 16} textAnchor="middle" fontSize={8} fontFamily="monospace" fill="var(--color-ink-3)">Buckets</text>
 
         {/* ── Latch 태그 — BC 왼쪽 바깥, 버킷들 옆에 배치. 루프 바깥에서 최상단 렌더 */}
         {(() => {
@@ -544,16 +544,16 @@ function BufferCacheAnatomyDiagram({ isKo }: { isKo: boolean }) {
               <line
                 x1={lineX1} y1={lineY1}
                 x2={lineX2} y2={lineY2}
-                stroke={isHlLatch ? '#ca8a04' : '#fb923c'}
+                stroke={isHlLatch ? 'var(--color-amber)' : 'var(--color-amber)'}
                 strokeWidth={1} strokeDasharray="3 2" opacity={0.7}
               />
               <rect
                 x={LATCH_X} y={LATCH_Y} width={LATCH_W} height={LATCH_H}
-                fill={isHlLatch ? '#fef08a' : '#fff7ed'}
-                stroke={isHlLatch ? '#ca8a04' : '#fb923c'}
+                fill={isHlLatch ? 'var(--color-amber)' : 'var(--color-rail)'}
+                stroke={isHlLatch ? 'var(--color-amber)' : 'var(--color-amber)'}
                 strokeWidth={isHlLatch ? 2 : 1} rx={4}
               />
-              <text x={LATCH_X + LATCH_W / 2} y={LATCH_Y + 14} textAnchor="middle" fontSize={8} fontFamily="monospace" fontWeight="bold" fill={isHlLatch ? '#92400e' : '#ea580c'}>
+              <text x={LATCH_X + LATCH_W / 2} y={LATCH_Y + 14} textAnchor="middle" fontSize={8} fontFamily="monospace" fontWeight="bold" fill={isHlLatch ? 'var(--color-amber)' : 'var(--color-amber)'}>
                 Latch
               </text>
             </g>
@@ -570,10 +570,10 @@ function BufferCacheAnatomyDiagram({ isKo }: { isKo: boolean }) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 6 }}
             transition={{ duration: 0.16 }}
-            className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3"
+            className="mt-3 rounded-panel border border-amber/30 bg-amber/5 px-4 py-3"
           >
-            <p className="mb-1 font-mono text-[11px] font-bold text-amber-800">{desc.label}</p>
-            <p className="text-[11px] leading-relaxed text-slate-600">{desc.desc}</p>
+            <p className="mb-1 font-mono text-[11px] font-bold text-amber">{desc.label}</p>
+            <p className="text-[11px] leading-relaxed text-ink">{desc.desc}</p>
           </motion.div>
         ) : (
           <motion.div
@@ -582,9 +582,9 @@ function BufferCacheAnatomyDiagram({ isKo }: { isKo: boolean }) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.15 }}
-            className="mt-3 flex h-10 items-center justify-center rounded-xl border border-dashed border-slate-200"
+            className="mt-3 flex h-10 items-center justify-center rounded-panel border border-dashed border-line"
           >
-            <p className="font-mono text-[10px] text-slate-300">
+            <p className="font-mono text-[10px] text-ink-3">
               {isKo ? '위 뱃지를 클릭하면 용어 설명이 표시됩니다' : 'Click a badge above to see the term explained'}
             </p>
           </motion.div>
@@ -597,12 +597,12 @@ function BufferCacheAnatomyDiagram({ isKo }: { isKo: boolean }) {
 // ── 색상 매핑 ────────────────────────────────────────────────────────────────
 
 const STEP_COLORS: Record<string, { bg: string; border: string; badge: string; text: string; dot: string }> = {
-  violet: { bg: 'bg-violet-50',  border: 'border-violet-200', badge: 'bg-violet-500', text: 'text-violet-700', dot: 'bg-violet-400' },
-  blue:   { bg: 'bg-blue-50',    border: 'border-blue-200',   badge: 'bg-blue-500',   text: 'text-blue-700',   dot: 'bg-blue-400' },
-  amber:  { bg: 'bg-amber-50',   border: 'border-amber-200',  badge: 'bg-amber-500',  text: 'text-amber-700',  dot: 'bg-amber-400' },
-  emerald:{ bg: 'bg-emerald-50', border: 'border-emerald-200',badge: 'bg-emerald-500',text: 'text-emerald-700',dot: 'bg-emerald-400' },
-  rose:   { bg: 'bg-rose-50',    border: 'border-rose-200',   badge: 'bg-rose-500',   text: 'text-rose-700',   dot: 'bg-rose-400' },
-  slate:  { bg: 'bg-slate-50',   border: 'border-slate-200',  badge: 'bg-slate-500',  text: 'text-slate-700',  dot: 'bg-slate-400' },
+  violet: { bg: 'bg-purple/5',  border: 'border-purple/30', badge: 'bg-purple', text: 'text-purple', dot: 'bg-purple' },
+  blue:   { bg: 'bg-blue/5',    border: 'border-blue/30',   badge: 'bg-blue',   text: 'text-blue',   dot: 'bg-blue' },
+  amber:  { bg: 'bg-amber/5',   border: 'border-amber/30',  badge: 'bg-amber',  text: 'text-amber',  dot: 'bg-amber' },
+  emerald:{ bg: 'bg-green/5', border: 'border-green/30',badge: 'bg-green',text: 'text-green',dot: 'bg-green' },
+  rose:   { bg: 'bg-red/5',    border: 'border-red/30',   badge: 'bg-red',   text: 'text-red',   dot: 'bg-red' },
+  slate:  { bg: 'bg-paper-sunk',   border: 'border-line',  badge: 'bg-ink-3',  text: 'text-ink',  dot: 'bg-line-2' },
 }
 
 // ── Step → diagram highlight mapping ─────────────────────────────────────────
@@ -689,16 +689,16 @@ const BUCKET_R = 14
 const BUCKET_X = 20
 
 function cellFill(style: CellStyle) {
-  if (style === 'target') return '#d1fae5'   // emerald-100
-  if (style === 'dirty')  return '#fef3c7'   // amber-100
-  if (style === 'used')   return '#e0e7ff'   // indigo-100
-  return '#f8fafc'                            // slate-50
+  if (style === 'target') return 'var(--color-line)'   // emerald-100
+  if (style === 'dirty')  return 'var(--color-amber)'   // amber-100
+  if (style === 'used')   return 'var(--color-rail)'   // indigo-100
+  return 'var(--color-paper-sunk)'                            // slate-50
 }
 function cellStroke(style: CellStyle) {
-  if (style === 'target') return '#6ee7b7'
-  if (style === 'dirty')  return '#fcd34d'
-  if (style === 'used')   return '#a5b4fc'
-  return '#e2e8f0'
+  if (style === 'target') return 'var(--color-green)'
+  if (style === 'dirty')  return 'var(--color-amber)'
+  if (style === 'used')   return 'var(--color-blue)'
+  return 'var(--color-rail)'
 }
 
 const SVG_W = GRID_X + GRID_COLS * CELL_W + 4
@@ -733,10 +733,10 @@ function BufferCacheDiagram({ isKo, activeStep }: { isKo: boolean; activeStep: n
         style={{ display: 'block', overflow: 'visible' }}
       >
         {/* Section labels — SVG 안에서 비율 유지 */}
-        <text x={GRID_X / 2} y={10} textAnchor="middle" fontSize={8} fontFamily="monospace" fontWeight="bold" fill="#94a3b8" letterSpacing={1}>
+        <text x={GRID_X / 2} y={10} textAnchor="middle" fontSize={8} fontFamily="monospace" fontWeight="bold" fill="var(--color-ink-3)" letterSpacing={1}>
           {isKo ? 'HASH BUCKET + BUFFER HEADER' : 'HASH BUCKET + BUFFER HEADER'}
         </text>
-        <text x={GRID_X + (GRID_COLS * CELL_W) / 2} y={10} textAnchor="middle" fontSize={8} fontFamily="monospace" fontWeight="bold" fill="#94a3b8" letterSpacing={1}>
+        <text x={GRID_X + (GRID_COLS * CELL_W) / 2} y={10} textAnchor="middle" fontSize={8} fontFamily="monospace" fontWeight="bold" fill="var(--color-ink-3)" letterSpacing={1}>
           BUFFER BLOCK
         </text>
         <g transform={`translate(0, 14)`}>
@@ -756,7 +756,7 @@ function BufferCacheDiagram({ isKo, activeStep }: { isKo: boolean; activeStep: n
                   y1={bh.y + BH_H / 2}
                   x2={bx}
                   y2={by}
-                  stroke={isTarget ? '#10b981' : '#94a3b8'}
+                  stroke={isTarget ? 'var(--color-green)' : 'var(--color-ink-3)'}
                   strokeWidth={isTarget ? 1.5 : 1}
                   strokeDasharray={isTarget ? '4 2' : '3 3'}
                   opacity={isTarget ? 0.9 : 0.45}
@@ -786,18 +786,18 @@ function BufferCacheDiagram({ isKo, activeStep }: { isKo: boolean; activeStep: n
                   />
                   {style === 'dirty' && (
                     <>
-                      <line x1={x+4}  y1={y}       x2={x}       y2={y+4}  stroke="#fcd34d" strokeWidth={1} opacity={0.6} />
-                      <line x1={x+10} y1={y}       x2={x}       y2={y+10} stroke="#fcd34d" strokeWidth={1} opacity={0.6} />
-                      <line x1={x+16} y1={y}       x2={x}       y2={y+16} stroke="#fcd34d" strokeWidth={1} opacity={0.6} />
-                      <line x1={x+CELL_W} y1={y+4} x2={x+4}    y2={y+CELL_H} stroke="#fcd34d" strokeWidth={1} opacity={0.6} />
-                      <line x1={x+CELL_W} y1={y+12} x2={x+12}  y2={y+CELL_H} stroke="#fcd34d" strokeWidth={1} opacity={0.6} />
+                      <line x1={x+4}  y1={y}       x2={x}       y2={y+4}  stroke="var(--color-amber)" strokeWidth={1} opacity={0.6} />
+                      <line x1={x+10} y1={y}       x2={x}       y2={y+10} stroke="var(--color-amber)" strokeWidth={1} opacity={0.6} />
+                      <line x1={x+16} y1={y}       x2={x}       y2={y+16} stroke="var(--color-amber)" strokeWidth={1} opacity={0.6} />
+                      <line x1={x+CELL_W} y1={y+4} x2={x+4}    y2={y+CELL_H} stroke="var(--color-amber)" strokeWidth={1} opacity={0.6} />
+                      <line x1={x+CELL_W} y1={y+12} x2={x+12}  y2={y+CELL_H} stroke="var(--color-amber)" strokeWidth={1} opacity={0.6} />
                     </>
                   )}
                   {effectiveStyle === 'target' && (
                     <text
                       x={x + CELL_W / 2} y={y + CELL_H / 2 + 4}
                       textAnchor="middle"
-                      fontSize={9} fontWeight="bold" fill="#065f46" fontFamily="monospace"
+                      fontSize={9} fontWeight="bold" fill="var(--color-green)" fontFamily="monospace"
                     >
                       {bufZone === 'row' ? 'HIT' : bufZone === 'disk' ? 'I/O' : 'HIT'}
                     </text>
@@ -811,7 +811,7 @@ function BufferCacheDiagram({ isKo, activeStep }: { isKo: boolean; activeStep: n
           <rect
             x={GRID_X} y={GRID_Y}
             width={GRID_COLS * CELL_W} height={GRID_ROWS * CELL_H}
-            fill="none" stroke="#cbd5e1" strokeWidth={1.5} rx={3}
+            fill="none" stroke="var(--color-line)" strokeWidth={1.5} rx={3}
           />
 
           {/* ── Hash Bucket chains */}
@@ -829,22 +829,22 @@ function BufferCacheDiagram({ isKo, activeStep }: { isKo: boolean; activeStep: n
                 {bucketPulse && (
                   <circle
                     cx={BUCKET_X + BUCKET_R} cy={cy} r={BUCKET_R + 5}
-                    fill="none" stroke="#f59e0b" strokeWidth={2} opacity={0.4}
+                    fill="none" stroke="var(--color-amber)" strokeWidth={2} opacity={0.4}
                     strokeDasharray="4 3"
                   />
                 )}
                 {/* Bucket circle */}
                 <circle
                   cx={BUCKET_X + BUCKET_R} cy={cy} r={BUCKET_R}
-                  fill={bucketGlow ? '#fef3c7' : isTarget ? '#fef3c7' : '#f1f5f9'}
-                  stroke={bucketGlow ? '#f59e0b' : isTarget ? '#f59e0b' : '#94a3b8'}
+                  fill={bucketGlow ? 'var(--color-amber)' : isTarget ? 'var(--color-amber)' : 'var(--color-rail)'}
+                  stroke={bucketGlow ? 'var(--color-amber)' : isTarget ? 'var(--color-amber)' : 'var(--color-ink-3)'}
                   strokeWidth={bucketGlow ? 2 : isTarget ? 1.5 : 1}
                 />
                 <text
                   x={BUCKET_X + BUCKET_R} y={cy + 4}
                   textAnchor="middle" fontSize={9} fontFamily="monospace"
                   fontWeight="bold"
-                  fill={isTarget ? '#92400e' : '#64748b'}
+                  fill={isTarget ? 'var(--color-amber)' : 'var(--color-ink-2)'}
                 >
                   {ci}
                 </text>
@@ -854,7 +854,7 @@ function BufferCacheDiagram({ isKo, activeStep }: { isKo: boolean; activeStep: n
                   <line
                     x1={BUCKET_X + BUCKET_R * 2} y1={cy}
                     x2={bhPos[ci][0].x} y2={cy}
-                    stroke={isTarget ? '#f59e0b' : '#94a3b8'}
+                    stroke={isTarget ? 'var(--color-amber)' : 'var(--color-ink-3)'}
                     strokeWidth={1} markerEnd="url(#arr)"
                   />
                 )}
@@ -872,18 +872,18 @@ function BufferCacheDiagram({ isKo, activeStep }: { isKo: boolean; activeStep: n
                       <rect
                         x={x} y={y} width={BH_W} height={BH_H}
                         fill={
-                          isPinned ? '#d1fae5'
-                          : isScanning ? '#fef9c3'
-                          : isHit ? '#d1fae5'
-                          : isTarget ? '#fffbeb'
-                          : '#f8fafc'
+                          isPinned ? 'var(--color-line)'
+                          : isScanning ? 'var(--color-amber)'
+                          : isHit ? 'var(--color-line)'
+                          : isTarget ? 'var(--color-rail)'
+                          : 'var(--color-paper-sunk)'
                         }
                         stroke={
-                          isPinned ? '#10b981'
-                          : isScanning ? '#facc15'
-                          : isHit ? '#10b981'
-                          : isTarget ? '#fbbf24'
-                          : '#cbd5e1'
+                          isPinned ? 'var(--color-green)'
+                          : isScanning ? 'var(--color-amber)'
+                          : isHit ? 'var(--color-green)'
+                          : isTarget ? 'var(--color-amber)'
+                          : 'var(--color-line)'
                         }
                         strokeWidth={isPinned || isHit ? 1.5 : 1}
                         rx={3}
@@ -892,7 +892,7 @@ function BufferCacheDiagram({ isKo, activeStep }: { isKo: boolean; activeStep: n
                         x={x + BH_W / 2} y={y + BH_H / 2 + 4}
                         textAnchor="middle" fontSize={9} fontFamily="monospace"
                         fontWeight={isHit || isPinned ? 'bold' : 'normal'}
-                        fill={isPinned ? '#065f46' : isHit ? '#065f46' : isTarget ? '#92400e' : '#64748b'}
+                        fill={isPinned ? 'var(--color-green)' : isHit ? 'var(--color-green)' : isTarget ? 'var(--color-amber)' : 'var(--color-ink-2)'}
                       >
                         {bh.dba}
                       </text>
@@ -902,7 +902,7 @@ function BufferCacheDiagram({ isKo, activeStep }: { isKo: boolean; activeStep: n
                         <line
                           x1={x + BH_W} y1={y + BH_H / 2}
                           x2={bhPos[ci][bi + 1].x} y2={y + BH_H / 2}
-                          stroke={isTarget ? '#f59e0b' : '#94a3b8'}
+                          stroke={isTarget ? 'var(--color-amber)' : 'var(--color-ink-3)'}
                           strokeWidth={1} markerEnd="url(#arr)"
                         />
                       )}
@@ -919,13 +919,13 @@ function BufferCacheDiagram({ isKo, activeStep }: { isKo: boolean; activeStep: n
               <rect
                 x={GRID_X} y={GRID_Y}
                 width={GRID_COLS * CELL_W} height={GRID_ROWS * CELL_H}
-                fill="#fff1f2" stroke="#fda4af" strokeWidth={2} rx={3} opacity={0.5}
+                fill="var(--color-rail)" stroke="var(--color-red)" strokeWidth={2} rx={3} opacity={0.5}
               />
               <text
                 x={GRID_X + (GRID_COLS * CELL_W) / 2}
                 y={GRID_Y + (GRID_ROWS * CELL_H) / 2 - 6}
                 textAnchor="middle" fontSize={12} fontFamily="monospace"
-                fontWeight="bold" fill="#e11d48"
+                fontWeight="bold" fill="var(--color-red)"
               >
                 {isKo ? '💾 디스크 I/O' : '💾 Disk I/O'}
               </text>
@@ -933,7 +933,7 @@ function BufferCacheDiagram({ isKo, activeStep }: { isKo: boolean; activeStep: n
                 x={GRID_X + (GRID_COLS * CELL_W) / 2}
                 y={GRID_Y + (GRID_ROWS * CELL_H) / 2 + 10}
                 textAnchor="middle" fontSize={9} fontFamily="monospace"
-                fill="#e11d48" opacity={0.8}
+                fill="var(--color-red)" opacity={0.8}
               >
                 db file sequential read
               </text>
@@ -946,7 +946,7 @@ function BufferCacheDiagram({ isKo, activeStep }: { isKo: boolean; activeStep: n
               <rect
                 x={BUCKET_X} y={CHAIN_START_Y - 4}
                 width={BUCKET_R * 2} height={SVG_H - CHAIN_START_Y}
-                fill="#ede9fe" stroke="#a78bfa" strokeWidth={1.5} rx={4} opacity={0.4}
+                fill="var(--color-rail)" stroke="var(--color-purple)" strokeWidth={1.5} rx={4} opacity={0.4}
               />
             </g>
           )}
@@ -955,7 +955,7 @@ function BufferCacheDiagram({ isKo, activeStep }: { isKo: boolean; activeStep: n
           <text
             x={6} y={SVG_H / 2}
             textAnchor="middle" fontSize={9} fontFamily="monospace"
-            fill="#94a3b8"
+            fill="var(--color-ink-3)"
             transform={`rotate(-90, 6, ${SVG_H / 2})`}
           >
             Hash Bucket
@@ -964,7 +964,7 @@ function BufferCacheDiagram({ isKo, activeStep }: { isKo: boolean; activeStep: n
           {/* Arrowhead marker */}
           <defs>
             <marker id="arr" markerWidth={6} markerHeight={6} refX={5} refY={3} orient="auto">
-              <path d="M0,0 L0,6 L6,3 z" fill="#94a3b8" />
+              <path d="M0,0 L0,6 L6,3 z" fill="var(--color-ink-3)" />
             </marker>
           </defs>
         </g>
@@ -973,26 +973,26 @@ function BufferCacheDiagram({ isKo, activeStep }: { isKo: boolean; activeStep: n
       {/* Legend */}
       <div className="mt-2 flex flex-wrap gap-3">
         {[
-          { color: '#e0e7ff', stroke: '#a5b4fc', label: isKo ? 'Clean' : 'Clean' },
-          { color: '#fef3c7', stroke: '#fcd34d', label: isKo ? 'Dirty' : 'Dirty' },
-          { color: '#d1fae5', stroke: '#6ee7b7', label: isKo ? 'Target (Hit)' : 'Target (Hit)' },
-          { color: '#f8fafc', stroke: '#e2e8f0', label: isKo ? 'Free' : 'Free' },
+          { color: 'var(--color-rail)', stroke: 'var(--color-blue)', label: isKo ? 'Clean' : 'Clean' },
+          { color: 'var(--color-amber)', stroke: 'var(--color-amber)', label: isKo ? 'Dirty' : 'Dirty' },
+          { color: 'var(--color-line)', stroke: 'var(--color-green)', label: isKo ? 'Target (Hit)' : 'Target (Hit)' },
+          { color: 'var(--color-paper-sunk)', stroke: 'var(--color-rail)', label: isKo ? 'Free' : 'Free' },
         ].map((item) => (
           <div key={item.label} className="flex items-center gap-1">
             <span
-              className="inline-block h-3 w-5 rounded-sm border"
+              className="inline-block h-3 w-5 rounded-chip border"
               style={{ background: item.color, borderColor: item.stroke }}
             />
-            <span className="font-mono text-[9px] text-slate-500">{item.label}</span>
+            <span className="font-mono text-[9px] text-ink-2">{item.label}</span>
           </div>
         ))}
         <div className="flex items-center gap-1">
-          <svg width={20} height={10}><line x1={0} y1={5} x2={20} y2={5} stroke="#10b981" strokeWidth={1.5} strokeDasharray="4 2" /></svg>
-          <span className="font-mono text-[9px] text-slate-500">{isKo ? 'BH → Block 포인터 (target)' : 'BH → Block ptr (target)'}</span>
+          <svg width={20} height={10}><line x1={0} y1={5} x2={20} y2={5} stroke="var(--color-green)" strokeWidth={1.5} strokeDasharray="4 2" /></svg>
+          <span className="font-mono text-[9px] text-ink-2">{isKo ? 'BH → Block 포인터 (target)' : 'BH → Block ptr (target)'}</span>
         </div>
         <div className="flex items-center gap-1">
-          <svg width={20} height={10}><line x1={0} y1={5} x2={20} y2={5} stroke="#94a3b8" strokeWidth={1} strokeDasharray="3 3" opacity={0.6} /></svg>
-          <span className="font-mono text-[9px] text-slate-500">{isKo ? 'BH → Block 포인터' : 'BH → Block ptr'}</span>
+          <svg width={20} height={10}><line x1={0} y1={5} x2={20} y2={5} stroke="var(--color-ink-3)" strokeWidth={1} strokeDasharray="3 3" opacity={0.6} /></svg>
+          <span className="font-mono text-[9px] text-ink-2">{isKo ? 'BH → Block 포인터' : 'BH → Block ptr'}</span>
         </div>
       </div>
     </div>
@@ -1003,17 +1003,17 @@ function BufferCacheDiagram({ isKo, activeStep }: { isKo: boolean; activeStep: n
 
 // FlowDiagram 노드별 색상 정의 (tailwind 클래스 대신 inline style로 처리해 activeStep 강조 가능)
 const NODE_BASE_COLORS = [
-  { bg: '#ede9fe', border: '#a78bfa', dot: '#7c3aed', text: '#5b21b6', ring: '#a78bfa' }, // 0 ROWID
-  { bg: '#ede9fe', border: '#a78bfa', dot: '#7c3aed', text: '#5b21b6', ring: '#a78bfa' }, // 1 DBA
-  { bg: '#dbeafe', border: '#93c5fd', dot: '#2563eb', text: '#1e40af', ring: '#93c5fd' }, // 2 Hash
-  { bg: '#fef3c7', border: '#fbbf24', dot: '#d97706', text: '#92400e', ring: '#fbbf24' }, // 3 Latch
-  { bg: '#fef3c7', border: '#fbbf24', dot: '#d97706', text: '#92400e', ring: '#fbbf24' }, // 4 Chain
-  { bg: '#fef3c7', border: '#fbbf24', dot: '#d97706', text: '#92400e', ring: '#fbbf24' }, // 5 Pin
-  { bg: '#d1fae5', border: '#6ee7b7', dot: '#059669', text: '#065f46', ring: '#6ee7b7' }, // 6 Latch Rel
-  { bg: '#f1f5f9', border: '#cbd5e1', dot: '#64748b', text: '#334155', ring: '#cbd5e1' }, // 7 Row Data
+  { bg: 'var(--color-rail)', border: 'var(--color-purple)', dot: 'var(--color-purple)', text: 'var(--color-purple)', ring: 'var(--color-purple)' }, // 0 ROWID
+  { bg: 'var(--color-rail)', border: 'var(--color-purple)', dot: 'var(--color-purple)', text: 'var(--color-purple)', ring: 'var(--color-purple)' }, // 1 DBA
+  { bg: 'var(--color-rail)', border: 'var(--color-blue)', dot: 'var(--color-blue)', text: 'var(--color-blue)', ring: 'var(--color-blue)' }, // 2 Hash
+  { bg: 'var(--color-amber)', border: 'var(--color-amber)', dot: 'var(--color-amber)', text: 'var(--color-amber)', ring: 'var(--color-amber)' }, // 3 Latch
+  { bg: 'var(--color-amber)', border: 'var(--color-amber)', dot: 'var(--color-amber)', text: 'var(--color-amber)', ring: 'var(--color-amber)' }, // 4 Chain
+  { bg: 'var(--color-amber)', border: 'var(--color-amber)', dot: 'var(--color-amber)', text: 'var(--color-amber)', ring: 'var(--color-amber)' }, // 5 Pin
+  { bg: 'var(--color-line)', border: 'var(--color-green)', dot: 'var(--color-green)', text: 'var(--color-green)', ring: 'var(--color-green)' }, // 6 Latch Rel
+  { bg: 'var(--color-rail)', border: 'var(--color-line)', dot: 'var(--color-ink-2)', text: 'var(--color-ink)', ring: 'var(--color-line)' }, // 7 Row Data
 ]
 
-const NODE_ACTIVE = { bg: '#fef9c3', border: '#facc15', dot: '#ca8a04', ring: '#fde047' }
+const NODE_ACTIVE = { bg: 'var(--color-amber)', border: 'var(--color-amber)', dot: 'var(--color-amber)', ring: 'var(--color-amber)' }
 
 function FlowDiagram({
   isKo,
@@ -1046,7 +1046,7 @@ function FlowDiagram({
   const selectedColor = selectedWalk ? STEP_COLORS[selectedWalk.color] : null
 
   return (
-    <div className="rounded-2xl border bg-slate-50 px-4 py-4">
+    <div className="rounded-panel border bg-paper-sunk px-4 py-4">
 
       {/* ── 상단: [phase 버튼 목록] + [Buffer Cache 다이어그램] 좌우 배치 */}
       <div className="flex gap-3">
@@ -1064,7 +1064,7 @@ function FlowDiagram({
               <div key={i} className="flex flex-col">
                 <button
                   onClick={() => onStepClick(stepNum)}
-                  className="flex items-center gap-2 rounded-lg border px-2 py-1.5 text-left transition-all duration-200 hover:shadow-sm"
+                  className="flex items-center gap-2 rounded-card border px-2 py-1.5 text-left transition-all duration-200"
                   style={{
                     background: isActive ? NODE_ACTIVE.bg : c.bg,
                     borderColor: isSelected ? NODE_ACTIVE.ring : isActive ? NODE_ACTIVE.ring : c.border,
@@ -1073,7 +1073,7 @@ function FlowDiagram({
                   }}
                 >
                   <span
-                    className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full font-mono text-[9px] font-bold text-white transition-colors duration-200"
+                    className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full font-mono text-[9px] font-bold text-paper transition-colors duration-200"
                     style={{ background: isActive ? NODE_ACTIVE.dot : c.dot }}
                   >
                     {stepNum}
@@ -1087,7 +1087,7 @@ function FlowDiagram({
                 </button>
                 {!isLast && (
                   <div className="ml-[13px] h-2 w-px transition-colors duration-200"
-                    style={{ background: connActive ? NODE_ACTIVE.dot : '#e2e8f0' }}
+                    style={{ background: connActive ? NODE_ACTIVE.dot : 'var(--color-rail)' }}
                   />
                 )}
               </div>
@@ -1096,8 +1096,8 @@ function FlowDiagram({
         </div>
 
         {/* 오른쪽: Buffer Cache 다이어그램 */}
-        <div className="min-w-0 flex-1 rounded-xl border border-slate-200 bg-white px-3 py-3">
-          <p className="mb-2 font-mono text-[9px] font-bold uppercase tracking-widest text-slate-400">
+        <div className="min-w-0 flex-1 rounded-panel border border-line bg-paper px-3 py-3">
+          <p className="mb-2 font-mono text-[9px] font-bold uppercase tracking-widest text-ink-2">
             {isKo ? 'Buffer Cache 해시 구조' : 'Buffer Cache Hash Structure'}
           </p>
           <BufferCacheDiagram isKo={isKo} activeStep={activeStep} />
@@ -1113,17 +1113,17 @@ function FlowDiagram({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 6 }}
             transition={{ duration: 0.18 }}
-            className={`mt-3 rounded-xl border p-3 ${selectedColor.bg} ${selectedColor.border}`}
+            className={`mt-3 rounded-panel border p-3 ${selectedColor.bg} ${selectedColor.border}`}
           >
             <div className="mb-1.5 flex items-center gap-2">
-              <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full font-mono text-[10px] font-bold text-white ${selectedColor.badge}`}>
+              <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full font-mono text-[10px] font-bold text-paper ${selectedColor.badge}`}>
                 {selectedWalk.step}
               </span>
               <span className={`text-[12px] font-bold ${selectedColor.text}`}>
                 {selectedWalk.phase}
               </span>
             </div>
-            <p className="text-[11px] leading-relaxed text-slate-600">
+            <p className="text-[11px] leading-relaxed text-ink">
               {selectedWalk.detail}
             </p>
             {selectedWalk.note && (
@@ -1133,23 +1133,23 @@ function FlowDiagram({
             )}
             {/* Cache Miss 분기 — step 7일 때 설명 패널 안에 인라인 표시 */}
             {isMissStep && (
-              <div className="mt-2 rounded-lg border border-rose-300 bg-rose-50 px-3 py-2">
-                <p className="mb-1 font-mono text-[9px] font-bold uppercase tracking-widest text-rose-400">
+              <div className="mt-2 rounded-card border border-red/50 bg-red/5 px-3 py-2">
+                <p className="mb-1 font-mono text-[9px] font-bold uppercase tracking-widest text-red">
                   {isKo ? 'Cache Miss 분기' : 'Cache Miss branch'}
                 </p>
                 <div className="flex flex-wrap items-center gap-1">
                   {missExtra.map((label, i) => (
                     <div key={i} className="flex items-center gap-1">
-                      <span className="rounded border border-rose-200 bg-white px-1.5 py-0.5 font-mono text-[9px] font-semibold text-rose-700">
+                      <span className="rounded border border-red/30 bg-paper px-1.5 py-0.5 font-mono text-[9px] font-semibold text-red">
                         {label}
                       </span>
                       {i < missExtra.length - 1 && (
-                        <span className="font-mono text-[9px] text-rose-400">→</span>
+                        <span className="font-mono text-[9px] text-red">→</span>
                       )}
                     </div>
                   ))}
                 </div>
-                <p className="mt-1 font-mono text-[9px] text-rose-500">
+                <p className="mt-1 font-mono text-[9px] text-red">
                   {isKo ? '대기: db file sequential read' : 'Wait: db file sequential read'}
                 </p>
               </div>
@@ -1162,9 +1162,9 @@ function FlowDiagram({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.15 }}
-            className="mt-3 flex h-10 items-center justify-center rounded-xl border border-dashed border-slate-200"
+            className="mt-3 flex h-10 items-center justify-center rounded-panel border border-dashed border-line"
           >
-            <p className="font-mono text-[10px] text-slate-300">
+            <p className="font-mono text-[10px] text-ink-3">
               {isKo ? '단계를 클릭하면 설명이 표시됩니다' : 'Click a step to see details'}
             </p>
           </motion.div>
@@ -1192,7 +1192,7 @@ export function TableAccessSection() {
   return (
     <PageContainer className="max-w-5xl">
       <ChapterTitle
-        icon={<IconRoute size={36} color="#7c3aed" stroke={1.5} />}
+        icon={<IconRoute size={36} color="var(--color-purple)" stroke={1.5} />}
         title={t.title}
         subtitle={t.subtitle}
       />
@@ -1213,14 +1213,14 @@ export function TableAccessSection() {
       <SectionTitle>{t.waitTitle}</SectionTitle>
       <div className="grid gap-3 sm:grid-cols-2">
         {t.waits.map((w, i) => (
-          <div key={i} className="rounded-xl border bg-card p-4">
-            <p className="mb-2 font-mono text-xs font-bold text-rose-600">{w.event}</p>
-            <p className="mb-2 text-xs leading-relaxed text-muted-foreground">
-              <span className="font-semibold text-foreground">{isKo ? '원인: ' : 'Cause: '}</span>
+          <div key={i} className="rounded-panel border bg-paper p-4">
+            <p className="mb-2 font-mono text-xs font-bold text-red">{w.event}</p>
+            <p className="mb-2 text-xs leading-relaxed text-ink-2">
+              <span className="font-semibold text-ink">{isKo ? '원인: ' : 'Cause: '}</span>
               {w.cause}
             </p>
-            <p className="text-xs leading-relaxed text-muted-foreground">
-              <span className="font-semibold text-emerald-600">{isKo ? '대응: ' : 'Fix: '}</span>
+            <p className="text-xs leading-relaxed text-ink-2">
+              <span className="font-semibold text-green">{isKo ? '대응: ' : 'Fix: '}</span>
               {w.fix}
             </p>
           </div>
@@ -1241,9 +1241,9 @@ export function TableAccessSection() {
 
       <SectionTitle>{t.coveringTitle}</SectionTitle>
       <Prose>{t.coveringDesc}</Prose>
-      <div className="mt-3 rounded-xl border bg-slate-900 px-4 py-3">
-        <p className="mb-2 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500">SQL</p>
-        <pre className="overflow-x-auto font-mono text-[12px] leading-relaxed text-slate-100">{t.coveringSql}</pre>
+      <div className="mt-3 rounded-panel border bg-ink px-4 py-3">
+        <p className="mb-2 font-mono text-[10px] font-bold uppercase tracking-widest text-ink-2">SQL</p>
+        <pre className="overflow-x-auto font-mono text-[12px] leading-relaxed text-ink-3">{t.coveringSql}</pre>
       </div>
     </PageContainer>
   )

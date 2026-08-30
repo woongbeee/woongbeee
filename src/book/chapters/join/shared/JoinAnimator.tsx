@@ -51,9 +51,9 @@ const JOIN_SQL: Record<JoinType, string> = {
 }
 
 const C = {
-  bg:     'bg-muted/40',
-  border: 'border-border',
-  text:   'text-foreground/80',
+  bg:     'bg-rail',
+  border: 'border-line',
+  text:   'text-ink/80',
 }
 
 // ── JoinVenn ────────────────────────────────────────────────────────────────
@@ -65,19 +65,19 @@ export function JoinVenn({ type }: { type: JoinType }) {
   const isCross   = type === 'cross'
   return (
     <svg viewBox="0 0 100 52" className="w-20 h-10 shrink-0">
-      <circle cx="35" cy="26" r="20" fill={showLeft  ? '#818cf830' : 'none'} stroke="#818cf8" strokeWidth="1.5" />
-      <circle cx="65" cy="26" r="20" fill={showRight ? '#fb923c30' : 'none'} stroke="#fb923c" strokeWidth="1.5" />
+      <circle cx="35" cy="26" r="20" fill={showLeft  ? 'color-mix(in srgb, var(--color-blue) 19%, transparent)' : 'none'} stroke="var(--color-blue)" strokeWidth="1.5" />
+      <circle cx="65" cy="26" r="20" fill={showRight ? 'color-mix(in srgb, var(--color-amber) 19%, transparent)' : 'none'} stroke="var(--color-amber)" strokeWidth="1.5" />
       {showMid && !isCross && (
         <>
           <clipPath id={`v-${type}`}><circle cx="35" cy="26" r="20" /></clipPath>
-          <circle cx="65" cy="26" r="20" fill="#6ee7b750" stroke="none" clipPath={`url(#v-${type})`} />
+          <circle cx="65" cy="26" r="20" fill="color-mix(in srgb, var(--color-green) 31%, transparent)" stroke="none" clipPath={`url(#v-${type})`} />
         </>
       )}
       {isCross && (
-        <text x="50" y="30" fontSize="9" fill="#f43f5e" fontWeight="bold" textAnchor="middle">×</text>
+        <text x="50" y="30" fontSize="9" fill="var(--color-red)" fontWeight="bold" textAnchor="middle">×</text>
       )}
-      <text x="26" y="29" fontSize="6" fill="#6d28d9" fontWeight="bold" textAnchor="middle">EMP</text>
-      <text x="74" y="29" fontSize="6" fill="#c2410c" fontWeight="bold" textAnchor="middle">DEPT</text>
+      <text x="26" y="29" fontSize="6" fill="var(--color-purple)" fontWeight="bold" textAnchor="middle">EMP</text>
+      <text x="74" y="29" fontSize="6" fill="var(--color-red)" fontWeight="bold" textAnchor="middle">DEPT</text>
     </svg>
   )
 }
@@ -177,18 +177,18 @@ export function JoinAnimator({ type, joinRowCount, queryDesc }: JoinAnimatorProp
   const doneDeptIdxs = new Set(animRows.slice(0, visibleCount).map((r) => r.deptIdx).filter((x): x is number => x !== null))
 
   const ROW_COL: Record<JoinAnimRow['_side'], string> = {
-    both:  'bg-ios-teal-light',
-    left:  'bg-ios-blue-light',
-    right: 'bg-muted/50',
+    both:  'bg-green/10',
+    left:  'bg-blue/10',
+    right: 'bg-rail',
   }
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="rounded-lg border bg-muted/60 px-3 py-2.5">
+      <div className="rounded-card border bg-rail px-3 py-2.5">
         <SqlHighlight sql={JOIN_SQL[type]} />
       </div>
 
-      <div className={cn('rounded-lg border px-3 py-2 text-[12px] leading-relaxed', C.border, C.bg, C.text)}>
+      <div className={cn('rounded-card border px-3 py-2 text-[12px] leading-relaxed', C.border, C.bg, C.text)}>
         {queryDesc}
       </div>
 
@@ -197,9 +197,9 @@ export function JoinAnimator({ type, joinRowCount, queryDesc }: JoinAnimatorProp
           onClick={startPlay}
           disabled={playing}
           className={cn(
-            'rounded-lg border px-4 py-1.5 font-mono text-xs font-bold transition-all',
+            'rounded-card border px-4 py-1.5 font-mono text-xs font-bold transition-all',
             playing
-              ? 'border-border bg-muted text-muted-foreground cursor-not-allowed'
+              ? 'border-line bg-rail text-ink-2 cursor-not-allowed'
               : `${C.border} ${C.bg} ${C.text} hover:brightness-95`,
           )}
         >
@@ -209,26 +209,26 @@ export function JoinAnimator({ type, joinRowCount, queryDesc }: JoinAnimatorProp
         <button
           onClick={() => { setPlaying(false); if (timerRef.current) clearTimeout(timerRef.current); setVisibleCount((v) => Math.max(0, v - 1)) }}
           disabled={playing || visibleCount === 0}
-          className="rounded-lg border border-border bg-card px-3 py-1.5 font-mono text-xs text-muted-foreground hover:bg-muted transition-colors disabled:opacity-40"
+          className="rounded-card border border-line bg-paper px-3 py-1.5 font-mono text-xs text-ink-2 hover:bg-rail transition-colors disabled:opacity-40"
         >
           ← {lang === 'ko' ? '이전' : 'Prev'}
         </button>
         <button
           onClick={() => { setPlaying(false); if (timerRef.current) clearTimeout(timerRef.current); setVisibleCount((v) => Math.min(animRows.length, v + 1)) }}
           disabled={playing || visibleCount >= animRows.length}
-          className="rounded-lg border border-border bg-card px-3 py-1.5 font-mono text-xs text-muted-foreground hover:bg-muted transition-colors disabled:opacity-40"
+          className="rounded-card border border-line bg-paper px-3 py-1.5 font-mono text-xs text-ink-2 hover:bg-rail transition-colors disabled:opacity-40"
         >
           {lang === 'ko' ? '다음' : 'Next'} →
         </button>
 
-        <span className="font-mono text-[11px] text-muted-foreground">
+        <span className="font-mono text-[11px] text-ink-2">
           {lang === 'ko' ? `총 ${animRows.length} 단계` : `${animRows.length} steps total`}
         </span>
 
         {visibleCount > 0 && !playing && (
           <button
             onClick={() => setVisibleCount(0)}
-            className="rounded-lg border border-border bg-card px-3 py-1.5 font-mono text-xs text-muted-foreground hover:bg-muted transition-colors"
+            className="rounded-card border border-line bg-paper px-3 py-1.5 font-mono text-xs text-ink-2 hover:bg-rail transition-colors"
           >
             {lang === 'ko' ? '초기화' : 'Reset'}
           </button>
@@ -243,13 +243,13 @@ export function JoinAnimator({ type, joinRowCount, queryDesc }: JoinAnimatorProp
       <div className="mt-3 grid grid-cols-[1fr_auto_1fr] items-start gap-2">
         {/* LEFT: EMPLOYEES */}
         <div>
-          <p className="mb-1 font-mono text-[10px] font-bold text-ios-blue-dark">EMPLOYEES</p>
-          <div className="overflow-hidden rounded-lg border text-xs">
+          <p className="mb-1 font-mono text-[10px] font-bold text-blue">EMPLOYEES</p>
+          <div className="overflow-hidden rounded-card border text-xs">
             <table className="w-full">
               <thead>
-                <tr className="border-b bg-muted/60">
+                <tr className="border-b bg-rail">
                   {(['emp_id', 'first_name', 'dept_id'] as const).map((h) => (
-                    <th key={h} className="px-2 py-1 text-left font-mono text-[9px] font-bold text-muted-foreground">{h}</th>
+                    <th key={h} className="px-2 py-1 text-left font-mono text-[9px] font-bold text-ink-2">{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -261,16 +261,16 @@ export function JoinAnimator({ type, joinRowCount, queryDesc }: JoinAnimatorProp
                     <motion.tr
                       key={e.emp_id}
                       animate={
-                        isActive ? { backgroundColor: '#fef08a', scale: 1.02 }
-                        : isDone  ? { backgroundColor: '#f0fdf4', scale: 1 }
-                        :           { backgroundColor: '#ffffff', scale: 1 }
+                        isActive ? { backgroundColor: 'var(--color-amber)', scale: 1.02 }
+                        : isDone  ? { backgroundColor: 'var(--color-rail)', scale: 1 }
+                        :           { backgroundColor: 'var(--color-paper)', scale: 1 }
                       }
                       transition={{ duration: 0.2 }}
                       className="border-b last:border-0"
                     >
-                      <td className={cn('px-2 py-1 font-mono text-[10px]', isActive ? 'font-bold text-yellow-800' : 'text-foreground/80')}>{e.emp_id}</td>
-                      <td className={cn('px-2 py-1 font-mono text-[10px]', isActive ? 'font-bold text-yellow-800' : 'text-foreground/80')}>{e.first_name}</td>
-                      <td className={cn('px-2 py-1 font-mono text-[10px] font-bold', e.dept_id === null ? 'italic text-muted-foreground/40' : isActive ? 'text-foreground' : 'text-ios-blue-dark')}>
+                      <td className={cn('px-2 py-1 font-mono text-[10px]', isActive ? 'font-bold text-amber' : 'text-ink/80')}>{e.emp_id}</td>
+                      <td className={cn('px-2 py-1 font-mono text-[10px]', isActive ? 'font-bold text-amber' : 'text-ink/80')}>{e.first_name}</td>
+                      <td className={cn('px-2 py-1 font-mono text-[10px] font-bold', e.dept_id === null ? 'italic text-ink-2/40' : isActive ? 'text-ink' : 'text-blue')}>
                         {e.dept_id ?? 'NULL'}
                       </td>
                     </motion.tr>
@@ -292,19 +292,19 @@ export function JoinAnimator({ type, joinRowCount, queryDesc }: JoinAnimatorProp
             >
               →
             </motion.div>
-            <span className="font-mono text-[9px] text-muted-foreground">ON dept_id</span>
+            <span className="font-mono text-[9px] text-ink-2">ON dept_id</span>
           </div>
         </div>
 
         {/* RIGHT: DEPARTMENTS */}
         <div>
-          <p className="mb-1 font-mono text-[10px] font-bold text-muted-foreground">DEPARTMENTS</p>
-          <div className="overflow-hidden rounded-lg border text-xs">
+          <p className="mb-1 font-mono text-[10px] font-bold text-ink-2">DEPARTMENTS</p>
+          <div className="overflow-hidden rounded-card border text-xs">
             <table className="w-full">
               <thead>
-                <tr className="border-b bg-muted/60">
+                <tr className="border-b bg-rail">
                   {(['dept_id', 'dept_name', 'location'] as const).map((h) => (
-                    <th key={h} className="px-2 py-1 text-left font-mono text-[9px] font-bold text-muted-foreground">{h}</th>
+                    <th key={h} className="px-2 py-1 text-left font-mono text-[9px] font-bold text-ink-2">{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -316,16 +316,16 @@ export function JoinAnimator({ type, joinRowCount, queryDesc }: JoinAnimatorProp
                     <motion.tr
                       key={d.dept_id}
                       animate={
-                        isActive ? { backgroundColor: '#fef08a', scale: 1.02 }
-                        : isDone  ? { backgroundColor: '#fff7ed', scale: 1 }
-                        :           { backgroundColor: '#ffffff', scale: 1 }
+                        isActive ? { backgroundColor: 'var(--color-amber)', scale: 1.02 }
+                        : isDone  ? { backgroundColor: 'var(--color-rail)', scale: 1 }
+                        :           { backgroundColor: 'var(--color-paper)', scale: 1 }
                       }
                       transition={{ duration: 0.2 }}
                       className="border-b last:border-0"
                     >
-                      <td className={cn('px-2 py-1 font-mono text-[10px] font-bold', isActive ? 'text-foreground' : 'text-foreground/70')}>{d.dept_id}</td>
-                      <td className={cn('px-2 py-1 font-mono text-[10px]', isActive ? 'font-bold text-yellow-800' : 'text-foreground/80')}>{d.dept_name}</td>
-                      <td className={cn('px-2 py-1 font-mono text-[10px]', isActive ? 'font-bold text-yellow-800' : 'text-foreground/80')}>{d.location}</td>
+                      <td className={cn('px-2 py-1 font-mono text-[10px] font-bold', isActive ? 'text-ink' : 'text-ink/70')}>{d.dept_id}</td>
+                      <td className={cn('px-2 py-1 font-mono text-[10px]', isActive ? 'font-bold text-amber' : 'text-ink/80')}>{d.dept_name}</td>
+                      <td className={cn('px-2 py-1 font-mono text-[10px]', isActive ? 'font-bold text-amber' : 'text-ink/80')}>{d.location}</td>
                     </motion.tr>
                   )
                 })}
@@ -337,19 +337,19 @@ export function JoinAnimator({ type, joinRowCount, queryDesc }: JoinAnimatorProp
 
       {/* Result rows */}
       <div>
-        <p className="mb-1.5 font-mono text-[10px] font-bold text-muted-foreground">
+        <p className="mb-1.5 font-mono text-[10px] font-bold text-ink-2">
           {lang === 'ko' ? '결과' : 'Result'}
         </p>
-        <div className="overflow-x-auto rounded-lg border bg-card text-xs">
+        <div className="overflow-x-auto rounded-card border bg-paper text-xs">
           <table className="w-full">
             <thead>
-              <tr className="border-b bg-muted/60">
+              <tr className="border-b bg-rail">
                 {(['emp_id', 'first_name', 'dept_id', 'dept_name', 'location'] as const).map((h) => (
                   <th key={h} className={cn(
                     'whitespace-nowrap px-2 py-1.5 text-left font-mono text-[10px] font-bold',
-                    h === 'dept_id' ? 'text-ios-blue-dark'
-                    : h === 'dept_name' || h === 'location' ? 'text-foreground/60'
-                    : 'text-muted-foreground',
+                    h === 'dept_id' ? 'text-blue'
+                    : h === 'dept_name' || h === 'location' ? 'text-ink/60'
+                    : 'text-ink-2',
                   )}>{h}</th>
                 ))}
               </tr>
@@ -359,15 +359,15 @@ export function JoinAnimator({ type, joinRowCount, queryDesc }: JoinAnimatorProp
                 {animRows.slice(0, visibleCount).map((row, i) => (
                   <motion.tr
                     key={i}
-                    initial={{ opacity: 0, y: -6, backgroundColor: '#fef08a' }}
-                    animate={{ opacity: 1, y: 0,  backgroundColor: row._side === 'both' ? '#e5f5fc' : row._side === 'left' ? '#e8f3ff' : '#f4f4f5' }}
+                    initial={{ opacity: 0, y: -6, backgroundColor: 'var(--color-amber)' }}
+                    animate={{ opacity: 1, y: 0,  backgroundColor: row._side === 'both' ? 'var(--color-rail)' : row._side === 'left' ? 'var(--color-rail)' : 'var(--color-rail)' }}
                     transition={{ duration: 0.3 }}
                     className={cn('border-b last:border-0', ROW_COL[row._side])}
                   >
                     {(['emp_id', 'first_name', 'dept_id', 'dept_name', 'location'] as const).map((col) => {
                       const val = row[col]
                       return (
-                        <td key={col} className={cn('px-2 py-1 font-mono text-[10px]', val === null ? 'italic text-muted-foreground/40' : 'text-foreground/80')}>
+                        <td key={col} className={cn('px-2 py-1 font-mono text-[10px]', val === null ? 'italic text-ink-2/40' : 'text-ink/80')}>
                           {val ?? 'NULL'}
                         </td>
                       )
@@ -376,7 +376,7 @@ export function JoinAnimator({ type, joinRowCount, queryDesc }: JoinAnimatorProp
                 ))}
               </AnimatePresence>
               {visibleCount === 0 && (
-                <tr><td colSpan={5} className="py-4 text-center font-mono text-[10px] text-muted-foreground/50">
+                <tr><td colSpan={5} className="py-4 text-center font-mono text-[10px] text-ink-2/50">
                   {lang === 'ko' ? '▶ 조인 시작을 클릭해 시작하세요' : '▶ Press Run to start'}
                 </td></tr>
               )}
@@ -385,10 +385,10 @@ export function JoinAnimator({ type, joinRowCount, queryDesc }: JoinAnimatorProp
         </div>
 
         {visibleCount > 0 && (
-          <div className="mt-1.5 flex flex-wrap gap-3 font-mono text-[10px] text-muted-foreground">
-            <span className="flex items-center gap-1"><span className="inline-block h-2 w-2 rounded-sm bg-ios-teal/40" />{lang === 'ko' ? '양쪽 일치' : 'Both match'}</span>
-            {(type === 'left' || type === 'full') && <span className="flex items-center gap-1"><span className="inline-block h-2 w-2 rounded-sm bg-ios-blue/30" />{lang === 'ko' ? '왼쪽만' : 'Left only'}</span>}
-            {(type === 'right' || type === 'full') && <span className="flex items-center gap-1"><span className="inline-block h-2 w-2 rounded-sm bg-muted-foreground/20" />{lang === 'ko' ? '오른쪽만' : 'Right only'}</span>}
+          <div className="mt-1.5 flex flex-wrap gap-3 font-mono text-[10px] text-ink-2">
+            <span className="flex items-center gap-1"><span className="inline-block h-2 w-2 rounded-chip bg-green/40" />{lang === 'ko' ? '양쪽 일치' : 'Both match'}</span>
+            {(type === 'left' || type === 'full') && <span className="flex items-center gap-1"><span className="inline-block h-2 w-2 rounded-chip bg-blue/30" />{lang === 'ko' ? '왼쪽만' : 'Left only'}</span>}
+            {(type === 'right' || type === 'full') && <span className="flex items-center gap-1"><span className="inline-block h-2 w-2 rounded-chip bg-rail-foreground/20" />{lang === 'ko' ? '오른쪽만' : 'Right only'}</span>}
           </div>
         )}
       </div>

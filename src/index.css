@@ -1,99 +1,32 @@
 @import "tailwindcss";
+@import "./styles/tokens.css";
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 
-:root {
-  color-scheme: light;
-
-  /* shadcn standard variables — neutral / clean black-white */
-  --background:        0 0% 98%;       /* #fafafa */
-  --foreground:        0 0% 7%;        /* #111111 */
-  --card:              0 0% 100%;
-  --card-foreground:   0 0% 7%;
-  --popover:           0 0% 100%;
-  --popover-foreground:0 0% 7%;
-  --primary:           0 0% 9%;        /* near black */
-  --primary-foreground:0 0% 98%;
-  --secondary:         0 0% 96%;
-  --secondary-foreground:0 0% 9%;
-  --muted:             0 0% 94%;
-  --muted-foreground:  0 0% 44%;
-  --accent:            0 0% 94%;
-  --accent-foreground: 0 0% 9%;
-  --destructive:       0 84% 60%;
-  --destructive-foreground:0 0% 98%;
-  --border:            0 0% 88%;
-  --input:             0 0% 88%;
-  --ring:              0 0% 9%;
-  --radius:            0.5rem;
-
-  /* Semantic status colors (used sparingly for simulation states) */
-  --active-border:     220 90% 45%;   /* blue — active component */
-  --active-bg:         220 90% 97%;
-  --active-text:       220 90% 35%;
-  --warn-border:       28 90% 50%;    /* orange — miss / IO */
-  --warn-bg:           28 90% 97%;
-  --warn-text:         28 90% 38%;
-  --ok-border:         142 70% 40%;   /* green — hit */
-  --ok-bg:             142 70% 96%;
-  --ok-text:           142 70% 28%;
-
-  /* legacy aliases — kept for gradual migration */
-  --bg-base:    hsl(var(--background));
-  --bg-surface: hsl(var(--card));
-  --bg-raised:  hsl(var(--secondary));
-  --bg-overlay: hsl(var(--muted));
-  --border-subtle: hsl(var(--border));
-  --border-mid:    hsl(0 0% 78%);
-  --border-bright: hsl(0 0% 44%);
-  --text-primary:   hsl(var(--foreground));
-  --text-secondary: hsl(0 0% 22%);
-  --text-muted:     hsl(var(--muted-foreground));
-  --sapphire-bright: hsl(var(--active-border));
-  --sapphire-mid:    hsl(220 90% 25%);
-  --sapphire-soft:   hsl(220 70% 65%);
-  --tangerine: hsl(var(--warn-border));
-  --gold:      hsl(42 90% 50%);
-  --gold-light:hsl(42 80% 80%);
-}
-
-/* ── iOS highlight palette ───────────────────────────────────────────────── */
-/* 4 semantic accent colors — used sparingly on a neutral mono base          */
-@theme {
-  /* Blue — actions, links, primary interactive */
-  --color-ios-blue:        #0A84FF;
-  --color-ios-blue-light:  #e8f3ff;
-  --color-ios-blue-dark:   #004999;
-
-  /* Teal — info, tips, secondary callouts */
-  --color-ios-teal:        #32ADE6;
-  --color-ios-teal-light:  #e5f5fc;
-  --color-ios-teal-dark:   #0a5c80;
-
-  /* Orange — warnings, caution, noteworthy */
-  --color-ios-orange:      #FF9F0A;
-  --color-ios-orange-light:#fff3e0;
-  --color-ios-orange-dark: #7a4500;
-
-  /* Red — errors, deletion, danger */
-  --color-ios-red:         #FF453A;
-  --color-ios-red-light:   #fff0ee;
-  --color-ios-red-dark:    #8a0f08;
-
-  /* Green — usage, practical examples, "when to use" */
-  --color-ios-green:       #30D158;
-  --color-ios-green-light: #e6f9ed;
-  --color-ios-green-dark:  #0a5c22;
-}
+/* ============================================================================
+   구조 규칙만.  색·폰트 값은 전부 src/styles/tokens.css 에 있다.
+   ============================================================================ */
 
 * { box-sizing: border-box; }
 
+/* 색 없는 유틸리티(`border`, `divide-y` 등)의 기본 테두리색을 토큰 헤어라인으로.
+   Tailwind v4 preflight 는 currentColor 라 너무 진하다.
+   반드시 `@layer base` 안에 둘 것 — 언레이어드면 `border-blue` 같은
+   `@layer utilities` 색 유틸까지 덮어버린다. 색·폰트 원본은 tokens.css. */
+@layer base {
+  *,
+  ::before,
+  ::after {
+    border-color: var(--color-line);
+  }
+}
+
 body {
   margin: 0;
-  background: hsl(var(--background));
-  color: hsl(var(--foreground));
-  font-family: 'Nanum Gothic', sans-serif;
+  background: var(--color-paper-sunk);
+  color: var(--color-ink);
+  font-family: var(--font-sans-active);
   font-feature-settings: "rlig" 1, "calt" 1;
 }
 
@@ -103,14 +36,8 @@ body {
   overflow: hidden;
 }
 
-/* Landing page needs its own scroll context */
-#root.landing {
-  overflow-y: auto;
-  height: auto;
-  min-height: 100vh;
-}
-
 /* ── React Flow overrides ─────────────────────────────────────────────────── */
+/* 색은 tokens.css의 shadcn 변수를 경유. Phase 2에서 --color-* 시맨틱 토큰으로 이관. */
 .react-flow__background { background: hsl(var(--background)) !important; }
 
 .react-flow__controls button {

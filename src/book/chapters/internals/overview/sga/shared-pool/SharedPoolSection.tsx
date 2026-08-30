@@ -231,19 +231,19 @@ function ComponentCard({
   color: 'violet' | 'slate' | 'amber' | 'emerald'
 }) {
   const cls = {
-    violet: { bg: 'bg-violet-50/60', border: 'border-violet-200', badge: 'bg-violet-100 text-violet-700' },
-    slate:  { bg: 'bg-slate-50/60',  border: 'border-slate-200',  badge: 'bg-slate-100 text-slate-600' },
-    amber:  { bg: 'bg-amber-50/60',  border: 'border-amber-200',  badge: 'bg-amber-100 text-amber-700' },
-    emerald:{ bg: 'bg-emerald-50/60',border: 'border-emerald-200',badge: 'bg-emerald-100 text-emerald-700' },
+    violet: { bg: 'bg-purple/5', border: 'border-purple/30', badge: 'bg-purple/10 text-purple' },
+    slate:  { bg: 'bg-paper-sunk',  border: 'border-line',  badge: 'bg-paper-sunk text-ink' },
+    amber:  { bg: 'bg-amber/5',  border: 'border-amber/30',  badge: 'bg-amber/10 text-amber' },
+    emerald:{ bg: 'bg-green/5',border: 'border-green/30',badge: 'bg-green/10 text-green' },
   }[color]
 
   return (
-    <div className={cn('rounded-xl border p-4', cls.bg, cls.border)}>
+    <div className={cn('rounded-panel border p-4', cls.bg, cls.border)}>
       <div className="mb-2 flex items-center gap-2">
-        <span className={cn('flex h-6 w-6 shrink-0 items-center justify-center rounded-md', cls.badge)}>{icon}</span>
+        <span className={cn('flex h-6 w-6 shrink-0 items-center justify-center rounded-card', cls.badge)}>{icon}</span>
         <span className="text-sm font-bold">{title}</span>
       </div>
-      <p className="text-xs leading-relaxed text-muted-foreground">{desc}</p>
+      <p className="text-xs leading-relaxed text-ink-2">{desc}</p>
     </div>
   )
 }
@@ -262,12 +262,12 @@ function ParseSection({ lang }: { lang: 'ko' | 'en' }) {
             key={m}
             onClick={() => setMode(m)}
             className={cn(
-              'rounded-lg border px-4 py-2 text-xs font-bold transition-all',
+              'rounded-card border px-4 py-2 text-xs font-bold transition-all',
               mode === m
                 ? m === 'hard'
-                  ? 'border-rose-400 bg-rose-500 text-white shadow-sm'
-                  : 'border-emerald-400 bg-emerald-500 text-white shadow-sm'
-                : 'border-border bg-card text-muted-foreground hover:text-foreground',
+                  ? 'border-red/50 bg-red text-paper '
+                  : 'border-green/50 bg-green text-paper '
+                : 'border-line bg-paper text-ink-2 hover:text-ink',
             )}
           >
             {m === 'hard' ? t.hardTitle : t.softTitle}
@@ -282,23 +282,23 @@ function ParseSection({ lang }: { lang: 'ko' | 'en' }) {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -6 }}
           transition={{ duration: 0.18 }}
-          className="overflow-hidden rounded-xl border bg-card"
+          className="overflow-hidden rounded-panel border bg-paper"
         >
           {mode === 'hard' ? (
             <>
-              <div className="flex items-center gap-2.5 border-b bg-rose-50/60 px-5 py-3">
-                <span className="rounded bg-rose-500 px-2.5 py-0.5 text-xs font-bold text-white">Hard Parse</span>
-                <span className="text-sm font-bold text-foreground">{t.hardDesc}</span>
+              <div className="flex items-center gap-2.5 border-b bg-red/5 px-5 py-3">
+                <span className="rounded bg-red px-2.5 py-0.5 text-xs font-bold text-paper">Hard Parse</span>
+                <span className="text-sm font-bold text-ink">{t.hardDesc}</span>
               </div>
-              <div className="space-y-0 divide-y divide-border/50">
+              <div className="space-y-0 divide-y divide-line/50">
                 {t.hardSteps.map((s) => (
                   <div key={s.n} className="flex items-start gap-4 px-5 py-3.5">
-                    <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-rose-500 font-mono text-[11px] font-bold text-white">
+                    <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-red font-mono text-[11px] font-bold text-paper">
                       {s.n}
                     </span>
                     <div>
-                      <div className="mb-0.5 text-sm font-semibold text-foreground">{s.label}</div>
-                      <div className="text-xs leading-relaxed text-muted-foreground">{s.desc}</div>
+                      <div className="mb-0.5 text-sm font-semibold text-ink">{s.label}</div>
+                      <div className="text-xs leading-relaxed text-ink-2">{s.desc}</div>
                     </div>
                   </div>
                 ))}
@@ -306,16 +306,16 @@ function ParseSection({ lang }: { lang: 'ko' | 'en' }) {
             </>
           ) : (
             <>
-              <div className="flex items-center gap-2.5 border-b bg-emerald-50/60 px-5 py-3">
-                <span className="rounded bg-emerald-500 px-2.5 py-0.5 text-xs font-bold text-white">Soft Parse</span>
-                <span className="text-sm font-bold text-foreground">{t.softDesc}</span>
+              <div className="flex items-center gap-2.5 border-b bg-green/5 px-5 py-3">
+                <span className="rounded bg-green px-2.5 py-0.5 text-xs font-bold text-paper">Soft Parse</span>
+                <span className="text-sm font-bold text-ink">{t.softDesc}</span>
               </div>
               <div className="px-5 py-4 space-y-3">
-                <div className="flex items-center gap-3 rounded-lg border border-emerald-200 bg-emerald-50/60 px-4 py-3">
-                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-500 font-mono text-[11px] font-bold text-white">✓</span>
-                  <span className="text-sm text-muted-foreground">{lang === 'ko' ? 'Library Cache 검색 → 커서 발견 → 재사용' : 'Library Cache search → cursor found → reuse'}</span>
+                <div className="flex items-center gap-3 rounded-card border border-green/30 bg-green/5 px-4 py-3">
+                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-green font-mono text-[11px] font-bold text-paper">✓</span>
+                  <span className="text-sm text-ink-2">{lang === 'ko' ? 'Library Cache 검색 → 커서 발견 → 재사용' : 'Library Cache search → cursor found → reuse'}</span>
                 </div>
-                <div className="rounded-lg bg-muted/40 px-4 py-3 text-xs text-muted-foreground leading-relaxed">
+                <div className="rounded-card bg-rail px-4 py-3 text-xs text-ink-2 leading-relaxed">
                   💡 {t.softNote}
                 </div>
               </div>
@@ -377,7 +377,7 @@ function SharedPrivateSection({ lang }: { lang: 'ko' | 'en' }) {
   return (
     <div className="space-y-4">
       {/* SVG Diagram */}
-      <div className="overflow-x-auto rounded-xl border bg-card">
+      <div className="overflow-x-auto rounded-panel border bg-paper">
         <svg
           viewBox={`0 0 ${SP_W} ${SP_H}`}
           width="100%"
@@ -385,45 +385,45 @@ function SharedPrivateSection({ lang }: { lang: 'ko' | 'en' }) {
         >
           <defs>
             <marker id="spArrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-              <path d="M0,0 L0,6 L8,3 z" fill="#7c3aed" />
+              <path d="M0,0 L0,6 L8,3 z" fill="var(--color-purple)" />
             </marker>
           </defs>
 
           {/* ── SGA box ── */}
           <rect x={SGA_X} y={SGA_Y} width={SGA_W} height={SGA_H} rx={10}
-            fill="#f5f3ff" stroke="#7c3aed" strokeWidth={1.5} strokeDasharray="6 3" />
+            fill="var(--color-paper-sunk)" stroke="var(--color-purple)" strokeWidth={1.5} strokeDasharray="6 3" />
           <text x={SGA_X + 12} y={SGA_Y + 22} fontFamily="monospace" fontSize={9}
-            fontWeight="bold" fill="#7c3aed" letterSpacing={1}>SGA — Library Cache</text>
+            fontWeight="bold" fill="var(--color-purple)" letterSpacing={1}>SGA — Library Cache</text>
 
           {/* ── Shared SQL Area box ── */}
           <rect x={SHARED_X} y={SHARED_Y} width={SHARED_W} height={SHARED_H} rx={7}
-            fill="#ede9fe" stroke="#7c3aed" strokeWidth={1.5} />
+            fill="var(--color-rail)" stroke="var(--color-purple)" strokeWidth={1.5} />
           <text x={SHARED_X + 10} y={SHARED_Y + 18} fontFamily="monospace" fontSize={8.5}
-            fontWeight="bold" fill="#5b21b6">{t.sharedAreaLabel}</text>
+            fontWeight="bold" fill="var(--color-purple)">{t.sharedAreaLabel}</text>
           <text x={SHARED_X + 10} y={SHARED_Y + 30} fontFamily="monospace" fontSize={7.5}
-            fill="#7c3aed" opacity={0.7}>{isKo ? '(모든 세션 공유 · 읽기 전용)' : '(shared · read-only)'}</text>
+            fill="var(--color-purple)" opacity={0.7}>{isKo ? '(모든 세션 공유 · 읽기 전용)' : '(shared · read-only)'}</text>
 
           {/* Parse tree block */}
           <rect x={BLOCK_X} y={BLOCK_Y1} width={BLOCK_W} height={BLOCK_H} rx={4}
-            fill="#ddd6fe" stroke="#a78bfa" strokeWidth={1} />
+            fill="var(--color-rail)" stroke="var(--color-purple)" strokeWidth={1} />
           <text x={BLOCK_X + BLOCK_W / 2} y={BLOCK_Y1 + 17} fontFamily="monospace" fontSize={8}
-            fontWeight="bold" fill="#4c1d95" textAnchor="middle">
+            fontWeight="bold" fill="var(--color-purple)" textAnchor="middle">
             {isKo ? 'Parse Tree (파싱 트리)' : 'Parse Tree'}
           </text>
 
           {/* Execution plan block */}
           <rect x={BLOCK_X} y={BLOCK_Y2} width={BLOCK_W} height={BLOCK_H} rx={4}
-            fill="#ddd6fe" stroke="#a78bfa" strokeWidth={1} />
+            fill="var(--color-rail)" stroke="var(--color-purple)" strokeWidth={1} />
           <text x={BLOCK_X + BLOCK_W / 2} y={BLOCK_Y2 + 17} fontFamily="monospace" fontSize={8}
-            fontWeight="bold" fill="#4c1d95" textAnchor="middle">
+            fontWeight="bold" fill="var(--color-purple)" textAnchor="middle">
             {isKo ? 'Execution Plan (실행 계획)' : 'Execution Plan'}
           </text>
 
           {/* Optimization metadata block */}
           <rect x={BLOCK_X} y={BLOCK_Y3} width={BLOCK_W} height={BLOCK_H} rx={4}
-            fill="#ddd6fe" stroke="#a78bfa" strokeWidth={1} />
+            fill="var(--color-rail)" stroke="var(--color-purple)" strokeWidth={1} />
           <text x={BLOCK_X + BLOCK_W / 2} y={BLOCK_Y3 + 17} fontFamily="monospace" fontSize={8}
-            fontWeight="bold" fill="#4c1d95" textAnchor="middle">
+            fontWeight="bold" fill="var(--color-purple)" textAnchor="middle">
             {isKo ? 'Optimization Info' : 'Optimization Info'}
           </text>
 
@@ -449,17 +449,17 @@ function SharedPrivateSection({ lang }: { lang: 'ko' | 'en' }) {
               <g key={sess.label}>
                 {/* PGA outer box */}
                 <rect x={PGA_X} y={sess.y} width={PGA_W} height={PGA_H} rx={8}
-                  fill="#eff6ff" stroke="#93c5fd" strokeWidth={1.5} strokeDasharray="5 3" />
+                  fill="var(--color-rail)" stroke="var(--color-blue)" strokeWidth={1.5} strokeDasharray="5 3" />
                 <text x={PGA_X + 12} y={sess.y + 18} fontFamily="monospace" fontSize={8.5}
-                  fontWeight="bold" fill="#1d4ed8">PGA — {sess.label}</text>
+                  fontWeight="bold" fill="var(--color-blue)">PGA — {sess.label}</text>
 
                 {/* Private SQL Area inner box */}
                 <rect x={PRIV_X} y={privY} width={PRIV_W} height={privH} rx={5}
-                  fill="#dbeafe" stroke="#60a5fa" strokeWidth={1} />
+                  fill="var(--color-rail)" stroke="var(--color-blue)" strokeWidth={1} />
                 <text x={PRIV_X + PRIV_W / 2} y={privY + 13} fontFamily="monospace" fontSize={7.5}
-                  fontWeight="bold" fill="#1e40af" textAnchor="middle">{t.privateAreaLabel}</text>
+                  fontWeight="bold" fill="var(--color-blue)" textAnchor="middle">{t.privateAreaLabel}</text>
                 <text x={PRIV_X + PRIV_W / 2} y={privY + 25} fontFamily="monospace" fontSize={7}
-                  fill="#3b82f6" textAnchor="middle">
+                  fill="var(--color-blue)" textAnchor="middle">
                   {isKo ? 'bind vars · exec state' : 'bind vars · exec state'}
                 </text>
 
@@ -467,7 +467,7 @@ function SharedPrivateSection({ lang }: { lang: 'ko' | 'en' }) {
                 <path
                   d={`M ${arrowStartX},${arrowStartY} C ${cp1x},${cp1y} ${cp2x},${cp2y} ${arrowEndX},${arrowEndY}`}
                   fill="none"
-                  stroke="#7c3aed"
+                  stroke="var(--color-purple)"
                   strokeWidth={1.5}
                   strokeDasharray="4 3"
                   markerEnd="url(#spArrow)"
@@ -479,7 +479,7 @@ function SharedPrivateSection({ lang }: { lang: 'ko' | 'en' }) {
                   y={(arrowStartY + arrowEndY) / 2 - 5}
                   fontFamily="monospace"
                   fontSize={7}
-                  fill="#7c3aed"
+                  fill="var(--color-purple)"
                   textAnchor="middle"
                 >
                   {isKo ? '포인터' : 'pointer'}
@@ -490,32 +490,32 @@ function SharedPrivateSection({ lang }: { lang: 'ko' | 'en' }) {
 
           {/* ── Legend ── */}
           <rect x={SGA_X} y={376} width={14} height={8} rx={2}
-            fill="#ddd6fe" stroke="#a78bfa" strokeWidth={1} />
+            fill="var(--color-rail)" stroke="var(--color-purple)" strokeWidth={1} />
           <text x={SGA_X + 18} y={384} fontFamily="monospace" fontSize={8}
-            fill="#6b7280">{isKo ? 'Shared SQL Area (1개)' : 'Shared SQL Area (×1)'}</text>
+            fill="var(--color-ink-2)">{isKo ? 'Shared SQL Area (1개)' : 'Shared SQL Area (×1)'}</text>
 
           <rect x={PGA_X} y={376} width={14} height={8} rx={2}
-            fill="#dbeafe" stroke="#60a5fa" strokeWidth={1} />
+            fill="var(--color-rail)" stroke="var(--color-blue)" strokeWidth={1} />
           <text x={PGA_X + 18} y={384} fontFamily="monospace" fontSize={8}
-            fill="#6b7280">{isKo ? 'Private SQL Area (세션마다 1개)' : 'Private SQL Area (×1 per session)'}</text>
+            fill="var(--color-ink-2)">{isKo ? 'Private SQL Area (세션마다 1개)' : 'Private SQL Area (×1 per session)'}</text>
         </svg>
       </div>
 
       {/* Description cards */}
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <div className="rounded-lg border-2 border-violet-200 bg-violet-50/50 px-4 py-3">
-          <div className="mb-1 font-mono text-[10px] font-bold uppercase tracking-widest text-violet-500">SGA · Library Cache</div>
-          <div className="mb-1 text-sm font-bold text-violet-800">{t.sharedAreaLabel}</div>
-          <p className="text-xs leading-relaxed text-muted-foreground">{t.sharedAreaDesc}</p>
+        <div className="rounded-card border-2 border-purple/30 bg-purple/5 px-4 py-3">
+          <div className="mb-1 font-mono text-[10px] font-bold uppercase tracking-widest text-purple">SGA · Library Cache</div>
+          <div className="mb-1 text-sm font-bold text-purple">{t.sharedAreaLabel}</div>
+          <p className="text-xs leading-relaxed text-ink-2">{t.sharedAreaDesc}</p>
         </div>
-        <div className="rounded-lg border-2 border-blue-200 bg-blue-50/50 px-4 py-3">
-          <div className="mb-1 font-mono text-[10px] font-bold uppercase tracking-widest text-blue-400">PGA · per session</div>
-          <div className="mb-1 text-sm font-bold text-blue-700">{t.privateAreaLabel}</div>
-          <p className="text-xs leading-relaxed text-muted-foreground">{t.privateAreaDesc}</p>
+        <div className="rounded-card border-2 border-blue/30 bg-blue/5 px-4 py-3">
+          <div className="mb-1 font-mono text-[10px] font-bold uppercase tracking-widest text-blue">PGA · per session</div>
+          <div className="mb-1 text-sm font-bold text-blue">{t.privateAreaLabel}</div>
+          <p className="text-xs leading-relaxed text-ink-2">{t.privateAreaDesc}</p>
         </div>
       </div>
 
-      <div className="rounded-lg bg-violet-50/40 px-4 py-2.5 text-xs leading-relaxed text-muted-foreground border border-violet-100">
+      <div className="rounded-card bg-purple/5 px-4 py-2.5 text-xs leading-relaxed text-ink-2 border border-purple/30">
         💡 {t.sharedPrivateNote}
       </div>
     </div>
@@ -541,10 +541,10 @@ function ChildCursorSection({ lang }: { lang: 'ko' | 'en' }) {
   const CHILD_H = 48
   const CHILD_W = 140
   const children = [
-    { x: 24,  label: 'Child #0', color: '#6d28d9', bg: '#ede9fe', border: '#a78bfa', desc: isKo ? '기본 실행 계획' : 'default plan' },
-    { x: 200, label: 'Child #1', color: '#1d4ed8', bg: '#dbeafe', border: '#60a5fa', desc: isKo ? '다른 스키마' : 'diff schema' },
-    { x: 376, label: 'Child #2', color: '#065f46', bg: '#d1fae5', border: '#34d399', desc: isKo ? '다른 파라미터' : 'diff params' },
-    { x: 490, label: 'Child #N', color: '#9f1239', bg: '#ffe4e6', border: '#fca5a5', desc: isKo ? '…' : '…' },
+    { x: 24,  label: 'Child #0', color: 'var(--color-purple)', bg: 'var(--color-rail)', border: 'var(--color-purple)', desc: isKo ? '기본 실행 계획' : 'default plan' },
+    { x: 200, label: 'Child #1', color: 'var(--color-blue)', bg: 'var(--color-rail)', border: 'var(--color-blue)', desc: isKo ? '다른 스키마' : 'diff schema' },
+    { x: 376, label: 'Child #2', color: 'var(--color-green)', bg: 'var(--color-line)', border: 'var(--color-green)', desc: isKo ? '다른 파라미터' : 'diff params' },
+    { x: 490, label: 'Child #N', color: 'var(--color-red)', bg: 'var(--color-rail)', border: 'var(--color-red)', desc: isKo ? '…' : '…' },
   ]
 
   return (
@@ -552,26 +552,26 @@ function ChildCursorSection({ lang }: { lang: 'ko' | 'en' }) {
       <Prose>{t.childCursorDesc}</Prose>
 
       {/* SVG */}
-      <div className="overflow-x-auto rounded-xl border bg-card">
+      <div className="overflow-x-auto rounded-panel border bg-paper">
         <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ maxWidth: W, display: 'block', margin: '0 auto' }}>
           <defs>
             <marker id="childArrow" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto">
-              <path d="M0,0 L0,6 L7,3 z" fill="#7c3aed" opacity={0.7} />
+              <path d="M0,0 L0,6 L7,3 z" fill="var(--color-purple)" opacity={0.7} />
             </marker>
           </defs>
 
           {/* SQL text hash label */}
-          <text x={PAR_X} y={PAR_Y - 10} fontFamily="monospace" fontSize={8} fill="#9ca3af">
+          <text x={PAR_X} y={PAR_Y - 10} fontFamily="monospace" fontSize={8} fill="var(--color-ink-3)">
             hash({isKo ? 'SQL 텍스트' : 'SQL text'})
           </text>
 
           {/* Parent cursor box */}
           <rect x={PAR_X} y={PAR_Y} width={PAR_W} height={PAR_H} rx={7}
-            fill="#ede9fe" stroke="#7c3aed" strokeWidth={2} />
+            fill="var(--color-rail)" stroke="var(--color-purple)" strokeWidth={2} />
           <text x={PAR_X + PAR_W / 2} y={PAR_Y + 18} fontFamily="monospace" fontSize={9}
-            fontWeight="bold" fill="#4c1d95" textAnchor="middle">Parent Cursor</text>
+            fontWeight="bold" fill="var(--color-purple)" textAnchor="middle">Parent Cursor</text>
           <text x={PAR_X + PAR_W / 2} y={PAR_Y + 32} fontFamily="monospace" fontSize={7.5}
-            fill="#7c3aed" textAnchor="middle">
+            fill="var(--color-purple)" textAnchor="middle">
             {isKo ? '"SELECT * FROM emp WHERE …"' : '"SELECT * FROM emp WHERE …"'}
           </text>
 
@@ -584,7 +584,7 @@ function ChildCursorSection({ lang }: { lang: 'ko' | 'en' }) {
                 key={c.label}
                 x1={parMidX} y1={PAR_Y + PAR_H}
                 x2={childMidX} y2={CHILD_Y}
-                stroke="#7c3aed" strokeWidth={1.2} strokeDasharray="4 3" opacity={0.6}
+                stroke="var(--color-purple)" strokeWidth={1.2} strokeDasharray="4 3" opacity={0.6}
                 markerEnd="url(#childArrow)"
               />
             )
@@ -592,7 +592,7 @@ function ChildCursorSection({ lang }: { lang: 'ko' | 'en' }) {
 
           {/* "Child Cursors" label */}
           <text x={PAR_X + PAR_W + 16} y={CHILD_Y + CHILD_H / 2 + 4} fontFamily="monospace"
-            fontSize={8} fill="#9ca3af" transform={`rotate(-90, ${PAR_X + PAR_W + 16}, ${CHILD_Y + CHILD_H / 2 + 4})`}>
+            fontSize={8} fill="var(--color-ink-3)" transform={`rotate(-90, ${PAR_X + PAR_W + 16}, ${CHILD_Y + CHILD_H / 2 + 4})`}>
           </text>
 
           {/* Child cursor boxes */}
@@ -609,7 +609,7 @@ function ChildCursorSection({ lang }: { lang: 'ko' | 'en' }) {
 
           {/* VERSION_COUNT label */}
           <text x={W - 12} y={CHILD_Y + CHILD_H / 2 + 4} fontFamily="monospace" fontSize={7.5}
-            fill="#6b7280" textAnchor="end">
+            fill="var(--color-ink-2)" textAnchor="end">
             {isKo ? '→ VERSION_COUNT (V$SQL)' : '→ VERSION_COUNT (V$SQL)'}
           </text>
         </svg>
@@ -618,11 +618,11 @@ function ChildCursorSection({ lang }: { lang: 'ko' | 'en' }) {
       {/* Item list */}
       <div className="space-y-2">
         {t.childCursorItems.map((item) => (
-          <div key={item.label} className="flex items-start gap-3 rounded-lg border bg-card px-4 py-2.5">
-            <code className="mt-0.5 shrink-0 rounded bg-violet-100 px-2 py-0.5 font-mono text-[10px] font-bold text-violet-700">
+          <div key={item.label} className="flex items-start gap-3 rounded-card border bg-paper px-4 py-2.5">
+            <code className="mt-0.5 shrink-0 rounded bg-purple/10 px-2 py-0.5 font-mono text-[10px] font-bold text-purple">
               {item.label}
             </code>
-            <p className="text-xs leading-relaxed text-muted-foreground">{item.desc}</p>
+            <p className="text-xs leading-relaxed text-ink-2">{item.desc}</p>
           </div>
         ))}
       </div>
@@ -739,24 +739,24 @@ export function SharedPoolSection() {
 
       {/* ── Parameters ── */}
       <SectionTitle>{t.paramsTitle}</SectionTitle>
-      <div className="mb-6 overflow-hidden rounded-xl border bg-card">
+      <div className="mb-6 overflow-hidden rounded-panel border bg-paper">
         {t.params.map((p, i) => (
           <div key={p.name} className={cn('flex items-start gap-4 px-5 py-3', i > 0 && 'border-t')}>
-            <code className="mt-0.5 shrink-0 rounded bg-violet-100 px-2 py-0.5 font-mono text-[11px] font-bold text-violet-700">
+            <code className="mt-0.5 shrink-0 rounded bg-purple/10 px-2 py-0.5 font-mono text-[11px] font-bold text-purple">
               {p.name}
             </code>
-            <p className="text-xs leading-relaxed text-muted-foreground">{p.desc}</p>
+            <p className="text-xs leading-relaxed text-ink-2">{p.desc}</p>
           </div>
         ))}
       </div>
 
       {/* ── Summary ── */}
-      <div className="rounded-2xl border bg-gradient-to-br from-slate-50 to-violet-50/30 px-6 py-5">
+      <div className="rounded-panel border border-line border-l-[3px] border-l-purple bg-paper-sunk px-6 py-5">
         <div className="mb-3"><SubTitle>{t.summaryTitle}</SubTitle></div>
         <ul className="space-y-1.5">
           {t.summaryItems.map((item, i) => (
-            <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
-              <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-violet-400" />
+            <li key={i} className="flex items-start gap-2 text-sm text-ink-2">
+              <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-purple" />
               {item}
             </li>
           ))}

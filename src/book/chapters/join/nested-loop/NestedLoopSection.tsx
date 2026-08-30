@@ -300,16 +300,16 @@ function NLSimulation({ lang }: { lang: 'ko' | 'en' }) {
   const allDone = outerIdx === OUTER_ROWS.length - 1 && innerDone
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-slate-50 p-5">
-      <p className="mb-1 font-mono text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+    <div className="rounded-panel border border-line bg-paper-sunk p-5">
+      <p className="mb-1 font-mono text-[11px] font-bold uppercase tracking-wider text-ink-2">
         {t.simTitle}
       </p>
-      <p className="mb-4 text-[12px] leading-relaxed text-muted-foreground">{t.simDesc}</p>
+      <p className="mb-4 text-[12px] leading-relaxed text-ink-2">{t.simDesc}</p>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-[1fr_auto_1fr_auto_1fr]">
         {/* OUTER */}
         <div>
-          <p className="mb-2 font-mono text-[10px] font-bold text-blue-600">{t.labelOuter}</p>
+          <p className="mb-2 font-mono text-[10px] font-bold text-blue">{t.labelOuter}</p>
           <div className="flex flex-col gap-1.5">
             {OUTER_ROWS.map((row, i) => {
               const isSelected = outerIdx === i
@@ -319,37 +319,37 @@ function NLSimulation({ lang }: { lang: 'ko' | 'en' }) {
                   key={row.dept_id}
                   onClick={() => selectOuter(i)}
                   className={cn(
-                    'rounded-lg border px-3 py-2 text-left font-mono text-xs transition-all',
+                    'rounded-card border px-3 py-2 text-left font-mono text-xs transition-all',
                     isSelected
-                      ? 'border-blue-400 bg-blue-100 font-bold text-blue-800 shadow-sm'
+                      ? 'border-blue/50 bg-blue/10 font-bold text-blue '
                       : wasSelected
-                        ? 'border-slate-300 bg-slate-100 text-slate-400 line-through'
-                        : 'border-border bg-card text-muted-foreground hover:bg-muted/40',
+                        ? 'border-line-2 bg-paper-sunk text-ink-2 line-through'
+                        : 'border-line bg-paper text-ink-2 hover:bg-rail',
                   )}
                 >
-                  <span className="text-[10px] text-muted-foreground mr-1">dept_id=</span>
+                  <span className="text-[10px] text-ink-2 mr-1">dept_id=</span>
                   <span className="font-bold">{row.dept_id}</span>
                   <span className="ml-1 text-[10px] opacity-70">{row.dept_name}</span>
                   {isSelected && innerStep === 0 && (
-                    <span className="ml-2 text-[9px] text-blue-500">{t.labelSelectOuter}</span>
+                    <span className="ml-2 text-[9px] text-blue">{t.labelSelectOuter}</span>
                   )}
                 </button>
               )
             })}
           </div>
           {prevOuterIdx !== null && outerIdx !== null && (
-            <p className="mt-2 font-mono text-[9px] text-amber-600">{t.noteRestart}</p>
+            <p className="mt-2 font-mono text-[9px] text-amber">{t.noteRestart}</p>
           )}
         </div>
 
         {/* Arrow */}
         <div className="hidden sm:flex items-center justify-center pt-6">
-          <span className="text-xl text-muted-foreground/30">→</span>
+          <span className="text-xl text-ink-2/30">→</span>
         </div>
 
         {/* INNER */}
         <div>
-          <p className="mb-2 font-mono text-[10px] font-bold text-orange-600">{t.labelInner}</p>
+          <p className="mb-2 font-mono text-[10px] font-bold text-amber">{t.labelInner}</p>
           <div className="flex flex-col gap-1.5">
             {INNER_ROWS.map((row, i) => {
               const isCurrent = innerStep === i + 1
@@ -360,30 +360,30 @@ function NLSimulation({ lang }: { lang: 'ko' | 'en' }) {
                   key={row.emp_id}
                   animate={
                     isCurrent
-                      ? { backgroundColor: '#fed7aa', scale: 1.02 }
+                      ? { backgroundColor: 'var(--color-amber)', scale: 1.02 }
                       : matched
-                        ? { backgroundColor: '#d1fae5', scale: 1 }
+                        ? { backgroundColor: 'var(--color-line)', scale: 1 }
                         : isPassed
-                          ? { backgroundColor: '#f8fafc', scale: 1 }
-                          : { backgroundColor: '#ffffff', scale: 1 }
+                          ? { backgroundColor: 'var(--color-paper-sunk)', scale: 1 }
+                          : { backgroundColor: 'var(--color-paper)', scale: 1 }
                   }
                   transition={{ duration: 0.18 }}
                   className={cn(
-                    'rounded-lg border px-3 py-2 font-mono text-xs',
+                    'rounded-card border px-3 py-2 font-mono text-xs',
                     isCurrent
-                      ? 'border-orange-400 font-bold text-orange-800'
+                      ? 'border-amber/50 font-bold text-amber'
                       : matched
-                        ? 'border-emerald-300 text-emerald-700'
+                        ? 'border-green/50 text-green'
                         : isPassed
-                          ? 'border-slate-100 text-slate-400'
-                          : 'border-border text-muted-foreground',
+                          ? 'border-line text-ink-2'
+                          : 'border-line text-ink-2',
                   )}
                 >
                   <span className="text-[10px] opacity-60 mr-1">dept_id=</span>
                   <span className="font-bold">{row.dept_id}</span>
                   <span className="ml-1 text-[10px]">{row.first_name}</span>
                   {isCurrent && (
-                    <span className={cn('ml-1 text-[9px] font-bold', isMatch ? 'text-emerald-600' : 'text-rose-500')}>
+                    <span className={cn('ml-1 text-[9px] font-bold', isMatch ? 'text-green' : 'text-red')}>
                       {isMatch ? '✓' : '✗'}
                     </span>
                   )}
@@ -392,7 +392,7 @@ function NLSimulation({ lang }: { lang: 'ko' | 'en' }) {
             })}
           </div>
           {outerIdx !== null && (
-            <p className="mt-2 font-mono text-[9px] text-muted-foreground">
+            <p className="mt-2 font-mono text-[9px] text-ink-2">
               {innerDone ? t.statusDone : t.labelInnerLoop(innerStep, INNER_ROWS.length)}
             </p>
           )}
@@ -400,12 +400,12 @@ function NLSimulation({ lang }: { lang: 'ko' | 'en' }) {
 
         {/* Arrow */}
         <div className="hidden sm:flex items-center justify-center pt-6">
-          <span className="text-xl text-muted-foreground/30">→</span>
+          <span className="text-xl text-ink-2/30">→</span>
         </div>
 
         {/* RESULT */}
         <div>
-          <p className="mb-2 font-mono text-[10px] font-bold text-emerald-600">{t.labelResult}</p>
+          <p className="mb-2 font-mono text-[10px] font-bold text-green">{t.labelResult}</p>
           <div className="flex flex-col gap-1.5 min-h-[40px]">
             <AnimatePresence initial={false}>
               {results.map((r, i) => (
@@ -415,7 +415,7 @@ function NLSimulation({ lang }: { lang: 'ko' | 'en' }) {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.2 }}
-                  className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 font-mono text-[10px] text-emerald-800"
+                  className="rounded-card border border-green/30 bg-green/5 px-3 py-2 font-mono text-[10px] text-green"
                 >
                   <span className="font-bold">{r.outerDeptId}</span>
                   <span className="mx-1 opacity-50">·</span>
@@ -426,7 +426,7 @@ function NLSimulation({ lang }: { lang: 'ko' | 'en' }) {
               ))}
             </AnimatePresence>
             {results.length === 0 && (
-              <p className="font-mono text-[10px] text-muted-foreground/40 italic">
+              <p className="font-mono text-[10px] text-ink-2/40 italic">
                 {outerIdx === null ? t.labelSelectOuter : '—'}
               </p>
             )}
@@ -440,10 +440,10 @@ function NLSimulation({ lang }: { lang: 'ko' | 'en' }) {
           onClick={togglePlay}
           disabled={allDone && !playing}
           className={cn(
-            'rounded-lg border px-4 py-1.5 font-mono text-xs font-bold transition-all',
+            'rounded-card border px-4 py-1.5 font-mono text-xs font-bold transition-all',
             playing
-              ? 'border-amber-300 bg-amber-50 text-amber-700 hover:bg-amber-100'
-              : 'border-blue-300 bg-blue-50 text-blue-700 hover:bg-blue-100 disabled:opacity-30',
+              ? 'border-amber/50 bg-amber/5 text-amber hover:bg-amber/10'
+              : 'border-blue/50 bg-blue/5 text-blue hover:bg-blue/10 disabled:opacity-30',
           )}
         >
           {playing ? t.btnPause : t.btnPlay}
@@ -451,25 +451,25 @@ function NLSimulation({ lang }: { lang: 'ko' | 'en' }) {
         <button
           onClick={stepBackward}
           disabled={playing || outerIdx === null || innerStep === 0}
-          className="rounded-lg border border-slate-200 px-3 py-1.5 font-mono text-xs text-muted-foreground hover:bg-muted disabled:opacity-30"
+          className="rounded-card border border-line px-3 py-1.5 font-mono text-xs text-ink-2 hover:bg-rail disabled:opacity-30"
         >
           {t.btnPrev}
         </button>
         <button
           onClick={stepForward}
           disabled={playing || outerIdx === null || innerDone}
-          className="rounded-lg border border-slate-200 px-3 py-1.5 font-mono text-xs text-muted-foreground hover:bg-muted disabled:opacity-30"
+          className="rounded-card border border-line px-3 py-1.5 font-mono text-xs text-ink-2 hover:bg-rail disabled:opacity-30"
         >
           {t.btnNext}
         </button>
         <button
           onClick={reset}
-          className="rounded-lg border border-slate-200 px-3 py-1.5 font-mono text-xs text-muted-foreground hover:bg-muted"
+          className="rounded-card border border-line px-3 py-1.5 font-mono text-xs text-ink-2 hover:bg-rail"
         >
           {t.btnReset}
         </button>
         {currentInnerRow && outerRow && (
-          <span className={cn('ml-auto self-center font-mono text-[11px] font-bold', isMatch ? 'text-emerald-600' : 'text-rose-500')}>
+          <span className={cn('ml-auto self-center font-mono text-[11px] font-bold', isMatch ? 'text-green' : 'text-red')}>
             {isMatch ? t.statusMatch : t.statusNoMatch}
           </span>
         )}
@@ -486,7 +486,7 @@ export function JoinNestedLoopSection() {
   return (
     <PageContainer>
       <ChapterTitle
-        icon={<IconArrowMerge size={36} stroke={1.5} className="text-blue-500" />}
+        icon={<IconArrowMerge size={36} stroke={1.5} className="text-blue" />}
         title={t.title}
         subtitle={t.subtitle}
       />

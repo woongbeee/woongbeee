@@ -321,7 +321,7 @@ export function CompareSection() {
   return (
     <PageContainer>
       <ChapterTitle
-        icon={<IconArrowsShuffle size={36} stroke={1.5} className="text-orange-500" />}
+        icon={<IconArrowsShuffle size={36} stroke={1.5} className="text-amber" />}
         title={t.title}
         subtitle={t.subtitle}
       />
@@ -330,7 +330,7 @@ export function CompareSection() {
       <Prose>{t.purposeDesc}</Prose>
       <ul className="mt-2 mb-4 space-y-1.5 pl-4">
         {t.purposeItems.map((item, i) => (
-          <li key={i} className="text-sm leading-relaxed text-foreground/80 before:mr-2 before:content-['•']">
+          <li key={i} className="text-sm leading-relaxed text-ink/80 before:mr-2 before:content-['•']">
             {item}
           </li>
         ))}

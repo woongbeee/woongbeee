@@ -1,6 +1,7 @@
 # External Integrations
 
 **Analysis Date:** 2026-08-29
+**Updated:** 2026-08-30 — CDN font list
 
 ## Summary
 
@@ -12,8 +13,8 @@ This is a **fully client-side, self-contained SPA** with no backend. It has **no
 - None. No REST/GraphQL clients, no SDKs that make network calls. Grep for `fetch(` / `axios` / `XMLHttpRequest` / `WebSocket` in `src/` returns nothing.
 
 **Fonts (CDN):**
-- Google Fonts - `index.html` loads `https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700;800` via `<link rel="stylesheet">`, with `preconnect` to `fonts.googleapis.com` and `fonts.gstatic.com`. This is the active Korean UI font (`--font-sans-ko` in `src/index.css`).
-- `@fontsource-variable/geist` (npm) is installed but never imported — no self-hosted font is actually bundled.
+- Google Fonts - `index.html` loads a `<link rel="stylesheet">` for **Noto Sans KR** (KO, all roles), **Inter** (EN UI/headings), **Newsreader** (EN long-form body), and **JetBrains Mono** (code/data/badges), with `preconnect` to `fonts.googleapis.com` / `fonts.gstatic.com`. Stacks are defined only in `src/styles/tokens.css` (`--font-ui-ko|-en`, `--font-read-ko|-en`, `--font-mono`); `:root:lang(en)` swaps `--font-sans-active` / `--font-read-active` to the EN faces.
+- `@fontsource-variable/geist` (npm) is installed but never imported — no self-hosted font is bundled.
 
 **Simulated (not real) Oracle engine:**
 - `src/lib/optimizer/` - Pure TS reimplementation of Oracle CBO: `parser.ts` (SQL SELECT parsing), `stats.ts` (`TABLE_STATS` — 12 hardcoded table statistics), `estimator.ts` (selectivity + cost), `planGenerator.ts` (Query Transformer → Estimator → Plan Generator). Entry: `src/lib/optimizer/index.ts` `optimize(sql)`.
@@ -36,7 +37,7 @@ This is a **fully client-side, self-contained SPA** with no backend. It has **no
 - No HTTP or persistent cache. In-memory only:
   - `internalsStore.ts` `cachedQueries` (max 8, FIFO) simulates the Library Cache
   - `largeDataGenerator.ts` module-level cache of generated datasets
-- No `localStorage` / `sessionStorage` / `indexedDB` usage — language selection and all simulator state reset on page reload.
+- `localStorage` is used for exactly one key: `oracle-book-theme` (light/dark choice), read/written in `src/store/simulationStore.ts` (try/catch guarded). Language selection, section position, and all simulator state still reset on page reload. No `sessionStorage` / `indexedDB`.
 
 ## Authentication & Identity
 

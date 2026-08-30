@@ -144,13 +144,13 @@ const T = {
 // ── Process Architecture Diagram ──────────────────────────────────────────────
 
 const COLORS = {
-  blue:   { bg: '#dbeafe', border: '#93c5fd', text: '#1d4ed8' },
-  violet: { bg: '#ede9fe', border: '#c4b5fd', text: '#6d28d9' },
-  teal:   { bg: '#ccfbf1', border: '#5eead4', text: '#0f766e' },
-  amber:  { bg: '#fef3c7', border: '#fcd34d', text: '#b45309' },
-  rose:   { bg: '#ffe4e6', border: '#fda4af', text: '#be123c' },
-  emerald:{ bg: '#d1fae5', border: '#6ee7b7', text: '#065f46' },
-  slate:  { bg: '#f1f5f9', border: '#cbd5e1', text: '#475569' },
+  blue:   { bg: 'var(--color-rail)', border: 'var(--color-blue)', text: 'var(--color-blue)' },
+  violet: { bg: 'var(--color-rail)', border: 'var(--color-purple)', text: 'var(--color-purple)' },
+  teal:   { bg: 'var(--color-green)', border: 'var(--color-green)', text: 'var(--color-green)' },
+  amber:  { bg: 'var(--color-amber)', border: 'var(--color-amber)', text: 'var(--color-amber)' },
+  rose:   { bg: 'var(--color-rail)', border: 'var(--color-red)', text: 'var(--color-red)' },
+  emerald:{ bg: 'var(--color-line)', border: 'var(--color-green)', text: 'var(--color-green)' },
+  slate:  { bg: 'var(--color-rail)', border: 'var(--color-line)', text: 'var(--color-ink-2)' },
 }
 
 function ProcessArchDiagram({ isKo }: { isKo: boolean }) {
@@ -206,10 +206,10 @@ function ProcessArchDiagram({ isKo }: { isKo: boolean }) {
     <svg viewBox={`0 0 ${W} ${H}`} className="w-full">
       <defs>
         <marker id="povArrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
-          <path d="M0,0 L7,3.5 L0,7 Z" fill="#6b7280" />
+          <path d="M0,0 L7,3.5 L0,7 Z" fill="var(--color-ink-2)" />
         </marker>
         <marker id="povArrowTeal" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
-          <path d="M0,0 L7,3.5 L0,7 Z" fill="#0f766e" />
+          <path d="M0,0 L7,3.5 L0,7 Z" fill="var(--color-green)" />
         </marker>
       </defs>
 
@@ -230,22 +230,22 @@ function ProcessArchDiagram({ isKo }: { isKo: boolean }) {
       <line
         x1={CL_X + CL_W + 2} y1={MID_Y}
         x2={ORA_X - 4}        y2={MID_Y}
-        stroke="#6b7280" strokeWidth={1.5} markerEnd="url(#povArrow)" />
+        stroke="var(--color-ink-2)" strokeWidth={1.5} markerEnd="url(#povArrow)" />
       <text x={CL_X + CL_W + (ORA_X - CL_X - CL_W) / 2} y={MID_Y - 5}
-        textAnchor="middle" fill="#9ca3af" fontSize={8.5}>
+        textAnchor="middle" fill="var(--color-ink-3)" fontSize={8.5}>
         Oracle Net
       </text>
 
       {/* ── Oracle 서버 외곽 (점선) ── */}
       <rect x={ORA_X} y={TOP_Y} width={ORA_W} height={ORA_H} rx={10}
-        fill="none" stroke="#94a3b8" strokeWidth={1.2} strokeDasharray="5 3" />
-      <text x={ORA_X + 8} y={TOP_Y + 12} fill="#64748b" fontSize={8.5} fontWeight={600}>
+        fill="none" stroke="var(--color-ink-3)" strokeWidth={1.2} strokeDasharray="5 3" />
+      <text x={ORA_X + 8} y={TOP_Y + 12} fill="var(--color-ink-2)" fontSize={8.5} fontWeight={600}>
         Oracle Server
       </text>
 
       {/* ── SGA 박스 (Oracle 서버 안) ── */}
       <rect x={SGA_X} y={SGA_Y} width={SGA_W} height={SGA_H} rx={7}
-        fill="#f0fdf4" stroke="#86efac" strokeWidth={1.5} />
+        fill="var(--color-rail)" stroke="var(--color-green)" strokeWidth={1.5} />
       {/* SGA 라벨 — 박스 상단 외곽에 렌더 (z-order 상 마지막에 그림) */}
 
       {/* ── 서버 프로세스 박스 (SGA 안) ── */}
@@ -262,53 +262,53 @@ function ProcessArchDiagram({ isKo }: { isKo: boolean }) {
       <line
         x1={SP_X + SP_W + 2} y1={SP_Y + SP_H / 2}
         x2={MEM_X - 2}       y2={SP_Y + SP_H / 2}
-        stroke="#6b7280" strokeWidth={1.2} markerEnd="url(#povArrow)" />
+        stroke="var(--color-ink-2)" strokeWidth={1.2} markerEnd="url(#povArrow)" />
 
       {/* ── SGA 메모리 블록 ── */}
       <rect x={MEM_X} y={SP_Y} width={MEM_W} height={MEM_H} rx={6}
-        fill="#e0e7ff" stroke="#a5b4fc" strokeWidth={1.2} />
-      <text x={MEM_X + MEM_W / 2} y={SP_Y + 15} textAnchor="middle" fill="#3730a3" fontSize={9.5} fontWeight={700}>
+        fill="var(--color-rail)" stroke="var(--color-blue)" strokeWidth={1.2} />
+      <text x={MEM_X + MEM_W / 2} y={SP_Y + 15} textAnchor="middle" fill="var(--color-blue)" fontSize={9.5} fontWeight={700}>
         Buffer Cache
       </text>
-      <text x={MEM_X + MEM_W / 2} y={SP_Y + 28} textAnchor="middle" fill="#3730a3" fontSize={8}>
+      <text x={MEM_X + MEM_W / 2} y={SP_Y + 28} textAnchor="middle" fill="var(--color-blue)" fontSize={8}>
         Shared Pool
       </text>
-      <text x={MEM_X + MEM_W / 2} y={SP_Y + 39} textAnchor="middle" fill="#3730a3" fontSize={8}>
+      <text x={MEM_X + MEM_W / 2} y={SP_Y + 39} textAnchor="middle" fill="var(--color-blue)" fontSize={8}>
         Redo Log Buf
       </text>
 
       {/* ── SGA 라벨 (z-order 마지막 — 박스 위에 표시) ── */}
-      <rect x={SGA_X + 4} y={SGA_Y - 8} width={30} height={14} rx={3} fill="#f0fdf4" />
-      <text x={SGA_X + 8} y={SGA_Y + 2} fill="#16a34a" fontSize={9.5} fontWeight={700}>SGA</text>
+      <rect x={SGA_X + 4} y={SGA_Y - 8} width={30} height={14} rx={3} fill="var(--color-rail)" />
+      <text x={SGA_X + 8} y={SGA_Y + 2} fill="var(--color-green)" fontSize={9.5} fontWeight={700}>SGA</text>
 
       {/* ── Oracle 서버 → 디스크 화살표 ── */}
       <line
         x1={ORA_X + ORA_W + 2} y1={MID_Y}
         x2={DISK_X - 4}        y2={MID_Y}
-        stroke="#6b7280" strokeWidth={1.5} markerEnd="url(#povArrow)" />
+        stroke="var(--color-ink-2)" strokeWidth={1.5} markerEnd="url(#povArrow)" />
 
       {/* ── 디스크 박스 ── */}
       <rect x={DISK_X} y={TOP_Y} width={DISK_W} height={DISK_H} rx={8}
-        fill="#f8fafc" stroke="#cbd5e1" strokeWidth={1.5} />
-      <text x={DISK_X + DISK_W / 2} y={TOP_Y + 18} textAnchor="middle" fill="#475569" fontSize={10} fontWeight={700}>
+        fill="var(--color-paper-sunk)" stroke="var(--color-line)" strokeWidth={1.5} />
+      <text x={DISK_X + DISK_W / 2} y={TOP_Y + 18} textAnchor="middle" fill="var(--color-ink-2)" fontSize={10} fontWeight={700}>
         {isKo ? '디스크' : 'Disk'}
       </text>
-      <text x={DISK_X + DISK_W / 2} y={TOP_Y + 32} textAnchor="middle" fill="#475569" fontSize={8.5}>
+      <text x={DISK_X + DISK_W / 2} y={TOP_Y + 32} textAnchor="middle" fill="var(--color-ink-2)" fontSize={8.5}>
         Data Files
       </text>
-      <text x={DISK_X + DISK_W / 2} y={TOP_Y + 45} textAnchor="middle" fill="#475569" fontSize={8.5}>
+      <text x={DISK_X + DISK_W / 2} y={TOP_Y + 45} textAnchor="middle" fill="var(--color-ink-2)" fontSize={8.5}>
         Redo Logs
       </text>
-      <text x={DISK_X + DISK_W / 2} y={TOP_Y + 58} textAnchor="middle" fill="#475569" fontSize={8.5}>
+      <text x={DISK_X + DISK_W / 2} y={TOP_Y + 58} textAnchor="middle" fill="var(--color-ink-2)" fontSize={8.5}>
         Control File
       </text>
 
       {/* ── 구분선 ── */}
       <line x1={8} y1={BG_SECTION_Y - 8} x2={W - 8} y2={BG_SECTION_Y - 8}
-        stroke="#e2e8f0" strokeWidth={1} />
+        stroke="var(--color-rail)" strokeWidth={1} />
 
       {/* ── 백그라운드 프로세스 영역 라벨 ── */}
-      <text x={W / 2} y={BG_LABEL_Y} textAnchor="middle" fill="#374151" fontSize={9.5} fontWeight={700}>
+      <text x={W / 2} y={BG_LABEL_Y} textAnchor="middle" fill="var(--color-ink)" fontSize={9.5} fontWeight={700}>
         {isKo ? '백그라운드 프로세스 (인스턴스 시작 시 자동 기동)' : 'Background Processes (auto-started with instance)'}
       </text>
 
@@ -316,7 +316,7 @@ function ProcessArchDiagram({ isKo }: { isKo: boolean }) {
       <line
         x1={BG_ARROW_X} y1={BG_ARROW_Y1 - 2}
         x2={BG_ARROW_X} y2={BG_ARROW_Y2 + 2}
-        stroke="#0f766e" strokeWidth={1.5} markerEnd="url(#povArrowTeal)"
+        stroke="var(--color-green)" strokeWidth={1.5} markerEnd="url(#povArrowTeal)"
         strokeDasharray="4 3" />
 
       {/* ── 백그라운드 프로세스 박스들 ── */}
@@ -379,7 +379,7 @@ export function ProcessOverviewSection() {
             return (
               <div
                 key={type.labelEn}
-                className="rounded-xl border p-4"
+                className="rounded-panel border p-4"
                 style={{ background: c.bg, borderColor: c.border }}
               >
                 <div className="mb-1 text-sm font-bold" style={{ color: c.text }}>
@@ -388,7 +388,7 @@ export function ProcessOverviewSection() {
                 <div className="mb-2 text-xs font-semibold" style={{ color: c.text }}>
                   {type.label}
                 </div>
-                <p className="text-xs leading-relaxed text-gray-600">{type.desc}</p>
+                <p className="text-xs leading-relaxed text-ink">{type.desc}</p>
               </div>
             )
           })}
@@ -401,7 +401,7 @@ export function ProcessOverviewSection() {
       <section>
         <SectionTitle>{t.architectureTitle}</SectionTitle>
         <Prose>{t.architectureDesc}</Prose>
-        <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
+        <div className="mt-4 rounded-panel border border-line bg-paper-sunk p-4">
           <ProcessArchDiagram isKo={isKo} />
         </div>
       </section>
@@ -413,9 +413,9 @@ export function ProcessOverviewSection() {
         <SectionTitle>{t.connectionTitle}</SectionTitle>
         <div className="mt-3 space-y-3">
           {t.connections.map((conn) => (
-            <div key={conn.label} className="rounded-lg border border-slate-200 bg-white p-3">
-              <span className="text-sm font-semibold text-slate-700">{conn.label}</span>
-              <p className="mt-1 text-sm leading-relaxed text-slate-600">{conn.desc}</p>
+            <div key={conn.label} className="rounded-card border border-line bg-paper p-3">
+              <span className="text-sm font-semibold text-ink">{conn.label}</span>
+              <p className="mt-1 text-sm leading-relaxed text-ink">{conn.desc}</p>
             </div>
           ))}
         </div>
@@ -426,27 +426,27 @@ export function ProcessOverviewSection() {
       {/* Background processes overview table */}
       <section>
         <SectionTitle>{t.bgOverviewTitle}</SectionTitle>
-        <div className="mt-3 overflow-hidden rounded-xl border border-slate-200">
+        <div className="mt-3 overflow-hidden rounded-panel border border-line">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-slate-100">
-                <th className="w-24 px-4 py-2 text-left font-semibold text-slate-600">
+              <tr className="bg-paper-sunk">
+                <th className="w-24 px-4 py-2 text-left font-semibold text-ink">
                   {isKo ? '약자' : 'Abbr'}
                 </th>
-                <th className="w-40 px-4 py-2 text-left font-semibold text-slate-600">
+                <th className="w-40 px-4 py-2 text-left font-semibold text-ink">
                   {isKo ? '이름' : 'Name'}
                 </th>
-                <th className="px-4 py-2 text-left font-semibold text-slate-600">
+                <th className="px-4 py-2 text-left font-semibold text-ink">
                   {isKo ? '역할' : 'Role'}
                 </th>
               </tr>
             </thead>
             <tbody>
               {t.bgProcesses.map((p, i) => (
-                <tr key={p.abbr} className={i % 2 === 0 ? 'bg-white' : 'bg-slate-50'}>
-                  <td className="px-4 py-2 font-mono text-xs font-semibold text-teal-700">{p.abbr}</td>
-                  <td className="px-4 py-2 text-xs text-slate-700">{p.name}</td>
-                  <td className="px-4 py-2 text-xs text-slate-600">{p.desc}</td>
+                <tr key={p.abbr} className={i % 2 === 0 ? 'bg-paper' : 'bg-paper-sunk'}>
+                  <td className="px-4 py-2 font-mono text-xs font-semibold text-green">{p.abbr}</td>
+                  <td className="px-4 py-2 text-xs text-ink">{p.name}</td>
+                  <td className="px-4 py-2 text-xs text-ink">{p.desc}</td>
                 </tr>
               ))}
             </tbody>

@@ -27,14 +27,14 @@ const DmlMoreT = {
     why: 'Oracle 데이터베이스를 쓰는 업무의 대부분은 데이터를 "읽고 가공하는" 작업이에요. 테이블을 만들거나 권한을 설정하는 DDL·DCL(Data Control Language)은 한 번 설정하면 잘 바뀌지 않지만, 데이터를 조회하고 분석하는 SELECT 쿼리는 매일 수십·수백 번씩 실행되거든요.\n\nOracle은 단순한 SELECT * FROM 훨씬 이상의 강력한 기능을 제공해요. 여러 테이블을 JOIN으로 연결하고, GROUP BY로 통계를 내고, 윈도우 함수(Window Function)로 누적합·순위를 계산하고, PIVOT으로 행과 열을 뒤집는 등 — 복잡한 업무 요구사항을 SQL 한 문장으로 처리할 수 있어요.\n\n이 챕터를 잘 익혀두면 Oracle에 저장된 데이터를 자유자재로 다룰 수 있게 될 거예요.',
     topicsTitle: '이 챕터에서 배우는 것들',
     topics: [
-      { icon: <IconSortAscending size={20} color="#3b82f6" stroke={1.5} />, title: 'ORDER BY / GROUP BY / HAVING', desc: '데이터를 정렬하고, 그룹으로 묶어 집계하고, 조건으로 필터링하는 방법이에요', color: 'blue' },
-      { icon: <IconArrowMerge size={20} color="#10b981" stroke={1.5} />, title: 'JOIN', desc: '여러 테이블을 연결해서 필요한 데이터를 한 번에 조회하는 핵심 기법이에요', color: 'emerald' },
-      { icon: <IconMathOff size={20} color="#8b5cf6" stroke={1.5} />, title: 'NULL 다루기', desc: 'NULL의 특성과 NVL·COALESCE 등 Oracle 핵심 함수 활용법을 배워요', color: 'violet' },
-      { icon: <IconCalendarEvent size={20} color="#f97316" stroke={1.5} />, title: '날짜와 시간', desc: 'SYSDATE·TO_DATE·ADD_MONTHS 등 날짜 연산과 포맷 변환을 다뤄요', color: 'orange' },
-      { icon: <IconChartBar size={20} color="#06b6d4" stroke={1.5} />, title: '윈도우 함수', desc: '행을 그룹화하지 않고 순위·누적합·이동평균을 계산하는 분석 함수예요', color: 'teal' },
-      { icon: <IconGitMerge size={20} color="#14b8a6" stroke={1.5} />, title: 'MERGE INTO', desc: '조건에 따라 INSERT·UPDATE·DELETE를 한 번에 처리하는 병합 구문이에요', color: 'teal' },
-      { icon: <IconChartTreemap size={20} color="#f43f5e" stroke={1.5} />, title: 'ROLLUP / CUBE / GROUPING SETS', desc: '소계·중간합계·전체합계를 한 쿼리로 만드는 고급 집계 방법이에요', color: 'rose' },
-      { icon: <IconLayoutColumns size={20} color="#f59e0b" stroke={1.5} />, title: 'PIVOT / UNPIVOT', desc: '행과 열을 전환해서 리포트 형태로 데이터를 재구성해요. 엑셀의 피벗 기능과 같은 역할이에요', color: 'amber' },
+      { icon: <IconSortAscending size={20} color="var(--color-blue)" stroke={1.5} />, title: 'ORDER BY / GROUP BY / HAVING', desc: '데이터를 정렬하고, 그룹으로 묶어 집계하고, 조건으로 필터링하는 방법이에요', color: 'blue' },
+      { icon: <IconArrowMerge size={20} color="var(--color-green)" stroke={1.5} />, title: 'JOIN', desc: '여러 테이블을 연결해서 필요한 데이터를 한 번에 조회하는 핵심 기법이에요', color: 'emerald' },
+      { icon: <IconMathOff size={20} color="var(--color-purple)" stroke={1.5} />, title: 'NULL 다루기', desc: 'NULL의 특성과 NVL·COALESCE 등 Oracle 핵심 함수 활용법을 배워요', color: 'violet' },
+      { icon: <IconCalendarEvent size={20} color="var(--color-amber)" stroke={1.5} />, title: '날짜와 시간', desc: 'SYSDATE·TO_DATE·ADD_MONTHS 등 날짜 연산과 포맷 변환을 다뤄요', color: 'orange' },
+      { icon: <IconChartBar size={20} color="var(--color-blue)" stroke={1.5} />, title: '윈도우 함수', desc: '행을 그룹화하지 않고 순위·누적합·이동평균을 계산하는 분석 함수예요', color: 'teal' },
+      { icon: <IconGitMerge size={20} color="var(--color-green)" stroke={1.5} />, title: 'MERGE INTO', desc: '조건에 따라 INSERT·UPDATE·DELETE를 한 번에 처리하는 병합 구문이에요', color: 'teal' },
+      { icon: <IconChartTreemap size={20} color="var(--color-red)" stroke={1.5} />, title: 'ROLLUP / CUBE / GROUPING SETS', desc: '소계·중간합계·전체합계를 한 쿼리로 만드는 고급 집계 방법이에요', color: 'rose' },
+      { icon: <IconLayoutColumns size={20} color="var(--color-amber)" stroke={1.5} />, title: 'PIVOT / UNPIVOT', desc: '행과 열을 전환해서 리포트 형태로 데이터를 재구성해요. 엑셀의 피벗 기능과 같은 역할이에요', color: 'amber' },
     ],
   },
   en: {
@@ -44,14 +44,14 @@ const DmlMoreT = {
     why: 'Most day-to-day work with Oracle revolves around reading and transforming data. DDL and DCL are set-and-forget operations, but SELECT queries run dozens or hundreds of times every day.\n\nOracle offers far more than a basic SELECT * FROM. You can JOIN multiple tables, aggregate with GROUP BY, compute running totals and rankings with window functions, and flip rows into columns with PIVOT — all in a single SQL statement.\n\nMastering this chapter means you will be able to handle any data requirement Oracle throws at you.',
     topicsTitle: 'What you will learn in this chapter',
     topics: [
-      { icon: <IconSortAscending size={20} color="#3b82f6" stroke={1.5} />, title: 'ORDER BY / GROUP BY / HAVING', desc: 'Sort, group, aggregate, and filter grouped results', color: 'blue' },
-      { icon: <IconArrowMerge size={20} color="#10b981" stroke={1.5} />, title: 'JOIN', desc: 'Combine rows from multiple tables to retrieve exactly the data you need', color: 'emerald' },
-      { icon: <IconMathOff size={20} color="#8b5cf6" stroke={1.5} />, title: 'Handling NULL', desc: 'Understand NULL behavior and use NVL, COALESCE, and other key Oracle functions', color: 'violet' },
-      { icon: <IconCalendarEvent size={20} color="#f97316" stroke={1.5} />, title: 'Date & Time', desc: 'Work with SYSDATE, TO_DATE, ADD_MONTHS, and date arithmetic', color: 'orange' },
-      { icon: <IconChartBar size={20} color="#06b6d4" stroke={1.5} />, title: 'Window Functions', desc: 'Compute rankings, running totals, and moving averages without collapsing rows', color: 'teal' },
-      { icon: <IconGitMerge size={20} color="#14b8a6" stroke={1.5} />, title: 'MERGE INTO', desc: 'Conditionally INSERT, UPDATE, or DELETE in a single merge statement', color: 'teal' },
-      { icon: <IconChartTreemap size={20} color="#f43f5e" stroke={1.5} />, title: 'ROLLUP / CUBE / GROUPING SETS', desc: 'Generate subtotals, cross-totals, and grand totals in one query', color: 'rose' },
-      { icon: <IconLayoutColumns size={20} color="#f59e0b" stroke={1.5} />, title: 'PIVOT / UNPIVOT', desc: 'Transpose rows to columns (and back) to reshape data into report format', color: 'amber' },
+      { icon: <IconSortAscending size={20} color="var(--color-blue)" stroke={1.5} />, title: 'ORDER BY / GROUP BY / HAVING', desc: 'Sort, group, aggregate, and filter grouped results', color: 'blue' },
+      { icon: <IconArrowMerge size={20} color="var(--color-green)" stroke={1.5} />, title: 'JOIN', desc: 'Combine rows from multiple tables to retrieve exactly the data you need', color: 'emerald' },
+      { icon: <IconMathOff size={20} color="var(--color-purple)" stroke={1.5} />, title: 'Handling NULL', desc: 'Understand NULL behavior and use NVL, COALESCE, and other key Oracle functions', color: 'violet' },
+      { icon: <IconCalendarEvent size={20} color="var(--color-amber)" stroke={1.5} />, title: 'Date & Time', desc: 'Work with SYSDATE, TO_DATE, ADD_MONTHS, and date arithmetic', color: 'orange' },
+      { icon: <IconChartBar size={20} color="var(--color-blue)" stroke={1.5} />, title: 'Window Functions', desc: 'Compute rankings, running totals, and moving averages without collapsing rows', color: 'teal' },
+      { icon: <IconGitMerge size={20} color="var(--color-green)" stroke={1.5} />, title: 'MERGE INTO', desc: 'Conditionally INSERT, UPDATE, or DELETE in a single merge statement', color: 'teal' },
+      { icon: <IconChartTreemap size={20} color="var(--color-red)" stroke={1.5} />, title: 'ROLLUP / CUBE / GROUPING SETS', desc: 'Generate subtotals, cross-totals, and grand totals in one query', color: 'rose' },
+      { icon: <IconLayoutColumns size={20} color="var(--color-amber)" stroke={1.5} />, title: 'PIVOT / UNPIVOT', desc: 'Transpose rows to columns (and back) to reshape data into report format', color: 'amber' },
     ],
   },
 }
@@ -72,7 +72,7 @@ export function SqlBasicsPage({ sectionId }: Props) {
     const t = DmlMoreT[lang]
     return (
       <PageContainer>
-        <ChapterTitle icon={<IconDatabase size={36} color="#3b82f6" stroke={1.5} />} title={t.title} subtitle={t.subtitle} />
+        <ChapterTitle icon={<IconDatabase size={36} color="var(--color-blue)" stroke={1.5} />} title={t.title} subtitle={t.subtitle} />
         <SectionTitle>{t.whyTitle}</SectionTitle>
         <Prose>{t.why}</Prose>
         <InfoBox variant="usage">

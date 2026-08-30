@@ -150,23 +150,23 @@ function PivotTable() {
   const rows = computePivot()
   const pivotCols: PivotJob[] = ['IT Prog', 'Sales Rep', 'Accountant', 'Finance Mgr']
   return (
-    <div className="inline-block rounded-lg border overflow-hidden">
+    <div className="inline-block rounded-card border overflow-hidden">
       <table className="text-xs">
         <thead>
-          <tr className="border-b bg-muted/60">
-            <th className="px-3 py-2 text-left font-mono font-bold text-muted-foreground whitespace-nowrap">dept_id</th>
+          <tr className="border-b bg-rail">
+            <th className="px-3 py-2 text-left font-mono font-bold text-ink-2 whitespace-nowrap">dept_id</th>
             {pivotCols.map((c) => (
-              <th key={c} className="px-3 py-2 text-left font-mono font-bold text-muted-foreground whitespace-nowrap">{c}</th>
+              <th key={c} className="px-3 py-2 text-left font-mono font-bold text-ink-2 whitespace-nowrap">{c}</th>
             ))}
           </tr>
         </thead>
         <tbody>
           {rows.map((row, i) => (
-            <tr key={i} className={cn('border-b last:border-0', i % 2 === 0 ? 'bg-background' : 'bg-muted/20')}>
-              <td className="px-3 py-1.5 font-mono text-[11px] whitespace-nowrap font-bold text-foreground/80">{row.dept_id}</td>
+            <tr key={i} className={cn('border-b last:border-0', i % 2 === 0 ? 'bg-paper' : 'bg-rail')}>
+              <td className="px-3 py-1.5 font-mono text-[11px] whitespace-nowrap font-bold text-ink/80">{row.dept_id}</td>
               {pivotCols.map((c) => (
-                <td key={c} className="px-3 py-1.5 font-mono text-[11px] whitespace-nowrap text-foreground/80">
-                  {row[c] != null ? row[c]!.toLocaleString() : <span className="text-muted-foreground/40 italic">NULL</span>}
+                <td key={c} className="px-3 py-1.5 font-mono text-[11px] whitespace-nowrap text-ink/80">
+                  {row[c] != null ? row[c]!.toLocaleString() : <span className="text-ink-2/40 italic">NULL</span>}
                 </td>
               ))}
             </tr>
@@ -179,23 +179,23 @@ function PivotTable() {
 
 function UnpivotTable() {
   const rows = computeUnpivot()
-  const DEPT_COLOR: Record<number, string> = { 60: 'bg-ios-blue-light', 80: 'bg-ios-teal-light', 100: 'bg-muted/40' }
+  const DEPT_COLOR: Record<number, string> = { 60: 'bg-blue/10', 80: 'bg-green/10', 100: 'bg-rail' }
   return (
-    <div className="inline-block rounded-lg border overflow-hidden">
+    <div className="inline-block rounded-card border overflow-hidden">
       <table className="text-xs">
         <thead>
-          <tr className="border-b bg-muted/60">
+          <tr className="border-b bg-rail">
             {['dept_id', 'job_title', 'total_sal'].map((h) => (
-              <th key={h} className="px-3 py-2 text-left font-mono font-bold text-muted-foreground whitespace-nowrap">{h}</th>
+              <th key={h} className="px-3 py-2 text-left font-mono font-bold text-ink-2 whitespace-nowrap">{h}</th>
             ))}
           </tr>
         </thead>
         <tbody>
           {rows.map((row, i) => (
             <tr key={i} className={cn('border-b last:border-0', DEPT_COLOR[row.dept_id] ?? '')}>
-              <td className="px-3 py-1.5 font-mono text-[11px] whitespace-nowrap font-bold text-foreground/80">{row.dept_id}</td>
-              <td className="px-3 py-1.5 font-mono text-[11px] whitespace-nowrap text-foreground/80">{row.job_title}</td>
-              <td className="px-3 py-1.5 font-mono text-[11px] whitespace-nowrap text-foreground/80">{row.total_sal.toLocaleString()}</td>
+              <td className="px-3 py-1.5 font-mono text-[11px] whitespace-nowrap font-bold text-ink/80">{row.dept_id}</td>
+              <td className="px-3 py-1.5 font-mono text-[11px] whitespace-nowrap text-ink/80">{row.job_title}</td>
+              <td className="px-3 py-1.5 font-mono text-[11px] whitespace-nowrap text-ink/80">{row.total_sal.toLocaleString()}</td>
             </tr>
           ))}
         </tbody>
@@ -216,11 +216,11 @@ export function PivotSection() {
     { id: 'unpivot', label: t.tabUnpivot },
   ]
 
-  const tabActiveClass = 'border-ios-orange/40 bg-ios-orange-light text-ios-orange-dark'
+  const tabActiveClass = 'border-amber/30 bg-amber/10 text-amber'
 
   return (
     <PageContainer className="max-w-5xl">
-      <ChapterTitle icon={<IconLayoutColumns size={36} color="#14b8a6" stroke={1.5} />} title={t.chapterTitle} subtitle={t.chapterSubtitle} />
+      <ChapterTitle icon={<IconLayoutColumns size={36} color="var(--color-green)" stroke={1.5} />} title={t.chapterTitle} subtitle={t.chapterSubtitle} />
 
       {/* Tab bar */}
       <div className="mb-6 flex gap-2">
@@ -229,8 +229,8 @@ export function PivotSection() {
             key={tb.id}
             onClick={() => setTab(tb.id)}
             className={cn(
-              'rounded-md border px-4 py-1.5 font-mono text-[11px] font-bold transition-all',
-              tab === tb.id ? tabActiveClass + ' shadow-sm' : 'border-border bg-muted/30 text-muted-foreground hover:bg-muted',
+              'rounded-card border px-4 py-1.5 font-mono text-[11px] font-bold transition-all',
+              tab === tb.id ? tabActiveClass + ' ' : 'border-line bg-rail text-ink-2 hover:bg-rail',
             )}
           >
             {tb.label}
@@ -250,21 +250,21 @@ export function PivotSection() {
           <Divider />
 
           <SubTitle>{t.beforeTitle}</SubTitle>
-          <div className="mb-5 inline-block rounded-lg border overflow-hidden">
+          <div className="mb-5 inline-block rounded-card border overflow-hidden">
             <table className="text-xs">
               <thead>
-                <tr className="border-b bg-muted/60">
+                <tr className="border-b bg-rail">
                   {['dept_id', 'job_title', 'salary'].map((h) => (
-                    <th key={h} className="px-3 py-2 text-left font-mono font-bold text-muted-foreground whitespace-nowrap">{h}</th>
+                    <th key={h} className="px-3 py-2 text-left font-mono font-bold text-ink-2 whitespace-nowrap">{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {EMPS.map((e, i) => (
-                  <tr key={i} className={cn('border-b last:border-0', i % 2 === 0 ? 'bg-background' : 'bg-muted/20')}>
-                    <td className="px-3 py-1.5 font-mono text-[11px] whitespace-nowrap text-foreground/80">{e.dept_id}</td>
-                    <td className="px-3 py-1.5 font-mono text-[11px] whitespace-nowrap text-foreground/80">{e.job_title}</td>
-                    <td className="px-3 py-1.5 font-mono text-[11px] whitespace-nowrap text-foreground/80">{e.salary.toLocaleString()}</td>
+                  <tr key={i} className={cn('border-b last:border-0', i % 2 === 0 ? 'bg-paper' : 'bg-rail')}>
+                    <td className="px-3 py-1.5 font-mono text-[11px] whitespace-nowrap text-ink/80">{e.dept_id}</td>
+                    <td className="px-3 py-1.5 font-mono text-[11px] whitespace-nowrap text-ink/80">{e.job_title}</td>
+                    <td className="px-3 py-1.5 font-mono text-[11px] whitespace-nowrap text-ink/80">{e.salary.toLocaleString()}</td>
                   </tr>
                 ))}
               </tbody>
@@ -307,12 +307,12 @@ export function PivotSection() {
           <Divider />
 
           <SubTitle>{t.comparisonTitle}</SubTitle>
-          <div className="mb-5 rounded-lg border overflow-hidden">
+          <div className="mb-5 rounded-card border overflow-hidden">
             <table className="w-full text-xs">
               <thead>
-                <tr className="border-b bg-muted/60">
+                <tr className="border-b bg-rail">
                   {['', 'PIVOT', 'UNPIVOT'].map((h, i) => (
-                    <th key={i} className="px-4 py-2 text-left font-mono font-bold text-muted-foreground">{h}</th>
+                    <th key={i} className="px-4 py-2 text-left font-mono font-bold text-ink-2">{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -328,9 +328,9 @@ export function PivotSection() {
                   ['Aggregation',   'Required (SUM, AVG …)',        'Not needed (values kept as-is)'],
                   ['NULL handling', 'Missing combos become NULL',   'Excluded by default; use INCLUDE NULLS'],
                 ]).map((row, i) => (
-                  <tr key={i} className={cn('border-b last:border-0', i % 2 === 0 ? 'bg-background' : 'bg-muted/20')}>
+                  <tr key={i} className={cn('border-b last:border-0', i % 2 === 0 ? 'bg-paper' : 'bg-rail')}>
                     {row.map((cell, j) => (
-                      <td key={j} className="px-4 py-2 font-mono text-[11px] text-foreground/80">{cell}</td>
+                      <td key={j} className="px-4 py-2 font-mono text-[11px] text-ink/80">{cell}</td>
                     ))}
                   </tr>
                 ))}

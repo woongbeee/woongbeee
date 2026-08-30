@@ -159,7 +159,7 @@ export function PartitionListSection() {
   return (
     <PageContainer>
       <ChapterTitle
-        icon={<IconList size={36} stroke={1.5} className="text-amber-500" />}
+        icon={<IconList size={36} stroke={1.5} className="text-amber" />}
         title={t.title}
         subtitle={t.subtitle}
       />

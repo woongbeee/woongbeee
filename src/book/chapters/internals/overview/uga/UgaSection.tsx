@@ -159,68 +159,68 @@ function UgaLocationDiagram({ lang }: { lang: 'ko' | 'en' }) {
   const H = LEGEND_Y + 20
 
   return (
-    <div className="overflow-x-auto rounded-xl border bg-card">
+    <div className="overflow-x-auto rounded-panel border bg-paper">
       <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ maxWidth: W, display: 'block', margin: '0 auto' }}>
 
         {/* column headers */}
         <text x={DED_X + HALF_W / 2} y={HEADER_Y} fontFamily="monospace" fontSize={11}
-          fontWeight="bold" fill="#1d4ed8" textAnchor="middle">
+          fontWeight="bold" fill="var(--color-blue)" textAnchor="middle">
           {isKo ? 'Dedicated Server' : 'Dedicated Server'}
         </text>
         <text x={SHR_X + HALF_W / 2} y={HEADER_Y} fontFamily="monospace" fontSize={11}
-          fontWeight="bold" fill="#065f46" textAnchor="middle">
+          fontWeight="bold" fill="var(--color-green)" textAnchor="middle">
           {isKo ? 'Shared Server' : 'Shared Server'}
         </text>
 
         {/* divider */}
         <line x1={W / 2} y1={PAD} x2={W / 2} y2={LEGEND_Y - 4}
-          stroke="#e2e8f0" strokeWidth={1.5} strokeDasharray="4 3" />
+          stroke="var(--color-rail)" strokeWidth={1.5} strokeDasharray="4 3" />
 
         {/* ── Dedicated: session → PGA → UGA ── */}
         <rect x={DED_X + 8} y={DED_Y} width={HALF_W - 16} height={DED_BOX_H} rx={8}
-          fill="#eff6ff" stroke="#3b82f6" strokeWidth={1.5} strokeDasharray="5 3" />
+          fill="var(--color-rail)" stroke="var(--color-blue)" strokeWidth={1.5} strokeDasharray="5 3" />
         <text x={DED_X + 20} y={DED_Y + 18} fontFamily="monospace" fontSize={10}
-          fontWeight="bold" fill="#1d4ed8">{isKo ? '세션 (Session)' : 'Session'}</text>
+          fontWeight="bold" fill="var(--color-blue)">{isKo ? '세션 (Session)' : 'Session'}</text>
         {/* PGA */}
         <rect x={DED_X + 18} y={PGA_INNER_Y} width={HALF_W - 36} height={PGA_INNER_H} rx={6}
-          fill="#faf5ff" stroke="#7c3aed" strokeWidth={1.5} strokeDasharray="5 3" />
+          fill="var(--color-paper-sunk)" stroke="var(--color-purple)" strokeWidth={1.5} strokeDasharray="5 3" />
         <text x={DED_X + 30} y={PGA_INNER_Y + 18} fontFamily="monospace" fontSize={10}
-          fontWeight="bold" fill="#7c3aed">PGA</text>
+          fontWeight="bold" fill="var(--color-purple)">PGA</text>
         {/* UGA inside PGA */}
         <rect x={DED_X + 28} y={UGA_D_Y} width={HALF_W - 56} height={UGA_D_H} rx={5}
-          fill="#d1fae5" stroke="#10b981" strokeWidth={2} />
+          fill="var(--color-line)" stroke="var(--color-green)" strokeWidth={2} />
         <text x={DED_X + 28 + (HALF_W - 56) / 2} y={UGA_D_Y + UGA_D_H / 2 - 8}
-          fontFamily="monospace" fontSize={13} fontWeight="bold" fill="#065f46" textAnchor="middle">UGA</text>
+          fontFamily="monospace" fontSize={13} fontWeight="bold" fill="var(--color-green)" textAnchor="middle">UGA</text>
         <text x={DED_X + 28 + (HALF_W - 56) / 2} y={UGA_D_Y + UGA_D_H / 2 + 10}
-          fontFamily="monospace" fontSize={9} fill="#065f46" textAnchor="middle" opacity={0.8}>
+          fontFamily="monospace" fontSize={9} fill="var(--color-green)" textAnchor="middle" opacity={0.8}>
           {isKo ? '세션 변수 · 커서 상태' : 'session vars · cursor state'}
         </text>
 
         {/* ── Shared: server process pool + SGA ── */}
         <rect x={SHR_X + 8} y={SHR_PROC_Y} width={HALF_W - 16} height={SHR_PROC_H} rx={7}
-          fill="#f1f5f9" stroke="#94a3b8" strokeWidth={1.5} />
+          fill="var(--color-rail)" stroke="var(--color-ink-3)" strokeWidth={1.5} />
         <text x={SHR_X + HALF_W / 2} y={SHR_PROC_Y + 18} fontFamily="monospace" fontSize={9.5}
-          fontWeight="bold" fill="#475569" textAnchor="middle">
+          fontWeight="bold" fill="var(--color-ink-2)" textAnchor="middle">
           {isKo ? '공유 서버 프로세스' : 'Shared Server Processes'}
         </text>
         <text x={SHR_X + HALF_W / 2} y={SHR_PROC_Y + 32} fontFamily="monospace" fontSize={8.5}
-          fill="#94a3b8" textAnchor="middle">
+          fill="var(--color-ink-3)" textAnchor="middle">
           PGA: {isKo ? 'Work Area만' : 'Work Area only'}
         </text>
         {/* SGA */}
         <rect x={SHR_X + 8} y={SGA_Y} width={HALF_W - 16} height={SGA_H} rx={7}
-          fill="#f8fafc" stroke="#94a3b8" strokeWidth={1.5} strokeDasharray="6 3" />
+          fill="var(--color-paper-sunk)" stroke="var(--color-ink-3)" strokeWidth={1.5} strokeDasharray="6 3" />
         <text x={SHR_X + 20} y={SGA_Y + 18} fontFamily="monospace" fontSize={10}
-          fontWeight="bold" fill="#64748b">SGA — Large Pool</text>
+          fontWeight="bold" fill="var(--color-ink-2)">SGA — Large Pool</text>
         {/* 3 UGA blocks */}
         {[0, 1, 2].map((i) => {
           const uy = SGA_Y + 28 + i * 42
           return (
             <g key={i}>
               <rect x={SHR_X + 18} y={uy} width={HALF_W - 36} height={30} rx={5}
-                fill="#d1fae5" stroke="#10b981" strokeWidth={1.5} />
+                fill="var(--color-line)" stroke="var(--color-green)" strokeWidth={1.5} />
               <text x={SHR_X + 18 + (HALF_W - 36) / 2} y={uy + 19}
-                fontFamily="monospace" fontSize={10} fontWeight="bold" fill="#065f46" textAnchor="middle">
+                fontFamily="monospace" fontSize={10} fontWeight="bold" fill="var(--color-green)" textAnchor="middle">
                 UGA — {isKo ? `세션 ${i + 1}` : `Session ${i + 1}`}
               </text>
             </g>
@@ -228,12 +228,12 @@ function UgaLocationDiagram({ lang }: { lang: 'ko' | 'en' }) {
         })}
 
         {/* legends */}
-        <rect x={PAD + 8} y={LEGEND_Y} width={10} height={8} rx={2} fill="#d1fae5" stroke="#10b981" strokeWidth={1} />
-        <text x={PAD + 22} y={LEGEND_Y + 8} fontFamily="monospace" fontSize={8.5} fill="#6b7280">UGA</text>
-        <rect x={PAD + 58} y={LEGEND_Y} width={10} height={8} rx={2} fill="#faf5ff" stroke="#7c3aed" strokeWidth={1} />
-        <text x={PAD + 72} y={LEGEND_Y + 8} fontFamily="monospace" fontSize={8.5} fill="#6b7280">PGA</text>
-        <rect x={PAD + 108} y={LEGEND_Y} width={10} height={8} rx={2} fill="#f8fafc" stroke="#94a3b8" strokeWidth={1} />
-        <text x={PAD + 122} y={LEGEND_Y + 8} fontFamily="monospace" fontSize={8.5} fill="#6b7280">SGA</text>
+        <rect x={PAD + 8} y={LEGEND_Y} width={10} height={8} rx={2} fill="var(--color-line)" stroke="var(--color-green)" strokeWidth={1} />
+        <text x={PAD + 22} y={LEGEND_Y + 8} fontFamily="monospace" fontSize={8.5} fill="var(--color-ink-2)">UGA</text>
+        <rect x={PAD + 58} y={LEGEND_Y} width={10} height={8} rx={2} fill="var(--color-paper-sunk)" stroke="var(--color-purple)" strokeWidth={1} />
+        <text x={PAD + 72} y={LEGEND_Y + 8} fontFamily="monospace" fontSize={8.5} fill="var(--color-ink-2)">PGA</text>
+        <rect x={PAD + 108} y={LEGEND_Y} width={10} height={8} rx={2} fill="var(--color-paper-sunk)" stroke="var(--color-ink-3)" strokeWidth={1} />
+        <text x={PAD + 122} y={LEGEND_Y + 8} fontFamily="monospace" fontSize={8.5} fill="var(--color-ink-2)">SGA</text>
       </svg>
     </div>
   )
@@ -261,13 +261,13 @@ export function UgaSection() {
 
       {/* ── Contents ── */}
       <SectionTitle>{t.contentsTitle}</SectionTitle>
-      <div className="mb-6 overflow-hidden rounded-xl border bg-card">
+      <div className="mb-6 overflow-hidden rounded-panel border bg-paper">
         {t.contents.map((c, i) => (
           <div key={c.label} className={cn('flex items-start gap-4 px-5 py-3', i > 0 && 'border-t')}>
-            <code className="mt-0.5 shrink-0 rounded bg-teal-100 px-2 py-0.5 font-mono text-[11px] font-bold text-teal-700">
+            <code className="mt-0.5 shrink-0 rounded bg-green/10 px-2 py-0.5 font-mono text-[11px] font-bold text-green">
               {c.label}
             </code>
-            <p className="text-xs leading-relaxed text-muted-foreground">{c.desc}</p>
+            <p className="text-xs leading-relaxed text-ink-2">{c.desc}</p>
           </div>
         ))}
       </div>
@@ -280,21 +280,21 @@ export function UgaSection() {
       <UgaLocationDiagram lang={lang} />
 
       <div className="mt-4 mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div className="rounded-xl border-2 border-blue-200 bg-blue-50/40 p-4">
-          <div className="mb-1 font-mono text-[10px] font-bold uppercase tracking-widest text-blue-500">
+        <div className="rounded-panel border-2 border-blue/30 bg-blue/5 p-4">
+          <div className="mb-1 font-mono text-[10px] font-bold uppercase tracking-widest text-blue">
             {t.dedicatedLabel}
           </div>
-          <p className="mb-3 text-xs leading-relaxed text-muted-foreground">{t.dedicatedDesc}</p>
-          <code className="rounded bg-blue-100 px-2 py-1 font-mono text-[11px] font-bold text-blue-700">
+          <p className="mb-3 text-xs leading-relaxed text-ink-2">{t.dedicatedDesc}</p>
+          <code className="rounded bg-blue/10 px-2 py-1 font-mono text-[11px] font-bold text-blue">
             {t.dedicatedUgaLocation}
           </code>
         </div>
-        <div className="rounded-xl border-2 border-teal-200 bg-teal-50/40 p-4">
-          <div className="mb-1 font-mono text-[10px] font-bold uppercase tracking-widest text-teal-600">
+        <div className="rounded-panel border-2 border-green/30 bg-green/5 p-4">
+          <div className="mb-1 font-mono text-[10px] font-bold uppercase tracking-widest text-green">
             {t.sharedLabel}
           </div>
-          <p className="mb-3 text-xs leading-relaxed text-muted-foreground">{t.sharedDesc}</p>
-          <code className="rounded bg-teal-100 px-2 py-1 font-mono text-[11px] font-bold text-teal-700">
+          <p className="mb-3 text-xs leading-relaxed text-ink-2">{t.sharedDesc}</p>
+          <code className="rounded bg-green/10 px-2 py-1 font-mono text-[11px] font-bold text-green">
             {t.sharedUgaLocation}
           </code>
         </div>
@@ -308,11 +308,11 @@ export function UgaSection() {
       <Prose className="mb-4">{t.pgaInSharedDesc}</Prose>
       <div className="mb-4 space-y-2">
         {t.pgaInSharedItems.map((item) => (
-          <div key={item.label} className="flex items-start gap-3 rounded-lg border bg-card px-4 py-2.5">
-            <code className="mt-0.5 shrink-0 rounded bg-violet-100 px-2 py-0.5 font-mono text-[10px] font-bold text-violet-700">
+          <div key={item.label} className="flex items-start gap-3 rounded-card border bg-paper px-4 py-2.5">
+            <code className="mt-0.5 shrink-0 rounded bg-purple/10 px-2 py-0.5 font-mono text-[10px] font-bold text-purple">
               {item.label}
             </code>
-            <p className="text-xs leading-relaxed text-muted-foreground">{item.desc}</p>
+            <p className="text-xs leading-relaxed text-ink-2">{item.desc}</p>
           </div>
         ))}
       </div>
@@ -322,28 +322,28 @@ export function UgaSection() {
 
       {/* ── PGA vs UGA table ── */}
       <SectionTitle>{t.vsTitle}</SectionTitle>
-      <div className="mb-6 overflow-hidden rounded-xl border bg-card">
-        <div className="grid grid-cols-3 border-b bg-muted/40 px-4 py-2">
+      <div className="mb-6 overflow-hidden rounded-panel border bg-paper">
+        <div className="grid grid-cols-3 border-b bg-rail px-4 py-2">
           {[t.vsAttr, t.vsPga, t.vsUga].map((h) => (
-            <div key={h} className="font-mono text-[10px] font-bold uppercase tracking-wide text-muted-foreground">{h}</div>
+            <div key={h} className="font-mono text-[10px] font-bold uppercase tracking-wide text-ink-2">{h}</div>
           ))}
         </div>
         {t.vsRows.map((row, i) => (
           <div key={row.attr} className={cn('grid grid-cols-3 px-4 py-2.5 text-xs', i > 0 && 'border-t')}>
-            <div className="font-semibold text-foreground">{row.attr}</div>
-            <div className="font-medium text-violet-700">{row.pga}</div>
-            <div className="font-medium text-teal-700">{row.uga}</div>
+            <div className="font-semibold text-ink">{row.attr}</div>
+            <div className="font-medium text-purple">{row.pga}</div>
+            <div className="font-medium text-green">{row.uga}</div>
           </div>
         ))}
       </div>
 
       {/* ── Summary ── */}
-      <div className="mt-8 rounded-2xl border bg-gradient-to-br from-slate-50 to-teal-50/30 px-6 py-5">
+      <div className="mt-8 rounded-panel border border-line border-l-[3px] border-l-green bg-paper-sunk px-6 py-5">
         <div className="mb-3"><SubTitle>{t.summaryTitle}</SubTitle></div>
         <ul className="space-y-1.5">
           {t.summaryItems.map((item, i) => (
-            <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
-              <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-teal-400" />
+            <li key={i} className="flex items-start gap-2 text-sm text-ink-2">
+              <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-green" />
               {item}
             </li>
           ))}

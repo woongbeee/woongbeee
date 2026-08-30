@@ -1,6 +1,7 @@
 # Technology Stack
 
 **Analysis Date:** 2026-08-29
+**Updated:** 2026-08-30 — design-system refactor (token CSS, font swap, theme toggle)
 
 ## Languages
 
@@ -9,8 +10,8 @@
 - TSX / JSX - React components throughout `src/book/`, `src/components/`
 
 **Secondary:**
-- CSS - Single global stylesheet `src/index.css` (Tailwind v4 CSS-first config + theme variables). `src/App.css` is a 1-line placeholder.
-- HTML - `index.html` (Vite entry, Korean `lang="ko"`, Google Fonts preconnect)
+- CSS - Two stylesheets: `src/styles/tokens.css` (the design-token source — `@theme` color/font/radius vars, light + dark via `[data-theme]`) and `src/index.css` (`@import` lines + structural rules only: `body`, `#root`, bare-`border` default color, `.react-flow__*` overrides). `src/App.css` is a 35-byte placeholder.
+- HTML - `index.html` (Vite entry; `<html lang>` synced to the store by `App.tsx`; Google Fonts `<link>` for Noto Sans KR + Inter + Newsreader + JetBrains Mono)
 - JavaScript (ESM `.mjs`) - Build-time PDF export scripts in `scripts/` (not part of the app bundle)
 
 ## Runtime
@@ -52,14 +53,16 @@
 - `@tabler/icons-react` 3.44.0 - Primary icon library (~113 import sites). Convention: `size={36}` titles, `size={20}` grids, `size={16}` inline, `stroke={1.5}`.
 
 **UI / Styling:**
-- `tailwindcss` 4.2.2 - Utility-first CSS, v4 CSS-first (`@import "tailwindcss"` in `src/index.css`)
+- `tailwindcss` 4.2.2 - Utility-first CSS, v4 CSS-first (`@import "tailwindcss"` in `src/index.css`; tokens generated from `@theme` in `src/styles/tokens.css`)
 - `tw-animate-css` 1.4.0 - Animation utility classes (`@import "tw-animate-css"`)
 - `@base-ui/react` 1.3.0 - Headless primitives backing shadcn components (`src/components/ui/button.tsx`, `badge.tsx`, `separator.tsx`)
 - `class-variance-authority` 0.7.1 - Variant styling for `src/components/ui/*`
 - `clsx` 2.1.1 + `tailwind-merge` 3.5.0 - `cn()` helper in `src/lib/utils.ts`
-- `@fontsource-variable/geist` 5.2.8 - Installed but not imported anywhere in `src/`; active font is Nanum Gothic via Google Fonts `<link>` in `index.html`
-- shadcn/ui - Style `base-nova`, config in `components.json` (`iconLibrary: lucide`, but code standardizes on Tabler)
-- `lucide-react` - Listed in CLAUDE.md as legacy; no `lucide-react` imports found in current `src/`
+- **Design tokens** - `src/styles/tokens.css` is the single source for every color/font/radius value. `src/lib/theme.tsx` is the single TS mapping module (`INFOBOX_VARIANT`, `DIAGRAM`, `DATA_PALETTE`, `CODE` — Tailwind class / `var(--color-*)` strings only, zero hex). Components use token utilities (`bg-paper`, `text-ink`, `text-blue`, `border-line`, `rounded-card`). Full spec + migration status in repo-root `DESIGN.md`.
+- **Fonts** (Google Fonts `<link>`) - Noto Sans KR (KO all roles), Inter (EN UI/headings), Newsreader (EN long-form body), JetBrains Mono (code/data/badges). Swap by `<html lang>` → `:root:lang(en)` overriding `--font-sans-active` / `--font-read-active`.
+- `@fontsource-variable/geist` 5.2.8 - **Dead dependency**, never imported.
+- shadcn/ui - Style `base-nova`, config in `components.json` (`iconLibrary: lucide`, but code standardizes on Tabler). shadcn HSL vars survive in `tokens.css` §1 for react-flow overrides only (Phase 3 removal).
+- `lucide-react` - No imports in `src/`; migration to Tabler complete in code, only `components.json` lags.
 
 **Dev tooling / diagnostics:**
 - `react-scan` 0.5.3 - Dev-only render profiler, `scan({ enabled: import.meta.env.DEV })` in `src/main.tsx`. Must not ship to production. Note: renders label overlays on named components — SVG diagrams avoid named subcomponents because of this.
@@ -70,7 +73,8 @@
 - No `.env` files, no runtime environment variables, no `import.meta.env.VITE_*` custom vars.
 - Only built-in Vite env flags used: `import.meta.env.DEV` (`src/main.tsx`), `import.meta.env.BASE_URL` (`src/book/chapters/internals/overview/sga/buffer-cache/BufferCacheSection.tsx` for `memory.png`).
 - Build-time constant: `__BUILD_DATE__` injected by `vite.config.ts` `define` as a `"YYYY-MM-DD"` string; typed in `src/build-env.d.ts`; rendered in `src/book/BookLayout.tsx` ("last updated ...").
-- Language state (`ko` / `en`) is in-memory Zustand only — not persisted (no `localStorage`).
+- Language state (`ko` / `en`) is in-memory Zustand only — not persisted.
+- Theme state (`light` / `dark`) IS persisted: `src/store/simulationStore.ts` reads/writes `localStorage['oracle-book-theme']` (init: stored → `prefers-color-scheme` → `light`); `App.tsx` reflects it onto `<html data-theme>`.
 
 **Build:**
 - `vite.config.ts` - `base: '/woongbeee/'` on build (GitHub Pages project path), `/` in dev; aliases `@` → `./src`; plugins `react()`, `tailwindcss()`; `define.__BUILD_DATE__`

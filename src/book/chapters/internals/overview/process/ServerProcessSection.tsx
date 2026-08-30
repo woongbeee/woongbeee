@@ -158,10 +158,10 @@ function DedicatedDiagram({ isKo }: { isKo: boolean }) {
     <svg viewBox={`0 0 ${W} ${H}`} className="w-full">
       <defs>
         <marker id="dedArrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
-          <path d="M0,0 L7,3.5 L0,7 Z" fill="#7c3aed" />
+          <path d="M0,0 L7,3.5 L0,7 Z" fill="var(--color-purple)" />
         </marker>
         <marker id="dedArrowGray" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
-          <path d="M0,0 L7,3.5 L0,7 Z" fill="#86efac" />
+          <path d="M0,0 L7,3.5 L0,7 Z" fill="var(--color-green)" />
         </marker>
       </defs>
 
@@ -171,11 +171,11 @@ function DedicatedDiagram({ isKo }: { isKo: boolean }) {
         return (
           <g key={`cl${i}`}>
             <rect x={cx} y={CL_Y} width={CL_W} height={CL_H} rx={7}
-              fill="#dbeafe" stroke="#93c5fd" strokeWidth={1.5} />
-            <text x={cx + CL_W / 2} y={CL_Y + 17} textAnchor="middle" fill="#1d4ed8" fontSize={10} fontWeight={700}>
+              fill="var(--color-rail)" stroke="var(--color-blue)" strokeWidth={1.5} />
+            <text x={cx + CL_W / 2} y={CL_Y + 17} textAnchor="middle" fill="var(--color-blue)" fontSize={10} fontWeight={700}>
               {isKo ? `클라이언트 ${i + 1}` : `Client ${i + 1}`}
             </text>
-            <text x={cx + CL_W / 2} y={CL_Y + 33} textAnchor="middle" fill="#1d4ed8" fontSize={9}>
+            <text x={cx + CL_W / 2} y={CL_Y + 33} textAnchor="middle" fill="var(--color-blue)" fontSize={9}>
               JDBC / SQL*Plus
             </text>
           </g>
@@ -189,9 +189,9 @@ function DedicatedDiagram({ isKo }: { isKo: boolean }) {
         return (
           <g key={`arr${i}`}>
             <line x1={cx} y1={ARR_Y1} x2={cx} y2={ARR_Y2 - 5}
-              stroke="#7c3aed" strokeWidth={1.5} markerEnd="url(#dedArrow)" />
+              stroke="var(--color-purple)" strokeWidth={1.5} markerEnd="url(#dedArrow)" />
             {i === 1 && (
-              <text x={labelX} y={ARR_Y1 + ARR_GAP / 2 + 4} fill="#6d28d9" fontSize={8.5} fontWeight={600}>
+              <text x={labelX} y={ARR_Y1 + ARR_GAP / 2 + 4} fill="var(--color-purple)" fontSize={8.5} fontWeight={600}>
                 {isKo ? '1:1 전용 연결' : '1:1 dedicated'}
               </text>
             )}
@@ -205,11 +205,11 @@ function DedicatedDiagram({ isKo }: { isKo: boolean }) {
         return (
           <g key={`sp${i}`}>
             <rect x={sx} y={SP_Y} width={CL_W} height={SP_H} rx={7}
-              fill="#ede9fe" stroke="#c4b5fd" strokeWidth={1.5} />
-            <text x={sx + CL_W / 2} y={SP_Y + 17} textAnchor="middle" fill="#6d28d9" fontSize={10} fontWeight={700}>
+              fill="var(--color-rail)" stroke="var(--color-purple)" strokeWidth={1.5} />
+            <text x={sx + CL_W / 2} y={SP_Y + 17} textAnchor="middle" fill="var(--color-purple)" fontSize={10} fontWeight={700}>
               {isKo ? `서버 프로세스 ${i + 1}` : `Server ${i + 1}`}
             </text>
-            <text x={sx + CL_W / 2} y={SP_Y + 33} textAnchor="middle" fill="#6d28d9" fontSize={9}>
+            <text x={sx + CL_W / 2} y={SP_Y + 33} textAnchor="middle" fill="var(--color-purple)" fontSize={9}>
               {isKo ? 'SQL 파싱·실행' : 'parse & execute'}
             </text>
           </g>
@@ -217,7 +217,7 @@ function DedicatedDiagram({ isKo }: { isKo: boolean }) {
       })}
 
       {/* PGA 섹션 라벨 — 박스 위에 충분한 공간 확보 후 렌더 */}
-      <text x={W / 2} y={PGA_LABEL_Y} textAnchor="middle" fill="#7e22ce" fontSize={8.5} fontWeight={600}>
+      <text x={W / 2} y={PGA_LABEL_Y} textAnchor="middle" fill="var(--color-purple)" fontSize={8.5} fontWeight={600}>
         {isKo ? '▼  각 프로세스 전용 메모리' : '▼  private memory per process'}
       </text>
 
@@ -227,8 +227,8 @@ function DedicatedDiagram({ isKo }: { isKo: boolean }) {
         return (
           <g key={`pga${i}`}>
             <rect x={px} y={PGA_Y} width={CL_W} height={PGA_H} rx={5}
-              fill="#fdf4ff" stroke="#e9d5ff" strokeWidth={1.2} />
-            <text x={px + CL_W / 2} y={PGA_Y + 17} textAnchor="middle" fill="#7e22ce" fontSize={9.5} fontWeight={600}>
+              fill="var(--color-paper-sunk)" stroke="var(--color-rail)" strokeWidth={1.2} />
+            <text x={px + CL_W / 2} y={PGA_Y + 17} textAnchor="middle" fill="var(--color-purple)" fontSize={9.5} fontWeight={600}>
               PGA + UGA
             </text>
           </g>
@@ -242,7 +242,7 @@ function DedicatedDiagram({ isKo }: { isKo: boolean }) {
           <line key={`sga_arr${i}`}
             x1={ax} y1={PGA_Y + PGA_H + 2}
             x2={ax} y2={SGA_Y - 2}
-            stroke="#86efac" strokeWidth={1.2}
+            stroke="var(--color-green)" strokeWidth={1.2}
             markerEnd={i === 1 ? 'url(#dedArrowGray)' : undefined}
             strokeDasharray="3 2" />
         )
@@ -250,14 +250,14 @@ function DedicatedDiagram({ isKo }: { isKo: boolean }) {
 
       {/* SGA 공유 박스 */}
       <rect x={CL_X0 - 4} y={SGA_Y} width={TOTAL_CL_W + 8} height={SGA_H} rx={8}
-        fill="#f0fdf4" stroke="#86efac" strokeWidth={1.5} />
-      <text x={W / 2} y={SGA_Y + 17} textAnchor="middle" fill="#15803d" fontSize={10.5} fontWeight={700}>
+        fill="var(--color-rail)" stroke="var(--color-green)" strokeWidth={1.5} />
+      <text x={W / 2} y={SGA_Y + 17} textAnchor="middle" fill="var(--color-green)" fontSize={10.5} fontWeight={700}>
         SGA
       </text>
-      <text x={W / 2} y={SGA_Y + 32} textAnchor="middle" fill="#16a34a" fontSize={9}>
+      <text x={W / 2} y={SGA_Y + 32} textAnchor="middle" fill="var(--color-green)" fontSize={9}>
         Buffer Cache · Shared Pool · Redo Log Buffer
       </text>
-      <text x={W / 2} y={SGA_Y + 44} textAnchor="middle" fill="#16a34a" fontSize={8.5}>
+      <text x={W / 2} y={SGA_Y + 44} textAnchor="middle" fill="var(--color-green)" fontSize={8.5}>
         {isKo ? '(모든 서버 프로세스가 공유)' : '(shared by all server processes)'}
       </text>
     </svg>
@@ -316,16 +316,16 @@ function SharedDiagram({ isKo }: { isKo: boolean }) {
     <svg viewBox={`0 0 ${W} ${H}`} className="w-full">
       <defs>
         <marker id="shdArrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
-          <path d="M0,0 L7,3.5 L0,7 Z" fill="#6b7280" />
+          <path d="M0,0 L7,3.5 L0,7 Z" fill="var(--color-ink-2)" />
         </marker>
         <marker id="shdGreen" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
-          <path d="M0,0 L7,3.5 L0,7 Z" fill="#16a34a" />
+          <path d="M0,0 L7,3.5 L0,7 Z" fill="var(--color-green)" />
         </marker>
         <marker id="shdAmber" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
-          <path d="M0,0 L7,3.5 L0,7 Z" fill="#d97706" />
+          <path d="M0,0 L7,3.5 L0,7 Z" fill="var(--color-amber)" />
         </marker>
         <marker id="shdViolet" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
-          <path d="M0,0 L7,3.5 L0,7 Z" fill="#7c3aed" />
+          <path d="M0,0 L7,3.5 L0,7 Z" fill="var(--color-purple)" />
         </marker>
       </defs>
 
@@ -335,11 +335,11 @@ function SharedDiagram({ isKo }: { isKo: boolean }) {
         return (
           <g key={`scl${i}`}>
             <rect x={CL_X} y={cy} width={CL_W} height={CL_H} rx={6}
-              fill="#dbeafe" stroke="#93c5fd" strokeWidth={1.5} />
-            <text x={CL_X + CL_W / 2} y={cy + 16} textAnchor="middle" fill="#1d4ed8" fontSize={10} fontWeight={700}>
+              fill="var(--color-rail)" stroke="var(--color-blue)" strokeWidth={1.5} />
+            <text x={CL_X + CL_W / 2} y={cy + 16} textAnchor="middle" fill="var(--color-blue)" fontSize={10} fontWeight={700}>
               {isKo ? `클라이언트 ${i + 1}` : `Client ${i + 1}`}
             </text>
-            <text x={CL_X + CL_W / 2} y={cy + 30} textAnchor="middle" fill="#1d4ed8" fontSize={8.5}>
+            <text x={CL_X + CL_W / 2} y={cy + 30} textAnchor="middle" fill="var(--color-blue)" fontSize={8.5}>
               JDBC / SQL*Plus
             </text>
           </g>
@@ -353,20 +353,20 @@ function SharedDiagram({ isKo }: { isKo: boolean }) {
           <line key={`cl_d${i}`}
             x1={CL_X + CL_W + 2} y1={cy}
             x2={DISP_X - 2}      y2={dispMY}
-            stroke="#6b7280" strokeWidth={1.2} markerEnd="url(#shdArrow)" />
+            stroke="var(--color-ink-2)" strokeWidth={1.2} markerEnd="url(#shdArrow)" />
         )
       })}
 
       {/* ── 디스패처 박스 ── */}
       <rect x={DISP_X} y={DISP_Y} width={DISP_W} height={DISP_H} rx={8}
-        fill="#ccfbf1" stroke="#2dd4bf" strokeWidth={1.8} />
-      <text x={dispMX} y={DISP_Y + 19} textAnchor="middle" fill="#0f766e" fontSize={10.5} fontWeight={700}>
+        fill="var(--color-green)" stroke="var(--color-green)" strokeWidth={1.8} />
+      <text x={dispMX} y={DISP_Y + 19} textAnchor="middle" fill="var(--color-green)" fontSize={10.5} fontWeight={700}>
         {isKo ? '디스패처' : 'Dispatcher'}
       </text>
-      <text x={dispMX} y={DISP_Y + 35} textAnchor="middle" fill="#0f766e" fontSize={9.5}>
+      <text x={dispMX} y={DISP_Y + 35} textAnchor="middle" fill="var(--color-green)" fontSize={9.5}>
         Dnnn
       </text>
-      <text x={dispMX} y={DISP_Y + 52} textAnchor="middle" fill="#0f766e" fontSize={9}>
+      <text x={dispMX} y={DISP_Y + 52} textAnchor="middle" fill="var(--color-green)" fontSize={9}>
         {isKo ? '요청수신 / 응답반환' : 'recv req / send resp'}
       </text>
 
@@ -381,9 +381,9 @@ function SharedDiagram({ isKo }: { isKo: boolean }) {
           <>
             <polyline
               points={`${DISP_X + DISP_W},${y1} ${midX},${y1} ${midX},${y2} ${INNER_X - 2},${y2}`}
-              fill="none" stroke="#16a34a" strokeWidth={1.5} markerEnd="url(#shdGreen)" />
+              fill="none" stroke="var(--color-green)" strokeWidth={1.5} markerEnd="url(#shdGreen)" />
             {/* 라벨: 꺾인 구간 수평 부분 위 */}
-            <text x={midX + 4} y={Math.min(y1, y2) - 4} fill="#15803d" fontSize={8.5} fontWeight={600}>
+            <text x={midX + 4} y={Math.min(y1, y2) - 4} fill="var(--color-green)" fontSize={8.5} fontWeight={600}>
               {isKo ? '① 요청 전달' : '① enqueue'}
             </text>
           </>
@@ -399,9 +399,9 @@ function SharedDiagram({ isKo }: { isKo: boolean }) {
           <>
             <polyline
               points={`${INNER_X - 2},${y1} ${midX},${y1} ${midX},${y2} ${DISP_X + DISP_W},${y2}`}
-              fill="none" stroke="#d97706" strokeWidth={1.5} markerEnd="url(#shdAmber)" />
+              fill="none" stroke="var(--color-amber)" strokeWidth={1.5} markerEnd="url(#shdAmber)" />
             {/* 라벨: 꺾인 구간 수평 부분 아래 */}
-            <text x={midX + 4} y={Math.max(y1, y2) + 10} fill="#b45309" fontSize={8.5} fontWeight={600}>
+            <text x={midX + 4} y={Math.max(y1, y2) + 10} fill="var(--color-amber)" fontSize={8.5} fontWeight={600}>
               {isKo ? '④ 응답 수신' : '④ dequeue'}
             </text>
           </>
@@ -410,15 +410,15 @@ function SharedDiagram({ isKo }: { isKo: boolean }) {
 
       {/* ── SGA 외곽 박스 ── */}
       <rect x={SGA_X} y={SGA_Y} width={SGA_W} height={SGA_H} rx={10}
-        fill="#f0fdf4" stroke="#86efac" strokeWidth={1.8} />
+        fill="var(--color-rail)" stroke="var(--color-green)" strokeWidth={1.8} />
 
       {/* Request Queue */}
       <rect x={INNER_X} y={RQ_Y} width={INNER_W} height={Q_H} rx={5}
-        fill="#dcfce7" stroke="#4ade80" strokeWidth={1.2} />
-      <text x={INNER_X + INNER_W / 2} y={RQ_Y + 14} textAnchor="middle" fill="#15803d" fontSize={10} fontWeight={700}>
+        fill="var(--color-rail)" stroke="var(--color-green)" strokeWidth={1.2} />
+      <text x={INNER_X + INNER_W / 2} y={RQ_Y + 14} textAnchor="middle" fill="var(--color-green)" fontSize={10} fontWeight={700}>
         Request Queue
       </text>
-      <text x={INNER_X + INNER_W / 2} y={RQ_Y + 27} textAnchor="middle" fill="#15803d" fontSize={8.5}>
+      <text x={INNER_X + INNER_W / 2} y={RQ_Y + 27} textAnchor="middle" fill="var(--color-green)" fontSize={8.5}>
         {isKo ? '(Large Pool)' : '(Large Pool)'}
       </text>
 
@@ -427,13 +427,13 @@ function SharedDiagram({ isKo }: { isKo: boolean }) {
         <line key={`rq_sp${i}`}
           x1={spX(i) + SP_W / 2} y1={RQ_Y + Q_H + 2}
           x2={spX(i) + SP_W / 2} y2={SP_Y - 2}
-          stroke="#7c3aed" strokeWidth={1.3} markerEnd="url(#shdViolet)" />
+          stroke="var(--color-purple)" strokeWidth={1.3} markerEnd="url(#shdViolet)" />
       ))}
       {/* 라벨: 두 화살표 사이 중앙, 화살표 중간 y */}
       <text
         x={INNER_X + INNER_W / 2}
         y={RQ_Y + Q_H + (SP_Y - RQ_Y - Q_H) / 2 + 4}
-        textAnchor="middle" fill="#7c3aed" fontSize={8} fontWeight={600}>
+        textAnchor="middle" fill="var(--color-purple)" fontSize={8} fontWeight={600}>
         {isKo ? '② 유휴 서버가 꺼냄' : '② idle server picks up'}
       </text>
 
@@ -441,14 +441,14 @@ function SharedDiagram({ isKo }: { isKo: boolean }) {
       {[0, 1].map((i) => (
         <g key={`ssp${i}`}>
           <rect x={spX(i)} y={SP_Y} width={SP_W} height={SP_H} rx={6}
-            fill="#ede9fe" stroke="#c4b5fd" strokeWidth={1.5} />
-          <text x={spX(i) + SP_W / 2} y={SP_Y + 19} textAnchor="middle" fill="#6d28d9" fontSize={10} fontWeight={700}>
+            fill="var(--color-rail)" stroke="var(--color-purple)" strokeWidth={1.5} />
+          <text x={spX(i) + SP_W / 2} y={SP_Y + 19} textAnchor="middle" fill="var(--color-purple)" fontSize={10} fontWeight={700}>
             {isKo ? `서버 프로세스 ${i + 1}` : `Server ${i + 1}`}
           </text>
-          <text x={spX(i) + SP_W / 2} y={SP_Y + 34} textAnchor="middle" fill="#6d28d9" fontSize={9.5}>
+          <text x={spX(i) + SP_W / 2} y={SP_Y + 34} textAnchor="middle" fill="var(--color-purple)" fontSize={9.5}>
             Snnn
           </text>
-          <text x={spX(i) + SP_W / 2} y={SP_Y + 49} textAnchor="middle" fill="#6d28d9" fontSize={8.5}>
+          <text x={spX(i) + SP_W / 2} y={SP_Y + 49} textAnchor="middle" fill="var(--color-purple)" fontSize={8.5}>
             {isKo ? '여러 세션 처리' : 'multi-session'}
           </text>
         </g>
@@ -459,41 +459,41 @@ function SharedDiagram({ isKo }: { isKo: boolean }) {
         <line key={`sp_rsq${i}`}
           x1={spX(i) + SP_W / 2} y1={SP_Y + SP_H + 2}
           x2={spX(i) + SP_W / 2} y2={RSQ_Y - 2}
-          stroke="#d97706" strokeWidth={1.3} markerEnd="url(#shdAmber)" />
+          stroke="var(--color-amber)" strokeWidth={1.3} markerEnd="url(#shdAmber)" />
       ))}
       <text
         x={INNER_X + INNER_W / 2}
         y={SP_Y + SP_H + (RSQ_Y - SP_Y - SP_H) / 2 + 4}
-        textAnchor="middle" fill="#d97706" fontSize={8} fontWeight={600}>
+        textAnchor="middle" fill="var(--color-amber)" fontSize={8} fontWeight={600}>
         {isKo ? '③ 결과를 응답 큐에 씀' : '③ write result to queue'}
       </text>
 
       {/* Response Queue */}
       <rect x={INNER_X} y={RSQ_Y} width={INNER_W} height={Q_H} rx={5}
-        fill="#fef3c7" stroke="#fbbf24" strokeWidth={1.2} />
-      <text x={INNER_X + INNER_W / 2} y={RSQ_Y + 14} textAnchor="middle" fill="#92400e" fontSize={10} fontWeight={700}>
+        fill="var(--color-amber)" stroke="var(--color-amber)" strokeWidth={1.2} />
+      <text x={INNER_X + INNER_W / 2} y={RSQ_Y + 14} textAnchor="middle" fill="var(--color-amber)" fontSize={10} fontWeight={700}>
         Response Queue
       </text>
-      <text x={INNER_X + INNER_W / 2} y={RSQ_Y + 27} textAnchor="middle" fill="#92400e" fontSize={8.5}>
+      <text x={INNER_X + INNER_W / 2} y={RSQ_Y + 27} textAnchor="middle" fill="var(--color-amber)" fontSize={8.5}>
         {isKo ? '(Large Pool)' : '(Large Pool)'}
       </text>
 
       {/* Large Pool */}
       <rect x={INNER_X} y={LP_Y} width={INNER_W} height={LP_H} rx={6}
-        fill="#e0f2fe" stroke="#7dd3fc" strokeWidth={1.2} />
-      <text x={INNER_X + INNER_W / 2} y={LP_Y + 17} textAnchor="middle" fill="#0369a1" fontSize={10} fontWeight={700}>
+        fill="var(--color-rail)" stroke="var(--color-blue)" strokeWidth={1.2} />
+      <text x={INNER_X + INNER_W / 2} y={LP_Y + 17} textAnchor="middle" fill="var(--color-blue)" fontSize={10} fontWeight={700}>
         Large Pool
       </text>
-      <text x={INNER_X + INNER_W / 2} y={LP_Y + 31} textAnchor="middle" fill="#0369a1" fontSize={9}>
+      <text x={INNER_X + INNER_W / 2} y={LP_Y + 31} textAnchor="middle" fill="var(--color-blue)" fontSize={9}>
         {isKo ? 'UGA (세션 수만큼) — 세션 컨텍스트' : 'UGA (per session) — session context'}
       </text>
-      <text x={INNER_X + INNER_W / 2} y={LP_Y + 44} textAnchor="middle" fill="#0369a1" fontSize={8.5}>
+      <text x={INNER_X + INNER_W / 2} y={LP_Y + 44} textAnchor="middle" fill="var(--color-blue)" fontSize={8.5}>
         {isKo ? '+ Request / Response Queue 포함' : '+ Request / Response Queues'}
       </text>
 
       {/* SGA 라벨 (z-order 마지막) */}
-      <rect x={SGA_X + 4} y={SGA_Y - 8} width={32} height={14} rx={3} fill="#f0fdf4" />
-      <text x={SGA_X + 8} y={SGA_Y + 2} fill="#15803d" fontSize={9.5} fontWeight={700}>SGA</text>
+      <rect x={SGA_X + 4} y={SGA_Y - 8} width={32} height={14} rx={3} fill="var(--color-rail)" />
+      <text x={SGA_X + 8} y={SGA_Y + 2} fill="var(--color-green)" fontSize={9.5} fontWeight={700}>SGA</text>
     </svg>
   )
 }
@@ -526,13 +526,13 @@ export function ServerProcessSection() {
       <section>
         <SectionTitle>{t.dedicatedTitle}</SectionTitle>
         <Prose>{t.dedicatedDesc}</Prose>
-        <div className="mt-4 rounded-xl border border-violet-100 bg-violet-50/40 p-4">
+        <div className="mt-4 rounded-panel border border-purple/30 bg-purple/5 p-4">
           <DedicatedDiagram isKo={isKo} />
         </div>
         <ul className="mt-4 space-y-1.5">
           {t.dedicatedFeatures.map((f, i) => (
-            <li key={i} className="flex gap-2 text-sm text-slate-700">
-              <span className="mt-0.5 text-violet-500">▸</span>
+            <li key={i} className="flex gap-2 text-sm text-ink">
+              <span className="mt-0.5 text-purple">▸</span>
               <span>{f}</span>
             </li>
           ))}
@@ -545,13 +545,13 @@ export function ServerProcessSection() {
       <section>
         <SectionTitle>{t.sharedTitle}</SectionTitle>
         <Prose>{t.sharedDesc}</Prose>
-        <div className="mt-4 rounded-xl border border-teal-100 bg-teal-50/40 p-4">
+        <div className="mt-4 rounded-panel border border-green/30 bg-green/5 p-4">
           <SharedDiagram isKo={isKo} />
         </div>
         <ul className="mt-4 space-y-1.5">
           {t.sharedFeatures.map((f, i) => (
-            <li key={i} className="flex gap-2 text-sm text-slate-700">
-              <span className="mt-0.5 text-teal-500">▸</span>
+            <li key={i} className="flex gap-2 text-sm text-ink">
+              <span className="mt-0.5 text-green">▸</span>
               <span>{f}</span>
             </li>
           ))}
@@ -564,23 +564,23 @@ export function ServerProcessSection() {
       <section>
         <SectionTitle>{t.compTitle}</SectionTitle>
 
-        <div className="mt-3 overflow-hidden rounded-xl border border-slate-200">
+        <div className="mt-3 overflow-hidden rounded-panel border border-line">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-slate-100">
-                <th className="px-4 py-2 text-left font-semibold text-slate-600">
+              <tr className="bg-paper-sunk">
+                <th className="px-4 py-2 text-left font-semibold text-ink">
                   {isKo ? '항목' : 'Aspect'}
                 </th>
-                <th className="px-4 py-2 text-left font-semibold text-violet-600">Dedicated</th>
-                <th className="px-4 py-2 text-left font-semibold text-teal-600">Shared</th>
+                <th className="px-4 py-2 text-left font-semibold text-purple">Dedicated</th>
+                <th className="px-4 py-2 text-left font-semibold text-green">Shared</th>
               </tr>
             </thead>
             <tbody>
               {t.compRows.map((row, i) => (
-                <tr key={row.aspect} className={i % 2 === 0 ? 'bg-white' : 'bg-slate-50'}>
-                  <td className="px-4 py-2 text-xs font-semibold text-slate-600">{row.aspect}</td>
-                  <td className="px-4 py-2 text-xs text-slate-700">{row.dedicated}</td>
-                  <td className="px-4 py-2 text-xs text-slate-700">{row.shared}</td>
+                <tr key={row.aspect} className={i % 2 === 0 ? 'bg-paper' : 'bg-paper-sunk'}>
+                  <td className="px-4 py-2 text-xs font-semibold text-ink">{row.aspect}</td>
+                  <td className="px-4 py-2 text-xs text-ink">{row.dedicated}</td>
+                  <td className="px-4 py-2 text-xs text-ink">{row.shared}</td>
                 </tr>
               ))}
             </tbody>
@@ -606,9 +606,9 @@ export function ServerProcessSection() {
         <SectionTitle>{t.paramsTitle}</SectionTitle>
         <div className="mt-3 space-y-2">
           {t.params.map((p) => (
-            <div key={p.name} className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">
-              <code className="text-sm font-semibold text-violet-700">{p.name}</code>
-              <p className="mt-1 text-sm text-slate-600">{p.desc}</p>
+            <div key={p.name} className="rounded-card border border-line bg-paper-sunk px-4 py-3">
+              <code className="text-sm font-semibold text-purple">{p.name}</code>
+              <p className="mt-1 text-sm text-ink">{p.desc}</p>
             </div>
           ))}
         </div>

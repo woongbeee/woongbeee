@@ -206,10 +206,10 @@ const ICON_MAP = {
 }
 
 const COLOR_CLS = {
-  emerald: { bg: 'bg-emerald-50/60', border: 'border-emerald-200', badge: 'bg-emerald-100 text-emerald-700' },
-  blue:    { bg: 'bg-blue-50/60',    border: 'border-blue-200',    badge: 'bg-blue-100 text-blue-700' },
-  violet:  { bg: 'bg-violet-50/60',  border: 'border-violet-200',  badge: 'bg-violet-100 text-violet-700' },
-  amber:   { bg: 'bg-amber-50/60',   border: 'border-amber-200',   badge: 'bg-amber-100 text-amber-700' },
+  emerald: { bg: 'bg-green/5', border: 'border-green/30', badge: 'bg-green/10 text-green' },
+  blue:    { bg: 'bg-blue/5',    border: 'border-blue/30',    badge: 'bg-blue/10 text-blue' },
+  violet:  { bg: 'bg-purple/5',  border: 'border-purple/30',  badge: 'bg-purple/10 text-purple' },
+  amber:   { bg: 'bg-amber/5',   border: 'border-amber/30',   badge: 'bg-amber/10 text-amber' },
 }
 
 function UserCard({
@@ -222,14 +222,14 @@ function UserCard({
 }) {
   const cls = COLOR_CLS[color]
   return (
-    <div className={cn('rounded-xl border p-4', cls.bg, cls.border)}>
+    <div className={cn('rounded-panel border p-4', cls.bg, cls.border)}>
       <div className="mb-2 flex items-center gap-2">
-        <span className={cn('flex h-6 w-6 shrink-0 items-center justify-center rounded-md', cls.badge)}>
+        <span className={cn('flex h-6 w-6 shrink-0 items-center justify-center rounded-card', cls.badge)}>
           {ICON_MAP[icon as keyof typeof ICON_MAP]}
         </span>
         <span className="text-sm font-bold">{label}</span>
       </div>
-      <p className="text-xs leading-relaxed text-muted-foreground">{desc}</p>
+      <p className="text-xs leading-relaxed text-ink-2">{desc}</p>
     </div>
   )
 }
@@ -256,10 +256,10 @@ function LargePoolDiagram({ lang }: { lang: 'ko' | 'en' }) {
   const LP_ROW_H   = 30
   const LP_ROW_GAP = 8
   const LP_ROWS = [
-    { label: isKo ? 'RMAN 버퍼'      : 'RMAN buffers',       color: '#d1fae5', stroke: '#6ee7b7' },
-    { label: isKo ? '병렬 쿼리 버퍼'  : 'Parallel msg buf',   color: '#dbeafe', stroke: '#93c5fd' },
-    { label: isKo ? '공유 서버 UGA'   : 'Shared Server UGA',  color: '#ede9fe', stroke: '#c4b5fd' },
-    { label: isKo ? '지연 삽입'       : 'Deferred Insert',    color: '#fef3c7', stroke: '#fcd34d' },
+    { label: isKo ? 'RMAN 버퍼'      : 'RMAN buffers',       color: 'var(--color-line)', stroke: 'var(--color-green)' },
+    { label: isKo ? '병렬 쿼리 버퍼'  : 'Parallel msg buf',   color: 'var(--color-rail)', stroke: 'var(--color-blue)' },
+    { label: isKo ? '공유 서버 UGA'   : 'Shared Server UGA',  color: 'var(--color-rail)', stroke: 'var(--color-purple)' },
+    { label: isKo ? '지연 삽입'       : 'Deferred Insert',    color: 'var(--color-amber)', stroke: 'var(--color-amber)' },
   ]
   const LP_ROWS_H = LP_ROWS.length * LP_ROW_H + (LP_ROWS.length - 1) * LP_ROW_GAP  // 156
   const LP_H      = 24 + 16 + LP_ROWS_H + 24   // title + subtitle + rows + padding = 220
@@ -272,48 +272,48 @@ function LargePoolDiagram({ lang }: { lang: 'ko' | 'en' }) {
   const H     = SGA_H + PAD + 10
 
   return (
-    <div className="overflow-x-auto rounded-xl border bg-card">
+    <div className="overflow-x-auto rounded-panel border bg-paper">
       <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ maxWidth: W, display: 'block', margin: '0 auto' }}>
 
         {/* SGA outer */}
         <rect x={PAD} y={PAD} width={W - PAD * 2} height={SGA_H} rx={12}
-          fill="#f8fafc" stroke="#94a3b8" strokeWidth={1.5} strokeDasharray="7 4" />
+          fill="var(--color-paper-sunk)" stroke="var(--color-ink-3)" strokeWidth={1.5} strokeDasharray="7 4" />
         <text x={PAD + 14} y={PAD + 22} fontFamily="monospace" fontSize={11}
-          fontWeight="bold" fill="#64748b" letterSpacing={1}>SGA</text>
+          fontWeight="bold" fill="var(--color-ink-2)" letterSpacing={1}>SGA</text>
 
         {/* ── Shared Pool ── */}
         <rect x={BOX_X} y={SP_Y} width={BOX_W} height={SP_H} rx={8}
-          fill="#ede9fe" stroke="#7c3aed" strokeWidth={2} />
+          fill="var(--color-rail)" stroke="var(--color-purple)" strokeWidth={2} />
         <text x={BOX_X + 16} y={SP_Y + 22} fontFamily="monospace" fontSize={13}
-          fontWeight="bold" fill="#5b21b6">Shared Pool</text>
+          fontWeight="bold" fill="var(--color-purple)">Shared Pool</text>
         <text x={BOX_X + 16} y={SP_Y + 38} fontFamily="monospace" fontSize={10}
-          fill="#7c3aed" opacity={0.85}>
+          fill="var(--color-purple)" opacity={0.85}>
           {isKo ? 'SQL 커서 · 딕셔너리 · PL/SQL' : 'SQL cursors · dictionary · PL/SQL'}
         </text>
         {/* LRU inner block */}
         <rect x={BOX_X + 16} y={SP_Y + 48} width={BOX_W - 32} height={SP_INNER_H} rx={5}
-          fill="#ddd6fe" stroke="#a78bfa" strokeWidth={1} />
+          fill="var(--color-rail)" stroke="var(--color-purple)" strokeWidth={1} />
         <text x={BOX_X + BOX_W / 2} y={SP_Y + 48 + SP_INNER_H / 2 - 6} fontFamily="monospace"
-          fontSize={12} fontWeight="bold" fill="#4c1d95" textAnchor="middle">
+          fontSize={12} fontWeight="bold" fill="var(--color-purple)" textAnchor="middle">
           LRU list
         </text>
         <text x={BOX_X + BOX_W / 2} y={SP_Y + 48 + SP_INNER_H / 2 + 12} fontFamily="monospace"
-          fontSize={10} fill="#6d28d9" textAnchor="middle">
+          fontSize={10} fill="var(--color-purple)" textAnchor="middle">
           {isKo ? '오래된 항목 자동 해제' : 'old entries aged out automatically'}
         </text>
 
         {/* ── Large Pool ── */}
         <rect x={BOX_X} y={LP_Y} width={BOX_W} height={LP_H} rx={8}
-          fill="#f0fdf4" stroke="#10b981" strokeWidth={2} />
+          fill="var(--color-rail)" stroke="var(--color-green)" strokeWidth={2} />
         <text x={BOX_X + 16} y={LP_Y + 22} fontFamily="monospace" fontSize={13}
-          fontWeight="bold" fill="#065f46">Large Pool</text>
+          fontWeight="bold" fill="var(--color-green)">Large Pool</text>
         {/* No LRU badge */}
         <rect x={BOX_X + BOX_W - 90} y={LP_Y + 8} width={74} height={22} rx={5}
-          fill="#d1fae5" stroke="#6ee7b7" strokeWidth={1.5} />
+          fill="var(--color-line)" stroke="var(--color-green)" strokeWidth={1.5} />
         <text x={BOX_X + BOX_W - 53} y={LP_Y + 23} fontFamily="monospace" fontSize={10}
-          fontWeight="bold" fill="#065f46" textAnchor="middle">No LRU</text>
+          fontWeight="bold" fill="var(--color-green)" textAnchor="middle">No LRU</text>
         <text x={BOX_X + 16} y={LP_Y + 40} fontFamily="monospace" fontSize={10}
-          fill="#10b981" opacity={0.85}>
+          fill="var(--color-green)" opacity={0.85}>
           {isKo ? '세션·프로세스가 해제할 때까지 유지' : 'held until session / process frees it'}
         </text>
         {/* rows */}
@@ -324,7 +324,7 @@ function LargePoolDiagram({ lang }: { lang: 'ko' | 'en' }) {
               <rect x={BOX_X + 16} y={ry} width={BOX_W - 32} height={LP_ROW_H} rx={5}
                 fill={row.color} stroke={row.stroke} strokeWidth={1.2} />
               <text x={BOX_X + BOX_W / 2} y={ry + LP_ROW_H / 2 + 5} fontFamily="monospace"
-                fontSize={11} fontWeight="bold" fill="#374151" textAnchor="middle">
+                fontSize={11} fontWeight="bold" fill="var(--color-ink)" textAnchor="middle">
                 {row.label}
               </text>
             </g>
@@ -332,7 +332,7 @@ function LargePoolDiagram({ lang }: { lang: 'ko' | 'en' }) {
         })}
 
         {/* note */}
-        <text x={BOX_X} y={NOTE_Y} fontFamily="monospace" fontSize={9.5} fill="#9ca3af">
+        <text x={BOX_X} y={NOTE_Y} fontFamily="monospace" fontSize={9.5} fill="var(--color-ink-3)">
           {isKo
             ? '* LARGE_POOL_SIZE 미설정 시 위 항목들이 모두 Shared Pool에서 할당됨'
             : '* Without LARGE_POOL_SIZE, all items above are allocated from the Shared Pool'}
@@ -378,18 +378,18 @@ export function LargePoolSection() {
       <SectionTitle>{t.vsTitle}</SectionTitle>
       <Prose className="mb-4">{t.vsDesc}</Prose>
       <LargePoolDiagram lang={lang} />
-      <div className="mt-4 mb-6 overflow-hidden rounded-xl border bg-card">
+      <div className="mt-4 mb-6 overflow-hidden rounded-panel border bg-paper">
         {/* Header */}
-        <div className="grid grid-cols-3 border-b bg-muted/40 px-4 py-2">
+        <div className="grid grid-cols-3 border-b bg-rail px-4 py-2">
           {[t.vsAttr, t.vsShared, t.vsLarge].map((h) => (
-            <div key={h} className="font-mono text-[10px] font-bold uppercase tracking-wide text-muted-foreground">{h}</div>
+            <div key={h} className="font-mono text-[10px] font-bold uppercase tracking-wide text-ink-2">{h}</div>
           ))}
         </div>
         {t.vsRows.map((row, i) => (
           <div key={row.attr} className={cn('grid grid-cols-3 px-4 py-2.5 text-xs', i > 0 && 'border-t')}>
-            <div className="font-semibold text-foreground">{row.attr}</div>
-            <div className="text-muted-foreground">{row.shared}</div>
-            <div className="font-medium text-teal-700">{row.large}</div>
+            <div className="font-semibold text-ink">{row.attr}</div>
+            <div className="text-ink-2">{row.shared}</div>
+            <div className="font-medium text-green">{row.large}</div>
           </div>
         ))}
       </div>
@@ -410,15 +410,15 @@ export function LargePoolSection() {
       <SectionTitle>{t.deferredTitle}</SectionTitle>
       <Prose className="mb-4">{t.deferredDesc}</Prose>
 
-      <div className="mb-4 overflow-hidden rounded-xl border bg-card">
+      <div className="mb-4 overflow-hidden rounded-panel border bg-paper">
         {t.deferredSteps.map((s, i) => (
           <div key={s.n} className={cn('flex items-start gap-4 px-5 py-3.5', i > 0 && 'border-t')}>
-            <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber-500 font-mono text-[11px] font-bold text-white">
+            <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber font-mono text-[11px] font-bold text-paper">
               {s.n}
             </span>
             <div>
-              <div className="mb-0.5 text-sm font-semibold text-foreground">{s.label}</div>
-              <div className="text-xs leading-relaxed text-muted-foreground">{s.desc}</div>
+              <div className="mb-0.5 text-sm font-semibold text-ink">{s.label}</div>
+              <div className="text-xs leading-relaxed text-ink-2">{s.desc}</div>
             </div>
           </div>
         ))}
@@ -433,24 +433,24 @@ export function LargePoolSection() {
 
       {/* ── Parameters ── */}
       <SectionTitle>{t.paramsTitle}</SectionTitle>
-      <div className="mb-6 overflow-hidden rounded-xl border bg-card">
+      <div className="mb-6 overflow-hidden rounded-panel border bg-paper">
         {t.params.map((p, i) => (
           <div key={p.name} className={cn('flex items-start gap-4 px-5 py-3', i > 0 && 'border-t')}>
-            <code className="mt-0.5 shrink-0 rounded bg-teal-100 px-2 py-0.5 font-mono text-[11px] font-bold text-teal-700">
+            <code className="mt-0.5 shrink-0 rounded bg-green/10 px-2 py-0.5 font-mono text-[11px] font-bold text-green">
               {p.name}
             </code>
-            <p className="text-xs leading-relaxed text-muted-foreground">{p.desc}</p>
+            <p className="text-xs leading-relaxed text-ink-2">{p.desc}</p>
           </div>
         ))}
       </div>
 
       {/* ── Summary ── */}
-      <div className="rounded-2xl border bg-gradient-to-br from-slate-50 to-teal-50/30 px-6 py-5">
+      <div className="rounded-panel border border-line border-l-[3px] border-l-green bg-paper-sunk px-6 py-5">
         <div className="mb-3"><SubTitle>{t.summaryTitle}</SubTitle></div>
         <ul className="space-y-1.5">
           {t.summaryItems.map((item, i) => (
-            <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
-              <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-teal-400" />
+            <li key={i} className="flex items-start gap-2 text-sm text-ink-2">
+              <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-green" />
               {item}
             </li>
           ))}

@@ -78,23 +78,23 @@ const T = {
 type StepState = 'commit' | 'rollback' | 'sp' | 'normal'
 
 const stateStyle: Record<StepState, string> = {
-  normal:   'border-slate-300 bg-white text-slate-600',
-  sp:       'border-amber-400 bg-amber-50 text-amber-700 font-bold',
-  rollback: 'border-rose-400 bg-rose-50 text-rose-700',
-  commit:   'border-emerald-400 bg-emerald-50 text-emerald-700 font-bold',
+  normal:   'border-line-2 bg-paper text-ink',
+  sp:       'border-amber/50 bg-amber/5 text-amber font-bold',
+  rollback: 'border-red/50 bg-red/5 text-red',
+  commit:   'border-green/50 bg-green/5 text-green font-bold',
 }
 
 function SavepointDiagram({ steps }: { steps: { label: string; state: StepState; note?: string }[] }) {
   return (
-    <div className="my-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
+    <div className="my-4 rounded-panel border border-line bg-paper-sunk p-4">
       <div className="flex flex-col gap-2">
         {steps.map((s, i) => (
           <div key={i} className="flex items-center gap-3">
-            <div className={cn('w-48 shrink-0 rounded-lg border px-3 py-2 font-mono text-[11px]', stateStyle[s.state])}>
+            <div className={cn('w-48 shrink-0 rounded-card border px-3 py-2 font-mono text-[11px]', stateStyle[s.state])}>
               {s.label}
             </div>
             {s.note && (
-              <span className="font-mono text-[10px] text-slate-400">{s.note}</span>
+              <span className="font-mono text-[10px] text-ink-2">{s.note}</span>
             )}
           </div>
         ))}
@@ -111,7 +111,7 @@ export function TransactionSavepointSection() {
   return (
     <PageContainer>
       <ChapterTitle
-        icon={<IconFlag size={36} stroke={1.5} className="text-amber-500" />}
+        icon={<IconFlag size={36} stroke={1.5} className="text-amber" />}
         title={t.title}
         subtitle={t.subtitle}
       />

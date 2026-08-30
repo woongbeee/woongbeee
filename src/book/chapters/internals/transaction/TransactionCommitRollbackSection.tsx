@@ -130,7 +130,7 @@ export function TransactionCommitRollbackSection() {
   return (
     <PageContainer>
       <ChapterTitle
-        icon={<IconHistory size={36} stroke={1.5} className="text-emerald-500" />}
+        icon={<IconHistory size={36} stroke={1.5} className="text-green" />}
         title={t.title}
         subtitle={t.subtitle}
       />

@@ -28,10 +28,11 @@ export function MapPanel({ title, highlightIds, callout }: {
   callout?: string
 }) {
   return (
-    <div className="rounded-xl border bg-card p-4 shadow-sm">
+    <div className="rounded-panel border bg-paper p-4">
       <div className="mb-3 flex items-center gap-2">
-        <div className="h-2 w-2 rounded-full bg-blue-500" />
-        <span className="font-mono text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
+        <div className="h-2 w-2 rounded-full bg-blue" />
+        {/* 한글 라벨이라 mono 금지 — mono 는 한글 글리프가 없어 시스템 폰트로 폴백된다 */}
+        <span className="font-sans text-[11px] font-semibold tracking-wide text-ink-2">
           {title}
         </span>
       </div>
@@ -67,8 +68,8 @@ export function TourPanel({
 }) {
   const lang = useSimulationStore((s) => s.lang)
   const active = accentColor === 'blue'
-    ? { btn: 'border-blue-400 bg-blue-100 text-blue-700 font-bold shadow-sm', hover: 'hover:border-blue-300 hover:bg-blue-50', card: 'border-blue-200 bg-blue-50', title: 'text-blue-700', badge: 'bg-blue-200 text-blue-800' }
-    : { btn: 'border-amber-400 bg-amber-100 text-amber-700 font-bold shadow-sm', hover: 'hover:border-amber-300 hover:bg-amber-50', card: 'border-amber-200 bg-amber-50', title: 'text-amber-700', badge: 'bg-amber-200 text-amber-800' }
+    ? { btn: 'border-blue/50 bg-blue/10 text-blue font-semibold ', hover: 'hover:border-blue/50 hover:bg-blue/5', card: 'border-blue/30 bg-blue/5', title: 'text-blue', badge: 'bg-blue/15 text-blue' }
+    : { btn: 'border-amber/50 bg-amber/10 text-amber font-semibold ', hover: 'hover:border-amber/50 hover:bg-amber/5', card: 'border-amber/30 bg-amber/5', title: 'text-amber', badge: 'bg-amber/15 text-amber' }
 
   return (
     <>
@@ -79,8 +80,8 @@ export function TourPanel({
             key={item.label}
             onClick={() => onSelect(activeIdx === i ? null : i)}
             className={cn(
-              'rounded-full border px-3 py-1 font-mono text-xs transition-all',
-              activeIdx === i ? active.btn : `${active.hover} text-muted-foreground`
+              'rounded-full border px-3 py-1 font-sans text-xs transition-all',
+              activeIdx === i ? active.btn : `${active.hover} text-ink-2`
             )}
           >
             {item.label}
@@ -89,7 +90,7 @@ export function TourPanel({
         {activeIdx !== null && (
           <button
             onClick={() => onSelect(null)}
-            className="rounded-full border border-dashed px-3 py-1 font-mono text-xs text-muted-foreground hover:text-foreground"
+            className="rounded-full border border-dashed px-3 py-1 font-sans text-xs text-ink-2 hover:text-ink"
           >
             ✕ {showAllLabel}
           </button>
@@ -101,12 +102,12 @@ export function TourPanel({
           key={activeIdx}
           initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
-          className={cn('mb-4 rounded-lg border p-3', active.card)}
+          className={cn('mb-4 rounded-card border p-3', active.card)}
         >
-          <div className={cn('mb-1 font-mono text-xs font-bold', active.title)}>
+          <div className={cn('mb-1 font-sans text-[12px] font-semibold', active.title)}>
             {tour[activeIdx].label}
           </div>
-          <p className="font-mono text-xs text-muted-foreground">{tour[activeIdx].desc[lang]}</p>
+          <p className="font-read text-xs leading-relaxed text-ink-2">{tour[activeIdx].desc[lang]}</p>
           {accentColor === 'amber' && (
             <div className="mt-2 flex flex-wrap gap-1">
               {tour[activeIdx].ids.map((id) => (

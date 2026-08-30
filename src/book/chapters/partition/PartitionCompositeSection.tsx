@@ -189,7 +189,7 @@ export function PartitionCompositeSection() {
   return (
     <PageContainer>
       <ChapterTitle
-        icon={<IconStack2 size={36} stroke={1.5} className="text-amber-500" />}
+        icon={<IconStack2 size={36} stroke={1.5} className="text-amber" />}
         title={t.title}
         subtitle={t.subtitle}
       />

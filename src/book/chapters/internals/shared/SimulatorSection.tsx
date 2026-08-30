@@ -71,7 +71,7 @@ function ErdPanel() {
   return (
     <div className="flex h-full overflow-hidden">
       {/* Left panel */}
-      <div className="flex shrink-0 flex-col overflow-hidden bg-card" style={{ width: panelWidth }}>
+      <div className="flex shrink-0 flex-col overflow-hidden bg-paper" style={{ width: panelWidth }}>
         {/* Schema tabs */}
         <div className="flex shrink-0 border-b">
           {SCHEMAS.map((s) => (
@@ -81,8 +81,8 @@ function ErdPanel() {
               className={cn(
                 'flex-1 py-2 font-mono text-xs font-semibold transition-colors',
                 selectedSchema.name === s.name
-                  ? 'border-b-2 border-violet-500 text-violet-600'
-                  : 'border-b-2 border-transparent text-muted-foreground hover:text-foreground'
+                  ? 'border-b-2 border-purple text-purple'
+                  : 'border-b-2 border-transparent text-ink-2 hover:text-ink'
               )}
             >
               {s.name}
@@ -99,8 +99,8 @@ function ErdPanel() {
               className={cn(
                 'flex-1 py-1.5 font-mono text-[11px] font-medium transition-colors',
                 leftView === v
-                  ? 'border-b-2 border-foreground text-foreground'
-                  : 'border-b-2 border-transparent text-muted-foreground hover:text-foreground'
+                  ? 'border-b-2 border-foreground text-ink'
+                  : 'border-b-2 border-transparent text-ink-2 hover:text-ink'
               )}
             >
               {v === 'schema' ? 'Schema' : 'Table Data'}
@@ -110,16 +110,16 @@ function ErdPanel() {
 
         {/* Table picker (only in Data view) */}
         {leftView === 'data' && (
-          <div className="flex shrink-0 flex-wrap gap-1 border-b bg-muted/30 px-3 py-2">
+          <div className="flex shrink-0 flex-wrap gap-1 border-b bg-rail px-3 py-2">
             {selectedSchema.tables.map((t) => (
               <button
                 key={t.name}
                 onClick={() => setSelectedTable(t)}
                 className={cn(
-                  'rounded-md border px-2 py-0.5 font-mono text-[10px] transition-colors',
+                  'rounded-card border px-2 py-0.5 font-mono text-[10px] transition-colors',
                   selectedTable?.name === t.name
                     ? 'border-foreground bg-foreground text-background'
-                    : 'border-border text-muted-foreground hover:border-foreground hover:text-foreground'
+                    : 'border-line text-ink-2 hover:border-foreground hover:text-ink'
                 )}
               >
                 {t.name}
@@ -132,7 +132,7 @@ function ErdPanel() {
           {leftView === 'schema' && <SchemaView schema={selectedSchema} />}
           {leftView === 'data' && selectedTable && <TableView table={selectedTable} />}
           {leftView === 'data' && !selectedTable && (
-            <div className="flex h-full items-center justify-center text-xs text-muted-foreground">
+            <div className="flex h-full items-center justify-center text-xs text-ink-2">
               위에서 테이블을 선택하세요
             </div>
           )}
@@ -142,9 +142,9 @@ function ErdPanel() {
       {/* Resize handle */}
       <div
         onMouseDown={onMouseDown}
-        className="group relative flex w-1 shrink-0 cursor-col-resize items-center justify-center bg-border transition-colors hover:bg-violet-400 active:bg-violet-500"
+        className="group relative flex w-1 shrink-0 cursor-col-resize items-center justify-center bg-border transition-colors hover:bg-purple active:bg-purple"
       >
-        <div className="absolute h-8 w-3 rounded-full bg-border transition-colors group-hover:bg-violet-400" />
+        <div className="absolute h-8 w-3 rounded-full bg-border transition-colors group-hover:bg-purple" />
       </div>
 
       {/* ERD diagram */}
@@ -171,10 +171,10 @@ export function InternalsSimulatorSection() {
   return (
     <div className="flex h-full flex-col overflow-hidden">
       {/* Tab bar */}
-      <div className="flex shrink-0 items-center border-b bg-muted/30">
+      <div className="flex shrink-0 items-center border-b bg-rail">
         <div className="px-4 py-2.5">
           <h2 className="text-sm font-bold leading-none">{t.simTitle}</h2>
-          <p className="mt-0.5 text-[11px] text-muted-foreground">{t.simDesc}</p>
+          <p className="mt-0.5 text-[11px] text-ink-2">{t.simDesc}</p>
         </div>
         <div className="ml-auto flex h-full shrink-0 items-stretch gap-px border-l pr-1">
           <button
@@ -182,8 +182,8 @@ export function InternalsSimulatorSection() {
             className={cn(
               'flex items-center gap-1.5 px-4 font-mono text-xs font-semibold transition-colors',
               activeTab === 'simulator'
-                ? 'border-b-2 border-foreground bg-background text-foreground'
-                : 'text-muted-foreground hover:text-foreground'
+                ? 'border-b-2 border-foreground bg-paper text-ink'
+                : 'text-ink-2 hover:text-ink'
             )}
           >
             <span className="text-[11px]">⚙</span>
@@ -192,10 +192,10 @@ export function InternalsSimulatorSection() {
           <button
             onClick={() => setActiveTab('erd')}
             className={cn(
-              'flex items-center gap-1.5 rounded-sm px-4 font-mono text-xs font-semibold transition-colors',
+              'flex items-center gap-1.5 rounded-chip px-4 font-mono text-xs font-semibold transition-colors',
               activeTab === 'erd'
-                ? 'border-b-2 border-violet-500 bg-background text-violet-600'
-                : 'text-muted-foreground hover:text-foreground'
+                ? 'border-b-2 border-purple bg-paper text-purple'
+                : 'text-ink-2 hover:text-ink'
             )}
           >
             <span className="text-[11px]">⬡</span>
@@ -221,13 +221,13 @@ export function InternalsSimulatorSection() {
                 <div className="min-h-0 overflow-hidden" style={{ width: '70%', flexShrink: 0 }}>
                   <OracleDiagram compact />
                 </div>
-                <div className="flex min-h-0 flex-1 flex-col overflow-hidden border-l bg-card">
-                  <div className="flex shrink-0 items-center gap-2 border-b bg-muted/50 px-3 py-2">
-                    <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                <div className="flex min-h-0 flex-1 flex-col overflow-hidden border-l bg-paper">
+                  <div className="flex shrink-0 items-center gap-2 border-b bg-rail px-3 py-2">
+                    <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-ink-2">
                       CBO Optimizer
                     </span>
                     {optimizerResult && (
-                      <span className="font-mono text-[10px] text-muted-foreground">
+                      <span className="font-mono text-[10px] text-ink-2">
                         cost {optimizerResult.plan.totalCost.toFixed(1)} · {optimizerResult.plan.estimatedRows} rows
                       </span>
                     )}
@@ -241,8 +241,8 @@ export function InternalsSimulatorSection() {
               {/* Bottom: SQL input (left 70%) + Log/Summary (right 30%) */}
               <div className="flex shrink-0 border-t" style={{ height: '220px' }}>
                 <div className="flex min-h-0 flex-col overflow-hidden border-r" style={{ width: '70%', flexShrink: 0 }}>
-                  <div className="shrink-0 border-b bg-muted/40 px-3 py-1.5">
-                    <span className="font-mono text-[9px] font-bold uppercase tracking-widest text-muted-foreground">
+                  <div className="shrink-0 border-b bg-rail px-3 py-1.5">
+                    <span className="font-mono text-[9px] font-bold uppercase tracking-widest text-ink-2">
                       SQL Input
                     </span>
                   </div>
@@ -250,9 +250,9 @@ export function InternalsSimulatorSection() {
                     <QueryInput />
                   </div>
                 </div>
-                <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-card">
-                  <div className="shrink-0 border-b bg-muted/40 px-3 py-1.5">
-                    <span className="font-mono text-[9px] font-bold uppercase tracking-widest text-muted-foreground">
+                <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-paper">
+                  <div className="shrink-0 border-b bg-rail px-3 py-1.5">
+                    <span className="font-mono text-[9px] font-bold uppercase tracking-widest text-ink-2">
                       {isComplete ? t.execSummary : t.liveLog}
                     </span>
                   </div>

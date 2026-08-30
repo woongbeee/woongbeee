@@ -500,7 +500,7 @@ export function ExplainSection() {
   return (
     <PageContainer>
       <ChapterTitle
-        icon={<IconSearch size={36} stroke={1.5} className="text-orange-500" />}
+        icon={<IconSearch size={36} stroke={1.5} className="text-amber" />}
         title={t.title}
         subtitle={t.subtitle}
       />
@@ -517,7 +517,7 @@ export function ExplainSection() {
       <SubTitle>{t.restrictionsTitle}</SubTitle>
       <ul className="mt-2 mb-4 space-y-1.5 pl-4">
         {t.restrictionsItems.map((item, i) => (
-          <li key={i} className="text-sm leading-relaxed text-foreground/80 before:mr-2 before:content-['•']">
+          <li key={i} className="text-sm leading-relaxed text-ink/80 before:mr-2 before:content-['•']">
             {item}
           </li>
         ))}
@@ -531,8 +531,8 @@ export function ExplainSection() {
         <SqlBlock sql={t.basicStepsSql} />
       </div>
       <div className="mt-4">
-        <div className="overflow-x-auto rounded-xl border bg-muted/30 px-4 py-3">
-          <pre className="font-mono text-xs leading-relaxed text-foreground/80 whitespace-pre">{t.basicStepsOutput}</pre>
+        <div className="overflow-x-auto rounded-panel border bg-rail px-4 py-3">
+          <pre className="font-mono text-xs leading-relaxed text-ink/80 whitespace-pre">{t.basicStepsOutput}</pre>
         </div>
       </div>
 
@@ -547,8 +547,8 @@ export function ExplainSection() {
       <AccordionSection title={isKo ? 'Example 6-2: STATEMENT_ID ex_plan1' : 'Example 6-2: Statement ID ex_plan1'}>
         <SqlBlock sql={t.ex1Sql} />
         <div className="mt-3">
-          <div className="overflow-x-auto rounded-xl border bg-muted/30 px-4 py-3">
-            <pre className="font-mono text-xs leading-relaxed text-foreground/80 whitespace-pre">{t.ex1Output}</pre>
+          <div className="overflow-x-auto rounded-panel border bg-rail px-4 py-3">
+            <pre className="font-mono text-xs leading-relaxed text-ink/80 whitespace-pre">{t.ex1Output}</pre>
           </div>
         </div>
       </AccordionSection>
@@ -556,8 +556,8 @@ export function ExplainSection() {
       <AccordionSection title={isKo ? 'Example 6-3: BASIC 포맷 ex_plan2' : 'Example 6-3: BASIC format ex_plan2'}>
         <SqlBlock sql={t.ex2Sql} />
         <div className="mt-3">
-          <div className="overflow-x-auto rounded-xl border bg-muted/30 px-4 py-3">
-            <pre className="font-mono text-xs leading-relaxed text-foreground/80 whitespace-pre">{t.ex2Output}</pre>
+          <div className="overflow-x-auto rounded-panel border bg-rail px-4 py-3">
+            <pre className="font-mono text-xs leading-relaxed text-ink/80 whitespace-pre">{t.ex2Output}</pre>
           </div>
         </div>
       </AccordionSection>
@@ -570,8 +570,8 @@ export function ExplainSection() {
         <SqlBlock sql={t.containersSql} />
       </div>
       <div className="mt-4">
-        <div className="overflow-x-auto rounded-xl border bg-muted/30 px-4 py-3">
-          <pre className="font-mono text-xs leading-relaxed text-foreground/80 whitespace-pre">{t.containersOutput}</pre>
+        <div className="overflow-x-auto rounded-panel border bg-rail px-4 py-3">
+          <pre className="font-mono text-xs leading-relaxed text-ink/80 whitespace-pre">{t.containersOutput}</pre>
         </div>
       </div>
       <div className="mt-4">
@@ -605,8 +605,8 @@ export function ExplainSection() {
         <SqlBlock sql={t.parallelSql} />
       </div>
       <div className="mt-4">
-        <div className="overflow-x-auto rounded-xl border bg-muted/30 px-4 py-3">
-          <pre className="font-mono text-xs leading-relaxed text-foreground/80 whitespace-pre">{t.parallelOutput}</pre>
+        <div className="overflow-x-auto rounded-panel border bg-rail px-4 py-3">
+          <pre className="font-mono text-xs leading-relaxed text-ink/80 whitespace-pre">{t.parallelOutput}</pre>
         </div>
       </div>
       <div className="mt-4">
@@ -623,8 +623,8 @@ export function ExplainSection() {
       <AccordionSection title={t.resultCacheTitle}>
         <SqlBlock sql={t.resultCacheSql} />
         <div className="mt-3">
-          <div className="overflow-x-auto rounded-xl border bg-muted/30 px-4 py-3">
-            <pre className="font-mono text-xs leading-relaxed text-foreground/80 whitespace-pre">{t.resultCacheOutput}</pre>
+          <div className="overflow-x-auto rounded-panel border bg-rail px-4 py-3">
+            <pre className="font-mono text-xs leading-relaxed text-ink/80 whitespace-pre">{t.resultCacheOutput}</pre>
           </div>
         </div>
         <div className="mt-4">
@@ -640,7 +640,7 @@ export function ExplainSection() {
       <SubTitle>{t.whyChangeSchemaTitle}</SubTitle>
       <ul className="mt-2 mb-4 space-y-1.5 pl-4">
         {t.whyChangeSchemaItems.map((item, i) => (
-          <li key={i} className="text-sm leading-relaxed text-foreground/80 before:mr-2 before:content-['•']">
+          <li key={i} className="text-sm leading-relaxed text-ink/80 before:mr-2 before:content-['•']">
             {item}
           </li>
         ))}
@@ -649,7 +649,7 @@ export function ExplainSection() {
       <SubTitle>{t.whyCostTitle}</SubTitle>
       <ul className="mt-2 mb-4 space-y-1.5 pl-4">
         {t.whyCostItems.map((item, i) => (
-          <li key={i} className="text-sm leading-relaxed text-foreground/80 before:mr-2 before:content-['•']">
+          <li key={i} className="text-sm leading-relaxed text-ink/80 before:mr-2 before:content-['•']">
             {item}
           </li>
         ))}

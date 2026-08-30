@@ -7,9 +7,22 @@ import { BookContent } from './BookContent'
 import { GlossaryPanel } from './GlossaryPanel'
 import { SchemaPanel } from './SchemaPanel'
 import { Badge } from '@/components/ui/badge'
-import { IconLanguage, IconSettings, IconChevronRight } from '@tabler/icons-react'
+import { IconLanguage, IconSettings, IconChevronRight, IconDatabase, IconSun, IconMoon } from '@tabler/icons-react'
 
-const T: Record<'ko' | 'en', { title: string; subtitle: string; langToggle: string; tocLabel: string; openTitle: string; closeTitle: string; simulator: string }> = {
+const T: Record<
+  'ko' | 'en',
+  {
+    title: string
+    subtitle: string
+    langToggle: string
+    tocLabel: string
+    openTitle: string
+    closeTitle: string
+    simulator: string
+    themeLight: string
+    themeDark: string
+  }
+> = {
   ko: {
     title: 'Oracle DB',
     subtitle: 'Interactive Learning Book',
@@ -18,6 +31,8 @@ const T: Record<'ko' | 'en', { title: string; subtitle: string; langToggle: stri
     openTitle: '목차 열기',
     closeTitle: '목차 닫기',
     simulator: 'Internals Simulator',
+    themeLight: '라이트 모드',
+    themeDark: '다크 모드',
   },
   en: {
     title: 'Oracle DB',
@@ -27,6 +42,8 @@ const T: Record<'ko' | 'en', { title: string; subtitle: string; langToggle: stri
     openTitle: 'Open TOC',
     closeTitle: 'Close TOC',
     simulator: 'Internals Simulator',
+    themeLight: 'Light mode',
+    themeDark: 'Dark mode',
   },
 }
 
@@ -42,7 +59,7 @@ const TocTab = memo(function TocTab({ onToggle }: { onToggle: () => void }) {
     <button
       onClick={onToggle}
       title={t.openTitle}
-      className="flex w-7 shrink-0 flex-col items-center justify-center gap-1.5 border-r bg-card text-muted-foreground transition-colors duration-150 hover:bg-muted/60 hover:text-foreground"
+      className="flex w-7 shrink-0 flex-col items-center justify-center gap-1.5 border-r border-line bg-rail text-ink-3 transition-colors duration-150 hover:bg-ink/[0.04] hover:text-ink"
     >
       <IconChevronRight size={13} />
       <span
@@ -58,6 +75,8 @@ const TocTab = memo(function TocTab({ onToggle }: { onToggle: () => void }) {
 export function BookLayout() {
   const lang = useSimulationStore((s) => s.lang)
   const setLang = useSimulationStore((s) => s.setLang)
+  const theme = useSimulationStore((s) => s.theme)
+  const toggleTheme = useSimulationStore((s) => s.toggleTheme)
   const t = T[lang]
 
   const [tocOpen, setTocOpen]           = useState(true)
@@ -94,39 +113,39 @@ export function BookLayout() {
   }
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden bg-background text-foreground">
-      {/* ── Top Header ── */}
-      <header className="flex h-[35px] shrink-0 items-center gap-3 border-b bg-card px-4 z-20">
-        <div className="flex items-center gap-1.5">
-          <div className="h-3 w-3 rounded-full bg-red-400" />
-          <div className="h-3 w-3 rounded-full bg-yellow-400" />
-          <div className="h-3 w-3 rounded-full bg-green-400" />
-        </div>
-
-        <div className="h-4 w-px bg-border" />
-
-        <span className="font-mono text-sm font-semibold tracking-tight">{t.title}</span>
-        <span className="font-mono text-sm text-muted-foreground">{t.subtitle}</span>
+    <div className="flex h-screen flex-col overflow-hidden bg-paper text-ink">
+      {/* ── Top Header — mono chrome ── */}
+      <header className="z-20 flex h-11 shrink-0 items-center gap-2.5 border-b border-line bg-paper px-4">
+        <span className="grid h-5 w-5 shrink-0 place-items-center rounded-chip bg-ink text-paper">
+          <IconDatabase size={13} stroke={2} />
+        </span>
+        <span className="font-sans text-[13px] font-semibold tracking-tight text-ink">{t.title}</span>
+        <span className="hidden font-mono text-[11px] text-ink-3 sm:inline">{t.subtitle}</span>
 
         <div className="ml-auto flex items-center gap-2">
-          <span className="hidden font-mono text-[10px] text-muted-foreground/50 sm:inline">
-            last updated {__BUILD_DATE__}
-          </span>
-          <div className="hidden h-3 w-px bg-border sm:block" />
+          <span className="hidden font-mono text-[10px] text-ink-3 lg:inline">updated {__BUILD_DATE__}</span>
+          <span className="hidden h-3.5 w-px bg-line lg:block" />
           <button
             onClick={() => window.open(`${window.location.pathname}#simulator`, '_blank', 'width=1400,height=900')}
-            className="flex items-center gap-1.5 rounded-full border bg-muted px-2.5 py-0.5 font-mono text-[10px] font-medium text-muted-foreground transition-colors hover:bg-blue-50 hover:text-blue-700 hover:border-blue-300"
+            className="flex items-center gap-1.5 rounded-chip border border-line bg-paper px-2.5 py-1 font-mono text-[10px] font-medium text-ink-2 transition-colors hover:bg-rail hover:text-ink"
           >
             <IconSettings size={12} />
             {t.simulator}
           </button>
-          <div className="h-3 w-px bg-border" />
           <button
             onClick={toggleLang}
-            className="flex items-center gap-1.5 rounded-full border bg-muted px-2.5 py-0.5 font-mono text-[10px] font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+            className="flex items-center gap-1.5 rounded-chip border border-line bg-paper px-2.5 py-1 font-mono text-[10px] font-medium text-ink-2 transition-colors hover:bg-rail hover:text-ink"
           >
             <IconLanguage size={12} />
             {t.langToggle}
+          </button>
+          <button
+            onClick={toggleTheme}
+            title={theme === 'dark' ? t.themeLight : t.themeDark}
+            aria-label={theme === 'dark' ? t.themeLight : t.themeDark}
+            className="grid h-[26px] w-[26px] shrink-0 place-items-center rounded-chip border border-line bg-paper text-ink-2 transition-colors hover:bg-rail hover:text-ink"
+          >
+            {theme === 'dark' ? <IconSun size={13} /> : <IconMoon size={13} />}
           </button>
           <SimulationBadge />
         </div>
@@ -144,7 +163,7 @@ export function BookLayout() {
                 animate={{ width: tocWidth, opacity: 1 }}
                 exit={{ width: 0, opacity: 0 }}
                 transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-                className="overflow-hidden border-r bg-card"
+                className="overflow-hidden border-r border-line bg-rail"
               >
                 <div className="relative flex h-full" style={{ width: tocWidth }}>
                   <div className="min-w-0 flex-1 overflow-y-auto">
@@ -157,7 +176,7 @@ export function BookLayout() {
                   {/* Drag handle */}
                   <div
                     onMouseDown={onDragStart}
-                    className="absolute right-0 top-0 h-full w-1 cursor-col-resize hover:bg-border active:bg-border transition-colors"
+                    className="absolute right-0 top-0 h-full w-1 cursor-col-resize transition-colors hover:bg-line-2 active:bg-line-2"
                   />
                 </div>
               </motion.div>
@@ -195,8 +214,8 @@ const SimulationBadge = memo(function SimulationBadge() {
   const isRunning = useInternalsStore((s) => s.isRunning)
   if (!isRunning) return null
   return (
-    <Badge variant="outline" className="font-mono text-[10px]">
-      <span className="mr-1.5 inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-orange-400" />
+    <Badge variant="outline" className="border-line font-mono text-[10px] text-ink-2">
+      <span className="mr-1.5 inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-ink-3" />
       RUNNING
     </Badge>
   )

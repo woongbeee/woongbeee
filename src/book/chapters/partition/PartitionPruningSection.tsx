@@ -171,7 +171,7 @@ export function PartitionPruningSection() {
   return (
     <PageContainer>
       <ChapterTitle
-        icon={<IconScissors size={36} stroke={1.5} className="text-amber-500" />}
+        icon={<IconScissors size={36} stroke={1.5} className="text-amber" />}
         title={t.title}
         subtitle={t.subtitle}
       />

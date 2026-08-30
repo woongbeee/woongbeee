@@ -273,13 +273,13 @@ const T = {
 // ── Color map ─────────────────────────────────────────────────────────────────
 
 const PROC_COLORS = {
-  blue:    { bg: '#dbeafe', border: '#93c5fd', text: '#1d4ed8', badge: '#1e40af' },
-  violet:  { bg: '#ede9fe', border: '#c4b5fd', text: '#6d28d9', badge: '#5b21b6' },
-  emerald: { bg: '#d1fae5', border: '#6ee7b7', text: '#065f46', badge: '#064e3b' },
-  amber:   { bg: '#fef3c7', border: '#fcd34d', text: '#b45309', badge: '#92400e' },
-  rose:    { bg: '#ffe4e6', border: '#fda4af', text: '#be123c', badge: '#9f1239' },
-  teal:    { bg: '#ccfbf1', border: '#5eead4', text: '#0f766e', badge: '#115e59' },
-  slate:   { bg: '#f1f5f9', border: '#cbd5e1', text: '#475569', badge: '#334155' },
+  blue:    { bg: 'var(--color-rail)', border: 'var(--color-blue)', text: 'var(--color-blue)', badge: 'var(--color-blue)' },
+  violet:  { bg: 'var(--color-rail)', border: 'var(--color-purple)', text: 'var(--color-purple)', badge: 'var(--color-purple)' },
+  emerald: { bg: 'var(--color-line)', border: 'var(--color-green)', text: 'var(--color-green)', badge: 'var(--color-green)' },
+  amber:   { bg: 'var(--color-amber)', border: 'var(--color-amber)', text: 'var(--color-amber)', badge: 'var(--color-amber)' },
+  rose:    { bg: 'var(--color-rail)', border: 'var(--color-red)', text: 'var(--color-red)', badge: 'var(--color-red)' },
+  teal:    { bg: 'var(--color-green)', border: 'var(--color-green)', text: 'var(--color-green)', badge: 'var(--color-green)' },
+  slate:   { bg: 'var(--color-rail)', border: 'var(--color-line)', text: 'var(--color-ink-2)', badge: 'var(--color-ink)' },
 }
 
 // ── COMMIT Flow Diagram ───────────────────────────────────────────────────────
@@ -292,73 +292,73 @@ function CommitFlowDiagram({ isKo }: { isKo: boolean }) {
     <svg viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ maxHeight: 200 }}>
       <defs>
         <marker id="cfArrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
-          <path d="M0,0 L7,3.5 L0,7 Z" fill="#6b7280" />
+          <path d="M0,0 L7,3.5 L0,7 Z" fill="var(--color-ink-2)" />
         </marker>
         <marker id="cfArrowSync" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
-          <path d="M0,0 L7,3.5 L0,7 Z" fill="#7c3aed" />
+          <path d="M0,0 L7,3.5 L0,7 Z" fill="var(--color-purple)" />
         </marker>
         <marker id="cfArrowAsync" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
-          <path d="M0,0 L7,3.5 L0,7 Z" fill="#6b7280" />
+          <path d="M0,0 L7,3.5 L0,7 Z" fill="var(--color-ink-2)" />
         </marker>
       </defs>
 
       {/* Server Process */}
       <rect x={10} y={60} width={100} height={50} rx={8}
-        fill="#ede9fe" stroke="#c4b5fd" strokeWidth={1.5} />
-      <text x={60} y={80} textAnchor="middle" fill="#6d28d9" fontSize={10} fontWeight={700}>
+        fill="var(--color-rail)" stroke="var(--color-purple)" strokeWidth={1.5} />
+      <text x={60} y={80} textAnchor="middle" fill="var(--color-purple)" fontSize={10} fontWeight={700}>
         {isKo ? '서버 프로세스' : 'Server Process'}
       </text>
-      <text x={60} y={95} textAnchor="middle" fill="#6d28d9" fontSize={8.5}>
+      <text x={60} y={95} textAnchor="middle" fill="var(--color-purple)" fontSize={8.5}>
         {isKo ? 'COMMIT 요청' : 'COMMIT request'}
       </text>
 
       {/* Arrow → Redo Buffer */}
-      <line x1={110} y1={85} x2={148} y2={85} stroke="#7c3aed" strokeWidth={1.5} markerEnd="url(#cfArrowSync)" />
-      <text x={129} y={78} textAnchor="middle" fill="#7c3aed" fontSize={8}>①</text>
+      <line x1={110} y1={85} x2={148} y2={85} stroke="var(--color-purple)" strokeWidth={1.5} markerEnd="url(#cfArrowSync)" />
+      <text x={129} y={78} textAnchor="middle" fill="var(--color-purple)" fontSize={8}>①</text>
 
       {/* Redo Log Buffer */}
       <rect x={150} y={60} width={110} height={50} rx={8}
-        fill="#fdf4ff" stroke="#e9d5ff" strokeWidth={1.5} />
-      <text x={205} y={80} textAnchor="middle" fill="#7e22ce" fontSize={9.5} fontWeight={700}>
+        fill="var(--color-paper-sunk)" stroke="var(--color-rail)" strokeWidth={1.5} />
+      <text x={205} y={80} textAnchor="middle" fill="var(--color-purple)" fontSize={9.5} fontWeight={700}>
         Redo Log Buffer
       </text>
-      <text x={205} y={95} textAnchor="middle" fill="#7e22ce" fontSize={8}>SGA</text>
+      <text x={205} y={95} textAnchor="middle" fill="var(--color-purple)" fontSize={8}>SGA</text>
 
       {/* Arrow → LGWR */}
-      <line x1={260} y1={85} x2={298} y2={85} stroke="#7c3aed" strokeWidth={1.5} markerEnd="url(#cfArrowSync)" />
-      <text x={279} y={78} textAnchor="middle" fill="#7c3aed" fontSize={8}>②</text>
+      <line x1={260} y1={85} x2={298} y2={85} stroke="var(--color-purple)" strokeWidth={1.5} markerEnd="url(#cfArrowSync)" />
+      <text x={279} y={78} textAnchor="middle" fill="var(--color-purple)" fontSize={8}>②</text>
 
       {/* LGWR */}
       <rect x={300} y={48} width={80} height={34} rx={7}
-        fill="#ede9fe" stroke="#c4b5fd" strokeWidth={1.5} />
-      <text x={340} y={62} textAnchor="middle" fill="#6d28d9" fontSize={10} fontWeight={700}>LGWR</text>
-      <text x={340} y={75} textAnchor="middle" fill="#6d28d9" fontSize={8}>Log Writer</text>
+        fill="var(--color-rail)" stroke="var(--color-purple)" strokeWidth={1.5} />
+      <text x={340} y={62} textAnchor="middle" fill="var(--color-purple)" fontSize={10} fontWeight={700}>LGWR</text>
+      <text x={340} y={75} textAnchor="middle" fill="var(--color-purple)" fontSize={8}>Log Writer</text>
 
       {/* Arrow LGWR → Redo Log File */}
-      <line x1={380} y1={65} x2={430} y2={65} stroke="#7c3aed" strokeWidth={1.5} markerEnd="url(#cfArrowSync)" />
+      <line x1={380} y1={65} x2={430} y2={65} stroke="var(--color-purple)" strokeWidth={1.5} markerEnd="url(#cfArrowSync)" />
 
       {/* Redo Log File */}
       <rect x={432} y={48} width={110} height={34} rx={7}
-        fill="#fdf4ff" stroke="#e9d5ff" strokeWidth={1.5} />
-      <text x={487} y={62} textAnchor="middle" fill="#7e22ce" fontSize={9.5} fontWeight={700}>
+        fill="var(--color-paper-sunk)" stroke="var(--color-rail)" strokeWidth={1.5} />
+      <text x={487} y={62} textAnchor="middle" fill="var(--color-purple)" fontSize={9.5} fontWeight={700}>
         {isKo ? 'Redo 로그 파일' : 'Redo Log File'}
       </text>
-      <text x={487} y={75} textAnchor="middle" fill="#7e22ce" fontSize={8}>
+      <text x={487} y={75} textAnchor="middle" fill="var(--color-purple)" fontSize={8}>
         {isKo ? '디스크 (동기)' : 'Disk (sync)'}
       </text>
 
       {/* Arrow ③ back to server process */}
       <path d="M340,82 Q340,145 60,145 Q60,135 60,110"
-        fill="none" stroke="#10b981" strokeWidth={1.5} markerEnd="url(#cfArrow)" strokeDasharray="4 3" />
-      <text x={200} y={158} textAnchor="middle" fill="#059669" fontSize={8.5} fontWeight={600}>
+        fill="none" stroke="var(--color-green)" strokeWidth={1.5} markerEnd="url(#cfArrow)" strokeDasharray="4 3" />
+      <text x={200} y={158} textAnchor="middle" fill="var(--color-green)" fontSize={8.5} fontWeight={600}>
         {isKo ? '③ COMMIT 완료 반환 (Fast Commit)' : '③ Commit success returned (Fast Commit)'}
       </text>
 
       {/* DBWn note */}
       <rect x={300} y={100} width={80} height={30} rx={6}
-        fill="#dbeafe" stroke="#93c5fd" strokeWidth={1.2} />
-      <text x={340} y={114} textAnchor="middle" fill="#1d4ed8" fontSize={9.5} fontWeight={700}>DBWn</text>
-      <text x={340} y={124} textAnchor="middle" fill="#1d4ed8" fontSize={7.5}>
+        fill="var(--color-rail)" stroke="var(--color-blue)" strokeWidth={1.2} />
+      <text x={340} y={114} textAnchor="middle" fill="var(--color-blue)" fontSize={9.5} fontWeight={700}>DBWn</text>
+      <text x={340} y={124} textAnchor="middle" fill="var(--color-blue)" fontSize={7.5}>
         {isKo ? '④ 나중에 비동기' : '④ async later'}
       </text>
     </svg>
@@ -409,14 +409,14 @@ export function BackgroundProcessSection() {
                 style={{
                   background: isActive ? pc.badge : pc.bg,
                   borderColor: pc.border,
-                  color: isActive ? '#fff' : pc.text,
+                  color: isActive ? 'var(--color-paper)' : pc.text,
                 }}
               >
                 {proc.abbr}
                 {proc.mandatory && (
                   <span
                     className="ml-1 rounded px-1 text-xs"
-                    style={{ background: isActive ? 'rgba(255,255,255,0.25)' : pc.border, color: isActive ? '#fff' : pc.text }}
+                    style={{ background: isActive ? 'rgba(255,255,255,0.25)' : pc.border, color: isActive ? 'var(--color-paper)' : pc.text }}
                   >
                     {lang === 'ko' ? '필수' : 'req'}
                   </span>
@@ -428,12 +428,12 @@ export function BackgroundProcessSection() {
 
         {/* Detail card */}
         <div
-          className="mt-4 rounded-xl border p-5 transition-all"
+          className="mt-4 rounded-panel border p-5 transition-all"
           style={{ background: c.bg, borderColor: c.border }}
         >
           <div className="mb-3 flex items-center gap-3">
             <span
-              className="rounded-lg px-3 py-1 font-mono text-base font-bold text-white"
+              className="rounded-card px-3 py-1 font-mono text-base font-bold text-paper"
               style={{ background: c.badge }}
             >
               {activeProc.abbr}
@@ -455,7 +455,7 @@ export function BackgroundProcessSection() {
           </p>
           <ul className="space-y-2">
             {activeProc.detail.map((d, i) => (
-              <li key={i} className="flex gap-2 text-sm text-slate-700">
+              <li key={i} className="flex gap-2 text-sm text-ink">
                 <span className="mt-0.5 font-bold" style={{ color: c.badge }}>▸</span>
                 <span>{d}</span>
               </li>
@@ -470,14 +470,14 @@ export function BackgroundProcessSection() {
       <section>
         <SectionTitle>{t.commitFlowTitle}</SectionTitle>
         <Prose>{t.commitFlowDesc}</Prose>
-        <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
+        <div className="mt-4 rounded-panel border border-line bg-paper-sunk p-4">
           <CommitFlowDiagram isKo={lang === 'ko'} />
         </div>
         <div className="mt-3 space-y-2">
           {t.commitSteps.map((step) => (
-            <div key={step.label} className="flex gap-3 rounded-lg border border-slate-200 bg-white px-3 py-2">
-              <span className="text-sm font-bold text-violet-600">{step.label}</span>
-              <span className="text-sm text-slate-700">{step.text}</span>
+            <div key={step.label} className="flex gap-3 rounded-card border border-line bg-paper px-3 py-2">
+              <span className="text-sm font-bold text-purple">{step.label}</span>
+              <span className="text-sm text-ink">{step.text}</span>
             </div>
           ))}
         </div>

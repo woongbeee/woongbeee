@@ -199,7 +199,7 @@ export function ParallelOverviewSection() {
   return (
     <PageContainer>
       <ChapterTitle
-        icon={<IconGitFork size={36} stroke={1.5} className="text-teal-500" />}
+        icon={<IconGitFork size={36} stroke={1.5} className="text-green" />}
         title={t.title}
         subtitle={t.subtitle}
       />
@@ -231,25 +231,25 @@ export function ParallelOverviewSection() {
       <SectionTitle>{t.whenTitle}</SectionTitle>
       <Prose>{t.whenDesc}</Prose>
       <ParallelVsSerialDiagram lang={lang} />
-      <table className="mb-6 w-full overflow-hidden rounded-lg border text-xs">
+      <table className="mb-6 w-full overflow-hidden rounded-card border text-xs">
         <thead>
-          <tr className="border-b bg-muted/60">
-            <th className="px-4 py-2.5 text-left font-mono font-bold text-muted-foreground">
+          <tr className="border-b bg-rail">
+            <th className="px-4 py-2.5 text-left font-mono font-bold text-ink-2">
               {isKo ? '상황' : 'Situation'}
             </th>
-            <th className="px-4 py-2.5 text-left font-mono font-bold text-muted-foreground">
+            <th className="px-4 py-2.5 text-left font-mono font-bold text-ink-2">
               {isKo ? '예시' : 'Example'}
             </th>
-            <th className="px-4 py-2.5 text-left font-mono font-bold text-muted-foreground">
+            <th className="px-4 py-2.5 text-left font-mono font-bold text-ink-2">
               {isKo ? '권장' : 'Recommendation'}
             </th>
           </tr>
         </thead>
         <tbody>
           {t.whenTable.map((row, i) => (
-            <tr key={i} className={`border-b last:border-0 ${i % 2 === 0 ? 'bg-background' : 'bg-muted/20'}`}>
+            <tr key={i} className={`border-b last:border-0 ${i % 2 === 0 ? 'bg-paper' : 'bg-rail'}`}>
               {row.map((cell, ci) => (
-                <td key={ci} className="px-4 py-2 font-mono text-[11px] text-foreground/80">
+                <td key={ci} className="px-4 py-2 font-mono text-[11px] text-ink/80">
                   {cell}
                 </td>
               ))}
@@ -290,15 +290,15 @@ function ParallelVsSerialDiagram({ lang }: { lang: 'ko' | 'en' }) {
   const H        = TOP_PAD + ROWS.length * (ROW_H + ROW_GAP) + 8
 
   return (
-    <div className="mb-6 overflow-hidden rounded-xl border bg-muted/20 p-4">
+    <div className="mb-6 overflow-hidden rounded-panel border bg-rail p-4">
       <svg viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ fontFamily: 'monospace' }}>
         {ROWS.map((row, i) => {
           const y      = rowY(i)
           const barW   = Math.round((row.time / MAX_TIME) * BAR_AREA)
           const saving = Math.round((1 - row.time / MAX_TIME) * 100)
-          const barFill   = row.isSerial ? '#fca5a5' : '#5eead4'
-          const barStroke = row.isSerial ? '#ef4444' : '#0d9488'
-          const textFill  = row.isSerial ? '#991b1b' : '#0f766e'
+          const barFill   = row.isSerial ? 'var(--color-red)' : 'var(--color-green)'
+          const barStroke = row.isSerial ? 'var(--color-red)' : 'var(--color-green)'
+          const textFill  = row.isSerial ? 'var(--color-red)' : 'var(--color-green)'
           const midCY  = y + ROW_H / 2
 
           return (
@@ -307,7 +307,7 @@ function ParallelVsSerialDiagram({ lang }: { lang: 'ko' | 'en' }) {
               <text
                 x={LABEL_W - 8} y={midCY + 4}
                 textAnchor="end" fontSize={9} fontWeight="bold"
-                fill={row.isSerial ? '#6b7280' : '#0f766e'}
+                fill={row.isSerial ? 'var(--color-ink-2)' : 'var(--color-green)'}
               >
                 {row.label}
               </text>
@@ -316,8 +316,8 @@ function ParallelVsSerialDiagram({ lang }: { lang: 'ko' | 'en' }) {
               <rect
                 x={LABEL_W} y={y}
                 width={BAR_AREA} height={ROW_H}
-                rx={5} fill={row.isSerial ? '#fee2e2' : '#f0fdf9'}
-                stroke={row.isSerial ? '#fca5a5' : '#ccfbf1'}
+                rx={5} fill={row.isSerial ? 'var(--color-rail)' : 'var(--color-rail)'}
+                stroke={row.isSerial ? 'var(--color-red)' : 'var(--color-green)'}
                 strokeWidth={1}
               />
 
@@ -359,7 +359,7 @@ function ParallelVsSerialDiagram({ lang }: { lang: 'ko' | 'en' }) {
         })}
       </svg>
 
-      <p className="mt-2 text-center font-mono text-[10px] text-muted-foreground">
+      <p className="mt-2 text-center font-mono text-[10px] text-ink-2">
         {isKo
           ? 'DOP가 높을수록 바가 짧아져요 — 같은 작업을 더 빨리 끝낼 수 있어요'
           : 'Higher DOP = shorter bar — the same work completes faster'}

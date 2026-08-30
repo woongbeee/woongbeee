@@ -82,18 +82,19 @@ const KW_GROUPS: KwDef[] = [
   },
 ]
 
+// 색은 tokens.css §2c 콘텐츠 색 (테마 따라 자동 스왑).
 const CATEGORY_CLASS: Record<KwCategory, string> = {
-  ddl:    'text-violet-600 dark:text-violet-400',
-  dml:    'text-ios-blue dark:text-ios-blue',
-  dcl:    'text-emerald-600 dark:text-emerald-400',
-  tcl:    'text-orange-500 dark:text-orange-400',
-  clause: 'text-ios-blue dark:text-ios-blue',
-  func:   'text-cyan-600 dark:text-cyan-400',
-  logic:  'text-ios-blue dark:text-ios-blue',
-  plan:   'text-rose-500 dark:text-rose-400',
+  ddl:    'text-purple',
+  dml:    'text-blue',
+  dcl:    'text-green',
+  tcl:    'text-amber',
+  clause: 'text-blue',
+  func:   'text-purple',
+  logic:  'text-blue',
+  plan:   'text-red',
 }
 
-const ACTIVE_CLASS = 'bg-ios-orange-light text-ios-orange-dark ring-1 ring-ios-orange/40'
+const ACTIVE_CLASS = 'bg-amber/15 text-amber ring-1 ring-amber/40'
 
 // flatten to [{word, category}] sorted longest-first so multi-word keywords match first
 const ALL_KEYWORDS = KW_GROUPS.flatMap(({ words, category }) =>
@@ -145,7 +146,7 @@ export function SqlHighlight({ sql, activeClause }: { sql: string; activeClause?
   }
 
   return (
-    <pre className="whitespace-pre-wrap break-all font-mono text-xs leading-relaxed text-foreground/80">
+    <pre className="whitespace-pre-wrap break-all font-mono text-xs leading-relaxed text-ink">
       {lines.map((line, li) => {
         const [code, comment] = splitLineComment(line)
         const parts = highlightCode(code)
@@ -167,7 +168,7 @@ export function SqlHighlight({ sql, activeClause }: { sql: string; activeClause?
                 </span>
               )
             })}
-            {comment && <span className="text-muted-foreground/60 italic">{comment}</span>}
+            {comment && <span className="italic text-ink-3">{comment}</span>}
             {li < lines.length - 1 && '\n'}
           </span>
         )

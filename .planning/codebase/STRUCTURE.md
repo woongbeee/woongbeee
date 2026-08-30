@@ -1,6 +1,7 @@
 # Codebase Structure
 
 **Analysis Date:** 2026-08-29
+**Updated:** 2026-08-30 — added `src/styles/`, `src/lib/theme.tsx`, `DESIGN.md`; `src/index.css` scope narrowed
 
 ## Directory Layout
 
@@ -16,6 +17,7 @@ oracleDataBaseSystem/
 ├── components.json            # shadcn config (base-nova style)
 ├── README.md                  # Public-facing overview
 ├── CLAUDE.md                  # PRIMARY architecture reference — read first
+├── DESIGN.md                  # Design-system spec + token catalog + migration status
 ├── .github/workflows/deploy.yml   # GitHub Pages CI (push to main → build → deploy dist/)
 ├── scripts/                   # Node PDF-export helpers (puppeteer + pdf-lib)
 │   ├── export-partition-pdf.mjs
@@ -26,8 +28,10 @@ oracleDataBaseSystem/
 ├── .planning/codebase/        # These analysis docs
 └── src/
     ├── main.tsx               # createRoot, StrictMode, react-scan (dev), render <App/>
-    ├── App.tsx                # View switch: #simulator / ?print= / BookLayout
-    ├── index.css              # Tailwind import + ALL theme CSS variables (only custom CSS allowed)
+    ├── App.tsx                # View switch: #simulator / ?print= / BookLayout; syncs <html lang> + <html data-theme>
+    ├── index.css              # @import (tailwindcss, tokens.css, tw-animate-css) + structural rules only (body, #root, bare-border color, .react-flow__*)
+    ├── styles/
+    │   └── tokens.css         # THE design source — @theme color/font/radius vars, light + [data-theme=dark]/[light]
     ├── build-env.d.ts         # Ambient decl for __BUILD_DATE__
     ├── assets/                # (empty)
     ├── book/                  # Book shell + all chapter content
@@ -124,10 +128,10 @@ oracleDataBaseSystem/
     │   ├── DataPanel.tsx       # SchemaView / TableView
     │   └── ui/                 # shadcn primitives: badge, button, card, separator
     ├── store/
-    │   ├── simulationStore.ts  # useLangStore (lang) + legacy alias useSimulationStore
+    │   ├── simulationStore.ts  # useLangStore (lang + theme/toggleTheme, theme→localStorage) + legacy alias useSimulationStore
     │   └── internalsStore.ts   # useInternalsStore — simulator step state machine + STEP_* maps + STEP_TEXTS
     ├── lib/
-    │   ├── theme.ts            # ACCENT_COLORS (AccentColor union → Tailwind class sets)
+    │   ├── theme.tsx           # TS token mapping — INFOBOX_VARIANT, DIAGRAM, DATA_PALETTE, CODE (zero hex); ACCENT_COLORS legacy
     │   ├── utils.ts            # cn() = twMerge(clsx(...))
     │   └── optimizer/          # Pure-TS CBO engine
     │       ├── index.ts        # barrel
@@ -173,8 +177,8 @@ oracleDataBaseSystem/
 
 **`src/lib/`:**
 - Purpose: framework-agnostic helpers
-- Contains: `theme.ts`, `utils.ts`, `optimizer/` (CBO engine)
-- Key files: `optimizer/planGenerator.ts` (`optimize()`), `theme.ts` (`ACCENT_COLORS`)
+- Contains: `theme.tsx`, `utils.ts`, `optimizer/` (CBO engine)
+- Key files: `optimizer/planGenerator.ts` (`optimize()`), `theme.tsx` (token mapping — pairs with `src/styles/tokens.css`)
 
 **`src/data/`:**
 - Purpose: schema fixtures and synthetic data for simulators and ERD
@@ -207,14 +211,15 @@ oracleDataBaseSystem/
 - `eslint.config.js`: flat config, `no-explicit-any: error`
 - `.prettierrc`: formatting + Tailwind class sorting
 - `components.json`: shadcn settings
-- `src/index.css`: all theme CSS variables (the only place custom CSS lives)
+- `src/styles/tokens.css`: the design source — every color/font/radius value
+- `src/index.css`: `@import`s + structural CSS only
 
 **Core Logic:**
 - `src/book/bookStructure.tsx`: `BOOK_CHAPTERS` (TOC data) + selectors
-- `src/book/BookContent.tsx`: `SectionRouter` prefix routing
+- `src/book/BookContent.tsx`: `SectionRouter` prefix routing + `DARK_READY` per-chapter theme opt-in
 - `src/store/internalsStore.ts`: simulator state machine + `startSimulation()` step loop
 - `src/lib/optimizer/planGenerator.ts`: `optimize(sql)` CBO pipeline
-- `src/lib/theme.ts`: `ACCENT_COLORS` chapter palette
+- `src/lib/theme.tsx`: token mapping (`INFOBOX_VARIANT`, `DIAGRAM`, `DATA_PALETTE`, `CODE`)
 
 **Testing:**
 - None. No test runner or test files. `npm run build` (`tsc -b && vite build`) is the correctness gate. `verify_storage.mjs` at repo root is an ad-hoc puppeteer check, not a suite.
@@ -251,14 +256,14 @@ oracleDataBaseSystem/
 4. In the file: declare `const T = { ko: {...}, en: {...} }`, read `const lang = useLangStore(s => s.lang)`, `const t = T[lang]`, build JSX from `src/book/chapters/shared.tsx` primitives following the page layout rules (`ChapterTitle` first, `Divider` only between sections, `InfoBox variant="summary"` in an `mt-8` wrapper last).
 
 **New chapter:**
-1. Add a `BookChapter` to `BOOK_CHAPTERS` (`color` must be a key of `ACCENT_COLORS` in `src/lib/theme.ts`).
+1. Add a `BookChapter` to `BOOK_CHAPTERS` (`color` must be a key of the `AccentColor` union in `src/lib/theme.tsx`).
 2. Create `src/book/chapters/<chapter>/index.tsx` exporting `XxxPage({ sectionId })`.
-3. Add a prefix branch to `SectionRouter` in `src/book/BookContent.tsx` (`if (sectionId.startsWith('<prefix>-')) return <XxxPage sectionId={sectionId} />`).
+3. Add a prefix branch to `SectionRouter` in `src/book/BookContent.tsx` (`if (sectionId.startsWith('<prefix>-')) return <XxxPage sectionId={sectionId} />`); add the prefix to `DARK_READY` if the chapter's content uses design tokens.
 4. Full-height simulator sections need special handling in `SectionRouter` (rendered without the layout wrapper — see `optimizer-simulator`).
 5. If the chapter should be selectable in the TOC, ensure its `num` is within the `isReady = chapter.num <= 7` gate in `src/book/TableOfContents.tsx` (raise the number when ready).
 
 **New shared UI primitive:**
-- Add to `src/book/chapters/shared.tsx` as a named export; document it in CLAUDE.md's component table.
+- Add to `src/book/chapters/shared.tsx` as a named export; use only design tokens (`src/styles/tokens.css`) / `src/lib/theme.tsx` mappings — no hex or `font-family` literals. Document it in CLAUDE.md's component table and `DESIGN.md §5`.
 
 **New chapter-local diagram/helper:**
 - `src/book/chapters/<chapter>/shared/` (or `shared.tsx` if the chapter has just one).

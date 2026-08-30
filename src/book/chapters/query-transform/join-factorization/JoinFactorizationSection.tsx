@@ -213,7 +213,7 @@ export function QtJoinFactorizationSection() {
   return (
     <PageContainer>
       <ChapterTitle
-        icon={<IconTransform size={36} stroke={1.5} className="text-cyan-500" />}
+        icon={<IconTransform size={36} stroke={1.5} className="text-green" />}
         title={t.title}
         subtitle={t.subtitle}
       />
@@ -253,10 +253,10 @@ export function QtJoinFactorizationSection() {
       <div className="mt-4 space-y-2">
         {t.restrictItems.map((item, i) => (
           <div key={i} className="flex items-start gap-3">
-            <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-rose-100 font-mono text-[10px] font-bold text-rose-600">
+            <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-red/10 font-mono text-[10px] font-bold text-red">
               {i + 1}
             </span>
-            <p className="text-sm leading-relaxed text-muted-foreground">{item}</p>
+            <p className="text-sm leading-relaxed text-ink-2">{item}</p>
           </div>
         ))}
       </div>
@@ -268,10 +268,10 @@ export function QtJoinFactorizationSection() {
       <div className="mt-4 space-y-2">
         {t.supportItems.map((item, i) => (
           <div key={i} className="flex items-start gap-3">
-            <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-100 font-mono text-[10px] font-bold text-emerald-600">
+            <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-green/10 font-mono text-[10px] font-bold text-green">
               {i + 1}
             </span>
-            <p className="text-sm leading-relaxed text-muted-foreground">{item}</p>
+            <p className="text-sm leading-relaxed text-ink-2">{item}</p>
           </div>
         ))}
       </div>

@@ -35,7 +35,7 @@ const T = {
         id: 'syntax',
         label: '① 구문 검사',
         sublabel: 'Syntax Check',
-        color: '#3b82f6', bg: '#eff6ff', border: '#93c5fd', activeBg: '#dbeafe',
+        color: 'var(--color-blue)', bg: 'var(--color-rail)', border: 'var(--color-blue)', activeBg: 'var(--color-rail)',
         desc: 'SQL 문법이 맞는지 확인해요. 오타나 잘못된 키워드가 있으면 이 단계에서 바로 걸러진답니다.',
         sql: `-- 구문 오류 예시: FROM을 FORM으로 오타냄
 SQL> SELECT * FORM employees;
@@ -49,7 +49,7 @@ ORA-00923: FROM keyword not found where expected`,
         id: 'semantic',
         label: '② 의미 검사',
         sublabel: 'Semantic Check',
-        color: '#8b5cf6', bg: '#f5f3ff', border: '#c4b5fd', activeBg: '#ede9fe',
+        color: 'var(--color-purple)', bg: 'var(--color-paper-sunk)', border: 'var(--color-purple)', activeBg: 'var(--color-rail)',
         desc: '문법은 맞아도 의미가 잘못될 수 있어요. 예를 들어 존재하지 않는 테이블 이름을 쓴 경우죠. 이 단계에서 참조한 테이블·컬럼이 실제로 있는지 확인해요.',
         sql: `-- 의미 오류 예시: 없는 테이블을 조회하려 했어요
 SQL> SELECT * FROM nonexistent_table;
@@ -63,7 +63,7 @@ ORA-00942: table or view does not exist`,
         id: 'sharedpool',
         label: '③ Shared Pool 확인',
         sublabel: 'Shared Pool Check',
-        color: '#f97316', bg: '#fff7ed', border: '#fdba74', activeBg: '#ffedd5',
+        color: 'var(--color-amber)', bg: 'var(--color-rail)', border: 'var(--color-amber)', activeBg: 'var(--color-rail)',
         desc: '파싱 중에 Oracle은 "이 SQL, 전에 누군가 실행한 적 있어?" 하고 Shared Pool을 뒤져봐요. 있으면 비싼 최적화 작업을 건너뛸 수 있거든요. 모든 SQL에는 해시 알고리즘으로 생성된 고유한 SQL ID가 붙는데, 이게 V$SQL.SQL_ID에 나타나는 그 값이에요.',
         sql: '',
         hasSql: false,
@@ -176,7 +176,7 @@ CREATE TABLE mytable (mycolumn INTEGER);
         id: 'syntax',
         label: '① Syntax Check',
         sublabel: 'Syntax Check',
-        color: '#3b82f6', bg: '#eff6ff', border: '#93c5fd', activeBg: '#dbeafe',
+        color: 'var(--color-blue)', bg: 'var(--color-rail)', border: 'var(--color-blue)', activeBg: 'var(--color-rail)',
         desc: 'Oracle checks whether the SQL statement is grammatically correct. Any statement that breaks SQL syntax rules fails immediately.',
         sql: `-- Syntax error: FROM misspelled as FORM
 SQL> SELECT * FORM employees;
@@ -190,7 +190,7 @@ ORA-00923: FROM keyword not found where expected`,
         id: 'semantic',
         label: '② Semantic Check',
         sublabel: 'Semantic Check',
-        color: '#8b5cf6', bg: '#f5f3ff', border: '#c4b5fd', activeBg: '#ede9fe',
+        color: 'var(--color-purple)', bg: 'var(--color-paper-sunk)', border: 'var(--color-purple)', activeBg: 'var(--color-rail)',
         desc: 'Even syntactically correct SQL can fail if the meaning is wrong — for example, referencing a table or column that does not exist.',
         sql: `-- Semantic error: table does not exist
 SQL> SELECT * FROM nonexistent_table;
@@ -204,7 +204,7 @@ ORA-00942: table or view does not exist`,
         id: 'sharedpool',
         label: '③ Shared Pool Check',
         sublabel: 'Shared Pool Check',
-        color: '#f97316', bg: '#fff7ed', border: '#fdba74', activeBg: '#ffedd5',
+        color: 'var(--color-amber)', bg: 'var(--color-rail)', border: 'var(--color-amber)', activeBg: 'var(--color-rail)',
         desc: "During parsing, Oracle checks the Shared Pool to see if this SQL has been run before. If it has, expensive steps can be skipped. Every SQL gets a unique SQL ID (visible in V$SQL.SQL_ID) from a hash of the statement text.",
         sql: '',
         hasSql: false,
@@ -305,7 +305,7 @@ function ParsingDiagram({ steps, lang }: { steps: ParseStep[]; lang: 'ko' | 'en'
   const active = steps[activeIdx]
 
   return (
-    <div className="my-4 rounded-xl border-2 border-slate-200 bg-slate-50 overflow-hidden">
+    <div className="my-4 rounded-panel border-2 border-line bg-paper-sunk overflow-hidden">
       {/* Step selector row */}
       <div className="flex">
         {steps.map((step, i) => {
@@ -322,11 +322,11 @@ function ParsingDiagram({ steps, lang }: { steps: ParseStep[]; lang: 'ko' | 'en'
             >
               <span
                 className="font-mono text-xs font-bold"
-                style={{ color: isActive ? step.color : '#94a3b8' }}
+                style={{ color: isActive ? step.color : 'var(--color-ink-3)' }}
               >
                 {step.label}
               </span>
-              <span className="font-mono text-[9px] text-muted-foreground hidden sm:block">
+              <span className="font-mono text-[9px] text-ink-2 hidden sm:block">
                 {step.sublabel}
               </span>
             </button>
@@ -335,15 +335,15 @@ function ParsingDiagram({ steps, lang }: { steps: ParseStep[]; lang: 'ko' | 'en'
       </div>
 
       {/* Arrow connector */}
-      <div className="flex items-center justify-center gap-1 py-2 bg-white border-b border-slate-100">
+      <div className="flex items-center justify-center gap-1 py-2 bg-paper border-b border-line">
         {steps.map((step, i) => (
           <div key={step.id} className="flex items-center gap-1">
             <div
               className="h-2.5 w-2.5 rounded-full transition-all"
-              style={{ backgroundColor: activeIdx === i ? step.color : '#e2e8f0' }}
+              style={{ backgroundColor: activeIdx === i ? step.color : 'var(--color-rail)' }}
             />
             {i < steps.length - 1 && (
-              <span className="font-mono text-[10px] text-muted-foreground/40">→</span>
+              <span className="font-mono text-[10px] text-ink-2/40">→</span>
             )}
           </div>
         ))}
@@ -360,27 +360,27 @@ function ParsingDiagram({ steps, lang }: { steps: ParseStep[]; lang: 'ko' | 'en'
           className="p-4"
         >
           <div
-            className="mb-3 inline-flex items-center gap-2 rounded-lg border px-3 py-1.5"
+            className="mb-3 inline-flex items-center gap-2 rounded-card border px-3 py-1.5"
             style={{ borderColor: active.border, backgroundColor: active.activeBg }}
           >
             <span className="font-mono text-xs font-bold" style={{ color: active.color }}>
               {active.label}
             </span>
           </div>
-          <p className="text-sm leading-relaxed text-foreground/80 mb-0">{active.desc}</p>
+          <p className="text-sm leading-relaxed text-ink/80 mb-0">{active.desc}</p>
           {active.hasSql && (
             <div className="mt-4">
               <SqlBlock sql={active.sql} />
             </div>
           )}
           {!active.hasSql && lang === 'ko' && (
-            <div className="mt-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 font-mono text-[11px] text-amber-700">
+            <div className="mt-3 rounded-card border border-amber/30 bg-amber/5 px-3 py-2 font-mono text-[11px] text-amber">
               💡 Shared Pool 히트 → 소프트 파싱 (최적화 건너뜀)<br />
               💡 Shared Pool 미스 → 하드 파싱 (최적화 수행)
             </div>
           )}
           {!active.hasSql && lang === 'en' && (
-            <div className="mt-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 font-mono text-[11px] text-amber-700">
+            <div className="mt-3 rounded-card border border-amber/30 bg-amber/5 px-3 py-2 font-mono text-[11px] text-amber">
               💡 Shared Pool hit → Soft parse (optimization skipped)<br />
               💡 Shared Pool miss → Hard parse (optimization runs)
             </div>
@@ -389,21 +389,21 @@ function ParsingDiagram({ steps, lang }: { steps: ParseStep[]; lang: 'ko' | 'en'
       </AnimatePresence>
 
       {/* Navigation */}
-      <div className="flex items-center justify-between border-t border-slate-100 bg-white px-4 py-2">
+      <div className="flex items-center justify-between border-t border-line bg-paper px-4 py-2">
         <button
           onClick={() => setActiveIdx((i) => Math.max(0, i - 1))}
           disabled={activeIdx === 0}
-          className="font-mono text-[11px] text-muted-foreground hover:text-foreground disabled:opacity-30 transition-colors"
+          className="font-mono text-[11px] text-ink-2 hover:text-ink disabled:opacity-30 transition-colors"
         >
           ← {lang === 'ko' ? '이전' : 'Prev'}
         </button>
-        <span className="font-mono text-[10px] text-muted-foreground">
+        <span className="font-mono text-[10px] text-ink-2">
           {activeIdx + 1} / {steps.length}
         </span>
         <button
           onClick={() => setActiveIdx((i) => Math.min(steps.length - 1, i + 1))}
           disabled={activeIdx === steps.length - 1}
-          className="font-mono text-[11px] text-muted-foreground hover:text-foreground disabled:opacity-30 transition-colors"
+          className="font-mono text-[11px] text-ink-2 hover:text-ink disabled:opacity-30 transition-colors"
         >
           {lang === 'ko' ? '다음' : 'Next'} →
         </button>
@@ -419,7 +419,7 @@ export function SqlProcessingSection() {
   return (
     <PageContainer>
       <ChapterTitle
-        icon={<IconBolt size={36} stroke={1.5} className="text-orange-500" />}
+        icon={<IconBolt size={36} stroke={1.5} className="text-amber" />}
         title={t.title}
         subtitle={t.subtitle}
       />
@@ -458,7 +458,7 @@ export function SqlProcessingSection() {
       <Prose>{t.rowSourceDesc}</Prose>
       <ul className="mt-2 mb-4 space-y-1.5 pl-4">
         {t.rowSourceItems.map((item, i) => (
-          <li key={i} className="text-sm leading-relaxed text-foreground/80 before:mr-2 before:content-['•']">
+          <li key={i} className="text-sm leading-relaxed text-ink/80 before:mr-2 before:content-['•']">
             {item}
           </li>
         ))}

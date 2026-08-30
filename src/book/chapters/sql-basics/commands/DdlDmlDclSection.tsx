@@ -25,7 +25,7 @@ const T = {
         abbr: 'DDL',
         full: 'Data Definition Language',
         color: 'violet',
-        icon: <IconTable size={20} color="#7c3aed" stroke={1.5} />,
+        icon: <IconTable size={20} color="var(--color-purple)" stroke={1.5} />,
         title: '데이터 정의어',
         desc: '테이블·인덱스·뷰 등 데이터를 어떤 형태로 저장할지 정의하거나 변경해요.',
         cmds: ['CREATE', 'ALTER', 'DROP', 'TRUNCATE', 'RENAME'],
@@ -34,7 +34,7 @@ const T = {
         abbr: 'DML',
         full: 'Data Manipulation Language',
         color: 'blue',
-        icon: <IconEdit size={20} color="#2563eb" stroke={1.5} />,
+        icon: <IconEdit size={20} color="var(--color-blue)" stroke={1.5} />,
         title: '데이터 조작어',
         desc: '테이블에 저장된 실제 데이터를 조회·삽입·수정·삭제해요.',
         cmds: ['SELECT', 'INSERT', 'UPDATE', 'DELETE', 'MERGE'],
@@ -43,7 +43,7 @@ const T = {
         abbr: 'DCL',
         full: 'Data Control Language',
         color: 'emerald',
-        icon: <IconShieldLock size={20} color="#059669" stroke={1.5} />,
+        icon: <IconShieldLock size={20} color="var(--color-green)" stroke={1.5} />,
         title: '데이터 제어어',
         desc: '사용자에게 권한을 부여하거나 회수해서 데이터 접근을 제어해요. 사용자마다 접근 권한을 다르게 설정할 수 있어요.',
         cmds: ['GRANT', 'REVOKE'],
@@ -52,7 +52,7 @@ const T = {
         abbr: 'TCL',
         full: 'Transaction Control Language',
         color: 'orange',
-        icon: <IconGitCommit size={20} color="#d97706" stroke={1.5} />,
+        icon: <IconGitCommit size={20} color="var(--color-amber)" stroke={1.5} />,
         title: '트랜잭션 제어어',
         desc: 'DML로 변경한 데이터를 확정하거나 이전 상태로 되돌려요.',
         cmds: ['COMMIT', 'ROLLBACK', 'SAVEPOINT'],
@@ -243,7 +243,7 @@ COMMIT;`,
         abbr: 'DDL',
         full: 'Data Definition Language',
         color: 'violet',
-        icon: <IconTable size={20} color="#7c3aed" stroke={1.5} />,
+        icon: <IconTable size={20} color="var(--color-purple)" stroke={1.5} />,
         title: 'Data Definition',
         desc: 'Defines or modifies the structure of database objects such as tables, indexes, and views.',
         cmds: ['CREATE', 'ALTER', 'DROP', 'TRUNCATE', 'RENAME'],
@@ -252,7 +252,7 @@ COMMIT;`,
         abbr: 'DML',
         full: 'Data Manipulation Language',
         color: 'blue',
-        icon: <IconEdit size={20} color="#2563eb" stroke={1.5} />,
+        icon: <IconEdit size={20} color="var(--color-blue)" stroke={1.5} />,
         title: 'Data Manipulation',
         desc: 'Queries, inserts, updates, and deletes actual data stored in tables.',
         cmds: ['SELECT', 'INSERT', 'UPDATE', 'DELETE', 'MERGE'],
@@ -261,7 +261,7 @@ COMMIT;`,
         abbr: 'DCL',
         full: 'Data Control Language',
         color: 'emerald',
-        icon: <IconShieldLock size={20} color="#059669" stroke={1.5} />,
+        icon: <IconShieldLock size={20} color="var(--color-green)" stroke={1.5} />,
         title: 'Data Control',
         desc: 'Grants or revokes privileges on database objects to control data access.',
         cmds: ['GRANT', 'REVOKE'],
@@ -270,7 +270,7 @@ COMMIT;`,
         abbr: 'TCL',
         full: 'Transaction Control Language',
         color: 'orange',
-        icon: <IconGitCommit size={20} color="#d97706" stroke={1.5} />,
+        icon: <IconGitCommit size={20} color="var(--color-amber)" stroke={1.5} />,
         title: 'Transaction Control',
         desc: 'Commits DML changes permanently or rolls them back to a previous state.',
         cmds: ['COMMIT', 'ROLLBACK', 'SAVEPOINT'],
@@ -457,10 +457,10 @@ COMMIT;`,
 }
 
 const COLOR_MAP: Record<string, { card: string; badge: string; tag: string }> = {
-  violet:  { card: 'border-violet-200 bg-violet-50/60',  badge: 'bg-violet-100 text-violet-700',  tag: 'bg-violet-100 text-violet-600' },
-  blue:    { card: 'border-blue-200 bg-blue-50/60',      badge: 'bg-blue-100 text-blue-700',      tag: 'bg-blue-100 text-blue-600' },
-  emerald: { card: 'border-emerald-200 bg-emerald-50/60',badge: 'bg-emerald-100 text-emerald-700',tag: 'bg-emerald-100 text-emerald-600' },
-  orange:  { card: 'border-orange-200 bg-orange-50/60',  badge: 'bg-orange-100 text-orange-700',  tag: 'bg-orange-100 text-orange-600' },
+  violet:  { card: 'border-purple/30 bg-purple/5',  badge: 'bg-purple/10 text-purple',  tag: 'bg-purple/10 text-purple' },
+  blue:    { card: 'border-blue/30 bg-blue/5',      badge: 'bg-blue/10 text-blue',      tag: 'bg-blue/10 text-blue' },
+  emerald: { card: 'border-green/30 bg-green/5',badge: 'bg-green/10 text-green',tag: 'bg-green/10 text-green' },
+  orange:  { card: 'border-amber/30 bg-amber/5',  badge: 'bg-amber/10 text-amber',  tag: 'bg-amber/10 text-amber' },
 }
 
 export function DdlDmlDclSection() {
@@ -469,7 +469,7 @@ export function DdlDmlDclSection() {
 
   return (
     <PageContainer className="max-w-5xl">
-      <ChapterTitle icon={<IconCategory size={36} color="#6366f1" stroke={1.5} />} title={t.chapterTitle} subtitle={t.chapterSubtitle} />
+      <ChapterTitle icon={<IconCategory size={36} color="var(--color-blue)" stroke={1.5} />} title={t.chapterTitle} subtitle={t.chapterSubtitle} />
 
       {/* ── Overview cards ── */}
       <h2 className="mb-4 mt-8 text-xl font-bold tracking-tight">{t.overviewTitle}</h2>
@@ -477,16 +477,16 @@ export function DdlDmlDclSection() {
         {t.categories.map((cat) => {
           const c = COLOR_MAP[cat.color]
           return (
-            <div key={cat.abbr} className={cn('rounded-xl border p-4', c.card)}>
+            <div key={cat.abbr} className={cn('rounded-panel border p-4', c.card)}>
               <div className="mb-2 flex items-center gap-2">
                 <span className="text-xl">{cat.icon}</span>
-                <span className={cn('rounded-md px-2 py-0.5 font-mono text-sm font-bold', c.badge)}>
+                <span className={cn('rounded-card px-2 py-0.5 font-mono text-sm font-bold', c.badge)}>
                   {cat.abbr}
                 </span>
-                <span className="text-xs text-muted-foreground">{cat.full}</span>
+                <span className="text-xs text-ink-2">{cat.full}</span>
               </div>
               <div className="mb-1 text-sm font-semibold">{cat.title}</div>
-              <p className="mb-3 text-xs leading-relaxed text-muted-foreground">{cat.desc}</p>
+              <p className="mb-3 text-xs leading-relaxed text-ink-2">{cat.desc}</p>
               <div className="flex flex-wrap gap-1.5">
                 {cat.cmds.map((cmd) => (
                   <span key={cmd} className={cn('rounded px-1.5 py-0.5 font-mono text-[11px] font-medium', c.tag)}>
@@ -560,20 +560,20 @@ export function DdlDmlDclSection() {
 
         {/* ── Summary table ── */}
         <AccordionSection title={t.summaryTitle}>
-          <div className="overflow-x-auto rounded-xl border">
+          <div className="overflow-x-auto rounded-panel border">
             <table className="w-full text-xs">
               <thead>
-                <tr className="border-b bg-muted/40">
+                <tr className="border-b bg-rail">
                   {t.summaryRows[0].map((h) => (
-                    <th key={h} className="px-4 py-2.5 text-left font-mono font-semibold text-foreground/70">{h}</th>
+                    <th key={h} className="px-4 py-2.5 text-left font-mono font-semibold text-ink/70">{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {t.summaryRows.slice(1).map((row, i) => (
-                  <tr key={i} className="border-b last:border-0 hover:bg-muted/20">
+                  <tr key={i} className="border-b last:border-0 hover:bg-rail">
                     {row.map((cell, j) => (
-                      <td key={j} className={cn('px-4 py-2.5', j === 0 ? 'font-mono font-bold' : 'text-muted-foreground')}>
+                      <td key={j} className={cn('px-4 py-2.5', j === 0 ? 'font-mono font-bold' : 'text-ink-2')}>
                         {cell}
                       </td>
                     ))}

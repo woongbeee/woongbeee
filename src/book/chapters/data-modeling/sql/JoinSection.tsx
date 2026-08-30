@@ -9,6 +9,7 @@ import {
   ConceptGrid,
   Divider,
   Table,
+  ResultTable,
   SqlBlock,
   StepList,
 } from '../../shared'
@@ -64,6 +65,14 @@ SELECT c.name        AS 고객명,
 FROM   customers c
 JOIN   orders    o ON o.customer_id = c.customer_id
 WHERE  c.customer_id = 1001;`,
+    joinResultMeta: ['customers ⋈ orders', '3 rows'],
+    joinResultCols: ['고객명', '주문번호', '주문일자'],
+    joinResultRows: [
+      ['이한결', '5001', '2026-01-15'],
+      ['이한결', '5014', '2026-02-03'],
+      ['이한결', '5088', '2026-03-21'],
+    ],
+    joinResultFoot: ['3 rows selected', 'Elapsed 00:00:00.004'],
 
     joinTypesTitle: 'JOIN 종류와 관계의 연결',
     joinTypesDesc:
@@ -167,6 +176,14 @@ SELECT c.name        AS customer_name,
 FROM   customers c
 JOIN   orders    o ON o.customer_id = c.customer_id
 WHERE  c.customer_id = 1001;`,
+    joinResultMeta: ['customers ⋈ orders', '3 rows'],
+    joinResultCols: ['customer_name', 'order_number', 'order_date'],
+    joinResultRows: [
+      ['Lee Han-gyeol', '5001', '2026-01-15'],
+      ['Lee Han-gyeol', '5014', '2026-02-03'],
+      ['Lee Han-gyeol', '5088', '2026-03-21'],
+    ],
+    joinResultFoot: ['3 rows selected', 'Elapsed 00:00:00.004'],
 
     joinTypesTitle: 'JOIN Types and Relationship Optionality',
     joinTypesDesc:
@@ -228,7 +245,7 @@ export function JoinSection() {
   return (
     <PageContainer>
       <ChapterTitle
-        icon={<IconSitemap size={36} stroke={1.5} className="text-indigo-500" />}
+        icon={<IconSitemap size={36} stroke={1.5} className="text-blue" />}
         title={t.title}
         subtitle={t.subtitle}
       />
@@ -247,6 +264,14 @@ export function JoinSection() {
       </div>
       <div className="mt-4">
         <SqlBlock sql={t.joinSql} badge="SELECT" badgeColor="emerald" desc={lang === 'ko' ? '1:N 관계 JOIN 조회' : '1:N relationship JOIN query'} />
+        <div className="mt-3">
+          <ResultTable
+            meta={t.joinResultMeta}
+            columns={t.joinResultCols.map((label) => ({ label }))}
+            rows={t.joinResultRows}
+            footer={t.joinResultFoot}
+          />
+        </div>
       </div>
 
       <Divider />

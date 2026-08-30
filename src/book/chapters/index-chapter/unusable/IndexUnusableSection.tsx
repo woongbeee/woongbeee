@@ -173,7 +173,7 @@ export function IndexUnusableSection() {
   return (
     <PageContainer className="max-w-5xl">
       <ChapterTitle
-        icon={<IconAlertTriangle size={36} color="#7c3aed" stroke={1.5} />}
+        icon={<IconAlertTriangle size={36} color="var(--color-purple)" stroke={1.5} />}
         title={t.title}
         subtitle={t.subtitle}
       />
@@ -188,13 +188,13 @@ export function IndexUnusableSection() {
         {t.cases.map((c, i) => {
           const isOpen = openCase === i
           return (
-            <div key={i} className="overflow-hidden rounded-xl border bg-card">
+            <div key={i} className="overflow-hidden rounded-panel border bg-paper">
               <button
-                className="flex w-full items-center justify-between px-4 py-3 text-left text-sm font-semibold transition-colors hover:bg-muted/40"
+                className="flex w-full items-center justify-between px-4 py-3 text-left text-sm font-semibold transition-colors hover:bg-rail"
                 onClick={() => setOpenCase(isOpen ? null : i)}
               >
                 <span>{c.title}</span>
-                <span className="ml-3 shrink-0 font-mono text-xs text-muted-foreground">
+                <span className="ml-3 shrink-0 font-mono text-xs text-ink-2">
                   {isOpen ? '▲' : '▼'}
                 </span>
               </button>
@@ -202,8 +202,8 @@ export function IndexUnusableSection() {
               {isOpen && (
                 <div className="border-t px-4 pb-4 pt-3">
                   {/* 이유 */}
-                  <p className="mb-3 text-[12px] leading-relaxed text-muted-foreground">
-                    <span className="mr-1 font-semibold text-rose-600">
+                  <p className="mb-3 text-[12px] leading-relaxed text-ink-2">
+                    <span className="mr-1 font-semibold text-red">
                       {isKo ? '왜 못 쓰나요? ' : 'Why skipped? '}
                     </span>
                     {c.reason}
@@ -212,17 +212,17 @@ export function IndexUnusableSection() {
                   {/* Bad / Good 나란히 */}
                   <div className="grid gap-3 sm:grid-cols-2">
                     <div>
-                      <p className="mb-1 font-mono text-[10px] font-bold uppercase tracking-widest text-rose-500">
+                      <p className="mb-1 font-mono text-[10px] font-bold uppercase tracking-widest text-red">
                         {t.badLabel}
                       </p>
                       <SqlBlock sql={c.bad} />
                     </div>
                     <div>
-                      <p className="mb-1 font-mono text-[10px] font-bold uppercase tracking-widest text-emerald-600">
+                      <p className="mb-1 font-mono text-[10px] font-bold uppercase tracking-widest text-green">
                         {t.goodLabel}
                       </p>
                       <SqlBlock sql={c.good} />
-                      <p className="mt-2 text-[11px] leading-snug text-muted-foreground">{c.goodDesc}</p>
+                      <p className="mt-2 text-[11px] leading-snug text-ink-2">{c.goodDesc}</p>
                     </div>
                   </div>
                 </div>

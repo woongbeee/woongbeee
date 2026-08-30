@@ -99,18 +99,18 @@ const JOIN_SQL: Record<JoinType, string> = {
 }
 
 const C = {
-  bg:     'bg-muted/40',
-  border: 'border-border',
-  text:   'text-foreground/80',
-  badge:  'bg-ios-blue-light text-ios-blue-dark',
+  bg:     'bg-rail',
+  border: 'border-line',
+  text:   'text-ink/80',
+  badge:  'bg-blue/10 text-blue',
 }
 
 const JOIN_COLOR: Record<JoinType, { border: string; bg: string; text: string; badge: string }> = {
-  inner: { border: 'border-emerald-400', bg: 'bg-emerald-50',  text: 'text-emerald-800', badge: 'bg-emerald-100 text-emerald-700' },
-  left:  { border: 'border-blue-400',    bg: 'bg-blue-50',     text: 'text-blue-800',    badge: 'bg-blue-100 text-blue-700' },
-  right: { border: 'border-violet-400',  bg: 'bg-violet-50',   text: 'text-violet-800',  badge: 'bg-violet-100 text-violet-700' },
-  full:  { border: 'border-amber-400',   bg: 'bg-amber-50',    text: 'text-amber-800',   badge: 'bg-amber-100 text-amber-700' },
-  cross: { border: 'border-rose-400',    bg: 'bg-rose-50',     text: 'text-rose-800',    badge: 'bg-rose-100 text-rose-700' },
+  inner: { border: 'border-green/50', bg: 'bg-green/5',  text: 'text-green', badge: 'bg-green/10 text-green' },
+  left:  { border: 'border-blue/50',    bg: 'bg-blue/5',     text: 'text-blue',    badge: 'bg-blue/10 text-blue' },
+  right: { border: 'border-purple/50',  bg: 'bg-purple/5',   text: 'text-purple',  badge: 'bg-purple/10 text-purple' },
+  full:  { border: 'border-amber/50',   bg: 'bg-amber/5',    text: 'text-amber',   badge: 'bg-amber/10 text-amber' },
+  cross: { border: 'border-red/50',    bg: 'bg-red/5',     text: 'text-red',    badge: 'bg-red/10 text-red' },
 }
 
 // ── Translation ────────────────────────────────────────────────────────────
@@ -125,11 +125,11 @@ const T = {
       { key: 'hierarchy', label: '계층형 질의' },
     ],
     joinTypes: [
-      { key: 'inner', icon: <IconArrowsJoin size={16} color="#2563eb" stroke={1.5} />, title: 'INNER JOIN',       desc: '양쪽 테이블 모두에서 조건을 만족하는 행만 반환해요. 가장 일반적인 JOIN이에요.' },
-      { key: 'left',  icon: <IconArrowBarToLeft size={16} color="#059669" stroke={1.5} />, title: 'LEFT OUTER JOIN',  desc: '왼쪽 테이블의 모든 행 + 오른쪽 테이블에서 조건에 맞는 행. 오른쪽에 일치하는 행이 없으면 NULL이 돼요.' },
-      { key: 'right', icon: <IconArrowBarToRight size={16} color="#d97706" stroke={1.5} />, title: 'RIGHT OUTER JOIN', desc: '오른쪽 테이블의 모든 행 + 왼쪽 테이블에서 조건에 맞는 행. 왼쪽에 일치하는 행이 없으면 NULL이 돼요.' },
-      { key: 'full',  icon: <IconArrowsHorizontal size={16} color="#7c3aed" stroke={1.5} />, title: 'FULL OUTER JOIN',  desc: '양쪽 테이블의 모든 행을 반환해요. 조건을 만족하지 않는 쪽은 NULL로 채워요.' },
-      { key: 'cross', icon: <IconGridDots size={16} color="#e11d48" stroke={1.5} />, title: 'CROSS JOIN',       desc: '모든 행의 조합(Cartesian Join)을 반환해요. ON 절이 없어요.' },
+      { key: 'inner', icon: <IconArrowsJoin size={16} color="var(--color-blue)" stroke={1.5} />, title: 'INNER JOIN',       desc: '양쪽 테이블 모두에서 조건을 만족하는 행만 반환해요. 가장 일반적인 JOIN이에요.' },
+      { key: 'left',  icon: <IconArrowBarToLeft size={16} color="var(--color-green)" stroke={1.5} />, title: 'LEFT OUTER JOIN',  desc: '왼쪽 테이블의 모든 행 + 오른쪽 테이블에서 조건에 맞는 행. 오른쪽에 일치하는 행이 없으면 NULL이 돼요.' },
+      { key: 'right', icon: <IconArrowBarToRight size={16} color="var(--color-amber)" stroke={1.5} />, title: 'RIGHT OUTER JOIN', desc: '오른쪽 테이블의 모든 행 + 왼쪽 테이블에서 조건에 맞는 행. 왼쪽에 일치하는 행이 없으면 NULL이 돼요.' },
+      { key: 'full',  icon: <IconArrowsHorizontal size={16} color="var(--color-purple)" stroke={1.5} />, title: 'FULL OUTER JOIN',  desc: '양쪽 테이블의 모든 행을 반환해요. 조건을 만족하지 않는 쪽은 NULL로 채워요.' },
+      { key: 'cross', icon: <IconGridDots size={16} color="var(--color-red)" stroke={1.5} />, title: 'CROSS JOIN',       desc: '모든 행의 조합(Cartesian Join)을 반환해요. ON 절이 없어요.' },
     ],
     joinQueryDesc: {
       inner: 'employees(직원) 테이블과 departments(부서) 테이블에서 dept_id(부서 번호)가 같은 행을 찾아요.',
@@ -176,11 +176,11 @@ const T = {
       { key: 'hierarchy', label: 'Hierarchical Query' },
     ],
     joinTypes: [
-      { key: 'inner', icon: <IconArrowsJoin size={16} color="#2563eb" stroke={1.5} />, title: 'INNER JOIN',       desc: 'Returns only rows with matching values in both tables. The most common join type.' },
-      { key: 'left',  icon: <IconArrowBarToLeft size={16} color="#059669" stroke={1.5} />, title: 'LEFT OUTER JOIN',  desc: 'All rows from the left table, plus matching rows from the right. Non-matching right rows become NULL.' },
-      { key: 'right', icon: <IconArrowBarToRight size={16} color="#d97706" stroke={1.5} />, title: 'RIGHT OUTER JOIN', desc: 'All rows from the right table, plus matching rows from the left. Non-matching left rows become NULL.' },
-      { key: 'full',  icon: <IconArrowsHorizontal size={16} color="#7c3aed" stroke={1.5} />, title: 'FULL OUTER JOIN',  desc: 'All rows from both tables. Non-matching rows on either side are filled with NULL.' },
-      { key: 'cross', icon: <IconGridDots size={16} color="#e11d48" stroke={1.5} />, title: 'CROSS JOIN',       desc: 'Returns every combination of rows (Cartesian product). No ON clause.' },
+      { key: 'inner', icon: <IconArrowsJoin size={16} color="var(--color-blue)" stroke={1.5} />, title: 'INNER JOIN',       desc: 'Returns only rows with matching values in both tables. The most common join type.' },
+      { key: 'left',  icon: <IconArrowBarToLeft size={16} color="var(--color-green)" stroke={1.5} />, title: 'LEFT OUTER JOIN',  desc: 'All rows from the left table, plus matching rows from the right. Non-matching right rows become NULL.' },
+      { key: 'right', icon: <IconArrowBarToRight size={16} color="var(--color-amber)" stroke={1.5} />, title: 'RIGHT OUTER JOIN', desc: 'All rows from the right table, plus matching rows from the left. Non-matching left rows become NULL.' },
+      { key: 'full',  icon: <IconArrowsHorizontal size={16} color="var(--color-purple)" stroke={1.5} />, title: 'FULL OUTER JOIN',  desc: 'All rows from both tables. Non-matching rows on either side are filled with NULL.' },
+      { key: 'cross', icon: <IconGridDots size={16} color="var(--color-red)" stroke={1.5} />, title: 'CROSS JOIN',       desc: 'Returns every combination of rows (Cartesian product). No ON clause.' },
     ],
     joinQueryDesc: {
       inner: 'Finds rows where dept_id matches in both the employees table and the departments table.',
@@ -229,19 +229,19 @@ function JoinVenn({ type }: { type: JoinType }) {
   const isCross   = type === 'cross'
   return (
     <svg viewBox="0 0 100 52" className="w-20 h-10 shrink-0">
-      <circle cx="35" cy="26" r="20" fill={showLeft  ? '#818cf830' : 'none'} stroke="#818cf8" strokeWidth="1.5" />
-      <circle cx="65" cy="26" r="20" fill={showRight ? '#fb923c30' : 'none'} stroke="#fb923c" strokeWidth="1.5" />
+      <circle cx="35" cy="26" r="20" fill={showLeft  ? 'color-mix(in srgb, var(--color-blue) 19%, transparent)' : 'none'} stroke="var(--color-blue)" strokeWidth="1.5" />
+      <circle cx="65" cy="26" r="20" fill={showRight ? 'color-mix(in srgb, var(--color-amber) 19%, transparent)' : 'none'} stroke="var(--color-amber)" strokeWidth="1.5" />
       {showMid && !isCross && (
         <>
           <clipPath id={`v-${type}`}><circle cx="35" cy="26" r="20" /></clipPath>
-          <circle cx="65" cy="26" r="20" fill="#6ee7b750" stroke="none" clipPath={`url(#v-${type})`} />
+          <circle cx="65" cy="26" r="20" fill="color-mix(in srgb, var(--color-green) 31%, transparent)" stroke="none" clipPath={`url(#v-${type})`} />
         </>
       )}
       {isCross && (
-        <text x="50" y="30" fontSize="9" fill="#f43f5e" fontWeight="bold" textAnchor="middle">×</text>
+        <text x="50" y="30" fontSize="9" fill="var(--color-red)" fontWeight="bold" textAnchor="middle">×</text>
       )}
-      <text x="26" y="29" fontSize="6" fill="#6d28d9" fontWeight="bold" textAnchor="middle">EMP</text>
-      <text x="74" y="29" fontSize="6" fill="#c2410c" fontWeight="bold" textAnchor="middle">DEPT</text>
+      <text x="26" y="29" fontSize="6" fill="var(--color-purple)" fontWeight="bold" textAnchor="middle">EMP</text>
+      <text x="74" y="29" fontSize="6" fill="var(--color-red)" fontWeight="bold" textAnchor="middle">DEPT</text>
     </svg>
   )
 }
@@ -335,18 +335,18 @@ function JoinAnimator({ type, joinRowCount, queryDesc }: { type: JoinType; joinR
   const doneDeptIdxs = new Set(animRows.slice(0, visibleCount).map((r) => r.deptIdx).filter((x): x is number => x !== null))
 
   const ROW_COL: Record<JoinAnimRow['_side'], string> = {
-    both:  'bg-ios-teal-light',
-    left:  'bg-ios-blue-light',
-    right: 'bg-muted/50',
+    both:  'bg-green/10',
+    left:  'bg-blue/10',
+    right: 'bg-rail',
   }
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="rounded-lg border bg-muted/60 px-3 py-2.5">
+      <div className="rounded-card border bg-rail px-3 py-2.5">
         <SqlHighlight sql={JOIN_SQL[type]} />
       </div>
 
-      <div className={cn('rounded-lg border px-3 py-2 text-[12px] leading-relaxed', C.border, C.bg, C.text)}>
+      <div className={cn('rounded-card border px-3 py-2 text-[12px] leading-relaxed', C.border, C.bg, C.text)}>
         {queryDesc}
       </div>
 
@@ -355,9 +355,9 @@ function JoinAnimator({ type, joinRowCount, queryDesc }: { type: JoinType; joinR
           onClick={startPlay}
           disabled={playing}
           className={cn(
-            'rounded-lg border px-4 py-1.5 font-mono text-xs font-bold transition-all',
+            'rounded-card border px-4 py-1.5 font-mono text-xs font-bold transition-all',
             playing
-              ? 'border-border bg-muted text-muted-foreground cursor-not-allowed'
+              ? 'border-line bg-rail text-ink-2 cursor-not-allowed'
               : `${C.border} ${C.bg} ${C.text} hover:brightness-95`,
           )}
         >
@@ -367,26 +367,26 @@ function JoinAnimator({ type, joinRowCount, queryDesc }: { type: JoinType; joinR
         <button
           onClick={() => { setPlaying(false); if (timerRef.current) clearTimeout(timerRef.current); setVisibleCount((v) => Math.max(0, v - 1)) }}
           disabled={playing || visibleCount === 0}
-          className="rounded-lg border border-border bg-card px-3 py-1.5 font-mono text-xs text-muted-foreground hover:bg-muted transition-colors disabled:opacity-40"
+          className="rounded-card border border-line bg-paper px-3 py-1.5 font-mono text-xs text-ink-2 hover:bg-rail transition-colors disabled:opacity-40"
         >
           ← {lang === 'ko' ? '이전' : 'Prev'}
         </button>
         <button
           onClick={() => { setPlaying(false); if (timerRef.current) clearTimeout(timerRef.current); setVisibleCount((v) => Math.min(animRows.length, v + 1)) }}
           disabled={playing || visibleCount >= animRows.length}
-          className="rounded-lg border border-border bg-card px-3 py-1.5 font-mono text-xs text-muted-foreground hover:bg-muted transition-colors disabled:opacity-40"
+          className="rounded-card border border-line bg-paper px-3 py-1.5 font-mono text-xs text-ink-2 hover:bg-rail transition-colors disabled:opacity-40"
         >
           {lang === 'ko' ? '다음' : 'Next'} →
         </button>
 
-        <span className="font-mono text-[11px] text-muted-foreground">
+        <span className="font-mono text-[11px] text-ink-2">
           {lang === 'ko' ? `총 ${animRows.length} 단계` : `${animRows.length} steps total`}
         </span>
 
         {visibleCount > 0 && !playing && (
           <button
             onClick={() => setVisibleCount(0)}
-            className="rounded-lg border border-border bg-card px-3 py-1.5 font-mono text-xs text-muted-foreground hover:bg-muted transition-colors"
+            className="rounded-card border border-line bg-paper px-3 py-1.5 font-mono text-xs text-ink-2 hover:bg-rail transition-colors"
           >
             {lang === 'ko' ? '초기화' : 'Reset'}
           </button>
@@ -401,13 +401,13 @@ function JoinAnimator({ type, joinRowCount, queryDesc }: { type: JoinType; joinR
       <div className="mt-3 grid grid-cols-[1fr_auto_1fr] items-start gap-2">
         {/* LEFT: EMPLOYEES */}
         <div>
-          <p className="mb-1 font-mono text-[10px] font-bold text-ios-blue-dark">EMPLOYEES</p>
-          <div className="overflow-hidden rounded-lg border text-xs">
+          <p className="mb-1 font-mono text-[10px] font-bold text-blue">EMPLOYEES</p>
+          <div className="overflow-hidden rounded-card border text-xs">
             <table className="w-full">
               <thead>
-                <tr className="border-b bg-muted/60">
+                <tr className="border-b bg-rail">
                   {(['emp_id', 'first_name', 'dept_id'] as const).map((h) => (
-                    <th key={h} className="px-2 py-1 text-left font-mono text-[9px] font-bold text-muted-foreground">{h}</th>
+                    <th key={h} className="px-2 py-1 text-left font-mono text-[9px] font-bold text-ink-2">{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -419,16 +419,16 @@ function JoinAnimator({ type, joinRowCount, queryDesc }: { type: JoinType; joinR
                     <motion.tr
                       key={e.emp_id}
                       animate={
-                        isActive ? { backgroundColor: '#fef08a', scale: 1.02 }
-                        : isDone  ? { backgroundColor: '#f0fdf4', scale: 1 }
-                        :           { backgroundColor: '#ffffff', scale: 1 }
+                        isActive ? { backgroundColor: 'var(--color-amber)', scale: 1.02 }
+                        : isDone  ? { backgroundColor: 'var(--color-rail)', scale: 1 }
+                        :           { backgroundColor: 'var(--color-paper)', scale: 1 }
                       }
                       transition={{ duration: 0.2 }}
                       className="border-b last:border-0"
                     >
-                      <td className={cn('px-2 py-1 font-mono text-[10px]', isActive ? 'font-bold text-yellow-800' : 'text-foreground/80')}>{e.emp_id}</td>
-                      <td className={cn('px-2 py-1 font-mono text-[10px]', isActive ? 'font-bold text-yellow-800' : 'text-foreground/80')}>{e.first_name}</td>
-                      <td className={cn('px-2 py-1 font-mono text-[10px] font-bold', e.dept_id === null ? 'italic text-muted-foreground/40' : isActive ? 'text-foreground' : 'text-ios-blue-dark')}>
+                      <td className={cn('px-2 py-1 font-mono text-[10px]', isActive ? 'font-bold text-amber' : 'text-ink/80')}>{e.emp_id}</td>
+                      <td className={cn('px-2 py-1 font-mono text-[10px]', isActive ? 'font-bold text-amber' : 'text-ink/80')}>{e.first_name}</td>
+                      <td className={cn('px-2 py-1 font-mono text-[10px] font-bold', e.dept_id === null ? 'italic text-ink-2/40' : isActive ? 'text-ink' : 'text-blue')}>
                         {e.dept_id ?? 'NULL'}
                       </td>
                     </motion.tr>
@@ -450,19 +450,19 @@ function JoinAnimator({ type, joinRowCount, queryDesc }: { type: JoinType; joinR
             >
               →
             </motion.div>
-            <span className="font-mono text-[9px] text-muted-foreground">ON dept_id</span>
+            <span className="font-mono text-[9px] text-ink-2">ON dept_id</span>
           </div>
         </div>
 
         {/* RIGHT: DEPARTMENTS */}
         <div>
-          <p className="mb-1 font-mono text-[10px] font-bold text-muted-foreground">DEPARTMENTS</p>
-          <div className="overflow-hidden rounded-lg border text-xs">
+          <p className="mb-1 font-mono text-[10px] font-bold text-ink-2">DEPARTMENTS</p>
+          <div className="overflow-hidden rounded-card border text-xs">
             <table className="w-full">
               <thead>
-                <tr className="border-b bg-muted/60">
+                <tr className="border-b bg-rail">
                   {(['dept_id', 'dept_name', 'location'] as const).map((h) => (
-                    <th key={h} className="px-2 py-1 text-left font-mono text-[9px] font-bold text-muted-foreground">{h}</th>
+                    <th key={h} className="px-2 py-1 text-left font-mono text-[9px] font-bold text-ink-2">{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -474,16 +474,16 @@ function JoinAnimator({ type, joinRowCount, queryDesc }: { type: JoinType; joinR
                     <motion.tr
                       key={d.dept_id}
                       animate={
-                        isActive ? { backgroundColor: '#fef08a', scale: 1.02 }
-                        : isDone  ? { backgroundColor: '#fff7ed', scale: 1 }
-                        :           { backgroundColor: '#ffffff', scale: 1 }
+                        isActive ? { backgroundColor: 'var(--color-amber)', scale: 1.02 }
+                        : isDone  ? { backgroundColor: 'var(--color-rail)', scale: 1 }
+                        :           { backgroundColor: 'var(--color-paper)', scale: 1 }
                       }
                       transition={{ duration: 0.2 }}
                       className="border-b last:border-0"
                     >
-                      <td className={cn('px-2 py-1 font-mono text-[10px] font-bold', isActive ? 'text-foreground' : 'text-foreground/70')}>{d.dept_id}</td>
-                      <td className={cn('px-2 py-1 font-mono text-[10px]', isActive ? 'font-bold text-yellow-800' : 'text-foreground/80')}>{d.dept_name}</td>
-                      <td className={cn('px-2 py-1 font-mono text-[10px]', isActive ? 'font-bold text-yellow-800' : 'text-foreground/80')}>{d.location}</td>
+                      <td className={cn('px-2 py-1 font-mono text-[10px] font-bold', isActive ? 'text-ink' : 'text-ink/70')}>{d.dept_id}</td>
+                      <td className={cn('px-2 py-1 font-mono text-[10px]', isActive ? 'font-bold text-amber' : 'text-ink/80')}>{d.dept_name}</td>
+                      <td className={cn('px-2 py-1 font-mono text-[10px]', isActive ? 'font-bold text-amber' : 'text-ink/80')}>{d.location}</td>
                     </motion.tr>
                   )
                 })}
@@ -495,19 +495,19 @@ function JoinAnimator({ type, joinRowCount, queryDesc }: { type: JoinType; joinR
 
       {/* Result rows */}
       <div>
-        <p className="mb-1.5 font-mono text-[10px] font-bold text-muted-foreground">
+        <p className="mb-1.5 font-mono text-[10px] font-bold text-ink-2">
           {lang === 'ko' ? '결과' : 'Result'}
         </p>
-        <div className="overflow-x-auto rounded-lg border bg-card text-xs">
+        <div className="overflow-x-auto rounded-card border bg-paper text-xs">
           <table className="w-full">
             <thead>
-              <tr className="border-b bg-muted/60">
+              <tr className="border-b bg-rail">
                 {(['emp_id', 'first_name', 'dept_id', 'dept_name', 'location'] as const).map((h) => (
                   <th key={h} className={cn(
                     'whitespace-nowrap px-2 py-1.5 text-left font-mono text-[10px] font-bold',
-                    h === 'dept_id' ? 'text-ios-blue-dark'
-                    : h === 'dept_name' || h === 'location' ? 'text-foreground/60'
-                    : 'text-muted-foreground',
+                    h === 'dept_id' ? 'text-blue'
+                    : h === 'dept_name' || h === 'location' ? 'text-ink/60'
+                    : 'text-ink-2',
                   )}>{h}</th>
                 ))}
               </tr>
@@ -517,15 +517,15 @@ function JoinAnimator({ type, joinRowCount, queryDesc }: { type: JoinType; joinR
                 {animRows.slice(0, visibleCount).map((row, i) => (
                   <motion.tr
                     key={i}
-                    initial={{ opacity: 0, y: -6, backgroundColor: '#fef08a' }}
-                    animate={{ opacity: 1, y: 0,  backgroundColor: row._side === 'both' ? '#e5f5fc' : row._side === 'left' ? '#e8f3ff' : '#f4f4f5' }}
+                    initial={{ opacity: 0, y: -6, backgroundColor: 'var(--color-amber)' }}
+                    animate={{ opacity: 1, y: 0,  backgroundColor: row._side === 'both' ? 'var(--color-rail)' : row._side === 'left' ? 'var(--color-rail)' : 'var(--color-rail)' }}
                     transition={{ duration: 0.3 }}
                     className={cn('border-b last:border-0', ROW_COL[row._side])}
                   >
                     {(['emp_id', 'first_name', 'dept_id', 'dept_name', 'location'] as const).map((col) => {
                       const val = row[col]
                       return (
-                        <td key={col} className={cn('px-2 py-1 font-mono text-[10px]', val === null ? 'italic text-muted-foreground/40' : 'text-foreground/80')}>
+                        <td key={col} className={cn('px-2 py-1 font-mono text-[10px]', val === null ? 'italic text-ink-2/40' : 'text-ink/80')}>
                           {val ?? 'NULL'}
                         </td>
                       )
@@ -534,7 +534,7 @@ function JoinAnimator({ type, joinRowCount, queryDesc }: { type: JoinType; joinR
                 ))}
               </AnimatePresence>
               {visibleCount === 0 && (
-                <tr><td colSpan={5} className="py-4 text-center font-mono text-[10px] text-muted-foreground/50">
+                <tr><td colSpan={5} className="py-4 text-center font-mono text-[10px] text-ink-2/50">
                   {lang === 'ko' ? '▶ 조인 시작을 클릭해 시작하세요' : '▶ Press Run to start'}
                 </td></tr>
               )}
@@ -543,10 +543,10 @@ function JoinAnimator({ type, joinRowCount, queryDesc }: { type: JoinType; joinR
         </div>
 
         {visibleCount > 0 && (
-          <div className="mt-1.5 flex flex-wrap gap-3 font-mono text-[10px] text-muted-foreground">
-            <span className="flex items-center gap-1"><span className="inline-block h-2 w-2 rounded-sm bg-ios-teal/40" />{lang === 'ko' ? '양쪽 일치' : 'Both match'}</span>
-            {(type === 'left' || type === 'full') && <span className="flex items-center gap-1"><span className="inline-block h-2 w-2 rounded-sm bg-ios-blue/30" />{lang === 'ko' ? '왼쪽만' : 'Left only'}</span>}
-            {(type === 'right' || type === 'full') && <span className="flex items-center gap-1"><span className="inline-block h-2 w-2 rounded-sm bg-muted-foreground/20" />{lang === 'ko' ? '오른쪽만' : 'Right only'}</span>}
+          <div className="mt-1.5 flex flex-wrap gap-3 font-mono text-[10px] text-ink-2">
+            <span className="flex items-center gap-1"><span className="inline-block h-2 w-2 rounded-chip bg-green/40" />{lang === 'ko' ? '양쪽 일치' : 'Both match'}</span>
+            {(type === 'left' || type === 'full') && <span className="flex items-center gap-1"><span className="inline-block h-2 w-2 rounded-chip bg-blue/30" />{lang === 'ko' ? '왼쪽만' : 'Left only'}</span>}
+            {(type === 'right' || type === 'full') && <span className="flex items-center gap-1"><span className="inline-block h-2 w-2 rounded-chip bg-rail-foreground/20" />{lang === 'ko' ? '오른쪽만' : 'Right only'}</span>}
           </div>
         )}
       </div>
@@ -585,22 +585,22 @@ function HierarchyPage() {
 
       {/* Clause reference table */}
       <div>
-        <p className="mb-2 font-mono text-[10px] font-bold text-muted-foreground uppercase tracking-wide">
+        <p className="mb-2 font-mono text-[10px] font-bold text-ink-2 uppercase tracking-wide">
           {lang === 'ko' ? '주요 키워드' : 'Key Keywords'}
         </p>
-        <div className="overflow-x-auto rounded-xl border bg-card">
+        <div className="overflow-x-auto rounded-panel border bg-paper">
           <table className="w-full text-xs">
             <thead>
-              <tr className="border-b bg-muted/60">
-                <th className="px-3 py-2 text-left font-mono text-[10px] font-bold text-ios-teal-dark whitespace-nowrap">Keyword</th>
-                <th className="px-3 py-2 text-left font-mono text-[10px] font-bold text-muted-foreground">{lang === 'ko' ? '설명' : 'Description'}</th>
+              <tr className="border-b bg-rail">
+                <th className="px-3 py-2 text-left font-mono text-[10px] font-bold text-green whitespace-nowrap">Keyword</th>
+                <th className="px-3 py-2 text-left font-mono text-[10px] font-bold text-ink-2">{lang === 'ko' ? '설명' : 'Description'}</th>
               </tr>
             </thead>
             <tbody>
               {t.hierClauses.map((row, i) => (
-                <tr key={i} className="border-b last:border-0 hover:bg-muted/30">
-                  <td className="px-3 py-2 font-mono text-[11px] font-bold text-ios-teal-dark whitespace-nowrap">{row.clause}</td>
-                  <td className="px-3 py-2 font-mono text-[11px] text-foreground/80 leading-relaxed">{row.desc}</td>
+                <tr key={i} className="border-b last:border-0 hover:bg-rail">
+                  <td className="px-3 py-2 font-mono text-[11px] font-bold text-green whitespace-nowrap">{row.clause}</td>
+                  <td className="px-3 py-2 font-mono text-[11px] text-ink/80 leading-relaxed">{row.desc}</td>
                 </tr>
               ))}
             </tbody>
@@ -616,10 +616,10 @@ function HierarchyPage() {
               key={tab}
               onClick={() => setHierTab(tab)}
               className={cn(
-                'rounded-lg border px-4 py-1.5 font-mono text-xs font-bold transition-all',
+                'rounded-card border px-4 py-1.5 font-mono text-xs font-bold transition-all',
                 hierTab === tab
-                  ? 'border-ios-teal/30 bg-ios-teal-light text-ios-teal-dark'
-                  : 'border-border bg-card text-muted-foreground hover:bg-muted/40',
+                  ? 'border-green/30 bg-green/10 text-green'
+                  : 'border-line bg-paper text-ink-2 hover:bg-rail',
               )}
             >
               {tab === 'basic' ? t.hierTabBasic : t.hierTabPath}
@@ -630,10 +630,10 @@ function HierarchyPage() {
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           {/* SQL + desc */}
           <div className="flex flex-col gap-3">
-            <div className="rounded-lg border bg-muted/60 px-3 py-2.5">
+            <div className="rounded-card border bg-rail px-3 py-2.5">
               <SqlHighlight sql={hierTab === 'basic' ? t.hierSqlBasic : t.hierSqlPath} />
             </div>
-            <div className="rounded-lg border border-ios-teal/20 bg-ios-teal-light px-3 py-2 text-[12px] leading-relaxed text-ios-teal-dark">
+            <div className="rounded-card border border-green/30 bg-green/10 px-3 py-2 text-[12px] leading-relaxed text-green">
               {hierTab === 'basic' ? t.hierDescBasic : t.hierDescPath}
             </div>
           </div>
@@ -641,16 +641,16 @@ function HierarchyPage() {
           {/* Right column: start buttons → query result → source table */}
           <div className="flex flex-col gap-3">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="font-mono text-[10px] text-muted-foreground">{t.startFrom}:</span>
+              <span className="font-mono text-[10px] text-ink-2">{t.startFrom}:</span>
               {startOptions.map((opt) => (
                 <button
                   key={opt.id ?? 'all'}
                   onClick={() => setStartId(opt.id)}
                   className={cn(
-                    'rounded-md border px-2.5 py-0.5 font-mono text-[11px] transition-all',
+                    'rounded-card border px-2.5 py-0.5 font-mono text-[11px] transition-all',
                     startId === opt.id
-                      ? 'border-cyan-300 bg-cyan-50 text-cyan-700 font-bold'
-                      : 'border-border bg-card text-muted-foreground hover:bg-muted/40',
+                      ? 'border-green/50 bg-green/5 text-green font-bold'
+                      : 'border-line bg-paper text-ink-2 hover:bg-rail',
                   )}
                 >
                   {opt.label}
@@ -659,40 +659,40 @@ function HierarchyPage() {
             </div>
 
             {/* Query result table */}
-            <div className="overflow-x-auto rounded-lg border bg-card text-xs">
-              <div className="border-b bg-muted/40 px-3 py-1.5 font-mono text-[10px] font-bold text-muted-foreground">
+            <div className="overflow-x-auto rounded-card border bg-paper text-xs">
+              <div className="border-b bg-rail px-3 py-1.5 font-mono text-[10px] font-bold text-ink-2">
                 {lang === 'ko' ? '쿼리 결과' : 'Query Result'}
               </div>
               <table className="w-full">
                 <thead>
-                  <tr className="border-b bg-muted/60">
+                  <tr className="border-b bg-rail">
                     {hierTab === 'basic'
                       ? ['emp_id', 'name (LPAD)', 'manager_id', t.hierLevelLabel].map((h) => (
-                          <th key={h} className="px-3 py-1.5 text-left font-mono text-[10px] font-bold text-muted-foreground whitespace-nowrap">{h}</th>
+                          <th key={h} className="px-3 py-1.5 text-left font-mono text-[10px] font-bold text-ink-2 whitespace-nowrap">{h}</th>
                         ))
                       : ['emp_id', 'name (LPAD)', t.hierLevelLabel, t.hierPathLabel].map((h) => (
-                          <th key={h} className="px-3 py-1.5 text-left font-mono text-[10px] font-bold text-muted-foreground whitespace-nowrap">{h}</th>
+                          <th key={h} className="px-3 py-1.5 text-left font-mono text-[10px] font-bold text-ink-2 whitespace-nowrap">{h}</th>
                         ))
                     }
                   </tr>
                 </thead>
                 <tbody>
                   {hierNodes.map((node) => (
-                    <tr key={node.emp_id} className="border-b last:border-0 hover:bg-muted/30">
-                      <td className="px-3 py-1.5 font-mono text-[11px] text-ios-blue-dark font-bold">{node.emp_id}</td>
+                    <tr key={node.emp_id} className="border-b last:border-0 hover:bg-rail">
+                      <td className="px-3 py-1.5 font-mono text-[11px] text-blue font-bold">{node.emp_id}</td>
                       <td className="py-1.5 pl-3 pr-4 font-mono text-[11px] whitespace-pre">
-                        <span className="text-ios-teal/60">{' '.repeat((node.level - 1) * 4)}</span>
-                        <span className="font-bold text-foreground/90">{node.first_name}</span>
+                        <span className="text-green">{' '.repeat((node.level - 1) * 4)}</span>
+                        <span className="font-bold text-ink/90">{node.first_name}</span>
                       </td>
                       {hierTab === 'basic' ? (
                         <>
-                          <td className="px-3 py-1.5 font-mono text-[11px] text-foreground/60">{node.manager_id ?? 'NULL'}</td>
-                          <td className="px-3 py-1.5 font-mono text-[11px] text-ios-teal-dark font-bold">{node.level}</td>
+                          <td className="px-3 py-1.5 font-mono text-[11px] text-ink/60">{node.manager_id ?? 'NULL'}</td>
+                          <td className="px-3 py-1.5 font-mono text-[11px] text-green font-bold">{node.level}</td>
                         </>
                       ) : (
                         <>
-                          <td className="px-3 py-1.5 font-mono text-[11px] text-ios-teal-dark font-bold">{node.level}</td>
-                          <td className="px-3 py-1.5 font-mono text-[11px] text-foreground/60">/{node.path}</td>
+                          <td className="px-3 py-1.5 font-mono text-[11px] text-green font-bold">{node.level}</td>
+                          <td className="px-3 py-1.5 font-mono text-[11px] text-ink/60">/{node.path}</td>
                         </>
                       )}
                     </tr>
@@ -702,24 +702,24 @@ function HierarchyPage() {
             </div>
 
             {/* Source table */}
-            <div className="overflow-x-auto rounded-lg border bg-card text-xs">
-              <div className="border-b bg-muted/40 px-3 py-1.5 font-mono text-[10px] font-bold text-muted-foreground">
+            <div className="overflow-x-auto rounded-card border bg-paper text-xs">
+              <div className="border-b bg-rail px-3 py-1.5 font-mono text-[10px] font-bold text-ink-2">
                 employees
               </div>
               <table className="w-full">
                 <thead>
-                  <tr className="border-b bg-muted/60">
+                  <tr className="border-b bg-rail">
                     {['name', 'emp_id', 'manager_id'].map((h) => (
-                      <th key={h} className="px-3 py-1.5 text-left font-mono text-[10px] font-bold text-muted-foreground whitespace-nowrap">{h}</th>
+                      <th key={h} className="px-3 py-1.5 text-left font-mono text-[10px] font-bold text-ink-2 whitespace-nowrap">{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {EMP_ORG.map((emp) => (
-                    <tr key={emp.emp_id} className={cn('border-b last:border-0', resultIds.has(emp.emp_id) ? 'bg-cyan-50/60 dark:bg-cyan-950/20' : 'opacity-40')}>
-                      <td className="px-3 py-1.5 font-mono text-[11px] font-bold text-foreground/90">{emp.first_name}</td>
-                      <td className="px-3 py-1.5 font-mono text-[11px] text-ios-blue-dark font-bold">{emp.emp_id}</td>
-                      <td className="px-3 py-1.5 font-mono text-[11px] text-foreground/60">{emp.manager_id ?? 'NULL'}</td>
+                    <tr key={emp.emp_id} className={cn('border-b last:border-0', resultIds.has(emp.emp_id) ? 'bg-green/5 dark:bg-green' : 'opacity-40')}>
+                      <td className="px-3 py-1.5 font-mono text-[11px] font-bold text-ink/90">{emp.first_name}</td>
+                      <td className="px-3 py-1.5 font-mono text-[11px] text-blue font-bold">{emp.emp_id}</td>
+                      <td className="px-3 py-1.5 font-mono text-[11px] text-ink/60">{emp.manager_id ?? 'NULL'}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -751,10 +751,10 @@ export function JoinSection() {
 
   return (
     <PageContainer className="max-w-6xl">
-      <ChapterTitle icon={<IconArrowMerge size={36} color="#06b6d4" stroke={1.5} />} title={t.chapterTitle} subtitle={t.joinSectionSubtitle} />
+      <ChapterTitle icon={<IconArrowMerge size={36} color="var(--color-blue)" stroke={1.5} />} title={t.chapterTitle} subtitle={t.joinSectionSubtitle} />
 
       {/* Top-level page tab switcher */}
-      <div className="flex gap-2 border-b border-border pb-3">
+      <div className="flex gap-2 border-b border-line pb-3">
         {t.pageTabs.map((tab) => {
           const isActive = pageTab === tab.key
           return (
@@ -762,10 +762,10 @@ export function JoinSection() {
               key={tab.key}
               onClick={() => setPageTab(tab.key as PageTab)}
               className={cn(
-                'rounded-lg border px-4 py-1.5 font-mono text-xs font-bold transition-all',
+                'rounded-card border px-4 py-1.5 font-mono text-xs font-bold transition-all',
                 isActive
-                  ? 'border-ios-blue/30 bg-ios-blue-light text-ios-blue-dark'
-                  : 'border-border bg-card text-muted-foreground hover:bg-muted/40',
+                  ? 'border-blue/30 bg-blue/10 text-blue'
+                  : 'border-line bg-paper text-ink-2 hover:bg-rail',
               )}
             >
               {tab.label}
@@ -797,20 +797,20 @@ export function JoinSection() {
                       key={jk}
                       onClick={() => setActiveJoin(jk)}
                       className={cn(
-                        'flex items-start gap-3 rounded-xl border-2 p-3 text-left transition-all',
+                        'flex items-start gap-3 rounded-panel border-2 p-3 text-left transition-all',
                         isActive
-                          ? `${JOIN_COLOR[jk].bg} ${JOIN_COLOR[jk].border} shadow-sm`
-                          : 'border-border bg-card hover:bg-muted/40',
+                          ? `${JOIN_COLOR[jk].bg} ${JOIN_COLOR[jk].border} `
+                          : 'border-line bg-paper hover:bg-rail',
                       )}
                     >
-                      <div className={cn('mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-sm font-bold', isActive ? JOIN_COLOR[jk].badge : 'bg-muted text-muted-foreground')}>
+                      <div className={cn('mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-card text-sm font-bold', isActive ? JOIN_COLOR[jk].badge : 'bg-rail text-ink-2')}>
                         {jt.icon}
                       </div>
                       <div className="min-w-0">
-                        <div className={cn('font-mono text-xs font-bold', isActive ? JOIN_COLOR[jk].text : 'text-foreground/70')}>
+                        <div className={cn('font-mono text-xs font-bold', isActive ? JOIN_COLOR[jk].text : 'text-ink/70')}>
                           {jt.title}
                         </div>
-                        <div className={cn('mt-0.5 text-[11px] leading-snug', isActive ? 'text-foreground/70' : 'text-muted-foreground')}>
+                        <div className={cn('mt-0.5 text-[11px] leading-snug', isActive ? 'text-ink/70' : 'text-ink-2')}>
                           {jt.desc}
                         </div>
                       </div>
@@ -821,7 +821,7 @@ export function JoinSection() {
               </div>
 
               {/* RIGHT: animation simulator */}
-              <div className={cn('rounded-xl border p-4 shadow-sm transition-colors', C.bg, C.border)}>
+              <div className={cn('rounded-panel border p-4  transition-colors', C.bg, C.border)}>
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={activeJoin}

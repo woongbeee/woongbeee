@@ -28,7 +28,7 @@ export function TransactionSection() {
   return (
     <PageContainer>
       <ChapterTitle
-        icon={<IconRefresh size={36} stroke={1.5} className="text-teal-500" />}
+        icon={<IconRefresh size={36} stroke={1.5} className="text-green" />}
         title={isKo ? '트랜잭션(Transaction)' : 'Transactions'}
         subtitle={isKo
           ? '트랜잭션은 Oracle이 데이터를 안전하게 변경하는 논리적 작업 단위예요. 왼쪽 목차에서 하위 섹션을 선택하세요.'

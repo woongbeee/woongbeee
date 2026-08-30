@@ -241,7 +241,7 @@ export function QtSubqueryUnnestingSection() {
   return (
     <PageContainer>
       <ChapterTitle
-        icon={<IconTransform size={36} stroke={1.5} className="text-cyan-500" />}
+        icon={<IconTransform size={36} stroke={1.5} className="text-green" />}
         title={t.title}
         subtitle={t.subtitle}
       />

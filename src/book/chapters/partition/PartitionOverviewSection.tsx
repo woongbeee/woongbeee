@@ -145,7 +145,7 @@ export function PartitionOverviewSection() {
   return (
     <PageContainer>
       <ChapterTitle
-        icon={<IconLayoutGrid size={36} stroke={1.5} className="text-amber-500" />}
+        icon={<IconLayoutGrid size={36} stroke={1.5} className="text-amber" />}
         title={t.title}
         subtitle={t.subtitle}
       />

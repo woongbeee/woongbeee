@@ -124,10 +124,10 @@ const T = {
 }
 
 const colorMap = {
-  blue:   { ring: 'ring-blue-300',   bg: 'bg-blue-50',   badge: 'bg-blue-500',   text: 'text-blue-700',   detail: 'bg-blue-50 border-blue-200'   },
-  emerald:{ ring: 'ring-emerald-300',bg: 'bg-emerald-50',badge: 'bg-emerald-500',text: 'text-emerald-700',detail: 'bg-emerald-50 border-emerald-200'},
-  violet: { ring: 'ring-violet-300', bg: 'bg-violet-50', badge: 'bg-violet-500', text: 'text-violet-700', detail: 'bg-violet-50 border-violet-200' },
-  orange: { ring: 'ring-orange-300', bg: 'bg-orange-50', badge: 'bg-orange-500', text: 'text-orange-700', detail: 'bg-orange-50 border-orange-200' },
+  blue:   { ring: 'ring-blue/50',   bg: 'bg-blue/5',   badge: 'bg-blue',   text: 'text-blue',   detail: 'bg-blue/5 border-blue/30'   },
+  emerald:{ ring: 'ring-green/50',bg: 'bg-green/5',badge: 'bg-green',text: 'text-green',detail: 'bg-green/5 border-green/30'},
+  violet: { ring: 'ring-purple/50', bg: 'bg-purple/5', badge: 'bg-purple', text: 'text-purple', detail: 'bg-purple/5 border-purple/30' },
+  orange: { ring: 'ring-amber/50', bg: 'bg-amber/5', badge: 'bg-amber', text: 'text-amber', detail: 'bg-amber/5 border-amber/30' },
 }
 
 type AcidColor = keyof typeof colorMap
@@ -139,14 +139,14 @@ function AcidCard({ letter, name, desc, detail, color, collapseLabel, expandLabe
   const [open, setOpen] = useState(false)
   const c = colorMap[color]
   return (
-    <div className={cn('rounded-xl border-2 p-4 transition-all', c.ring, c.bg)}>
+    <div className={cn('rounded-panel border-2 p-4 transition-all', c.ring, c.bg)}>
       <div className="flex items-start gap-3">
-        <span className={cn('shrink-0 flex h-9 w-9 items-center justify-center rounded-lg font-mono text-xl font-black text-white', c.badge)}>
+        <span className={cn('shrink-0 flex h-9 w-9 items-center justify-center rounded-card font-mono text-xl font-black text-paper', c.badge)}>
           {letter}
         </span>
         <div className="flex-1 min-w-0">
           <p className={cn('text-sm font-bold mb-1', c.text)}>{name}</p>
-          <p className="text-xs leading-relaxed text-muted-foreground">{desc}</p>
+          <p className="text-xs leading-relaxed text-ink-2">{desc}</p>
           <button
             onClick={() => setOpen(v => !v)}
             className={cn('mt-2 font-mono text-[10px] font-bold underline-offset-2 hover:underline', c.text)}
@@ -154,7 +154,7 @@ function AcidCard({ letter, name, desc, detail, color, collapseLabel, expandLabe
             {open ? expandLabel : collapseLabel}
           </button>
           {open && (
-            <div className={cn('mt-2 rounded-lg border px-3 py-2 text-xs leading-relaxed text-muted-foreground whitespace-pre-line', c.detail)}>
+            <div className={cn('mt-2 rounded-card border px-3 py-2 text-xs leading-relaxed text-ink-2 whitespace-pre-line', c.detail)}>
               {detail}
             </div>
           )}
@@ -172,7 +172,7 @@ export function TransactionAcidSection() {
   return (
     <PageContainer>
       <ChapterTitle
-        icon={<IconShieldCheck size={36} stroke={1.5} className="text-blue-500" />}
+        icon={<IconShieldCheck size={36} stroke={1.5} className="text-blue" />}
         title={t.title}
         subtitle={t.subtitle}
       />

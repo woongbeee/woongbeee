@@ -171,7 +171,7 @@ export function IntroSection() {
   return (
     <PageContainer>
       <ChapterTitle
-        icon={<IconMap size={36} stroke={1.5} className="text-orange-500" />}
+        icon={<IconMap size={36} stroke={1.5} className="text-amber" />}
         title={t.title}
         subtitle={t.subtitle}
       />
@@ -188,7 +188,7 @@ export function IntroSection() {
       <Prose>{t.rowSourceTreeDesc}</Prose>
       <ul className="mt-2 mb-4 space-y-1.5 pl-4">
         {t.rowSourceItems.map((item, i) => (
-          <li key={i} className="text-sm leading-relaxed text-foreground/80 before:mr-2 before:content-['•']">
+          <li key={i} className="text-sm leading-relaxed text-ink/80 before:mr-2 before:content-['•']">
             {item}
           </li>
         ))}
@@ -197,7 +197,7 @@ export function IntroSection() {
       <SubTitle>{t.additionalInfoTitle}</SubTitle>
       <ul className="mt-2 mb-4 space-y-1.5 pl-4">
         {t.additionalInfoItems.map((item, i) => (
-          <li key={i} className="text-sm leading-relaxed text-foreground/80 before:mr-2 before:content-['•']">
+          <li key={i} className="text-sm leading-relaxed text-ink/80 before:mr-2 before:content-['•']">
             {item}
           </li>
         ))}
@@ -209,8 +209,8 @@ export function IntroSection() {
       <Prose>{t.execOrderDesc}</Prose>
       <ol className="mt-3 mb-4 space-y-2 pl-4">
         {t.execOrderSteps.map((step, i) => (
-          <li key={i} className="text-sm leading-relaxed text-foreground/80">
-            <span className="font-bold text-orange-600 mr-2">{i + 1}.</span>{step}
+          <li key={i} className="text-sm leading-relaxed text-ink/80">
+            <span className="font-bold text-amber mr-2">{i + 1}.</span>{step}
           </li>
         ))}
       </ol>
@@ -224,7 +224,7 @@ export function IntroSection() {
       <SubTitle>{t.whyChangeSchemaTitle}</SubTitle>
       <ul className="mt-2 mb-4 space-y-1.5 pl-4">
         {t.whyChangeSchemaItems.map((item, i) => (
-          <li key={i} className="text-sm leading-relaxed text-foreground/80 before:mr-2 before:content-['•']">
+          <li key={i} className="text-sm leading-relaxed text-ink/80 before:mr-2 before:content-['•']">
             {item}
           </li>
         ))}
@@ -233,7 +233,7 @@ export function IntroSection() {
       <SubTitle>{t.whyCostTitle}</SubTitle>
       <ul className="mt-2 mb-4 space-y-1.5 pl-4">
         {t.whyCostItems.map((item, i) => (
-          <li key={i} className="text-sm leading-relaxed text-foreground/80 before:mr-2 before:content-['•']">
+          <li key={i} className="text-sm leading-relaxed text-ink/80 before:mr-2 before:content-['•']">
             {item}
           </li>
         ))}

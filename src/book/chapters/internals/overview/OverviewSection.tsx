@@ -48,8 +48,8 @@ const TOUR: TourEntry[] = [
         descEn: 'Multiple sessions share a small pool of processes in rotation. Saves memory when there are many connections but few simultaneous active requests. The trade-off: requests may queue when the pool is busy.',
       },
     ],
-    accentCls: 'border-teal-200 bg-teal-50',
-    badgeCls: 'bg-teal-500',
+    accentCls: 'border-green/30 bg-green/5',
+    badgeCls: 'bg-green',
   },
   {
     mapId: 'pga',
@@ -86,8 +86,8 @@ const TOUR: TourEntry[] = [
         descEn: 'A cursor is a pointer that tracks the current position in a SQL execution. For example, when fetching rows one at a time from a SELECT, this area remembers how far through the result set you have read.',
       },
     ],
-    accentCls: 'border-teal-200 bg-teal-50',
-    badgeCls: 'bg-teal-500',
+    accentCls: 'border-green/30 bg-green/5',
+    badgeCls: 'bg-green',
   },
   {
     mapId: 'sga',
@@ -124,8 +124,8 @@ const TOUR: TourEntry[] = [
         descEn: 'An optional area for large, one-time memory requests such as RMAN backup/recovery, parallel query, and UGA for Shared Server. Isolating these from the Shared Pool prevents them from crowding out the Library Cache.',
       },
     ],
-    accentCls: 'border-blue-200 bg-blue-50',
-    badgeCls: 'bg-blue-500',
+    accentCls: 'border-blue/30 bg-blue/5',
+    badgeCls: 'bg-blue',
   },
   {
     mapId: 'shared-pool',
@@ -162,8 +162,8 @@ const TOUR: TourEntry[] = [
         descEn: 'The dictionary itself lives on disk in the SYSTEM Tablespace. Reading it from disk on every SQL execution would be far too slow, so the Dictionary Cache (also called the Row Cache) keeps frequently used dictionary rows in memory for fast access.',
       },
     ],
-    accentCls: 'border-indigo-200 bg-indigo-50',
-    badgeCls: 'bg-indigo-500',
+    accentCls: 'border-blue/30 bg-blue/5',
+    badgeCls: 'bg-blue',
   },
   {
     mapId: 'dbwr',
@@ -212,8 +212,8 @@ const TOUR: TourEntry[] = [
         descEn: 'Redo Log Files are reused in rotation. Before a file is overwritten, ARCn copies its contents to an archive log. Having archive logs enables Point-in-Time Recovery — restoring the database to an exact past moment, such as "9 AM three days ago". ARCn only runs in ARCHIVELOG mode.',
       },
     ],
-    accentCls: 'border-amber-200 bg-amber-50',
-    badgeCls: 'bg-amber-500',
+    accentCls: 'border-amber/30 bg-amber/5',
+    badgeCls: 'bg-amber',
   },
   {
     mapId: 'disk',
@@ -250,22 +250,22 @@ const TOUR: TourEntry[] = [
         descEn: 'Copies of Redo Log Files made by ARCn before they are overwritten. Combined with a recent backup, archive logs enable Point-in-Time Recovery — restoring the database to any specific past moment. Production databases are almost always run in ARCHIVELOG mode to generate these files.',
       },
     ],
-    accentCls: 'border-slate-200 bg-slate-50',
-    badgeCls: 'bg-slate-500',
+    accentCls: 'border-line bg-paper-sunk',
+    badgeCls: 'bg-ink-3',
   },
 ]
 
 // ── Subtitle JSX ──────────────────────────────────────────────────────────
 
 const B = ({ children }: { children: React.ReactNode }) => (
-  <strong className="font-semibold text-foreground">{children}</strong>
+  <strong className="font-semibold text-ink">{children}</strong>
 )
 const Hi = ({ children, color = 'blue' }: { children: React.ReactNode; color?: 'blue' | 'amber' | 'teal' | 'orange' }) => {
   const cls = {
-    blue:   'text-blue-600 font-semibold',
-    amber:  'text-amber-600 font-semibold',
-    teal:   'text-teal-600 font-semibold',
-    orange: 'text-orange-600 font-semibold',
+    blue:   'text-blue font-semibold',
+    amber:  'text-amber font-semibold',
+    teal:   'text-green font-semibold',
+    orange: 'text-amber font-semibold',
   }[color]
   return <span className={cls}>{children}</span>
 }
@@ -384,14 +384,14 @@ export function OverviewSection() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
               transition={{ duration: 0.2 }}
-              className={cn('rounded-xl border-2 overflow-hidden', active.accentCls)}
+              className={cn('rounded-panel border-2 overflow-hidden', active.accentCls)}
             >
               {/* 헤더 */}
               <div className={cn('flex items-center gap-2.5 px-5 py-3 border-b border-black/5', active.accentCls)}>
-                <span className={cn('rounded px-2.5 py-0.5 font-mono text-xs font-bold text-white', active.badgeCls)}>
+                <span className={cn('rounded px-2.5 py-0.5 font-mono text-xs font-bold text-paper', active.badgeCls)}>
                   {lang === 'ko' ? active.labelKo : active.labelEn}
                 </span>
-                <span className="text-sm font-bold text-foreground/90">
+                <span className="text-sm font-bold text-ink/90">
                   {lang === 'ko' ? active.titleKo : active.titleEn}
                 </span>
               </div>
@@ -404,11 +404,11 @@ export function OverviewSection() {
                 active.mapId === 'pga' ? (
                   <div className="grid grid-cols-2 gap-3 p-4 sm:grid-cols-4">
                     {active.details.map((row, i) => (
-                      <div key={i} className="rounded-lg border border-black/10 bg-white/60 px-3 py-2.5">
-                        <div className="mb-1 font-mono text-[11px] font-bold text-slate-700">
+                      <div key={i} className="rounded-card border border-black/10 bg-paper/60 px-3 py-2.5">
+                        <div className="mb-1 font-mono text-[11px] font-bold text-ink">
                           {lang === 'ko' ? row.termKo : row.termEn}
                         </div>
-                        <div className="text-[11px] leading-snug text-muted-foreground">
+                        <div className="text-[11px] leading-snug text-ink-2">
                           {lang === 'ko' ? row.descKo : row.descEn}
                         </div>
                       </div>
@@ -418,13 +418,13 @@ export function OverviewSection() {
                   <div className="flex flex-col divide-y divide-black/5">
                     {active.details.map((row, i) => (
                       <div key={i} className="grid grid-cols-[200px_1fr] text-xs">
-                        <div className="flex items-center border-r border-black/5 bg-black/[0.03] px-4 py-2.5">
-                          <span className="font-mono font-bold text-slate-600">
+                        <div className="flex items-center border-r border-black/5 bg-ink/[0.03] px-4 py-2.5">
+                          <span className="font-mono font-bold text-ink">
                             {lang === 'ko' ? row.termKo : row.termEn}
                           </span>
                         </div>
                         <div className="flex items-center px-4 py-2.5">
-                          <span className="leading-snug text-muted-foreground">
+                          <span className="leading-snug text-ink-2">
                             {lang === 'ko' ? row.descKo : row.descEn}
                           </span>
                         </div>
@@ -440,9 +440,9 @@ export function OverviewSection() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="flex h-24 items-center justify-center rounded-xl border-2 border-dashed border-border"
+              className="flex h-24 items-center justify-center rounded-panel border-2 border-dashed border-line"
             >
-              <span className="font-mono text-sm text-muted-foreground">↑ {t.clickHint}</span>
+              <span className="font-mono text-sm text-ink-2">↑ {t.clickHint}</span>
             </motion.div>
           )}
         </AnimatePresence>
@@ -487,7 +487,7 @@ function ClickableMap({
 
   return (
     <div className="w-full">
-      <h3 className="mb-3 text-sm font-bold text-foreground/90">
+      <h3 className="mb-3 text-sm font-bold text-ink/90">
         {lang === 'ko' ? '오라클 데이터베이스 내부구조' : 'Oracle Database Internal Structure'}
       </h3>
       <div

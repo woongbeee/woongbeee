@@ -328,7 +328,7 @@ function WhyBufferCacheContent({ lang }: { lang: 'ko' | 'en' }) {
     <img
       src={`${import.meta.env.BASE_URL}memory.png`}
       alt={lang === 'ko' ? '디스크와 메모리 속도 비교 일러스트' : 'Disk vs Memory speed illustration'}
-      className="w-[70%] rounded-xl border object-contain"
+      className="w-[70%] rounded-panel border object-contain"
     />
   )
 }
@@ -345,8 +345,8 @@ function BufferPoolDiagram({ lang }: { lang: 'ko' | 'en' }) {
       id: 'default',
       label: 'Default Pool',
       param: 'DB_CACHE_SIZE',
-      color: 'border-blue-300 bg-blue-50/80 text-blue-700',
-      activeColor: 'border-blue-500 bg-blue-100 ring-2 ring-blue-300',
+      color: 'border-blue/50 bg-blue/5 text-blue',
+      activeColor: 'border-blue bg-blue/10 ring-2 ring-blue/50',
       desc: t.poolDefaultDesc,
       sql: t.poolDefaultSql,
       flex: 'flex-[3]',
@@ -355,8 +355,8 @@ function BufferPoolDiagram({ lang }: { lang: 'ko' | 'en' }) {
       id: 'keep',
       label: 'Keep Pool',
       param: 'DB_KEEP_CACHE_SIZE',
-      color: 'border-emerald-300 bg-emerald-50/80 text-emerald-700',
-      activeColor: 'border-emerald-500 bg-emerald-100 ring-2 ring-emerald-300',
+      color: 'border-green/50 bg-green/5 text-green',
+      activeColor: 'border-green bg-green/10 ring-2 ring-green/50',
       desc: t.poolKeepDesc,
       sql: t.poolKeepSql,
       flex: 'flex-[2]',
@@ -365,8 +365,8 @@ function BufferPoolDiagram({ lang }: { lang: 'ko' | 'en' }) {
       id: 'recycle',
       label: 'Recycle Pool',
       param: 'DB_RECYCLE_CACHE_SIZE',
-      color: 'border-rose-300 bg-rose-50/80 text-rose-700',
-      activeColor: 'border-rose-500 bg-rose-100 ring-2 ring-rose-300',
+      color: 'border-red/50 bg-red/5 text-red',
+      activeColor: 'border-red bg-red/10 ring-2 ring-red/50',
       desc: t.poolRecycleDesc,
       sql: t.poolRecycleSql,
       flex: 'flex-[2]',
@@ -374,11 +374,11 @@ function BufferPoolDiagram({ lang }: { lang: 'ko' | 'en' }) {
   ]
 
   const nonStdPools = [
-    { label: '2K', param: 'DB_2K_CACHE_SIZE', color: 'border-amber-200 bg-amber-50 text-amber-700' },
-    { label: '4K', param: 'DB_4K_CACHE_SIZE', color: 'border-amber-200 bg-amber-50 text-amber-700' },
-    { label: '8K (default)', param: '—', color: 'border-blue-200 bg-blue-50 text-blue-600' },
-    { label: '16K', param: 'DB_16K_CACHE_SIZE', color: 'border-amber-200 bg-amber-50 text-amber-700' },
-    { label: '32K', param: 'DB_32K_CACHE_SIZE', color: 'border-amber-200 bg-amber-50 text-amber-700' },
+    { label: '2K', param: 'DB_2K_CACHE_SIZE', color: 'border-amber/30 bg-amber/5 text-amber' },
+    { label: '4K', param: 'DB_4K_CACHE_SIZE', color: 'border-amber/30 bg-amber/5 text-amber' },
+    { label: '8K (default)', param: '—', color: 'border-blue/30 bg-blue/5 text-blue' },
+    { label: '16K', param: 'DB_16K_CACHE_SIZE', color: 'border-amber/30 bg-amber/5 text-amber' },
+    { label: '32K', param: 'DB_32K_CACHE_SIZE', color: 'border-amber/30 bg-amber/5 text-amber' },
   ]
 
   const active = pools.find((p) => p.id === activePool)
@@ -386,8 +386,8 @@ function BufferPoolDiagram({ lang }: { lang: 'ko' | 'en' }) {
   return (
     <div className="flex flex-col gap-4">
       {/* ── 다이어그램 ── */}
-      <div className="rounded-2xl border-2 border-slate-300 bg-slate-50/30 p-5">
-        <div className="mb-2 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500/70">
+      <div className="rounded-panel border-2 border-line-2 bg-paper-sunk p-5">
+        <div className="mb-2 font-mono text-[10px] font-bold uppercase tracking-widest text-ink-2">
           Database Buffer Cache
         </div>
 
@@ -402,7 +402,7 @@ function BufferPoolDiagram({ lang }: { lang: 'ko' | 'en' }) {
                 transition={isActive ? { repeat: Infinity, duration: 1.4, repeatDelay: 0.4 } : {}}
                 className={cn(
                   p.flex,
-                  'cursor-pointer rounded-xl border-2 px-3 py-3 text-left transition-all',
+                  'cursor-pointer rounded-panel border-2 px-3 py-3 text-left transition-all',
                   isActive ? p.activeColor : p.color,
                 )}
               >
@@ -415,14 +415,14 @@ function BufferPoolDiagram({ lang }: { lang: 'ko' | 'en' }) {
 
         <button
           onClick={() => { setNonStdOpen((v) => !v); setActivePool(null) }}
-          className="w-full cursor-pointer rounded-xl border border-slate-200 bg-white/60 px-4 py-3 text-left transition-colors hover:bg-slate-50"
+          className="w-full cursor-pointer rounded-panel border border-line bg-paper/60 px-4 py-3 text-left transition-colors hover:bg-paper-sunk"
         >
-          <div className="mb-2 font-mono text-[9px] font-bold uppercase tracking-wider text-slate-400">
+          <div className="mb-2 font-mono text-[9px] font-bold uppercase tracking-wider text-ink-2">
             {t.poolNonStd}
           </div>
           <div className="flex gap-1.5">
             {nonStdPools.map((p) => (
-              <div key={p.label} className={cn('flex-1 rounded-lg border px-2 py-1.5 text-center', p.color)}>
+              <div key={p.label} className={cn('flex-1 rounded-card border px-2 py-1.5 text-center', p.color)}>
                 <div className="font-mono text-[10px] font-bold">{p.label}</div>
                 <div className="truncate font-mono text-[8px] opacity-60">{p.param}</div>
               </div>
@@ -440,14 +440,14 @@ function BufferPoolDiagram({ lang }: { lang: 'ko' | 'en' }) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -4 }}
             transition={{ duration: 0.15 }}
-            className="rounded-xl border border-border bg-card px-4 py-3"
+            className="rounded-panel border border-line bg-paper px-4 py-3"
           >
             <div className="mb-2 flex items-center gap-2">
-              <span className="font-mono text-xs font-bold text-foreground/80">{active.label}</span>
-              <span className="text-muted-foreground/40">·</span>
-              <span className="font-mono text-[10px] text-muted-foreground">{active.param}</span>
+              <span className="font-mono text-xs font-bold text-ink/80">{active.label}</span>
+              <span className="text-ink-2/40">·</span>
+              <span className="font-mono text-[10px] text-ink-2">{active.param}</span>
             </div>
-            <p className="mb-3 text-xs leading-relaxed text-muted-foreground">{active.desc}</p>
+            <p className="mb-3 text-xs leading-relaxed text-ink-2">{active.desc}</p>
             <SqlBlock sql={active.sql} />
           </motion.div>
         ) : nonStdOpen ? (
@@ -457,10 +457,10 @@ function BufferPoolDiagram({ lang }: { lang: 'ko' | 'en' }) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -4 }}
             transition={{ duration: 0.15 }}
-            className="rounded-xl border border-border bg-card px-4 py-3"
+            className="rounded-panel border border-line bg-paper px-4 py-3"
           >
-            <div className="mb-2 font-mono text-xs font-bold text-foreground/80">{t.poolNonStd}</div>
-            <p className="text-xs leading-relaxed text-muted-foreground">{t.poolNonStdDesc}</p>
+            <div className="mb-2 font-mono text-xs font-bold text-ink/80">{t.poolNonStd}</div>
+            <p className="text-xs leading-relaxed text-ink-2">{t.poolNonStdDesc}</p>
           </motion.div>
         ) : (
           <motion.div
@@ -468,9 +468,9 @@ function BufferPoolDiagram({ lang }: { lang: 'ko' | 'en' }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="flex h-10 items-center justify-center rounded-xl border-2 border-dashed border-border"
+            className="flex h-10 items-center justify-center rounded-panel border-2 border-dashed border-line"
           >
-            <span className="font-mono text-[11px] text-muted-foreground">
+            <span className="font-mono text-[11px] text-ink-2">
               {lang === 'ko' ? '↑ Pool을 클릭해 설명을 확인하세요' : '↑ Click a pool to see details'}
             </span>
           </motion.div>
@@ -522,18 +522,18 @@ function LruDiagram({ lang }: { lang: 'ko' | 'en' }) {
   ]
 
   return (
-    <div className="rounded-xl border border-border bg-card p-4">
+    <div className="rounded-panel border border-line bg-paper p-4">
       <div className="mb-3 flex items-center justify-between">
-        <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+        <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-ink-2">
           LRU List
         </span>
-        <div className="flex gap-3 font-mono text-[10px] text-muted-foreground">
+        <div className="flex gap-3 font-mono text-[10px] text-ink-2">
           <span className="flex items-center gap-1">
-            <span className="inline-block h-2 w-2 rounded-full bg-blue-400" />
+            <span className="inline-block h-2 w-2 rounded-full bg-blue" />
             Hot End
           </span>
           <span className="flex items-center gap-1">
-            <span className="inline-block h-2 w-2 rounded-full bg-slate-300" />
+            <span className="inline-block h-2 w-2 rounded-full bg-line-2" />
             Cold End
           </span>
         </div>
@@ -543,8 +543,8 @@ function LruDiagram({ lang }: { lang: 'ko' | 'en' }) {
           if (b.mid) {
             return (
               <div key={b.id} className="flex flex-col items-center">
-                <div className="h-8 w-px border-l-2 border-dashed border-amber-400" />
-                <span className="mt-0.5 whitespace-nowrap font-mono text-[8px] text-amber-500">midpoint</span>
+                <div className="h-8 w-px border-l-2 border-dashed border-amber/50" />
+                <span className="mt-0.5 whitespace-nowrap font-mono text-[8px] text-amber">midpoint</span>
               </div>
             )
           }
@@ -552,26 +552,26 @@ function LruDiagram({ lang }: { lang: 'ko' | 'en' }) {
             <div
               key={b.id}
               className={cn(
-                'flex-1 rounded-lg border-2 px-2 py-1.5 text-center transition-all',
+                'flex-1 rounded-card border-2 px-2 py-1.5 text-center transition-all',
                 b.hot
-                  ? 'border-blue-300 bg-blue-50 text-blue-700'
+                  ? 'border-blue/50 bg-blue/5 text-blue'
                   : b.evict
-                  ? 'border-dashed border-rose-300 bg-rose-50/60 text-rose-500'
-                  : 'border-slate-200 bg-slate-50 text-slate-600',
+                  ? 'border-dashed border-red/50 bg-red/5 text-red'
+                  : 'border-line bg-paper-sunk text-ink',
               )}
             >
               <div className="truncate font-mono text-[9px] font-bold leading-tight">{b.label}</div>
-              <div className={cn('mt-0.5 font-mono text-[8px]', b.hot ? 'text-blue-500' : 'text-slate-400')}>
+              <div className={cn('mt-0.5 font-mono text-[8px]', b.hot ? 'text-blue' : 'text-ink-2')}>
                 touch: {b.touch}
               </div>
               {b.evict && (
-                <div className="font-mono text-[8px] text-rose-400">{lang === 'ko' ? '퇴출 대상' : 'evict'}</div>
+                <div className="font-mono text-[8px] text-red">{lang === 'ko' ? '퇴출 대상' : 'evict'}</div>
               )}
             </div>
           )
         })}
       </div>
-      <div className="mt-2 flex justify-between font-mono text-[9px] text-muted-foreground/60">
+      <div className="mt-2 flex justify-between font-mono text-[9px] text-ink-2/60">
         <span>← {lang === 'ko' ? 'Hot End (자주 사용)' : 'Hot End (frequently used)'}</span>
         <span>{lang === 'ko' ? 'Cold End (오래됨)' : 'Cold End (stale)'} →</span>
       </div>
@@ -588,7 +588,7 @@ export function SgaBufferCacheSection() {
   return (
     <div className="mx-auto max-w-screen-2xl px-10 py-10">
       <ChapterTitle
-        icon={<IconDatabase size={36} stroke={1.5} className="text-blue-500" />}
+        icon={<IconDatabase size={36} stroke={1.5} className="text-blue" />}
         title={t.title}
       />
 
@@ -625,16 +625,16 @@ export function SgaBufferCacheSection() {
 
       <LruDiagram lang={lang} />
 
-      <div className="mt-4 overflow-hidden rounded-xl border">
-        <div className="flex items-center gap-2 border-b border-border bg-muted/40 px-4 py-2">
-          <span className="rounded border border-slate-300 bg-slate-100 px-1.5 py-0.5 font-mono text-[9px] font-bold uppercase tracking-wider text-slate-500">
+      <div className="mt-4 overflow-hidden rounded-panel border">
+        <div className="flex items-center gap-2 border-b border-line bg-rail px-4 py-2">
+          <span className="rounded border border-line-2 bg-paper-sunk px-1.5 py-0.5 font-mono text-[9px] font-bold uppercase tracking-wider text-ink-2">
             {t.touchTitle}
           </span>
         </div>
         {([t.touchRule1, t.touchRule2, t.touchRule3, t.touchRule4] as const).map((rule, i) => (
-          <div key={i} className={cn('flex items-start gap-3 border-b px-4 py-2.5 text-xs last:border-0', i % 2 === 0 ? 'bg-background' : 'bg-muted/20')}>
-            <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-blue-500 font-mono text-[9px] font-bold text-white">{i + 1}</span>
-            <span className="leading-relaxed text-muted-foreground">{rule}</span>
+          <div key={i} className={cn('flex items-start gap-3 border-b px-4 py-2.5 text-xs last:border-0', i % 2 === 0 ? 'bg-paper' : 'bg-rail')}>
+            <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-blue font-mono text-[9px] font-bold text-paper">{i + 1}</span>
+            <span className="leading-relaxed text-ink-2">{rule}</span>
           </div>
         ))}
       </div>
@@ -650,28 +650,28 @@ export function SgaBufferCacheSection() {
           {
             label: t.stateUnused,
             desc: t.stateUnusedDesc,
-            color: 'border-slate-300 bg-slate-50',
-            dot: 'bg-slate-400',
+            color: 'border-line-2 bg-paper-sunk',
+            dot: 'bg-line-2',
           },
           {
             label: t.stateClean,
             desc: t.stateCleanDesc,
-            color: 'border-teal-300 bg-teal-50/60',
-            dot: 'bg-teal-500',
+            color: 'border-green/50 bg-green/5',
+            dot: 'bg-green',
           },
           {
             label: t.stateDirty,
             desc: t.stateDirtyDesc,
-            color: 'border-amber-300 bg-amber-50/60',
-            dot: 'bg-amber-500',
+            color: 'border-amber/50 bg-amber/5',
+            dot: 'bg-amber',
           },
         ] as const).map((s) => (
-          <div key={s.label} className={cn('rounded-xl border-2 p-4', s.color)}>
+          <div key={s.label} className={cn('rounded-panel border-2 p-4', s.color)}>
             <div className="mb-2 flex items-center gap-2">
               <span className={cn('h-2.5 w-2.5 shrink-0 rounded-full', s.dot)} />
               <span className="font-mono text-xs font-bold">{s.label}</span>
             </div>
-            <p className="text-xs leading-relaxed text-muted-foreground">{s.desc}</p>
+            <p className="text-xs leading-relaxed text-ink-2">{s.desc}</p>
           </div>
         ))}
       </div>
@@ -692,30 +692,30 @@ export function SgaBufferCacheSection() {
 
       <div className="mb-4 grid sm:grid-cols-2 gap-3">
         {/* Current Mode */}
-        <div className="rounded-xl border-2 border-blue-200 bg-blue-50/50 overflow-hidden">
+        <div className="rounded-panel border-2 border-blue/30 bg-blue/5 overflow-hidden">
           <div className="px-4 pt-4 pb-3">
             <div className="mb-1.5 flex items-center gap-2">
-              <IconBolt size={16} className="text-blue-500" />
+              <IconBolt size={16} className="text-blue" />
               <span className="font-mono text-xs font-bold">{t.modeCurrent}</span>
             </div>
-            <div className="mb-2 font-mono text-[10px] text-muted-foreground">db block get</div>
-            <p className="text-xs leading-relaxed text-muted-foreground">{t.modeCurrentDesc}</p>
+            <div className="mb-2 font-mono text-[10px] text-ink-2">db block get</div>
+            <p className="text-xs leading-relaxed text-ink-2">{t.modeCurrentDesc}</p>
           </div>
-          <div className="border-t border-blue-200 bg-blue-50/80 px-4 py-3">
-            <div className="mb-2 font-mono text-[9px] font-bold uppercase tracking-wider text-blue-500/70">
+          <div className="border-t border-blue/30 bg-blue/5 px-4 py-3">
+            <div className="mb-2 font-mono text-[9px] font-bold uppercase tracking-wider text-blue">
               {lang === 'ko' ? '예시 시나리오' : 'Example scenario'}
             </div>
-            <p className="mb-2 text-[11px] leading-relaxed text-muted-foreground">{t.modeCurrentExample}</p>
+            <p className="mb-2 text-[11px] leading-relaxed text-ink-2">{t.modeCurrentExample}</p>
             <div className="space-y-1">
               {t.modeCurrentScenario.map((line, i) => (
                 <div key={i} className="flex items-start gap-2 font-mono text-[10px]">
                   <span className={cn(
                     'mt-0.5 shrink-0 rounded px-1 py-px text-[8px] font-bold',
-                    i === 2 ? 'bg-blue-500 text-white' : 'bg-blue-100 text-blue-600',
+                    i === 2 ? 'bg-blue text-paper' : 'bg-blue/10 text-blue',
                   )}>
                     {i === 2 ? 'B' : 'A'}
                   </span>
-                  <span className="leading-snug text-muted-foreground">{line}</span>
+                  <span className="leading-snug text-ink-2">{line}</span>
                 </div>
               ))}
             </div>
@@ -723,30 +723,30 @@ export function SgaBufferCacheSection() {
         </div>
 
         {/* Consistent Mode */}
-        <div className="rounded-xl border-2 border-teal-200 bg-teal-50/50 overflow-hidden">
+        <div className="rounded-panel border-2 border-green/30 bg-green/5 overflow-hidden">
           <div className="px-4 pt-4 pb-3">
             <div className="mb-1.5 flex items-center gap-2">
-              <IconRefresh size={16} className="text-teal-500" />
+              <IconRefresh size={16} className="text-green" />
               <span className="font-mono text-xs font-bold">{t.modeConsistent}</span>
             </div>
-            <div className="mb-2 font-mono text-[10px] text-muted-foreground">consistent get</div>
-            <p className="text-xs leading-relaxed text-muted-foreground">{t.modeConsistentDesc}</p>
+            <div className="mb-2 font-mono text-[10px] text-ink-2">consistent get</div>
+            <p className="text-xs leading-relaxed text-ink-2">{t.modeConsistentDesc}</p>
           </div>
-          <div className="border-t border-teal-200 bg-teal-50/80 px-4 py-3">
-            <div className="mb-2 font-mono text-[9px] font-bold uppercase tracking-wider text-teal-500/70">
+          <div className="border-t border-green/30 bg-green/5 px-4 py-3">
+            <div className="mb-2 font-mono text-[9px] font-bold uppercase tracking-wider text-green">
               {lang === 'ko' ? '예시 시나리오' : 'Example scenario'}
             </div>
-            <p className="mb-2 text-[11px] leading-relaxed text-muted-foreground">{t.modeConsistentExample}</p>
+            <p className="mb-2 text-[11px] leading-relaxed text-ink-2">{t.modeConsistentExample}</p>
             <div className="space-y-1">
               {t.modeConsistentScenario.map((line, i) => (
                 <div key={i} className="flex items-start gap-2 font-mono text-[10px]">
                   <span className={cn(
                     'mt-0.5 shrink-0 rounded px-1 py-px text-[8px] font-bold',
-                    i === 2 ? 'bg-amber-400 text-white' : i === 3 ? 'bg-teal-500 text-white' : 'bg-teal-100 text-teal-600',
+                    i === 2 ? 'bg-amber text-paper' : i === 3 ? 'bg-green text-paper' : 'bg-green/10 text-green',
                   )}>
                     {i === 0 ? 'A' : i === 1 ? 'C' : i === 2 ? 'Undo' : (lang === 'ko' ? '결과' : 'result')}
                   </span>
-                  <span className="leading-snug text-muted-foreground">{line}</span>
+                  <span className="leading-snug text-ink-2">{line}</span>
                 </div>
               ))}
             </div>
@@ -772,24 +772,24 @@ export function SgaBufferCacheSection() {
       <div className="mb-4 grid sm:grid-cols-2 gap-3">
         {([
           {
-            icon: <IconLayersLinked size={16} className="text-teal-500" />,
+            icon: <IconLayersLinked size={16} className="text-green" />,
             label: lang === 'ko' ? '작은 테이블 Full Scan' : 'Small Table Full Scan',
             desc: t.fullScanP1,
-            color: 'border-teal-200 bg-teal-50/50',
+            color: 'border-green/30 bg-green/5',
           },
           {
-            icon: <IconDatabase size={16} className="text-slate-500" />,
+            icon: <IconDatabase size={16} className="text-ink-2" />,
             label: lang === 'ko' ? '큰 테이블 Full Scan (Direct Path)' : 'Large Table Full Scan (Direct Path)',
             desc: t.fullScanP2,
-            color: 'border-slate-200 bg-slate-50/50',
+            color: 'border-line bg-paper-sunk',
           },
         ] as const).map((item) => (
-          <div key={item.label} className={cn('rounded-xl border-2 p-4', item.color)}>
+          <div key={item.label} className={cn('rounded-panel border-2 p-4', item.color)}>
             <div className="mb-1.5 flex items-center gap-2">
               {item.icon}
               <span className="font-mono text-xs font-bold">{item.label}</span>
             </div>
-            <p className="text-xs leading-relaxed text-muted-foreground">{item.desc}</p>
+            <p className="text-xs leading-relaxed text-ink-2">{item.desc}</p>
           </div>
         ))}
       </div>
@@ -801,14 +801,14 @@ export function SgaBufferCacheSection() {
       {/* ── 11. Key Parameters ── */}
       <SectionTitle>{t.paramsTitle}</SectionTitle>
 
-      <div className="overflow-hidden rounded-xl border">
+      <div className="overflow-hidden rounded-panel border">
         <table className="w-full text-xs">
           <thead>
-            <tr className="border-b bg-muted/60">
-              <th className="w-[220px] px-4 py-2.5 text-left font-mono font-bold text-muted-foreground">
+            <tr className="border-b bg-rail">
+              <th className="w-[220px] px-4 py-2.5 text-left font-mono font-bold text-ink-2">
                 {lang === 'ko' ? '파라미터' : 'Parameter'}
               </th>
-              <th className="px-4 py-2.5 text-left font-mono font-bold text-muted-foreground">
+              <th className="px-4 py-2.5 text-left font-mono font-bold text-ink-2">
                 {lang === 'ko' ? '설명' : 'Description'}
               </th>
             </tr>
@@ -820,9 +820,9 @@ export function SgaBufferCacheSection() {
               { p: t.param3, d: t.param3Desc },
               { p: t.param4, d: t.param4Desc },
             ] as const).map((row, i) => (
-              <tr key={i} className={cn('border-b last:border-0', i % 2 === 0 ? 'bg-background' : 'bg-muted/20')}>
-                <td className="px-4 py-2.5 font-mono font-bold text-foreground/80">{row.p}</td>
-                <td className="px-4 py-2.5 text-muted-foreground">{row.d}</td>
+              <tr key={i} className={cn('border-b last:border-0', i % 2 === 0 ? 'bg-paper' : 'bg-rail')}>
+                <td className="px-4 py-2.5 font-mono font-bold text-ink/80">{row.p}</td>
+                <td className="px-4 py-2.5 text-ink-2">{row.d}</td>
               </tr>
             ))}
           </tbody>

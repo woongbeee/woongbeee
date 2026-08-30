@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useSimulationStore } from '@/store/simulationStore'
 import { GLOSSARY, getTermsForSection, sortTerms, type GlossaryTerm } from '@/data/glossary'
 import { cn } from '@/lib/utils'
+import { IconSearch, IconX, IconChevronRight } from '@tabler/icons-react'
 
 interface Props {
   sectionId: string
@@ -52,10 +53,10 @@ const GlossaryTab = memo(function GlossaryTab({
       onClick={onToggle}
       title={open ? t.closeTitle : t.openTitle}
       className={cn(
-        'flex w-7 shrink-0 flex-col items-center justify-center gap-1.5 border-l transition-colors duration-150',
+        'flex w-7 shrink-0 flex-col items-center justify-center gap-1.5 border-l border-line transition-colors duration-150',
         open
-          ? 'bg-muted/80 text-foreground'
-          : 'bg-card text-muted-foreground hover:bg-muted/60 hover:text-foreground'
+          ? 'bg-ink/[0.06] text-ink'
+          : 'bg-rail text-ink-3 hover:bg-ink/[0.04] hover:text-ink',
       )}
     >
       <motion.span
@@ -66,7 +67,7 @@ const GlossaryTab = memo(function GlossaryTab({
         ›
       </motion.span>
       <span
-        className="select-none font-mono text-[9px] font-bold uppercase tracking-widest"
+        className="select-none font-mono text-[9px] font-semibold uppercase tracking-widest"
         style={{ writingMode: 'vertical-rl', textOrientation: 'mixed' }}
       >
         {t.tabLabel}
@@ -88,7 +89,7 @@ export function GlossaryPanel({ sectionId, open, onToggle }: Props) {
             animate={{ width: 300, opacity: 1 }}
             exit={{ width: 0, opacity: 0 }}
             transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-            className="overflow-hidden border-l bg-card"
+            className="overflow-hidden border-l border-line bg-rail"
           >
             <GlossaryBody key={sectionId} sectionId={sectionId} />
           </motion.div>
@@ -151,35 +152,34 @@ function GlossaryBody({ sectionId }: { sectionId: string }) {
   return (
     <div className="flex h-full w-[300px] flex-col">
       {/* Header */}
-      <div className="shrink-0 border-b px-4 py-3">
+      <div className="shrink-0 border-b border-line px-4 py-3">
         <div className="mb-2.5 flex items-center justify-between">
-          <span className="font-mono text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
+          <span className="font-mono text-[11px] font-semibold uppercase tracking-widest text-ink-3">
             {t.title}
           </span>
-          <span className="font-mono text-[10px] text-muted-foreground/50">
-            {t.count(totalCount)}
-          </span>
+          <span className="font-mono text-[10px] text-ink-3/60">{t.count(totalCount)}</span>
         </div>
 
         {/* Search */}
         <div className="relative">
-          <span className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-[11px] text-muted-foreground/40">
-            🔍
-          </span>
+          <IconSearch
+            size={12}
+            className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-ink-3/50"
+          />
           <input
             ref={searchRef}
             type="text"
             value={query}
             onChange={handleQueryChange}
             placeholder={t.searchPlaceholder}
-            className="w-full rounded-md border bg-background py-1.5 pl-7 pr-7 font-mono text-[11px] placeholder:text-muted-foreground/40 focus:outline-none focus:ring-1 focus:ring-ring"
+            className="w-full rounded-card border border-line bg-paper py-1.5 pl-7 pr-7 font-mono text-[11px] text-ink placeholder:text-ink-3/50 focus:border-blue focus:outline-none focus:ring-1 focus:ring-blue/40"
           />
           {query && (
             <button
               onClick={() => setQuery('')}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 font-mono text-[11px] text-muted-foreground/50 hover:text-muted-foreground"
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-ink-3/50 transition-colors hover:text-ink"
             >
-              ✕
+              <IconX size={12} />
             </button>
           )}
         </div>
@@ -188,9 +188,7 @@ function GlossaryBody({ sectionId }: { sectionId: string }) {
       {/* Term list */}
       <div className="min-h-0 flex-1 overflow-y-auto py-2">
         {totalCount === 0 && (
-          <p className="px-2 py-8 text-center font-mono text-[11px] text-muted-foreground/40">
-            {t.noResults}
-          </p>
+          <p className="px-2 py-8 text-center font-mono text-[11px] text-ink-3/50">{t.noResults}</p>
         )}
 
         {/* This page section */}
@@ -204,7 +202,6 @@ function GlossaryBody({ sectionId }: { sectionId: string }) {
                   term={term}
                   expanded={expandedTerm === term.term}
                   onToggle={handleTermToggle}
-                  highlight
                 />
               ))}
             </div>
@@ -215,16 +212,14 @@ function GlossaryBody({ sectionId }: { sectionId: string }) {
         {filteredPage.length === 0 && !query.trim() && (
           <div className="mb-1">
             <SectionLabel label={t.sectionThis} count={0} highlight />
-            <p className="px-4 pb-2 font-mono text-[10px] text-muted-foreground/40">
-              {t.noPageTerms}
-            </p>
+            <p className="px-4 pb-2 font-mono text-[10px] text-ink-3/50">{t.noPageTerms}</p>
           </div>
         )}
 
         {/* Divider before all terms */}
         {filteredOther.length > 0 && (
           <>
-            {filteredPage.length > 0 && <div className="mx-4 my-2 border-t" />}
+            {filteredPage.length > 0 && <div className="mx-4 my-2 border-t border-line" />}
             <div className="mb-1">
               <SectionLabel label={t.sectionAll} count={filteredOther.length} />
               <div className="flex flex-col gap-0.5 px-2">
@@ -255,23 +250,18 @@ function SectionLabel({
   highlight?: boolean
 }) {
   return (
-    <div className={cn('mb-1.5 flex items-center gap-2 px-4 py-1', highlight && 'bg-blue-50/60 dark:bg-blue-950/20')}>
-      {highlight && <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-blue-400" />}
+    <div className={cn('mb-1.5 flex items-center gap-2 px-4 py-1', highlight && 'bg-ink/[0.05]')}>
+      {highlight && <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-ink-3" />}
       <span
         className={cn(
-          'font-mono text-[9px] font-bold uppercase tracking-widest',
-          highlight ? 'text-blue-500' : 'text-muted-foreground/40'
+          'font-mono text-[9px] font-semibold uppercase tracking-widest',
+          highlight ? 'text-ink-2' : 'text-ink-3/50',
         )}
       >
         {label}
       </span>
       {count > 0 && (
-        <span
-          className={cn(
-            'ml-auto font-mono text-[9px]',
-            highlight ? 'text-blue-400' : 'text-muted-foreground/30'
-          )}
-        >
+        <span className={cn('ml-auto font-mono text-[9px]', highlight ? 'text-ink-3' : 'text-ink-3/40')}>
           {count}
         </span>
       )}
@@ -283,39 +273,28 @@ const TermRow = memo(function TermRow({
   term,
   expanded,
   onToggle,
-  highlight = false,
 }: {
   term: GlossaryTerm
   expanded: boolean
   onToggle: (termName: string) => void
-  highlight?: boolean
 }) {
   const lang = useSimulationStore((s) => s.lang)
   return (
     <button
       onClick={() => onToggle(term.term)}
       className={cn(
-        'w-full rounded-md px-3 py-2 text-left transition-colors',
-        expanded
-          ? highlight ? 'bg-blue-50 dark:bg-blue-950/30' : 'bg-muted'
-          : highlight ? 'hover:bg-blue-50/70 dark:hover:bg-blue-950/20' : 'hover:bg-muted/60'
+        'w-full rounded-card px-3 py-2 text-left transition-colors',
+        expanded ? 'bg-ink/[0.06]' : 'hover:bg-ink/[0.04]',
       )}
     >
       <div className="flex items-center justify-between gap-2">
-        <span
-          className={cn(
-            'font-mono text-[11px] font-semibold',
-            highlight ? 'text-blue-700 dark:text-blue-300' : 'text-foreground'
-          )}
-        >
-          {term.term}
-        </span>
+        <span className="font-mono text-[11px] font-semibold text-ink">{term.term}</span>
         <motion.span
           animate={{ rotate: expanded ? 90 : 0 }}
           transition={{ duration: 0.15 }}
-          className="shrink-0 font-mono text-[9px] text-muted-foreground/40"
+          className="shrink-0 text-ink-3/40"
         >
-          ▶
+          <IconChevronRight size={11} />
         </motion.span>
       </div>
 
@@ -328,7 +307,7 @@ const TermRow = memo(function TermRow({
             transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
             className="overflow-hidden"
           >
-            <p className="mt-1.5 font-mono text-[10px] leading-relaxed text-muted-foreground">
+            <p className="mt-1.5 font-sans text-[10.5px] leading-relaxed text-ink-2">
               {term.definition[lang]}
             </p>
           </motion.div>

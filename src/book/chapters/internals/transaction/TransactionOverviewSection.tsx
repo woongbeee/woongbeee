@@ -124,32 +124,32 @@ function LifecycleDiagram({ lang }: { lang: 'ko' | 'en' }) {
 
   const steps = isKo
     ? [
-        { label: '첫 DML 실행', sub: 'INSERT / UPDATE / DELETE', dot: 'bg-blue-500' },
-        { label: 'Undo Slot 할당', sub: 'XID 부여 · Undo Segment 바인딩', dot: 'bg-indigo-500' },
-        { label: '변경 진행 중', sub: 'Undo 기록 + Redo 기록', dot: 'bg-slate-400' },
-        { label: 'COMMIT 또는 ROLLBACK', sub: 'Redo Flush → Lock 해제 / Undo 복원', dot: 'bg-emerald-500' },
+        { label: '첫 DML 실행', sub: 'INSERT / UPDATE / DELETE', dot: 'bg-blue' },
+        { label: 'Undo Slot 할당', sub: 'XID 부여 · Undo Segment 바인딩', dot: 'bg-blue' },
+        { label: '변경 진행 중', sub: 'Undo 기록 + Redo 기록', dot: 'bg-line-2' },
+        { label: 'COMMIT 또는 ROLLBACK', sub: 'Redo Flush → Lock 해제 / Undo 복원', dot: 'bg-green' },
       ]
     : [
-        { label: 'First DML', sub: 'INSERT / UPDATE / DELETE', dot: 'bg-blue-500' },
-        { label: 'Undo Slot Assigned', sub: 'XID assigned · bound to Undo Segment', dot: 'bg-indigo-500' },
-        { label: 'Changes in Progress', sub: 'Undo recorded + Redo recorded', dot: 'bg-slate-400' },
-        { label: 'COMMIT or ROLLBACK', sub: 'Redo Flush → locks released / Undo restored', dot: 'bg-emerald-500' },
+        { label: 'First DML', sub: 'INSERT / UPDATE / DELETE', dot: 'bg-blue' },
+        { label: 'Undo Slot Assigned', sub: 'XID assigned · bound to Undo Segment', dot: 'bg-blue' },
+        { label: 'Changes in Progress', sub: 'Undo recorded + Redo recorded', dot: 'bg-line-2' },
+        { label: 'COMMIT or ROLLBACK', sub: 'Redo Flush → locks released / Undo restored', dot: 'bg-green' },
       ]
 
   return (
-    <div className="my-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
+    <div className="my-4 rounded-panel border border-line bg-paper-sunk p-4">
       <div className="flex items-center gap-3 overflow-x-auto pb-1">
         {steps.map((s, i) => (
           <div key={i} className="flex items-center gap-2 shrink-0">
             <div className="flex flex-col items-center gap-1">
               <div className={cn('h-3 w-3 rounded-full', s.dot)} />
-              <div className="rounded-lg border border-slate-200 bg-white px-3 py-2 shadow-sm text-center">
-                <p className="font-mono text-[11px] font-bold text-slate-700">{s.label}</p>
-                <p className="font-mono text-[9px] text-slate-400 mt-0.5">{s.sub}</p>
+              <div className="rounded-card border border-line bg-paper px-3 py-2 text-center">
+                <p className="font-mono text-[11px] font-bold text-ink">{s.label}</p>
+                <p className="font-mono text-[9px] text-ink-2 mt-0.5">{s.sub}</p>
               </div>
             </div>
             {i < steps.length - 1 && (
-              <span className="font-mono text-slate-300 text-lg shrink-0">→</span>
+              <span className="font-mono text-ink-3 text-lg shrink-0">→</span>
             )}
           </div>
         ))}
@@ -166,7 +166,7 @@ export function TransactionOverviewSection() {
   return (
     <PageContainer>
       <ChapterTitle
-        icon={<IconRefresh size={36} stroke={1.5} className="text-teal-500" />}
+        icon={<IconRefresh size={36} stroke={1.5} className="text-green" />}
         title={t.title}
         subtitle={t.subtitle}
       />

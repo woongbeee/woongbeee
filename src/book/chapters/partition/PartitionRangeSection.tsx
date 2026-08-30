@@ -199,7 +199,7 @@ export function PartitionRangeSection() {
   return (
     <PageContainer>
       <ChapterTitle
-        icon={<IconCalendar size={36} stroke={1.5} className="text-amber-500" />}
+        icon={<IconCalendar size={36} stroke={1.5} className="text-amber" />}
         title={t.title}
         subtitle={t.subtitle}
       />

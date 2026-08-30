@@ -137,58 +137,82 @@ const T = {
   },
 }
 
+// 색은 tokens.css §2c 콘텐츠 색 (테마 스왑). teal 없음.
+const E_BLUE = 'var(--color-blue)'
+const E_GREEN = 'var(--color-green)'
+const E_AMBER = 'var(--color-amber)'
+const E_PURPLE = 'var(--color-purple)'
+
 const SHOP_ENTITIES = {
   ko: [
-    { name: '고객', attrs: ['고객ID (PK)', '이름', '이메일', '가입일'], color: '#6366f1' },
-    { name: '상품', attrs: ['상품ID (PK)', '상품명', '가격', '재고수량'], color: '#0d9488' },
-    { name: '주문', attrs: ['주문ID (PK)', '고객ID (FK)', '주문일시', '총금액'], color: '#ea580c' },
-    { name: '주문상세', attrs: ['주문상세ID (PK)', '주문ID (FK)', '상품ID (FK)', '수량'], color: '#7c3aed' },
+    { name: '고객', attrs: ['고객ID (PK)', '이름', '이메일', '가입일'], color: E_BLUE },
+    { name: '상품', attrs: ['상품ID (PK)', '상품명', '가격', '재고수량'], color: E_GREEN },
+    { name: '주문', attrs: ['주문ID (PK)', '고객ID (FK)', '주문일시', '총금액'], color: E_AMBER },
+    { name: '주문상세', attrs: ['주문상세ID (PK)', '주문ID (FK)', '상품ID (FK)', '수량'], color: E_PURPLE },
   ],
   en: [
-    { name: 'Customer', attrs: ['CustomerID (PK)', 'Name', 'Email', 'JoinDate'], color: '#6366f1' },
-    { name: 'Product', attrs: ['ProductID (PK)', 'Name', 'Price', 'Stock'], color: '#0d9488' },
-    { name: 'Order', attrs: ['OrderID (PK)', 'CustomerID (FK)', 'OrderDate', 'TotalAmount'], color: '#ea580c' },
-    { name: 'OrderDetail', attrs: ['DetailID (PK)', 'OrderID (FK)', 'ProductID (FK)', 'Qty'], color: '#7c3aed' },
+    { name: 'Customer', attrs: ['CustomerID (PK)', 'Name', 'Email', 'JoinDate'], color: E_BLUE },
+    { name: 'Product', attrs: ['ProductID (PK)', 'Name', 'Price', 'Stock'], color: E_GREEN },
+    { name: 'Order', attrs: ['OrderID (PK)', 'CustomerID (FK)', 'OrderDate', 'TotalAmount'], color: E_AMBER },
+    { name: 'OrderDetail', attrs: ['DetailID (PK)', 'OrderID (FK)', 'ProductID (FK)', 'Qty'], color: E_PURPLE },
   ],
 }
 
 function EntityDiagram({ lang }: { lang: 'ko' | 'en' }) {
   const entities = SHOP_ENTITIES[lang]
   const W = 560
-  const CARD_W = 120
-  const CARD_GAP = 16
+  const CARD_W = 124
+  const CARD_GAP = 18
   const totalW = entities.length * CARD_W + (entities.length - 1) * CARD_GAP
   const startX = (W - totalW) / 2
-  const HEADER_H = 28
-  const ROW_H = 18
-  const CARD_H = HEADER_H + entities[0].attrs.length * ROW_H + 10
+  const HEADER_H = 26
+  const ROW_H = 17
+  const CARD_H = HEADER_H + entities[0].attrs.length * ROW_H + 12
   const Y = 12
+  const R = 6
 
   return (
-    <div className="mb-6 overflow-hidden rounded-xl border bg-muted/20 p-4">
-      <svg viewBox={`0 0 ${W} ${CARD_H + 24}`} className="w-full" style={{ fontFamily: 'monospace' }}>
+    <div className="mb-6 overflow-x-auto rounded-card border border-line bg-rail p-4">
+      {/* 한글 엔터티명·속성명이 mono 로 깨지지 않도록 UI 폰트(언어별 스왑). */}
+      <svg viewBox={`0 0 ${W} ${CARD_H + 24}`} className="w-full min-w-[440px]" style={{ fontFamily: 'var(--font-sans-active)' }}>
         {entities.map((e, i) => {
           const x = startX + i * (CARD_W + CARD_GAP)
+          const hb = Y + HEADER_H
+          // header tint with only the top corners rounded (matches the card radius)
+          const headerPath =
+            `M${x + R},${Y} H${x + CARD_W - R} A${R},${R} 0 0 1 ${x + CARD_W},${Y + R} ` +
+            `V${hb} H${x} V${Y + R} A${R},${R} 0 0 1 ${x + R},${Y} Z`
           return (
             <g key={e.name}>
-              <rect x={x} y={Y} width={CARD_W} height={CARD_H} rx={6} fill="white" stroke={e.color} strokeWidth={1.5} />
-              <rect x={x} y={Y} width={CARD_W} height={HEADER_H} rx={6} fill={e.color} />
-              <rect x={x} y={Y + HEADER_H - 6} width={CARD_W} height={8} fill={e.color} />
-              <text x={x + CARD_W / 2} y={Y + 17} textAnchor="middle" fontSize={10} fontWeight="bold" fill="white">
+              {/* card — hairline, hue-tinted border (§6.8) */}
+              <rect
+                x={x} y={Y} width={CARD_W} height={CARD_H} rx={R}
+                fill="var(--color-paper)" stroke={e.color} strokeOpacity={0.4} strokeWidth={1}
+              />
+              {/* header — subtle hue wash + hairline divider */}
+              <path d={headerPath} fill={e.color} fillOpacity={0.09} />
+              <line x1={x} y1={hb} x2={x + CARD_W} y2={hb} stroke={e.color} strokeOpacity={0.28} strokeWidth={1} />
+              {/* entity name */}
+              <text x={x + 10} y={Y + 16.5} fontSize={10.5} fontWeight={600} fill={e.color}>
                 {e.name}
               </text>
-              {e.attrs.map((attr, ai) => (
-                <text
-                  key={attr}
-                  x={x + 8}
-                  y={Y + HEADER_H + 14 + ai * ROW_H}
-                  fontSize={8}
-                  fill={attr.includes('PK') ? e.color : '#6b7280'}
-                  fontWeight={attr.includes('PK') ? 'bold' : 'normal'}
-                >
-                  {attr}
-                </text>
-              ))}
+              {/* attributes — PK in the entity hue, FK emphasised, rest muted */}
+              {e.attrs.map((attr, ai) => {
+                const isPk = attr.includes('(PK)')
+                const isFk = attr.includes('(FK)')
+                return (
+                  <text
+                    key={attr}
+                    x={x + 10}
+                    y={hb + 15 + ai * ROW_H}
+                    fontSize={8}
+                    fill={isPk ? e.color : isFk ? 'var(--color-ink)' : 'var(--color-ink-2)'}
+                    fontWeight={isPk || isFk ? 600 : 400}
+                  >
+                    {attr}
+                  </text>
+                )
+              })}
             </g>
           )
         })}
@@ -204,7 +228,7 @@ export function EntitySection() {
   return (
     <PageContainer>
       <ChapterTitle
-        icon={<IconSitemap size={36} stroke={1.5} className="text-indigo-500" />}
+        icon={<IconSitemap size={36} stroke={1.5} className="text-blue" />}
         title={t.title}
         subtitle={t.subtitle}
       />

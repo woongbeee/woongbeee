@@ -192,7 +192,7 @@ export function CompositeSection() {
   return (
     <PageContainer>
       <ChapterTitle
-        icon={<IconLayersLinked size={36} stroke={1.5} className="text-violet-500" />}
+        icon={<IconLayersLinked size={36} stroke={1.5} className="text-purple" />}
         title={t.pageTitle}
         subtitle={t.pageSubtitle}
       />
@@ -205,17 +205,17 @@ export function CompositeSection() {
       <div className="mb-4">
         <SqlBlock sql={t.orderIndexExample} />
       </div>
-      <div className="mb-6 overflow-hidden rounded-xl border">
+      <div className="mb-6 overflow-hidden rounded-panel border">
         {t.orderRules.map((r, i) => (
-          <div key={i} className={cn('flex items-start gap-3 border-b px-4 py-3 last:border-b-0', i % 2 === 1 ? 'bg-muted/20' : '')}>
+          <div key={i} className={cn('flex items-start gap-3 border-b px-4 py-3 last:border-b-0', i % 2 === 1 ? 'bg-rail' : '')}>
             <span className={cn('mt-0.5 shrink-0 text-sm font-bold',
-              r.ok === true ? 'text-emerald-500' : r.ok === false ? 'text-rose-500' : 'text-amber-500'
+              r.ok === true ? 'text-green' : r.ok === false ? 'text-red' : 'text-amber'
             )}>
               {r.ok === true ? '✓' : r.ok === false ? '✗' : '△'}
             </span>
             <div>
               <div className="text-xs font-semibold">{r.rule}</div>
-              <div className="mt-0.5 font-mono text-[10px] text-muted-foreground">{r.example}</div>
+              <div className="mt-0.5 font-mono text-[10px] text-ink-2">{r.example}</div>
             </div>
           </div>
         ))}
@@ -240,18 +240,18 @@ export function CompositeSection() {
       <IotStorageVisual lang={lang} />
 
       <div className="mt-5 grid gap-4 md:grid-cols-2">
-        <div className="rounded-xl border bg-card p-5">
-          <div className="mb-2 font-mono text-xs font-bold text-amber-700">{t.iotOverflowTitle}</div>
-          <p className="mb-3 text-[11px] leading-relaxed text-muted-foreground">{t.iotOverflowDesc}</p>
-          <div className="rounded-lg bg-muted/40 p-3 font-mono text-[10px] leading-relaxed whitespace-pre text-foreground">
+        <div className="rounded-panel border bg-paper p-5">
+          <div className="mb-2 font-mono text-xs font-bold text-amber">{t.iotOverflowTitle}</div>
+          <p className="mb-3 text-[11px] leading-relaxed text-ink-2">{t.iotOverflowDesc}</p>
+          <div className="rounded-card bg-rail p-3 font-mono text-[10px] leading-relaxed whitespace-pre text-ink">
             {`CREATE TABLE orders_iot (\n  order_id     NUMBER PRIMARY KEY,\n  customer_id  NUMBER,\n  order_date   DATE,\n  description  VARCHAR2(2000)  -- 큰 컬럼\n)\nORGANIZATION INDEX\nPCTTHRESHOLD 20\nOVERFLOW SEGMENT IN overflow_ts;`}
           </div>
         </div>
 
-        <div className="rounded-xl border bg-card p-5">
-          <div className="mb-2 font-mono text-xs font-bold text-blue-700">{t.iotSecondaryTitle}</div>
-          <p className="mb-3 text-[11px] leading-relaxed text-muted-foreground">{t.iotSecondaryDesc}</p>
-          <div className="rounded-lg bg-muted/40 p-3 font-mono text-[10px] leading-relaxed whitespace-pre text-foreground">
+        <div className="rounded-panel border bg-paper p-5">
+          <div className="mb-2 font-mono text-xs font-bold text-blue">{t.iotSecondaryTitle}</div>
+          <p className="mb-3 text-[11px] leading-relaxed text-ink-2">{t.iotSecondaryDesc}</p>
+          <div className="rounded-card bg-rail p-3 font-mono text-[10px] leading-relaxed whitespace-pre text-ink">
             {`-- IOT 생성\nCREATE TABLE employees_iot (\n  employee_id   NUMBER PRIMARY KEY,\n  last_name     VARCHAR2(50),\n  department_id NUMBER\n)\nORGANIZATION INDEX;\n\n-- 보조 인덱스 생성\nCREATE INDEX emp_dept_idx\n  ON employees_iot(department_id);`}
           </div>
         </div>
@@ -262,7 +262,7 @@ export function CompositeSection() {
           <ul className="mt-1 space-y-1">
             {t.iotWhenItems.map((item, i) => (
               <li key={i} className="flex items-start gap-2 text-[11px]">
-                <span className="mt-0.5 shrink-0 font-mono text-rose-400">▸</span>{item}
+                <span className="mt-0.5 shrink-0 font-mono text-red">▸</span>{item}
               </li>
             ))}
           </ul>
@@ -271,7 +271,7 @@ export function CompositeSection() {
           <ul className="mt-1 space-y-1">
             {t.iotLimitItems.map((item, i) => (
               <li key={i} className="flex items-start gap-2 text-[11px]">
-                <span className="mt-0.5 shrink-0 font-mono text-blue-400">▸</span>{item}
+                <span className="mt-0.5 shrink-0 font-mono text-blue">▸</span>{item}
               </li>
             ))}
           </ul>
@@ -369,32 +369,32 @@ function KeyCompressionVisual({ lang }: { lang: 'ko' | 'en' }) {
   ]
 
   const colorMap = {
-    blue:   { bg: 'bg-blue-100',   border: 'border-blue-300',   text: 'text-blue-800',   badge: 'bg-blue-200 text-blue-900' },
-    violet: { bg: 'bg-violet-100', border: 'border-violet-300', text: 'text-violet-800', badge: 'bg-violet-200 text-violet-900' },
-    orange: { bg: 'bg-orange-100', border: 'border-orange-300', text: 'text-orange-800', badge: 'bg-orange-200 text-orange-900' },
-    rose:   { bg: 'bg-rose-100',   border: 'border-rose-300',   text: 'text-rose-800',   badge: 'bg-rose-200 text-rose-900' },
+    blue:   { bg: 'bg-blue/10',   border: 'border-blue/50',   text: 'text-blue',   badge: 'bg-blue/15 text-blue' },
+    violet: { bg: 'bg-purple/10', border: 'border-purple/50', text: 'text-purple', badge: 'bg-purple/15 text-purple' },
+    orange: { bg: 'bg-amber/10', border: 'border-amber/50', text: 'text-amber', badge: 'bg-amber/15 text-amber' },
+    rose:   { bg: 'bg-red/10',   border: 'border-red/50',   text: 'text-red',   badge: 'bg-red/15 text-red' },
   }
 
   const rowColors = [
-    'bg-blue-50', 'bg-blue-50', 'bg-blue-50',
-    'bg-violet-50', 'bg-violet-50',
-    'bg-orange-50',
-    'bg-rose-50',
+    'bg-blue/5', 'bg-blue/5', 'bg-blue/5',
+    'bg-purple/5', 'bg-purple/5',
+    'bg-amber/5',
+    'bg-red/5',
   ]
 
   return (
     <div className="grid gap-6 md:grid-cols-2">
       {/* Left: Uncompressed */}
-      <div className="overflow-hidden rounded-xl border">
-        <div className="flex items-center gap-2 border-b bg-muted/40 px-4 py-2">
-          <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+      <div className="overflow-hidden rounded-panel border">
+        <div className="flex items-center gap-2 border-b bg-rail px-4 py-2">
+          <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-ink-2">
             {lang === 'ko' ? '압축 전 (Leaf Block)' : 'Before Compression (Leaf Block)'}
           </span>
-          <span className="ml-auto rounded bg-rose-100 px-2 py-0.5 font-mono text-[9px] font-bold text-rose-700">
+          <span className="ml-auto rounded bg-red/10 px-2 py-0.5 font-mono text-[9px] font-bold text-red">
             7 × (mode + status + rowid)
           </span>
         </div>
-        <div className="grid grid-cols-[72px_56px_1fr] divide-x border-b bg-muted/20 font-mono text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">
+        <div className="grid grid-cols-[72px_56px_1fr] divide-x border-b bg-rail font-mono text-[9px] font-semibold uppercase tracking-wider text-ink-2">
           <div className="px-3 py-1.5">order_mode</div>
           <div className="px-3 py-1.5">status</div>
           <div className="px-3 py-1.5">ROWID</div>
@@ -406,10 +406,10 @@ function KeyCompressionVisual({ lang }: { lang: 'ko' | 'en' }) {
           >
             <div className="px-3 py-1.5 font-semibold">{row.mode}</div>
             <div className="px-3 py-1.5">{row.status}</div>
-            <div className="px-3 py-1.5 text-muted-foreground">{row.rowid}</div>
+            <div className="px-3 py-1.5 text-ink-2">{row.rowid}</div>
           </div>
         ))}
-        <div className="border-t bg-muted/20 px-4 py-2 font-mono text-[9px] text-muted-foreground">
+        <div className="border-t bg-rail px-4 py-2 font-mono text-[9px] text-ink-2">
           {lang === 'ko'
             ? '중복 낭비: "online"이 5번, "direct"가 2번, "0"이 4번 반복 저장되고 있어요'
             : 'Duplicated: "online" ×5, "direct" ×2, "0" ×4 …'}
@@ -417,12 +417,12 @@ function KeyCompressionVisual({ lang }: { lang: 'ko' | 'en' }) {
       </div>
 
       {/* Right: Compressed */}
-      <div className="overflow-hidden rounded-xl border">
-        <div className="flex items-center gap-2 border-b bg-muted/40 px-4 py-2">
-          <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+      <div className="overflow-hidden rounded-panel border">
+        <div className="flex items-center gap-2 border-b bg-rail px-4 py-2">
+          <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-ink-2">
             {lang === 'ko' ? '압축 후 (Leaf Block)' : 'After Compression (Leaf Block)'}
           </span>
-          <span className="ml-auto rounded bg-emerald-100 px-2 py-0.5 font-mono text-[9px] font-bold text-emerald-700">
+          <span className="ml-auto rounded bg-green/10 px-2 py-0.5 font-mono text-[9px] font-bold text-green">
             {lang === 'ko' ? '선두 컬럼 1회 저장' : 'prefix stored once'}
           </span>
         </div>
@@ -443,7 +443,7 @@ function KeyCompressionVisual({ lang }: { lang: 'ko' | 'en' }) {
                   {grp.rowids.map((rid, ri) => (
                     <div key={ri} className="flex items-center gap-2">
                       <span className={cn('h-1 w-1 rounded-full shrink-0', c.text.replace('text-', 'bg-'))} />
-                      <span className="font-mono text-[10px] text-muted-foreground">{rid}</span>
+                      <span className="font-mono text-[10px] text-ink-2">{rid}</span>
                     </div>
                   ))}
                 </div>
@@ -451,7 +451,7 @@ function KeyCompressionVisual({ lang }: { lang: 'ko' | 'en' }) {
             )
           })}
         </div>
-        <div className="border-t bg-muted/20 px-4 py-2 font-mono text-[9px] text-muted-foreground">
+        <div className="border-t bg-rail px-4 py-2 font-mono text-[9px] text-ink-2">
           {lang === 'ko'
             ? '앞쪽 컬럼 중복 제거 → 블록 하나에 더 많은 항목을 담을 수 있어요'
             : 'Leading column deduplication → more entries per block'}
@@ -465,10 +465,10 @@ function KeyCompressionVisual({ lang }: { lang: 'ko' | 'en' }) {
 
 function IotStorageVisual({ lang }: { lang: 'ko' | 'en' }) {
   const heapRows = [
-    { id: 20, name: 'Marketing',   mgr: 201, loc: 1800, color: 'bg-blue-50' },
-    { id: 50, name: 'Shipping',    mgr: 121, loc: 1500, color: 'bg-blue-50' },
-    { id: 30, name: 'Purchasing',  mgr: 114, loc: 1700, color: 'bg-violet-50' },
-    { id: 60, name: 'IT',          mgr: 103, loc: 1400, color: 'bg-violet-50' },
+    { id: 20, name: 'Marketing',   mgr: 201, loc: 1800, color: 'bg-blue/5' },
+    { id: 50, name: 'Shipping',    mgr: 121, loc: 1500, color: 'bg-blue/5' },
+    { id: 30, name: 'Purchasing',  mgr: 114, loc: 1700, color: 'bg-purple/5' },
+    { id: 60, name: 'IT',          mgr: 103, loc: 1400, color: 'bg-purple/5' },
   ]
 
   const iotLeaves = [
@@ -495,16 +495,16 @@ function IotStorageVisual({ lang }: { lang: 'ko' | 'en' }) {
   return (
     <div className="grid gap-5 md:grid-cols-2">
       {/* Heap */}
-      <div className="overflow-hidden rounded-xl border">
-        <div className="flex items-center gap-2 border-b bg-muted/40 px-4 py-2">
-          <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+      <div className="overflow-hidden rounded-panel border">
+        <div className="flex items-center gap-2 border-b bg-rail px-4 py-2">
+          <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-ink-2">
             {lang === 'ko' ? '힙(Heap) 테이블' : 'Heap-Organized Table'}
           </span>
-          <span className="ml-auto rounded bg-rose-100 px-2 py-0.5 font-mono text-[9px] font-bold text-rose-700">
+          <span className="ml-auto rounded bg-red/10 px-2 py-0.5 font-mono text-[9px] font-bold text-red">
             {lang === 'ko' ? 'PK 순서 보장 ✗' : 'No PK order guarantee'}
           </span>
         </div>
-        <div className={`grid ${col} gap-0 divide-x border-b bg-muted/20 font-mono text-[9px] font-semibold uppercase tracking-wider text-muted-foreground`}>
+        <div className={`grid ${col} gap-0 divide-x border-b bg-rail font-mono text-[9px] font-semibold uppercase tracking-wider text-ink-2`}>
           <div className="px-2 py-1.5">ID</div>
           <div className="px-2 py-1.5">NAME</div>
           <div className="px-2 py-1.5">MGR</div>
@@ -514,11 +514,11 @@ function IotStorageVisual({ lang }: { lang: 'ko' | 'en' }) {
           <div key={i} className={cn(`grid ${col} gap-0 divide-x border-b last:border-b-0 font-mono text-[10px]`, r.color)}>
             <div className="px-2 py-1.5 font-bold">{r.id}</div>
             <div className="px-2 py-1.5">{r.name}</div>
-            <div className="px-2 py-1.5 text-muted-foreground">{r.mgr}</div>
-            <div className="px-2 py-1.5 text-muted-foreground">{r.loc}</div>
+            <div className="px-2 py-1.5 text-ink-2">{r.mgr}</div>
+            <div className="px-2 py-1.5 text-ink-2">{r.loc}</div>
           </div>
         ))}
-        <div className="border-t bg-rose-50/60 px-3 py-2 font-mono text-[9px] text-rose-700">
+        <div className="border-t bg-red/5 px-3 py-2 font-mono text-[9px] text-red">
           {lang === 'ko'
             ? 'PK 순서로 읽으려면: Block1 → Block2 → Block1 (불규칙 I/O)'
             : 'To read in PK order: Block1 → Block2 → Block1 (random I/O)'}
@@ -526,36 +526,36 @@ function IotStorageVisual({ lang }: { lang: 'ko' | 'en' }) {
       </div>
 
       {/* IOT */}
-      <div className="overflow-hidden rounded-xl border">
-        <div className="flex items-center gap-2 border-b bg-muted/40 px-4 py-2">
-          <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+      <div className="overflow-hidden rounded-panel border">
+        <div className="flex items-center gap-2 border-b bg-rail px-4 py-2">
+          <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-ink-2">
             IOT (ORGANIZATION INDEX)
           </span>
-          <span className="ml-auto rounded bg-emerald-100 px-2 py-0.5 font-mono text-[9px] font-bold text-emerald-700">
+          <span className="ml-auto rounded bg-green/10 px-2 py-0.5 font-mono text-[9px] font-bold text-green">
             {lang === 'ko' ? 'PK 순서 정렬 ✓' : 'PK-ordered ✓'}
           </span>
         </div>
         <div className="divide-y">
           {iotLeaves.map((leaf, li) => (
-            <div key={li} className={cn('px-3 py-2', li === 0 ? 'bg-emerald-50/40' : 'bg-teal-50/40')}>
-              <div className={`mb-1.5 font-mono text-[9px] font-bold uppercase tracking-wider ${li === 0 ? 'text-emerald-700' : 'text-teal-700'}`}>
+            <div key={li} className={cn('px-3 py-2', li === 0 ? 'bg-green/5' : 'bg-green/5')}>
+              <div className={`mb-1.5 font-mono text-[9px] font-bold uppercase tracking-wider ${li === 0 ? 'text-green' : 'text-green'}`}>
                 {leaf.label}
               </div>
-              <div className={`grid ${col} gap-0 font-mono text-[9px] font-semibold uppercase tracking-wider text-muted-foreground border-b pb-1 mb-1`}>
+              <div className={`grid ${col} gap-0 font-mono text-[9px] font-semibold uppercase tracking-wider text-ink-2 border-b pb-1 mb-1`}>
                 <div>ID</div><div>NAME</div><div>MGR</div><div>LOC</div>
               </div>
               {leaf.rows.map((r, ri) => (
                 <div key={ri} className={`grid ${col} gap-0 font-mono text-[10px]`}>
                   <div className="py-0.5 font-bold">{r.id}</div>
                   <div className="py-0.5">{r.name}</div>
-                  <div className="py-0.5 text-muted-foreground">{r.mgr}</div>
-                  <div className="py-0.5 text-muted-foreground">{r.loc}</div>
+                  <div className="py-0.5 text-ink-2">{r.mgr}</div>
+                  <div className="py-0.5 text-ink-2">{r.loc}</div>
                 </div>
               ))}
             </div>
           ))}
         </div>
-        <div className="border-t bg-emerald-50/60 px-3 py-2 font-mono text-[9px] text-emerald-700">
+        <div className="border-t bg-green/5 px-3 py-2 font-mono text-[9px] text-green">
           {lang === 'ko'
             ? 'PK 순서로 읽으려면: Block1 → Block2 (순차 I/O) · 별도 PK 인덱스 불필요'
             : 'To read in PK order: Block1 → Block2 (sequential I/O) · no separate PK index needed'}

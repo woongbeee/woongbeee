@@ -374,9 +374,9 @@ const STEP_META = {
 }
 
 const LEVEL_STYLE: Record<string, { row: string; badge: string; label: { ko: string; en: string } }> = {
-  detail:   { row: '',                   badge: 'bg-muted text-muted-foreground',           label: { ko: '상세', en: 'Detail' } },
-  subtotal: { row: 'bg-ios-orange-light', badge: 'bg-ios-orange/15 text-ios-orange-dark',   label: { ko: '소계', en: 'Subtotal' } },
-  grand:    { row: 'bg-ios-orange/10',    badge: 'bg-ios-orange/25 text-ios-orange-dark font-semibold', label: { ko: '총계', en: 'Grand' } },
+  detail:   { row: '',                   badge: 'bg-rail text-ink-2',           label: { ko: '상세', en: 'Detail' } },
+  subtotal: { row: 'bg-amber/10', badge: 'bg-amber/15 text-amber',   label: { ko: '소계', en: 'Subtotal' } },
+  grand:    { row: 'bg-amber/10',    badge: 'bg-amber/25 text-amber font-semibold', label: { ko: '총계', en: 'Grand' } },
 }
 
 // ── CUBE step data ─────────────────────────────────────────────────────────
@@ -457,11 +457,11 @@ const CUBE_STEP_META = {
 }
 
 const CUBE_GROUPING_STYLE: Record<string, { row: string; badge: string; label: { ko: string; en: string } }> = {
-  'detail':   { row: '',                    badge: 'bg-muted text-muted-foreground',                          label: { ko: '원본',     en: 'Raw' } },
-  'dept+job': { row: '',                    badge: 'bg-muted text-muted-foreground',                          label: { ko: '상세',     en: 'Detail' } },
-  'dept':     { row: 'bg-ios-orange-light', badge: 'bg-ios-orange/15 text-ios-orange-dark',                   label: { ko: '부서 소계', en: 'Dept sub' } },
-  'job':      { row: 'bg-ios-teal-light',   badge: 'bg-ios-teal/15 text-ios-teal-dark',                       label: { ko: '직무 소계', en: 'Job sub' } },
-  'grand':    { row: 'bg-ios-orange/10',    badge: 'bg-ios-orange/25 text-ios-orange-dark font-semibold',     label: { ko: '총계',     en: 'Grand' } },
+  'detail':   { row: '',                    badge: 'bg-rail text-ink-2',                          label: { ko: '원본',     en: 'Raw' } },
+  'dept+job': { row: '',                    badge: 'bg-rail text-ink-2',                          label: { ko: '상세',     en: 'Detail' } },
+  'dept':     { row: 'bg-amber/10', badge: 'bg-amber/15 text-amber',                   label: { ko: '부서 소계', en: 'Dept sub' } },
+  'job':      { row: 'bg-green/10',   badge: 'bg-green/15 text-green',                       label: { ko: '직무 소계', en: 'Job sub' } },
+  'grand':    { row: 'bg-amber/10',    badge: 'bg-amber/25 text-amber font-semibold',     label: { ko: '총계',     en: 'Grand' } },
 }
 
 // ── GROUPING SETS step data ────────────────────────────────────────────────
@@ -519,9 +519,9 @@ const GS_STEP_META = {
 }
 
 const GS_SET_STYLE: Record<string, { row: string; badge: string; label: { ko: string; en: string } }> = {
-  raw:  { row: '',                    badge: 'bg-muted text-muted-foreground',        label: { ko: '원본',    en: 'Raw' } },
-  dept: { row: 'bg-ios-orange-light', badge: 'bg-ios-orange/15 text-ios-orange-dark', label: { ko: '부서별',  en: 'By dept' } },
-  job:  { row: 'bg-ios-teal-light',   badge: 'bg-ios-teal/15 text-ios-teal-dark',     label: { ko: '직무별',  en: 'By job' } },
+  raw:  { row: '',                    badge: 'bg-rail text-ink-2',        label: { ko: '원본',    en: 'Raw' } },
+  dept: { row: 'bg-amber/10', badge: 'bg-amber/15 text-amber', label: { ko: '부서별',  en: 'By dept' } },
+  job:  { row: 'bg-green/10',   badge: 'bg-green/15 text-green',     label: { ko: '직무별',  en: 'By job' } },
 }
 
 // ── GROUPING() step data ───────────────────────────────────────────────────
@@ -603,11 +603,11 @@ function RollupAnimator({ lang }: { lang: 'ko' | 'en' }) {
   }
 
   return (
-    <div className="mb-6 rounded-xl border overflow-hidden">
+    <div className="mb-6 rounded-panel border overflow-hidden">
       {/* Header */}
-      <div className="border-b bg-muted/40 px-4 py-3 flex items-center justify-between gap-4">
+      <div className="border-b bg-rail px-4 py-3 flex items-center justify-between gap-4">
         <div>
-          <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+          <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-ink-2">
             {lang === 'ko' ? 'ROLLUP 단계별로 보기' : 'ROLLUP Step-by-Step Simulator'}
           </span>
         </div>
@@ -620,8 +620,8 @@ function RollupAnimator({ lang }: { lang: 'ko' | 'en' }) {
               className={cn(
                 'rounded-full px-2.5 py-0.5 font-mono text-[10px] font-bold transition-all',
                 step === i
-                  ? 'bg-ios-orange text-white shadow-sm'
-                  : 'bg-muted text-muted-foreground hover:bg-muted/80',
+                  ? 'bg-amber text-paper '
+                  : 'bg-rail text-ink-2 hover:bg-rail',
               )}
             >
               {m.label}
@@ -632,10 +632,10 @@ function RollupAnimator({ lang }: { lang: 'ko' | 'en' }) {
 
       {/* Step description + active levels */}
       <div className="border-b px-4 py-2.5 flex flex-wrap items-center gap-x-3 gap-y-1.5">
-        <span className="shrink-0 rounded-md bg-ios-orange/15 px-2 py-0.5 font-mono text-[10px] font-bold text-ios-orange-dark">
+        <span className="shrink-0 rounded-card bg-amber/15 px-2 py-0.5 font-mono text-[10px] font-bold text-amber">
           {meta[step].label}
         </span>
-        <span className="font-mono text-[11px] text-foreground/80">{meta[step].desc}</span>
+        <span className="font-mono text-[11px] text-ink/80">{meta[step].desc}</span>
         <div className="ml-auto flex gap-1.5 shrink-0 flex-wrap justify-end">
           {groupingLevels[lang].map((lbl, i) => (
             <span
@@ -643,8 +643,8 @@ function RollupAnimator({ lang }: { lang: 'ko' | 'en' }) {
               className={cn(
                 'rounded px-2 py-0.5 font-mono text-[10px] font-semibold transition-all duration-300',
                 step >= i + 1
-                  ? 'bg-ios-orange/15 text-ios-orange-dark'
-                  : 'bg-muted text-muted-foreground/30',
+                  ? 'bg-amber/15 text-amber'
+                  : 'bg-rail text-ink-2/30',
               )}
             >
               {lbl}
@@ -659,7 +659,7 @@ function RollupAnimator({ lang }: { lang: 'ko' | 'en' }) {
           <thead>
             <tr className="border-b">
               {['dept_id', 'job_title', step === 0 ? 'salary' : 'total_sal', ...(step === 0 ? [] : ['cnt', ''])].map((h, i) => (
-                <th key={i} className="pb-2 pr-6 text-left font-mono font-bold text-muted-foreground whitespace-nowrap last:pr-0">{h}</th>
+                <th key={i} className="pb-2 pr-6 text-left font-mono font-bold text-ink-2 whitespace-nowrap last:pr-0">{h}</th>
               ))}
             </tr>
           </thead>
@@ -671,16 +671,16 @@ function RollupAnimator({ lang }: { lang: 'ko' | 'en' }) {
                   <motion.tr
                     key={row._key}
                     layout
-                    initial={row._new ? { opacity: 0, x: -12, backgroundColor: '#fff3e0' } : false}
+                    initial={row._new ? { opacity: 0, x: -12, backgroundColor: 'var(--color-rail)' } : false}
                     animate={{ opacity: 1, x: 0, backgroundColor: 'transparent' }}
                     transition={{ duration: 0.35, ease: 'easeOut' }}
                     className={cn('border-b last:border-0', s.row)}
                   >
-                    <td className="py-1.5 pr-6 font-mono text-[11px] whitespace-nowrap text-foreground/80">{row.dept_id ?? <NullCell />}</td>
-                    <td className="py-1.5 pr-6 font-mono text-[11px] whitespace-nowrap text-foreground/80">{row.job_title ?? <NullCell />}</td>
-                    <td className="py-1.5 pr-6 font-mono text-[11px] whitespace-nowrap text-foreground/80">{row.total_sal.toLocaleString()}</td>
+                    <td className="py-1.5 pr-6 font-mono text-[11px] whitespace-nowrap text-ink/80">{row.dept_id ?? <NullCell />}</td>
+                    <td className="py-1.5 pr-6 font-mono text-[11px] whitespace-nowrap text-ink/80">{row.job_title ?? <NullCell />}</td>
+                    <td className="py-1.5 pr-6 font-mono text-[11px] whitespace-nowrap text-ink/80">{row.total_sal.toLocaleString()}</td>
                     {step > 0 && (
-                      <td className="py-1.5 pr-6 font-mono text-[11px] whitespace-nowrap text-foreground/80">{row.cnt}</td>
+                      <td className="py-1.5 pr-6 font-mono text-[11px] whitespace-nowrap text-ink/80">{row.cnt}</td>
                     )}
                     {step > 0 && (
                       <td className="py-1.5">
@@ -696,21 +696,21 @@ function RollupAnimator({ lang }: { lang: 'ko' | 'en' }) {
       </div>
 
       {/* Next / Prev buttons */}
-      <div className="border-t bg-muted/20 px-4 py-2.5 flex items-center justify-between">
+      <div className="border-t bg-rail px-4 py-2.5 flex items-center justify-between">
         <button
           onClick={() => setStep((p) => Math.max(0, p - 1))}
           disabled={step === 0}
-          className="rounded-md border px-3 py-1 font-mono text-[11px] font-bold text-muted-foreground transition-colors hover:bg-muted disabled:opacity-30"
+          className="rounded-card border px-3 py-1 font-mono text-[11px] font-bold text-ink-2 transition-colors hover:bg-rail disabled:opacity-30"
         >
           ← {lang === 'ko' ? '이전' : 'Prev'}
         </button>
-        <span className="font-mono text-[10px] text-muted-foreground/50">
+        <span className="font-mono text-[10px] text-ink-2/50">
           {step + 1} / {ROLLUP_STEPS.length}
         </span>
         <button
           onClick={() => setStep((p) => Math.min(ROLLUP_STEPS.length - 1, p + 1))}
           disabled={isLast}
-          className="rounded-md border px-3 py-1 font-mono text-[11px] font-bold text-muted-foreground transition-colors hover:bg-muted disabled:opacity-30"
+          className="rounded-card border px-3 py-1 font-mono text-[11px] font-bold text-ink-2 transition-colors hover:bg-rail disabled:opacity-30"
         >
           {lang === 'ko' ? '다음' : 'Next'} →
         </button>
@@ -733,10 +733,10 @@ function CubeAnimator({ lang }: { lang: 'ko' | 'en' }) {
   }
 
   return (
-    <div className="mb-6 rounded-xl border overflow-hidden">
-      <div className="border-b bg-muted/40 px-4 py-3 flex items-center justify-between gap-4">
+    <div className="mb-6 rounded-panel border overflow-hidden">
+      <div className="border-b bg-rail px-4 py-3 flex items-center justify-between gap-4">
         <div>
-          <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+          <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-ink-2">
             {lang === 'ko' ? 'CUBE 단계별로 보기' : 'CUBE Step-by-Step Simulator'}
           </span>
         </div>
@@ -747,7 +747,7 @@ function CubeAnimator({ lang }: { lang: 'ko' | 'en' }) {
               onClick={() => setStep(i)}
               className={cn(
                 'rounded-full px-2.5 py-0.5 font-mono text-[10px] font-bold transition-all',
-                step === i ? 'bg-ios-orange text-white shadow-sm' : 'bg-muted text-muted-foreground hover:bg-muted/80',
+                step === i ? 'bg-amber text-paper ' : 'bg-rail text-ink-2 hover:bg-rail',
               )}
             >
               {m.label}
@@ -757,17 +757,17 @@ function CubeAnimator({ lang }: { lang: 'ko' | 'en' }) {
       </div>
 
       <div className="border-b px-4 py-2.5 flex flex-wrap items-center gap-x-3 gap-y-1.5">
-        <span className="shrink-0 rounded-md bg-ios-orange/15 px-2 py-0.5 font-mono text-[10px] font-bold text-ios-orange-dark">
+        <span className="shrink-0 rounded-card bg-amber/15 px-2 py-0.5 font-mono text-[10px] font-bold text-amber">
           {meta[step].label}
         </span>
-        <span className="font-mono text-[11px] text-foreground/80">{meta[step].desc}</span>
+        <span className="font-mono text-[11px] text-ink/80">{meta[step].desc}</span>
         <div className="ml-auto flex gap-1.5 shrink-0 flex-wrap justify-end">
           {levelBadges[lang].map((lbl, i) => (
             <span
               key={i}
               className={cn(
                 'rounded px-2 py-0.5 font-mono text-[10px] font-semibold transition-all duration-300',
-                step >= i + 1 ? (i === 2 ? 'bg-ios-teal/15 text-ios-teal-dark' : 'bg-ios-orange/15 text-ios-orange-dark') : 'bg-muted text-muted-foreground/30',
+                step >= i + 1 ? (i === 2 ? 'bg-green/15 text-green' : 'bg-amber/15 text-amber') : 'bg-rail text-ink-2/30',
               )}
             >
               {lbl}
@@ -781,7 +781,7 @@ function CubeAnimator({ lang }: { lang: 'ko' | 'en' }) {
           <thead>
             <tr className="border-b">
               {['dept_id', 'job_title', step === 0 ? 'salary' : 'total_sal', ...(step === 0 ? [] : ['cnt', ''])].map((h, i) => (
-                <th key={i} className="pb-2 pr-6 text-left font-mono font-bold text-muted-foreground whitespace-nowrap last:pr-0">{h}</th>
+                <th key={i} className="pb-2 pr-6 text-left font-mono font-bold text-ink-2 whitespace-nowrap last:pr-0">{h}</th>
               ))}
             </tr>
           </thead>
@@ -793,15 +793,15 @@ function CubeAnimator({ lang }: { lang: 'ko' | 'en' }) {
                   <motion.tr
                     key={row._key}
                     layout
-                    initial={row._new ? { opacity: 0, x: -12, backgroundColor: '#fff3e0' } : false}
+                    initial={row._new ? { opacity: 0, x: -12, backgroundColor: 'var(--color-rail)' } : false}
                     animate={{ opacity: 1, x: 0, backgroundColor: 'transparent' }}
                     transition={{ duration: 0.35, ease: 'easeOut' }}
                     className={cn('border-b last:border-0', s.row)}
                   >
-                    <td className="py-1.5 pr-6 font-mono text-[11px] whitespace-nowrap text-foreground/80">{row.dept_id ?? <NullCell />}</td>
-                    <td className="py-1.5 pr-6 font-mono text-[11px] whitespace-nowrap text-foreground/80">{row.job_title ?? <NullCell />}</td>
-                    <td className="py-1.5 pr-6 font-mono text-[11px] whitespace-nowrap text-foreground/80">{row.total_sal.toLocaleString()}</td>
-                    {step > 0 && <td className="py-1.5 pr-6 font-mono text-[11px] whitespace-nowrap text-foreground/80">{row.cnt}</td>}
+                    <td className="py-1.5 pr-6 font-mono text-[11px] whitespace-nowrap text-ink/80">{row.dept_id ?? <NullCell />}</td>
+                    <td className="py-1.5 pr-6 font-mono text-[11px] whitespace-nowrap text-ink/80">{row.job_title ?? <NullCell />}</td>
+                    <td className="py-1.5 pr-6 font-mono text-[11px] whitespace-nowrap text-ink/80">{row.total_sal.toLocaleString()}</td>
+                    {step > 0 && <td className="py-1.5 pr-6 font-mono text-[11px] whitespace-nowrap text-ink/80">{row.cnt}</td>}
                     {step > 0 && (
                       <td className="py-1.5">
                         <span className={cn('rounded px-1.5 py-0.5 text-[10px] font-bold', s.badge)}>{s.label[lang]}</span>
@@ -815,19 +815,19 @@ function CubeAnimator({ lang }: { lang: 'ko' | 'en' }) {
         </table>
       </div>
 
-      <div className="border-t bg-muted/20 px-4 py-2.5 flex items-center justify-between">
+      <div className="border-t bg-rail px-4 py-2.5 flex items-center justify-between">
         <button
           onClick={() => setStep((p) => Math.max(0, p - 1))}
           disabled={step === 0}
-          className="rounded-md border px-3 py-1 font-mono text-[11px] font-bold text-muted-foreground transition-colors hover:bg-muted disabled:opacity-30"
+          className="rounded-card border px-3 py-1 font-mono text-[11px] font-bold text-ink-2 transition-colors hover:bg-rail disabled:opacity-30"
         >
           ← {lang === 'ko' ? '이전' : 'Prev'}
         </button>
-        <span className="font-mono text-[10px] text-muted-foreground/50">{step + 1} / {CUBE_STEPS.length}</span>
+        <span className="font-mono text-[10px] text-ink-2/50">{step + 1} / {CUBE_STEPS.length}</span>
         <button
           onClick={() => setStep((p) => Math.min(CUBE_STEPS.length - 1, p + 1))}
           disabled={isLast}
-          className="rounded-md border px-3 py-1 font-mono text-[11px] font-bold text-muted-foreground transition-colors hover:bg-muted disabled:opacity-30"
+          className="rounded-card border px-3 py-1 font-mono text-[11px] font-bold text-ink-2 transition-colors hover:bg-rail disabled:opacity-30"
         >
           {lang === 'ko' ? '다음' : 'Next'} →
         </button>
@@ -850,10 +850,10 @@ function GroupingSetsAnimator({ lang }: { lang: 'ko' | 'en' }) {
   }
 
   return (
-    <div className="mb-6 rounded-xl border overflow-hidden">
-      <div className="border-b bg-muted/40 px-4 py-3 flex items-center justify-between gap-4">
+    <div className="mb-6 rounded-panel border overflow-hidden">
+      <div className="border-b bg-rail px-4 py-3 flex items-center justify-between gap-4">
         <div>
-          <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+          <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-ink-2">
             {lang === 'ko' ? 'GROUPING SETS 단계별로 보기' : 'GROUPING SETS Step-by-Step Simulator'}
           </span>
         </div>
@@ -864,7 +864,7 @@ function GroupingSetsAnimator({ lang }: { lang: 'ko' | 'en' }) {
               onClick={() => setStep(i)}
               className={cn(
                 'rounded-full px-2.5 py-0.5 font-mono text-[10px] font-bold transition-all',
-                step === i ? 'bg-ios-orange text-white shadow-sm' : 'bg-muted text-muted-foreground hover:bg-muted/80',
+                step === i ? 'bg-amber text-paper ' : 'bg-rail text-ink-2 hover:bg-rail',
               )}
             >
               {m.label}
@@ -874,17 +874,17 @@ function GroupingSetsAnimator({ lang }: { lang: 'ko' | 'en' }) {
       </div>
 
       <div className="border-b px-4 py-2.5 flex flex-wrap items-center gap-x-3 gap-y-1.5">
-        <span className="shrink-0 rounded-md bg-ios-orange/15 px-2 py-0.5 font-mono text-[10px] font-bold text-ios-orange-dark">
+        <span className="shrink-0 rounded-card bg-amber/15 px-2 py-0.5 font-mono text-[10px] font-bold text-amber">
           {meta[step].label}
         </span>
-        <span className="font-mono text-[11px] text-foreground/80">{meta[step].desc}</span>
+        <span className="font-mono text-[11px] text-ink/80">{meta[step].desc}</span>
         <div className="ml-auto flex gap-1.5 shrink-0 flex-wrap justify-end">
           {levelBadges[lang].map((lbl, i) => (
             <span
               key={i}
               className={cn(
                 'rounded px-2 py-0.5 font-mono text-[10px] font-semibold transition-all duration-300',
-                step >= i + 1 ? (i === 0 ? 'bg-ios-orange/15 text-ios-orange-dark' : 'bg-ios-teal/15 text-ios-teal-dark') : 'bg-muted text-muted-foreground/30',
+                step >= i + 1 ? (i === 0 ? 'bg-amber/15 text-amber' : 'bg-green/15 text-green') : 'bg-rail text-ink-2/30',
               )}
             >
               {lbl}
@@ -898,7 +898,7 @@ function GroupingSetsAnimator({ lang }: { lang: 'ko' | 'en' }) {
           <thead>
             <tr className="border-b">
               {['dept_id', 'job_title', step === 0 ? 'salary' : 'total_sal', ...(step === 0 ? [] : ['cnt', ''])].map((h, i) => (
-                <th key={i} className="pb-2 pr-6 text-left font-mono font-bold text-muted-foreground whitespace-nowrap last:pr-0">{h}</th>
+                <th key={i} className="pb-2 pr-6 text-left font-mono font-bold text-ink-2 whitespace-nowrap last:pr-0">{h}</th>
               ))}
             </tr>
           </thead>
@@ -910,15 +910,15 @@ function GroupingSetsAnimator({ lang }: { lang: 'ko' | 'en' }) {
                   <motion.tr
                     key={row._key}
                     layout
-                    initial={row._new ? { opacity: 0, x: -12, backgroundColor: '#fff3e0' } : false}
+                    initial={row._new ? { opacity: 0, x: -12, backgroundColor: 'var(--color-rail)' } : false}
                     animate={{ opacity: 1, x: 0, backgroundColor: 'transparent' }}
                     transition={{ duration: 0.35, ease: 'easeOut' }}
                     className={cn('border-b last:border-0', s.row)}
                   >
-                    <td className="py-1.5 pr-6 font-mono text-[11px] whitespace-nowrap text-foreground/80">{row.dept_id ?? <NullCell />}</td>
-                    <td className="py-1.5 pr-6 font-mono text-[11px] whitespace-nowrap text-foreground/80">{row.job_title ?? <NullCell />}</td>
-                    <td className="py-1.5 pr-6 font-mono text-[11px] whitespace-nowrap text-foreground/80">{row.total_sal.toLocaleString()}</td>
-                    {step > 0 && <td className="py-1.5 pr-6 font-mono text-[11px] whitespace-nowrap text-foreground/80">{row.cnt}</td>}
+                    <td className="py-1.5 pr-6 font-mono text-[11px] whitespace-nowrap text-ink/80">{row.dept_id ?? <NullCell />}</td>
+                    <td className="py-1.5 pr-6 font-mono text-[11px] whitespace-nowrap text-ink/80">{row.job_title ?? <NullCell />}</td>
+                    <td className="py-1.5 pr-6 font-mono text-[11px] whitespace-nowrap text-ink/80">{row.total_sal.toLocaleString()}</td>
+                    {step > 0 && <td className="py-1.5 pr-6 font-mono text-[11px] whitespace-nowrap text-ink/80">{row.cnt}</td>}
                     {step > 0 && (
                       <td className="py-1.5">
                         <span className={cn('rounded px-1.5 py-0.5 text-[10px] font-bold', s.badge)}>{s.label[lang]}</span>
@@ -932,19 +932,19 @@ function GroupingSetsAnimator({ lang }: { lang: 'ko' | 'en' }) {
         </table>
       </div>
 
-      <div className="border-t bg-muted/20 px-4 py-2.5 flex items-center justify-between">
+      <div className="border-t bg-rail px-4 py-2.5 flex items-center justify-between">
         <button
           onClick={() => setStep((p) => Math.max(0, p - 1))}
           disabled={step === 0}
-          className="rounded-md border px-3 py-1 font-mono text-[11px] font-bold text-muted-foreground transition-colors hover:bg-muted disabled:opacity-30"
+          className="rounded-card border px-3 py-1 font-mono text-[11px] font-bold text-ink-2 transition-colors hover:bg-rail disabled:opacity-30"
         >
           ← {lang === 'ko' ? '이전' : 'Prev'}
         </button>
-        <span className="font-mono text-[10px] text-muted-foreground/50">{step + 1} / {GS_STEPS.length}</span>
+        <span className="font-mono text-[10px] text-ink-2/50">{step + 1} / {GS_STEPS.length}</span>
         <button
           onClick={() => setStep((p) => Math.min(GS_STEPS.length - 1, p + 1))}
           disabled={isLast}
-          className="rounded-md border px-3 py-1 font-mono text-[11px] font-bold text-muted-foreground transition-colors hover:bg-muted disabled:opacity-30"
+          className="rounded-card border px-3 py-1 font-mono text-[11px] font-bold text-ink-2 transition-colors hover:bg-rail disabled:opacity-30"
         >
           {lang === 'ko' ? '다음' : 'Next'} →
         </button>
@@ -967,10 +967,10 @@ function GroupingFnAnimator({ lang }: { lang: 'ko' | 'en' }) {
   }
 
   return (
-    <div className="mb-6 rounded-xl border overflow-hidden">
-      <div className="border-b bg-muted/40 px-4 py-3 flex items-center justify-between gap-4">
+    <div className="mb-6 rounded-panel border overflow-hidden">
+      <div className="border-b bg-rail px-4 py-3 flex items-center justify-between gap-4">
         <div>
-          <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+          <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-ink-2">
             {lang === 'ko' ? 'GROUPING() 단계별로 보기=' : 'GROUPING() Step-by-Step Simulator'}
           </span>
         </div>
@@ -981,7 +981,7 @@ function GroupingFnAnimator({ lang }: { lang: 'ko' | 'en' }) {
               onClick={() => setStep(i)}
               className={cn(
                 'rounded-full px-2.5 py-0.5 font-mono text-[10px] font-bold transition-all',
-                step === i ? 'bg-ios-orange text-white shadow-sm' : 'bg-muted text-muted-foreground hover:bg-muted/80',
+                step === i ? 'bg-amber text-paper ' : 'bg-rail text-ink-2 hover:bg-rail',
               )}
             >
               {m.label}
@@ -991,17 +991,17 @@ function GroupingFnAnimator({ lang }: { lang: 'ko' | 'en' }) {
       </div>
 
       <div className="border-b px-4 py-2.5 flex flex-wrap items-center gap-x-3 gap-y-1.5">
-        <span className="shrink-0 rounded-md bg-ios-orange/15 px-2 py-0.5 font-mono text-[10px] font-bold text-ios-orange-dark">
+        <span className="shrink-0 rounded-card bg-amber/15 px-2 py-0.5 font-mono text-[10px] font-bold text-amber">
           {meta[step].label}
         </span>
-        <span className="font-mono text-[11px] text-foreground/80">{meta[step].desc}</span>
+        <span className="font-mono text-[11px] text-ink/80">{meta[step].desc}</span>
         <div className="ml-auto flex gap-1.5 shrink-0 flex-wrap justify-end">
           {levelBadges[lang].map((lbl, i) => (
             <span
               key={i}
               className={cn(
                 'rounded px-2 py-0.5 font-mono text-[10px] font-semibold transition-all duration-300',
-                step >= i + 1 ? 'bg-ios-orange/15 text-ios-orange-dark' : 'bg-muted text-muted-foreground/30',
+                step >= i + 1 ? 'bg-amber/15 text-amber' : 'bg-rail text-ink-2/30',
               )}
             >
               {lbl}
@@ -1015,7 +1015,7 @@ function GroupingFnAnimator({ lang }: { lang: 'ko' | 'en' }) {
           <thead>
             <tr className="border-b">
               {['dept_id', 'job_title', step === 0 ? 'salary' : 'total_sal', ...(step === 0 ? [] : ['cnt', 'grp_dept', 'grp_job'])].map((h, i) => (
-                <th key={i} className={cn('pb-2 pr-6 text-left font-mono font-bold whitespace-nowrap last:pr-0', i >= 4 ? 'text-ios-orange-dark' : 'text-muted-foreground')}>{h}</th>
+                <th key={i} className={cn('pb-2 pr-6 text-left font-mono font-bold whitespace-nowrap last:pr-0', i >= 4 ? 'text-amber' : 'text-ink-2')}>{h}</th>
               ))}
             </tr>
           </thead>
@@ -1027,26 +1027,26 @@ function GroupingFnAnimator({ lang }: { lang: 'ko' | 'en' }) {
                   <motion.tr
                     key={row._key}
                     layout
-                    initial={row._new ? { opacity: 0, x: -12, backgroundColor: '#fff3e0' } : false}
+                    initial={row._new ? { opacity: 0, x: -12, backgroundColor: 'var(--color-rail)' } : false}
                     animate={{ opacity: 1, x: 0, backgroundColor: 'transparent' }}
                     transition={{ duration: 0.35, ease: 'easeOut' }}
                     className={cn('border-b last:border-0', s.row)}
                   >
-                    <td className="py-1.5 pr-6 font-mono text-[11px] whitespace-nowrap text-foreground/80">{row.dept_id ?? <NullCell />}</td>
-                    <td className="py-1.5 pr-6 font-mono text-[11px] whitespace-nowrap text-foreground/80">{row.job_title ?? <NullCell />}</td>
-                    <td className="py-1.5 pr-6 font-mono text-[11px] whitespace-nowrap text-foreground/80">{row.total_sal.toLocaleString()}</td>
-                    {step > 0 && <td className="py-1.5 pr-6 font-mono text-[11px] whitespace-nowrap text-foreground/80">{row.cnt}</td>}
+                    <td className="py-1.5 pr-6 font-mono text-[11px] whitespace-nowrap text-ink/80">{row.dept_id ?? <NullCell />}</td>
+                    <td className="py-1.5 pr-6 font-mono text-[11px] whitespace-nowrap text-ink/80">{row.job_title ?? <NullCell />}</td>
+                    <td className="py-1.5 pr-6 font-mono text-[11px] whitespace-nowrap text-ink/80">{row.total_sal.toLocaleString()}</td>
+                    {step > 0 && <td className="py-1.5 pr-6 font-mono text-[11px] whitespace-nowrap text-ink/80">{row.cnt}</td>}
                     {step > 0 && (
                       <td className="py-1.5 pr-6 text-center">
                         <span className={cn('rounded px-1.5 py-0.5 font-mono text-[11px] font-bold',
-                          row.grp_dept === 1 ? 'bg-ios-orange/15 text-ios-orange-dark' : 'bg-muted text-muted-foreground'
+                          row.grp_dept === 1 ? 'bg-amber/15 text-amber' : 'bg-rail text-ink-2'
                         )}>{row.grp_dept}</span>
                       </td>
                     )}
                     {step > 0 && (
                       <td className="py-1.5 text-center">
                         <span className={cn('rounded px-1.5 py-0.5 font-mono text-[11px] font-bold',
-                          row.grp_job === 1 ? 'bg-ios-orange/15 text-ios-orange-dark' : 'bg-muted text-muted-foreground'
+                          row.grp_job === 1 ? 'bg-amber/15 text-amber' : 'bg-rail text-ink-2'
                         )}>{row.grp_job}</span>
                       </td>
                     )}
@@ -1058,19 +1058,19 @@ function GroupingFnAnimator({ lang }: { lang: 'ko' | 'en' }) {
         </table>
       </div>
 
-      <div className="border-t bg-muted/20 px-4 py-2.5 flex items-center justify-between">
+      <div className="border-t bg-rail px-4 py-2.5 flex items-center justify-between">
         <button
           onClick={() => setStep((p) => Math.max(0, p - 1))}
           disabled={step === 0}
-          className="rounded-md border px-3 py-1 font-mono text-[11px] font-bold text-muted-foreground transition-colors hover:bg-muted disabled:opacity-30"
+          className="rounded-card border px-3 py-1 font-mono text-[11px] font-bold text-ink-2 transition-colors hover:bg-rail disabled:opacity-30"
         >
           ← {lang === 'ko' ? '이전' : 'Prev'}
         </button>
-        <span className="font-mono text-[10px] text-muted-foreground/50">{step + 1} / {GRPFN_STEPS.length}</span>
+        <span className="font-mono text-[10px] text-ink-2/50">{step + 1} / {GRPFN_STEPS.length}</span>
         <button
           onClick={() => setStep((p) => Math.min(GRPFN_STEPS.length - 1, p + 1))}
           disabled={isLast}
-          className="rounded-md border px-3 py-1 font-mono text-[11px] font-bold text-muted-foreground transition-colors hover:bg-muted disabled:opacity-30"
+          className="rounded-card border px-3 py-1 font-mono text-[11px] font-bold text-ink-2 transition-colors hover:bg-rail disabled:opacity-30"
         >
           {lang === 'ko' ? '다음' : 'Next'} →
         </button>
@@ -1082,7 +1082,7 @@ function GroupingFnAnimator({ lang }: { lang: 'ko' | 'en' }) {
 // ── Sub-components ─────────────────────────────────────────────────────────
 
 function NullCell() {
-  return <span className="text-muted-foreground/50 italic">NULL</span>
+  return <span className="text-ink-2/50 italic">NULL</span>
 }
 
 // ── Main component ─────────────────────────────────────────────────────────
@@ -1099,11 +1099,11 @@ export function RollupSection() {
     { id: 'grouping',     label: t.tabGrouping     },
   ]
 
-  const tabActiveClass = 'border-ios-orange/40 bg-ios-orange-light text-ios-orange-dark'
+  const tabActiveClass = 'border-amber/30 bg-amber/10 text-amber'
 
   return (
     <PageContainer className="max-w-5xl">
-      <ChapterTitle icon={<IconChartTreemap size={36} color="#f97316" stroke={1.5} />} title={t.chapterTitle} subtitle={t.chapterSubtitle} />
+      <ChapterTitle icon={<IconChartTreemap size={36} color="var(--color-amber)" stroke={1.5} />} title={t.chapterTitle} subtitle={t.chapterSubtitle} />
 
       {/* Tab bar */}
       <div className="mb-6 flex gap-2">
@@ -1112,8 +1112,8 @@ export function RollupSection() {
             key={tb.id}
             onClick={() => setTab(tb.id)}
             className={cn(
-              'rounded-md border px-4 py-1.5 font-mono text-[11px] font-bold transition-all',
-              tab === tb.id ? tabActiveClass + ' shadow-sm' : 'border-border bg-muted/30 text-muted-foreground hover:bg-muted',
+              'rounded-card border px-4 py-1.5 font-mono text-[11px] font-bold transition-all',
+              tab === tb.id ? tabActiveClass + ' ' : 'border-line bg-rail text-ink-2 hover:bg-rail',
             )}
           >
             {tb.label}
@@ -1147,12 +1147,12 @@ export function RollupSection() {
           <SubTitle>{t.rollupUsageTitle}</SubTitle>
           <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
             {t.rollupUsages.map((u) => (
-              <div key={u.title} className="rounded-lg border bg-muted/20 p-3">
+              <div key={u.title} className="rounded-card border bg-rail p-3">
                 <div className="mb-1.5 flex items-center gap-2">
                   <span className="text-base">{u.icon}</span>
-                  <span className="font-mono text-[11px] font-bold text-foreground/80">{u.title}</span>
+                  <span className="font-mono text-[11px] font-bold text-ink/80">{u.title}</span>
                 </div>
-                <p className="font-mono text-[11px] leading-relaxed text-muted-foreground">{u.desc}</p>
+                <p className="font-mono text-[11px] leading-relaxed text-ink-2">{u.desc}</p>
               </div>
             ))}
           </div>
@@ -1171,12 +1171,12 @@ export function RollupSection() {
           <Divider />
 
           <SubTitle>{t.comparisonTitle}</SubTitle>
-          <div className="mb-5 rounded-lg border overflow-hidden">
+          <div className="mb-5 rounded-card border overflow-hidden">
             <table className="w-full text-xs">
               <thead>
-                <tr className="border-b bg-muted/60">
+                <tr className="border-b bg-rail">
                   {['', 'ROLLUP(dept, job)', 'CUBE(dept, job)'].map((h, i) => (
-                    <th key={i} className="px-4 py-2 text-left font-mono font-bold text-muted-foreground">{h}</th>
+                    <th key={i} className="px-4 py-2 text-left font-mono font-bold text-ink-2">{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -1194,9 +1194,9 @@ export function RollupSection() {
                   ['grand total',       '✅', '✅'],
                   ['rows generated',    `${computeRollup().length} rows`, `${computeCube().length} rows`],
                 ]).map((row, i) => (
-                  <tr key={i} className={cn('border-b last:border-0', i % 2 === 0 ? 'bg-background' : 'bg-muted/20')}>
+                  <tr key={i} className={cn('border-b last:border-0', i % 2 === 0 ? 'bg-paper' : 'bg-rail')}>
                     {row.map((cell, j) => (
-                      <td key={j} className="px-4 py-2 font-mono text-[11px] text-foreground/80">{cell}</td>
+                      <td key={j} className="px-4 py-2 font-mono text-[11px] text-ink/80">{cell}</td>
                     ))}
                   </tr>
                 ))}

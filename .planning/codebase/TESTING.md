@@ -1,6 +1,7 @@
 # Testing Patterns
 
 **Analysis Date:** 2026-08-29
+**Updated:** 2026-08-30 — manual-QA surface note (theme × lang) added
 
 ## Summary — There Is No Test Suite
 
@@ -61,6 +62,10 @@ These are **one-off developer utilities**, not a test suite. They render pages i
 ### 4. Deployment as smoke test
 
 `.github/workflows/deploy.yml` runs on push to `main`: `npm ci` → `npm run build` → deploy `dist/` to GitHub Pages. The workflow **only builds** — no `npm test`, no `npm run lint`. A broken `tsc` is the only thing that fails the pipeline.
+
+### 5. Manual visual QA surface (design system)
+
+Since the 2026-08-30 token migration, every screen must read correctly in **4 combinations**: `{light, dark} × {ko, en}` (theme toggle + language toggle in the header). Nothing automates this. Known debt: ~114 chapter files were token-migrated by script (`DESIGN.md §6`, `CONCERNS.md`), so diagrams that relied on pale hue fills or 7+ distinct colors need a human pass in `npm run dev`. A future smoke test that renders every `BOOK_CHAPTERS` leaf under both `data-theme` values would catch contrast/rendering regressions.
 
 ## Test File Organization
 

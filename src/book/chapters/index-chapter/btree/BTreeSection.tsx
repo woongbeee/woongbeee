@@ -344,7 +344,7 @@ export function BTreeSection() {
   return (
     <PageContainer className="max-w-5xl">
       <ChapterTitle
-        icon={<IconBinaryTree size={36} color="#7c3aed" stroke={1.5} />}
+        icon={<IconBinaryTree size={36} color="var(--color-purple)" stroke={1.5} />}
         title={t.introTitle}
         subtitle={t.introDesc}
       />
@@ -366,24 +366,24 @@ export function BTreeSection() {
         {/* 노드 설명 */}
         <div className="mt-6 space-y-4">
           {t.nodeDescs.map((node) => {
-            const border = node.color === 'amber' ? 'border-amber-200 bg-amber-50'
-              : node.color === 'blue' ? 'border-blue-200 bg-blue-50'
-              : 'border-slate-200 bg-slate-50'
-            const badge = node.color === 'amber' ? 'bg-amber-200 text-amber-800'
-              : node.color === 'blue' ? 'bg-blue-200 text-blue-800'
-              : 'bg-slate-200 text-slate-700'
-            const termColor = node.color === 'amber' ? 'text-amber-700'
-              : node.color === 'blue' ? 'text-blue-700'
-              : 'text-slate-600'
+            const border = node.color === 'amber' ? 'border-amber/30 bg-amber/5'
+              : node.color === 'blue' ? 'border-blue/30 bg-blue/5'
+              : 'border-line bg-paper-sunk'
+            const badge = node.color === 'amber' ? 'bg-amber/15 text-amber'
+              : node.color === 'blue' ? 'bg-blue/15 text-blue'
+              : 'bg-rail text-ink'
+            const termColor = node.color === 'amber' ? 'text-amber'
+              : node.color === 'blue' ? 'text-blue'
+              : 'text-ink'
             return (
-              <div key={node.label} className={`rounded-xl border p-4 ${border}`}>
+              <div key={node.label} className={`rounded-panel border p-4 ${border}`}>
                 <div className="mb-2 flex items-center gap-2">
-                  <span className={`shrink-0 whitespace-nowrap rounded-md px-2 py-0.5 font-mono text-[11px] font-bold ${badge}`}>{node.label}</span>
-                  <span className="text-sm text-muted-foreground">{node.body}</span>
+                  <span className={`shrink-0 whitespace-nowrap rounded-card px-2 py-0.5 font-mono text-[11px] font-bold ${badge}`}>{node.label}</span>
+                  <span className="text-sm text-ink-2">{node.body}</span>
                 </div>
-                <div className="rounded-lg border border-white/80 bg-white/60 px-3 py-2.5">
+                <div className="rounded-card border border-paper/80 bg-paper/60 px-3 py-2.5">
                   <span className={`font-mono text-[11px] font-bold ${termColor}`}>{node.sub.term}</span>
-                  <p className="mt-0.5 text-[12px] leading-relaxed text-muted-foreground">{node.sub.desc}</p>
+                  <p className="mt-0.5 text-[12px] leading-relaxed text-ink-2">{node.sub.desc}</p>
                 </div>
               </div>
             )
@@ -393,10 +393,10 @@ export function BTreeSection() {
         <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {t.structurePoints.map((p, i) => (
             <motion.div key={i} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.08 }} className="rounded-xl border bg-card p-4">
+              transition={{ delay: i * 0.08 }} className="rounded-panel border bg-paper p-4">
               <div className="mb-2 text-lg">{p.icon}</div>
               <div className="mb-1 text-xs font-bold">{p.title}</div>
-              <p className="text-[11px] leading-snug text-muted-foreground">{p.desc}</p>
+              <p className="text-[11px] leading-snug text-ink-2">{p.desc}</p>
             </motion.div>
           ))}
         </div>
@@ -410,16 +410,16 @@ export function BTreeSection() {
         <Prose>{t.searchDesc}</Prose>
 
         {/* 탭 */}
-        <div className="mb-5 flex gap-1 rounded-xl border bg-muted/40 p-1">
+        <div className="mb-5 flex gap-1 rounded-panel border bg-rail p-1">
           {(['single', 'composite'] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setSearchTab(tab)}
               className={[
-                'flex-1 rounded-lg px-3 py-2 font-mono text-[11px] font-semibold transition-all',
+                'flex-1 rounded-card px-3 py-2 font-mono text-[11px] font-semibold transition-all',
                 searchTab === tab
-                  ? 'bg-card text-violet-700 shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground',
+                  ? 'bg-paper text-purple '
+                  : 'text-ink-2 hover:text-ink',
               ].join(' ')}
             >
               {tab === 'single' ? t.tabSingle : t.tabComposite}
@@ -429,26 +429,26 @@ export function BTreeSection() {
 
         {searchTab === 'single' ? (
           <>
-            <p className="mb-4 text-[12px] leading-relaxed text-muted-foreground">{t.tabSingleDesc}</p>
+            <p className="mb-4 text-[12px] leading-relaxed text-ink-2">{t.tabSingleDesc}</p>
 
             {/* 키값 선택 버튼 */}
             <div className="mb-4">
-              <p className="mb-2 font-mono text-[11px] font-bold uppercase tracking-widest text-muted-foreground">{t.searchLabel}</p>
+              <p className="mb-2 font-mono text-[11px] font-bold uppercase tracking-widest text-ink-2">{t.searchLabel}</p>
               <div className="flex flex-wrap gap-1.5">
                 {ALL_KEYS.map((key) => (
                   <button key={key} onClick={() => handleSelectKey(key)}
                     className={[
-                      'rounded-lg border px-2.5 py-1.5 font-mono text-[11px] transition-all',
+                      'rounded-card border px-2.5 py-1.5 font-mono text-[11px] transition-all',
                       selectedKey === key
-                        ? 'border-violet-400 bg-violet-100 font-bold text-violet-800 shadow-sm'
-                        : 'border-border text-muted-foreground hover:border-violet-300 hover:text-foreground',
+                        ? 'border-purple/50 bg-purple/10 font-bold text-purple '
+                        : 'border-line text-ink-2 hover:border-purple/50 hover:text-ink',
                     ].join(' ')}>
                     {key}
                   </button>
                 ))}
                 {selectedKey !== null && (
                   <button onClick={handleReset}
-                    className="rounded-lg border px-2.5 py-1.5 font-mono text-[11px] text-muted-foreground transition hover:text-foreground">
+                    className="rounded-card border px-2.5 py-1.5 font-mono text-[11px] text-ink-2 transition hover:text-ink">
                     ✕ reset
                   </button>
                 )}
@@ -466,21 +466,21 @@ export function BTreeSection() {
           </>
         ) : (
           <>
-            <p className="mb-4 text-[12px] leading-relaxed text-muted-foreground">{t.tabCompositeDesc}</p>
+            <p className="mb-4 text-[12px] leading-relaxed text-ink-2">{t.tabCompositeDesc}</p>
 
             {/* 복합 키값 선택 버튼 */}
             <div className="mb-4">
-              <p className="mb-2 font-mono text-[11px] font-bold uppercase tracking-widest text-muted-foreground">{t.compositeLabel}</p>
+              <p className="mb-2 font-mono text-[11px] font-bold uppercase tracking-widest text-ink-2">{t.compositeLabel}</p>
               <div className="flex flex-wrap gap-1.5">
                 {ALL_COMPOSITE_KEYS.map((key, i) => {
                   const isSelected = selectedCompositeKey?.[0] === key[0] && selectedCompositeKey?.[1] === key[1]
                   return (
                     <button key={i} onClick={() => handleSelectCompositeKey(key)}
                       className={[
-                        'rounded-lg border px-2.5 py-1.5 font-mono text-[11px] transition-all',
+                        'rounded-card border px-2.5 py-1.5 font-mono text-[11px] transition-all',
                         isSelected
-                          ? 'border-violet-400 bg-violet-100 font-bold text-violet-800 shadow-sm'
-                          : 'border-border text-muted-foreground hover:border-violet-300 hover:text-foreground',
+                          ? 'border-purple/50 bg-purple/10 font-bold text-purple '
+                          : 'border-line text-ink-2 hover:border-purple/50 hover:text-ink',
                       ].join(' ')}>
                       ({key[0]}, {key[1]})
                     </button>
@@ -488,7 +488,7 @@ export function BTreeSection() {
                 })}
                 {selectedCompositeKey !== null && (
                   <button onClick={handleResetComposite}
-                    className="rounded-lg border px-2.5 py-1.5 font-mono text-[11px] text-muted-foreground transition hover:text-foreground">
+                    className="rounded-card border px-2.5 py-1.5 font-mono text-[11px] text-ink-2 transition hover:text-ink">
                     ✕ reset
                   </button>
                 )}
@@ -519,10 +519,10 @@ export function BTreeSection() {
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {t.introReasons.map((r, i) => (
             <motion.div key={i} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.08 }} className="rounded-xl border bg-card p-4">
+              transition={{ delay: i * 0.08 }} className="rounded-panel border bg-paper p-4">
               <div className="mb-2 text-lg">{r.icon}</div>
               <div className="mb-1 text-xs font-bold">{r.title}</div>
-              <p className="text-[11px] leading-snug text-muted-foreground">{r.desc}</p>
+              <p className="text-[11px] leading-snug text-ink-2">{r.desc}</p>
             </motion.div>
           ))}
         </div>
@@ -538,23 +538,23 @@ export function BTreeSection() {
         <ClusteringFactorDiagram lang={lang} />
 
         <div className="mt-6 grid gap-3 sm:grid-cols-2">
-          <div className="rounded-xl border border-emerald-200 bg-emerald-50/50 p-4">
-            <p className="mb-1 font-mono text-[11px] font-bold text-emerald-700">{lang === 'ko' ? '낮은 CF — 좋음' : 'Low CF — Good'}</p>
-            <p className="text-[11px] leading-relaxed text-muted-foreground">{t.cfRangeLow}</p>
+          <div className="rounded-panel border border-green/30 bg-green/5 p-4">
+            <p className="mb-1 font-mono text-[11px] font-bold text-green">{lang === 'ko' ? '낮은 CF — 좋음' : 'Low CF — Good'}</p>
+            <p className="text-[11px] leading-relaxed text-ink-2">{t.cfRangeLow}</p>
           </div>
-          <div className="rounded-xl border border-rose-200 bg-rose-50/50 p-4">
-            <p className="mb-1 font-mono text-[11px] font-bold text-rose-700">{lang === 'ko' ? '높은 CF — 나쁨' : 'High CF — Bad'}</p>
-            <p className="text-[11px] leading-relaxed text-muted-foreground">{t.cfRangeHigh}</p>
+          <div className="rounded-panel border border-red/30 bg-red/5 p-4">
+            <p className="mb-1 font-mono text-[11px] font-bold text-red">{lang === 'ko' ? '높은 CF — 나쁨' : 'High CF — Bad'}</p>
+            <p className="text-[11px] leading-relaxed text-ink-2">{t.cfRangeHigh}</p>
           </div>
         </div>
 
         <div className="mt-6">
-          <p className="mb-2 font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{t.cfHowTitle}</p>
+          <p className="mb-2 font-mono text-[10px] font-bold uppercase tracking-widest text-ink-2">{t.cfHowTitle}</p>
           <Prose>{t.cfHowDesc}</Prose>
         </div>
 
         <div className="mt-4">
-          <p className="mb-3 font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{t.cfExampleTitle}</p>
+          <p className="mb-3 font-mono text-[10px] font-bold uppercase tracking-widest text-ink-2">{t.cfExampleTitle}</p>
           <Prose>{t.cfExampleDesc}</Prose>
           <Table headers={t.cfTableHeaders} rows={t.cfTableRows} />
         </div>
@@ -568,9 +568,9 @@ export function BTreeSection() {
         </div>
 
         <div className="mt-4">
-          <p className="mb-1 font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{t.cfTipQuery}</p>
-          <div className="rounded-xl border bg-slate-900 px-4 py-3">
-            <pre className="font-mono text-[11px] leading-relaxed text-slate-200">{`SELECT index_name, clustering_factor, num_rows, blocks\nFROM   all_indexes\nWHERE  table_name = 'EMPLOYEES';`}</pre>
+          <p className="mb-1 font-mono text-[10px] font-bold uppercase tracking-widest text-ink-2">{t.cfTipQuery}</p>
+          <div className="rounded-panel border bg-ink px-4 py-3">
+            <pre className="font-mono text-[11px] leading-relaxed text-ink-3">{`SELECT index_name, clustering_factor, num_rows, blocks\nFROM   all_indexes\nWHERE  table_name = 'EMPLOYEES';`}</pre>
           </div>
         </div>
       </section>
@@ -589,22 +589,22 @@ function StaticRootBlock({
 }) {
   return (
     <div className={[
-      'rounded-xl border-2 shadow-sm transition-all duration-300',
-      active ? 'border-amber-500 bg-amber-100 shadow-amber-200' : 'border-amber-400 bg-amber-50',
+      'rounded-panel border-2  transition-all duration-300',
+      active ? 'border-amber bg-amber/10 ' : 'border-amber/50 bg-amber/5',
     ].join(' ')}>
-      <div className="rounded-t-[10px] bg-amber-200 px-3 py-0.5 text-center font-mono text-[9px] font-bold text-amber-800">ROOT</div>
-      <div className="flex border-b border-amber-200 px-2 pt-1">
-        <span className="w-24 font-mono text-[8px] font-bold text-amber-500">KEY</span>
-        <span className="font-mono text-[8px] font-bold text-amber-500">DBA</span>
+      <div className="rounded-t-[10px] bg-amber/15 px-3 py-0.5 text-center font-mono text-[9px] font-bold text-amber">ROOT</div>
+      <div className="flex border-b border-amber/30 px-2 pt-1">
+        <span className="w-24 font-mono text-[8px] font-bold text-amber">KEY</span>
+        <span className="font-mono text-[8px] font-bold text-amber">DBA</span>
       </div>
-      <div className="flex items-center gap-1 border-b border-amber-100 px-2 py-0.5">
-        <span className="w-24 font-mono text-[9px] italic text-amber-400">leftmost</span>
-        <span className="font-mono text-[9px] text-amber-600">{leftmost.dba}</span>
+      <div className="flex items-center gap-1 border-b border-amber/30 px-2 py-0.5">
+        <span className="w-24 font-mono text-[9px] italic text-amber">leftmost</span>
+        <span className="font-mono text-[9px] text-amber">{leftmost.dba}</span>
       </div>
       {entries.map((e) => (
         <div key={e.key} className="flex items-center gap-1 px-2 py-0.5">
-          <span className="w-24 font-mono text-[10px] font-semibold text-amber-900">{e.key}</span>
-          <span className="font-mono text-[9px] text-amber-600">{e.dba}</span>
+          <span className="w-24 font-mono text-[10px] font-semibold text-amber">{e.key}</span>
+          <span className="font-mono text-[9px] text-amber">{e.dba}</span>
         </div>
       ))}
       <div className="h-1" />
@@ -621,22 +621,22 @@ function StaticBranchBlock({
 }) {
   return (
     <div className={[
-      'rounded-xl border-2 shadow-sm transition-all duration-300',
-      active ? 'border-blue-500 bg-blue-100 shadow-blue-200' : 'border-blue-300 bg-blue-50',
+      'rounded-panel border-2  transition-all duration-300',
+      active ? 'border-blue bg-blue/10 ' : 'border-blue/50 bg-blue/5',
     ].join(' ')}>
-      <div className="rounded-t-[10px] bg-blue-200 px-3 py-0.5 text-center font-mono text-[9px] font-bold text-blue-800">BRANCH</div>
-      <div className="flex border-b border-blue-200 px-2 pt-1">
-        <span className="w-24 font-mono text-[8px] font-bold text-blue-400">KEY</span>
-        <span className="font-mono text-[8px] font-bold text-blue-400">DBA</span>
+      <div className="rounded-t-[10px] bg-blue/15 px-3 py-0.5 text-center font-mono text-[9px] font-bold text-blue">BRANCH</div>
+      <div className="flex border-b border-blue/30 px-2 pt-1">
+        <span className="w-24 font-mono text-[8px] font-bold text-blue">KEY</span>
+        <span className="font-mono text-[8px] font-bold text-blue">DBA</span>
       </div>
-      <div className="flex items-center gap-1 border-b border-blue-100 px-2 py-0.5">
-        <span className="w-24 font-mono text-[9px] italic text-blue-300">leftmost</span>
-        <span className="font-mono text-[9px] text-blue-500">{leftmost.dba}</span>
+      <div className="flex items-center gap-1 border-b border-blue/30 px-2 py-0.5">
+        <span className="w-24 font-mono text-[9px] italic text-blue">leftmost</span>
+        <span className="font-mono text-[9px] text-blue">{leftmost.dba}</span>
       </div>
       {entries.map((e) => (
         <div key={e.key} className="flex items-center gap-1 px-2 py-0.5">
-          <span className="w-24 font-mono text-[10px] font-semibold text-blue-900">{e.key}</span>
-          <span className="font-mono text-[9px] text-blue-500">{e.dba}</span>
+          <span className="w-24 font-mono text-[10px] font-semibold text-blue">{e.key}</span>
+          <span className="font-mono text-[9px] text-blue">{e.dba}</span>
         </div>
       ))}
       <div className="h-1" />
@@ -653,23 +653,23 @@ function StaticLeafBlock({
 }) {
   return (
     <div className={[
-      'rounded-xl border-2 shadow-sm transition-all duration-300',
-      active ? 'border-slate-500 bg-slate-100 shadow-slate-200' : 'border-slate-300 bg-white',
+      'rounded-panel border-2  transition-all duration-300',
+      active ? 'border-line-2 bg-paper-sunk shadow-line-2' : 'border-line-2 bg-paper',
     ].join(' ')}>
-      <div className="rounded-t-[10px] bg-slate-200 px-3 py-0.5 text-center font-mono text-[9px] font-bold text-slate-600">LEAF</div>
-      <div className="flex border-b border-slate-200 px-2 pt-1">
-        <span className="w-10 font-mono text-[8px] font-bold text-slate-400">KEY</span>
-        <span className="font-mono text-[8px] font-bold text-slate-400">ROWID</span>
+      <div className="rounded-t-[10px] bg-rail px-3 py-0.5 text-center font-mono text-[9px] font-bold text-ink">LEAF</div>
+      <div className="flex border-b border-line px-2 pt-1">
+        <span className="w-10 font-mono text-[8px] font-bold text-ink-2">KEY</span>
+        <span className="font-mono text-[8px] font-bold text-ink-2">ROWID</span>
       </div>
       {entries.map((e) => {
         const isMatch = active && e.key === matchKey
         return (
           <div key={e.key} className={[
             'flex items-center gap-1 px-2 py-0.5 transition-colors duration-300',
-            isMatch ? 'bg-emerald-100' : '',
+            isMatch ? 'bg-green/10' : '',
           ].join(' ')}>
-            <span className={['w-10 shrink-0 whitespace-nowrap font-mono text-[10px] font-semibold', isMatch ? 'text-emerald-700' : 'text-slate-700'].join(' ')}>{e.key}</span>
-            <span className={['whitespace-nowrap font-mono text-[9px]', isMatch ? 'text-emerald-500' : 'text-slate-400'].join(' ')}>{e.rowid}</span>
+            <span className={['w-10 shrink-0 whitespace-nowrap font-mono text-[10px] font-semibold', isMatch ? 'text-green' : 'text-ink'].join(' ')}>{e.key}</span>
+            <span className={['whitespace-nowrap font-mono text-[9px]', isMatch ? 'text-green' : 'text-ink-2'].join(' ')}>{e.rowid}</span>
           </div>
         )
       })}
@@ -751,19 +751,19 @@ function StaticBTreeDiagram({
   }, [path, visibleStep])
 
   return (
-    <div className="overflow-x-auto rounded-2xl border bg-slate-50">
+    <div className="overflow-x-auto rounded-panel border bg-paper-sunk">
     <div ref={containerRef} className="relative min-w-max px-6 py-5">
       <svg className="pointer-events-none absolute inset-0 h-full w-full overflow-visible">
         {lines.map((l, i) => (
           <line key={i} x1={l.x1} y1={l.y1} x2={l.x2} y2={l.y2}
-            stroke={l.active ? '#7c3aed' : '#cbd5e1'}
+            stroke={l.active ? 'var(--color-purple)' : 'var(--color-line)'}
             strokeWidth={l.active ? 2 : 1.5}
             strokeDasharray={l.active ? 'none' : undefined}
           />
         ))}
       </svg>
 
-      <p className="relative mb-5 font-mono text-[11px] font-bold uppercase tracking-widest text-slate-400">{title}</p>
+      <p className="relative mb-5 font-mono text-[11px] font-bold uppercase tracking-widest text-ink-2">{title}</p>
 
       {/* Root */}
       <div className="relative mb-0 flex justify-center">
@@ -800,7 +800,7 @@ function StaticBTreeDiagram({
                   return (
                     <div key={leaf.id} className="flex items-center">
                       {li > 0 && (
-                        <div className="flex flex-col items-center px-1 text-blue-300">
+                        <div className="flex flex-col items-center px-1 text-blue">
                           <span className="font-mono text-[9px] leading-none">←</span>
                           <span className="font-mono text-[9px] leading-none">→</span>
                         </div>
@@ -816,7 +816,7 @@ function StaticBTreeDiagram({
                   )
                 })}
                 {bi < STATIC_TREE.branches.length - 1 && (
-                  <div className="flex flex-col items-center self-center px-1 text-blue-300">
+                  <div className="flex flex-col items-center self-center px-1 text-blue">
                     <span className="font-mono text-[9px] leading-none">←</span>
                     <span className="font-mono text-[9px] leading-none">→</span>
                   </div>
@@ -844,8 +844,8 @@ function SearchStepPanel({
 
   if (!path) {
     return (
-      <div className="flex h-full items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-6 py-10 text-center">
-        <p className="font-mono text-[11px] text-slate-400">
+      <div className="flex h-full items-center justify-center rounded-panel border border-dashed border-line bg-paper-sunk px-6 py-10 text-center">
+        <p className="font-mono text-[11px] text-ink-2">
           {isKo ? '← EMPLOYEE_ID를 선택하면\n탐색 경로가 여기에 표시됩니다' : '← Select an EMPLOYEE_ID\nto see the search path here'}
         </p>
       </div>
@@ -895,21 +895,21 @@ function SearchStepPanel({
   const steps = [
     {
       step: 1,
-      dotColor: 'bg-amber-400',
+      dotColor: 'bg-amber',
       label: isKo ? 'Root 블록' : 'Root Block',
       reason: rootReason(),
       detail: isKo ? 'Root의 키값과 비교해 어느 Branch로 내려갈지 결정합니다.' : 'Compare the search key against Root entries to decide which Branch to visit.',
     },
     {
       step: 2,
-      dotColor: 'bg-blue-400',
+      dotColor: 'bg-blue',
       label: isKo ? `Branch ${p.branchId}` : `Branch ${p.branchId}`,
       reason: branchReason(),
       detail: isKo ? 'Branch의 키값과 비교해 어느 Leaf로 내려갈지 결정합니다.' : 'Compare against Branch entries to decide which Leaf to visit.',
     },
     {
       step: 3,
-      dotColor: 'bg-slate-400',
+      dotColor: 'bg-line-2',
       label: isKo ? `Leaf ${p.leafId}` : `Leaf ${p.leafId}`,
       reason: isKo ? `키값 ${p.matchKey} 발견 → ROWID 획득` : `Key ${p.matchKey} found → ROWID retrieved`,
       detail: isKo ? `ROWID(${p.rowid})로 테이블 블록을 직접 읽어 해당 행을 반환합니다.` : `Oracle uses ROWID (${p.rowid}) to jump directly to the table block and return the row.`,
@@ -923,13 +923,13 @@ function SearchStepPanel({
           initial={{ opacity: 0, x: 8 }}
           animate={{ opacity: visibleStep >= s.step ? 1 : 0.12, x: 0 }}
           transition={{ duration: 0.3, delay: i * 0.05 }}
-          className="rounded-xl border bg-card p-3.5">
+          className="rounded-panel border bg-paper p-3.5">
           <div className="mb-1.5 flex items-center gap-2">
             <div className={`h-2 w-2 shrink-0 rounded-full ${s.dotColor}`} />
-            <span className="font-mono text-[11px] font-bold text-foreground">{s.label}</span>
+            <span className="font-mono text-[11px] font-bold text-ink">{s.label}</span>
           </div>
-          <p className="mb-1 font-mono text-[11px] font-semibold text-violet-700">{s.reason}</p>
-          <p className="text-[11px] leading-relaxed text-muted-foreground">{s.detail}</p>
+          <p className="mb-1 font-mono text-[11px] font-semibold text-purple">{s.reason}</p>
+          <p className="text-[11px] leading-relaxed text-ink-2">{s.detail}</p>
         </motion.div>
       ))}
     </div>
@@ -945,22 +945,22 @@ function CompositeRootBlock({ leftmost, entries, active }: {
 }) {
   return (
     <div className={[
-      'rounded-xl border-2 shadow-sm transition-all duration-300',
-      active ? 'border-amber-500 bg-amber-100 shadow-amber-200' : 'border-amber-400 bg-amber-50',
+      'rounded-panel border-2  transition-all duration-300',
+      active ? 'border-amber bg-amber/10 ' : 'border-amber/50 bg-amber/5',
     ].join(' ')}>
-      <div className="rounded-t-[10px] bg-amber-200 px-3 py-0.5 text-center font-mono text-[9px] font-bold text-amber-800">ROOT</div>
-      <div className="flex border-b border-amber-200 px-2 pt-1">
-        <span className="w-28 font-mono text-[8px] font-bold text-amber-500">KEY (DEPT, SAL)</span>
-        <span className="font-mono text-[8px] font-bold text-amber-500">DBA</span>
+      <div className="rounded-t-[10px] bg-amber/15 px-3 py-0.5 text-center font-mono text-[9px] font-bold text-amber">ROOT</div>
+      <div className="flex border-b border-amber/30 px-2 pt-1">
+        <span className="w-28 font-mono text-[8px] font-bold text-amber">KEY (DEPT, SAL)</span>
+        <span className="font-mono text-[8px] font-bold text-amber">DBA</span>
       </div>
-      <div className="flex items-center gap-1 border-b border-amber-100 px-2 py-0.5">
-        <span className="w-28 font-mono text-[9px] italic text-amber-400">leftmost</span>
-        <span className="font-mono text-[9px] text-amber-600">{leftmost.dba}</span>
+      <div className="flex items-center gap-1 border-b border-amber/30 px-2 py-0.5">
+        <span className="w-28 font-mono text-[9px] italic text-amber">leftmost</span>
+        <span className="font-mono text-[9px] text-amber">{leftmost.dba}</span>
       </div>
       {entries.map((e, i) => (
         <div key={i} className="flex items-center gap-1 px-2 py-0.5">
-          <span className="w-28 shrink-0 whitespace-nowrap font-mono text-[10px] font-semibold text-amber-900">({e.key[0]}, {e.key[1]})</span>
-          <span className="font-mono text-[9px] text-amber-600">{e.dba}</span>
+          <span className="w-28 shrink-0 whitespace-nowrap font-mono text-[10px] font-semibold text-amber">({e.key[0]}, {e.key[1]})</span>
+          <span className="font-mono text-[9px] text-amber">{e.dba}</span>
         </div>
       ))}
       <div className="h-1" />
@@ -975,22 +975,22 @@ function CompositeBranchBlock({ leftmost, entries, active }: {
 }) {
   return (
     <div className={[
-      'rounded-xl border-2 shadow-sm transition-all duration-300',
-      active ? 'border-blue-500 bg-blue-100 shadow-blue-200' : 'border-blue-300 bg-blue-50',
+      'rounded-panel border-2  transition-all duration-300',
+      active ? 'border-blue bg-blue/10 ' : 'border-blue/50 bg-blue/5',
     ].join(' ')}>
-      <div className="rounded-t-[10px] bg-blue-200 px-3 py-0.5 text-center font-mono text-[9px] font-bold text-blue-800">BRANCH</div>
-      <div className="flex border-b border-blue-200 px-2 pt-1">
-        <span className="w-28 font-mono text-[8px] font-bold text-blue-400">KEY (DEPT, SAL)</span>
-        <span className="font-mono text-[8px] font-bold text-blue-400">DBA</span>
+      <div className="rounded-t-[10px] bg-blue/15 px-3 py-0.5 text-center font-mono text-[9px] font-bold text-blue">BRANCH</div>
+      <div className="flex border-b border-blue/30 px-2 pt-1">
+        <span className="w-28 font-mono text-[8px] font-bold text-blue">KEY (DEPT, SAL)</span>
+        <span className="font-mono text-[8px] font-bold text-blue">DBA</span>
       </div>
-      <div className="flex items-center gap-1 border-b border-blue-100 px-2 py-0.5">
-        <span className="w-28 font-mono text-[9px] italic text-blue-300">leftmost</span>
-        <span className="font-mono text-[9px] text-blue-500">{leftmost.dba}</span>
+      <div className="flex items-center gap-1 border-b border-blue/30 px-2 py-0.5">
+        <span className="w-28 font-mono text-[9px] italic text-blue">leftmost</span>
+        <span className="font-mono text-[9px] text-blue">{leftmost.dba}</span>
       </div>
       {entries.map((e, i) => (
         <div key={i} className="flex items-center gap-1 px-2 py-0.5">
-          <span className="w-28 shrink-0 whitespace-nowrap font-mono text-[10px] font-semibold text-blue-900">({e.key[0]}, {e.key[1]})</span>
-          <span className="font-mono text-[9px] text-blue-500">{e.dba}</span>
+          <span className="w-28 shrink-0 whitespace-nowrap font-mono text-[10px] font-semibold text-blue">({e.key[0]}, {e.key[1]})</span>
+          <span className="font-mono text-[9px] text-blue">{e.dba}</span>
         </div>
       ))}
       <div className="h-1" />
@@ -1005,22 +1005,22 @@ function CompositeLeafBlock({ entries, active, matchKey }: {
 }) {
   return (
     <div className={[
-      'rounded-xl border-2 shadow-sm transition-all duration-300',
-      active ? 'border-slate-500 bg-slate-100 shadow-slate-200' : 'border-slate-300 bg-white',
+      'rounded-panel border-2  transition-all duration-300',
+      active ? 'border-line-2 bg-paper-sunk shadow-line-2' : 'border-line-2 bg-paper',
     ].join(' ')}>
-      <div className="rounded-t-[10px] bg-slate-200 px-3 py-0.5 text-center font-mono text-[9px] font-bold text-slate-600">LEAF</div>
-      <div className="flex border-b border-slate-200 px-2 pt-1">
-        <span className="w-16 font-mono text-[8px] font-bold text-slate-400">KEY</span>
-        <span className="font-mono text-[8px] font-bold text-slate-400">ROWID</span>
+      <div className="rounded-t-[10px] bg-rail px-3 py-0.5 text-center font-mono text-[9px] font-bold text-ink">LEAF</div>
+      <div className="flex border-b border-line px-2 pt-1">
+        <span className="w-16 font-mono text-[8px] font-bold text-ink-2">KEY</span>
+        <span className="font-mono text-[8px] font-bold text-ink-2">ROWID</span>
       </div>
       {entries.map((e, i) => {
         const isMatch = active && matchKey !== null && cmpTuple(e.key, matchKey) === 0
         return (
-          <div key={i} className={['flex items-center gap-1 whitespace-nowrap px-2 py-0.5 transition-colors duration-300', isMatch ? 'bg-emerald-100' : ''].join(' ')}>
-            <span className={['w-16 shrink-0 font-mono text-[9px] font-semibold', isMatch ? 'text-emerald-700' : 'text-slate-700'].join(' ')}>
+          <div key={i} className={['flex items-center gap-1 whitespace-nowrap px-2 py-0.5 transition-colors duration-300', isMatch ? 'bg-green/10' : ''].join(' ')}>
+            <span className={['w-16 shrink-0 font-mono text-[9px] font-semibold', isMatch ? 'text-green' : 'text-ink'].join(' ')}>
               ({e.key[0]},{e.key[1]})
             </span>
-            <span className={['font-mono text-[9px]', isMatch ? 'text-emerald-500' : 'text-slate-400'].join(' ')}>{e.rowid}</span>
+            <span className={['font-mono text-[9px]', isMatch ? 'text-green' : 'text-ink-2'].join(' ')}>{e.rowid}</span>
           </div>
         )
       })}
@@ -1090,18 +1090,18 @@ function CompositeBTreeDiagram({ lang, path, visibleStep }: {
   }, [path, visibleStep])
 
   return (
-    <div className="overflow-x-auto rounded-2xl border bg-slate-50">
+    <div className="overflow-x-auto rounded-panel border bg-paper-sunk">
       <div ref={containerRef} className="relative min-w-max px-6 py-5">
         <svg className="pointer-events-none absolute inset-0 h-full w-full overflow-visible">
           {lines.map((l, i) => (
             <line key={i} x1={l.x1} y1={l.y1} x2={l.x2} y2={l.y2}
-              stroke={l.active ? '#7c3aed' : '#cbd5e1'}
+              stroke={l.active ? 'var(--color-purple)' : 'var(--color-line)'}
               strokeWidth={l.active ? 2 : 1.5}
             />
           ))}
         </svg>
 
-        <p className="relative mb-5 font-mono text-[11px] font-bold uppercase tracking-widest text-slate-400">{title}</p>
+        <p className="relative mb-5 font-mono text-[11px] font-bold uppercase tracking-widest text-ink-2">{title}</p>
 
         <div className="relative mb-0 flex justify-center">
           <div ref={rootRef}>
@@ -1134,7 +1134,7 @@ function CompositeBTreeDiagram({ lang, path, visibleStep }: {
                     return (
                       <div key={leaf.id} className="flex items-center">
                         {li > 0 && (
-                          <div className="flex flex-col items-center px-1 text-blue-300">
+                          <div className="flex flex-col items-center px-1 text-blue">
                             <span className="font-mono text-[9px] leading-none">←</span>
                             <span className="font-mono text-[9px] leading-none">→</span>
                           </div>
@@ -1150,7 +1150,7 @@ function CompositeBTreeDiagram({ lang, path, visibleStep }: {
                     )
                   })}
                   {bi < COMPOSITE_TREE.branches.length - 1 && (
-                    <div className="flex flex-col items-center self-center px-1 text-blue-300">
+                    <div className="flex flex-col items-center self-center px-1 text-blue">
                       <span className="font-mono text-[9px] leading-none">←</span>
                       <span className="font-mono text-[9px] leading-none">→</span>
                     </div>
@@ -1176,8 +1176,8 @@ function CompositeSearchStepPanel({ lang, path, visibleStep }: {
 
   if (!path) {
     return (
-      <div className="flex h-full items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-6 py-10 text-center">
-        <p className="font-mono text-[11px] text-slate-400">
+      <div className="flex h-full items-center justify-center rounded-panel border border-dashed border-line bg-paper-sunk px-6 py-10 text-center">
+        <p className="font-mono text-[11px] text-ink-2">
           {isKo ? '← (DEPT_ID, SALARY)를\n선택하면 경로가 표시됩니다' : '← Select a (DEPT_ID, SALARY)\nto see the path'}
         </p>
       </div>
@@ -1236,21 +1236,21 @@ function CompositeSearchStepPanel({ lang, path, visibleStep }: {
   const steps = [
     {
       step: 1,
-      dotColor: 'bg-amber-400',
+      dotColor: 'bg-amber',
       label: isKo ? 'Root 블록' : 'Root Block',
       reason: rootReason(),
       detail: rootCmpDetail,
     },
     {
       step: 2,
-      dotColor: 'bg-blue-400',
+      dotColor: 'bg-blue',
       label: `Branch ${p.branchId}`,
       reason: branchReason(),
       detail: isKo ? 'Branch의 복합 키값과 순서대로 비교해 Leaf를 결정합니다.' : 'Compare composite keys in order to determine the Leaf.',
     },
     {
       step: 3,
-      dotColor: 'bg-slate-400',
+      dotColor: 'bg-line-2',
       label: `Leaf ${p.leafId}`,
       reason: isKo ? `${fmt(p.matchKey)} 발견 → ROWID 획득` : `${fmt(p.matchKey)} found → ROWID retrieved`,
       detail: isKo ? `ROWID(${p.rowid})로 테이블 블록을 직접 읽습니다.` : `Oracle uses ROWID (${p.rowid}) to jump directly to the table block.`,
@@ -1264,13 +1264,13 @@ function CompositeSearchStepPanel({ lang, path, visibleStep }: {
           initial={{ opacity: 0, x: 8 }}
           animate={{ opacity: visibleStep >= s.step ? 1 : 0.12, x: 0 }}
           transition={{ duration: 0.3, delay: i * 0.05 }}
-          className="rounded-xl border bg-card p-3.5">
+          className="rounded-panel border bg-paper p-3.5">
           <div className="mb-1.5 flex items-center gap-2">
             <div className={`h-2 w-2 shrink-0 rounded-full ${s.dotColor}`} />
-            <span className="font-mono text-[11px] font-bold text-foreground">{s.label}</span>
+            <span className="font-mono text-[11px] font-bold text-ink">{s.label}</span>
           </div>
-          <p className="mb-1 font-mono text-[11px] font-semibold text-violet-700">{s.reason}</p>
-          <p className="text-[11px] leading-relaxed text-muted-foreground">{s.detail}</p>
+          <p className="mb-1 font-mono text-[11px] font-semibold text-purple">{s.reason}</p>
+          <p className="text-[11px] leading-relaxed text-ink-2">{s.detail}</p>
         </motion.div>
       ))}
     </div>
@@ -1305,10 +1305,10 @@ function ClusteringFactorDiagram({ lang }: { lang: 'ko' | 'en' }) {
   const highCfEntries = ['100','101','102','103','104','105','106']
   const highCfBlocks  = [2, 1, 2, 1, 2, 1, 2]
 
-  const GOOD = '#10b981'
-  const BAD  = '#ef4444'
-  const B1F  = '#dbeafe'; const B1S = '#93c5fd'
-  const B2F  = '#fce7f3'; const B2S = '#f9a8d4'
+  const GOOD = 'var(--color-green)'
+  const BAD  = 'var(--color-red)'
+  const B1F  = 'var(--color-rail)'; const B1S = 'var(--color-blue)'
+  const B2F  = 'var(--color-rail)'; const B2S = 'var(--color-red)'
 
   function rowY(i: number, leafY: number) {
     return leafY + HEADER_H + i * ENTRY_H + ENTRY_H / 2 + 2
@@ -1334,28 +1334,28 @@ function ClusteringFactorDiagram({ lang }: { lang: 'ko' | 'en' }) {
         {/* 제목 */}
         <text x={leafX + (TBL_W * 2 + 10) / 2} y={LEAF_Y - 22}
           textAnchor="middle" fontSize={11} fontWeight="bold"
-          fill={arrowColor === GOOD ? '#047857' : '#b91c1c'}>
+          fill={arrowColor === GOOD ? 'var(--color-green)' : 'var(--color-red)'}>
           {titleLabel}
         </text>
         <text x={leafX + (TBL_W * 2 + 10) / 2} y={LEAF_Y - 8}
-          textAnchor="middle" fontSize={10} fill="#94a3b8">
+          textAnchor="middle" fontSize={10} fill="var(--color-ink-3)">
           CF = {cf}
         </text>
 
         {/* Leaf 블록 배경 */}
         <rect x={leafX} y={LEAF_Y} width={LEAF_W} height={LEAF_H}
-          rx={6} fill="#f8fafc" stroke="#cbd5e1" strokeWidth={1.5} />
+          rx={6} fill="var(--color-paper-sunk)" stroke="var(--color-line)" strokeWidth={1.5} />
         {/* Leaf 헤더 */}
         <rect x={leafX} y={LEAF_Y} width={LEAF_W} height={HEADER_H}
-          rx={6} fill="#e2e8f0" />
-        <rect x={leafX} y={LEAF_Y + HEADER_H / 2} width={LEAF_W} height={HEADER_H / 2} fill="#e2e8f0" />
+          rx={6} fill="var(--color-rail)" />
+        <rect x={leafX} y={LEAF_Y + HEADER_H / 2} width={LEAF_W} height={HEADER_H / 2} fill="var(--color-rail)" />
         <text x={leafX + LEAF_W / 2} y={LEAF_Y + 16}
-          textAnchor="middle" fontSize={9} fontWeight="bold" fill="#475569">
+          textAnchor="middle" fontSize={9} fontWeight="bold" fill="var(--color-ink-2)">
           {isKo ? 'Index Leaf' : 'Index Leaf'}
         </text>
         {/* 헤더 구분선 */}
         <line x1={leafX} y1={LEAF_Y + HEADER_H}
-          x2={leafX + LEAF_W} y2={LEAF_Y + HEADER_H} stroke="#cbd5e1" strokeWidth={1} />
+          x2={leafX + LEAF_W} y2={LEAF_Y + HEADER_H} stroke="var(--color-line)" strokeWidth={1} />
 
         {/* 엔트리 행 */}
         {entries.map((key, i) => {
@@ -1363,11 +1363,11 @@ function ClusteringFactorDiagram({ lang }: { lang: 'ko' | 'en' }) {
           const blockFill = blocks[i] === 1 ? B1F : B2F
           return (
             <g key={i}>
-              <text x={leafX + 8} y={y + 4} fontSize={9} fill="#334155">{key}</text>
+              <text x={leafX + 8} y={y + 4} fontSize={9} fill="var(--color-ink)">{key}</text>
               <rect x={leafRight - 30} y={y - 8} width={24} height={15} rx={3} fill={blockFill} />
               <text x={leafRight - 18} y={y + 3}
                 textAnchor="middle" fontSize={8} fontWeight="bold"
-                fill={blocks[i] === 1 ? '#1d4ed8' : '#9d174d'}>
+                fill={blocks[i] === 1 ? 'var(--color-blue)' : 'var(--color-red)'}>
                 B{blocks[i]}
               </text>
             </g>
@@ -1378,11 +1378,11 @@ function ClusteringFactorDiagram({ lang }: { lang: 'ko' | 'en' }) {
         <rect x={tbl1X} y={TBL_Y} width={TBL_W} height={TBL_H}
           rx={6} fill={B1F} stroke={B1S} strokeWidth={1.5} />
         <text x={b1cx} y={TBL_Y + 15}
-          textAnchor="middle" fontSize={9} fontWeight="bold" fill="#1d4ed8">
+          textAnchor="middle" fontSize={9} fontWeight="bold" fill="var(--color-blue)">
           {isKo ? '블록 1' : 'Block 1'}
         </text>
         <text x={b1cx} y={TBL_Y + 28}
-          textAnchor="middle" fontSize={8} fill="#3b82f6">
+          textAnchor="middle" fontSize={8} fill="var(--color-blue)">
           (Abel~Baer)
         </text>
 
@@ -1390,11 +1390,11 @@ function ClusteringFactorDiagram({ lang }: { lang: 'ko' | 'en' }) {
         <rect x={tbl2X} y={TBL_Y} width={TBL_W} height={TBL_H}
           rx={6} fill={B2F} stroke={B2S} strokeWidth={1.5} />
         <text x={b2cx} y={TBL_Y + 15}
-          textAnchor="middle" fontSize={9} fontWeight="bold" fill="#9d174d">
+          textAnchor="middle" fontSize={9} fontWeight="bold" fill="var(--color-red)">
           {isKo ? '블록 2' : 'Block 2'}
         </text>
         <text x={b2cx} y={TBL_Y + 28}
-          textAnchor="middle" fontSize={8} fill="#db2777">
+          textAnchor="middle" fontSize={8} fill="var(--color-red)">
           (Bissot~)
         </text>
 
@@ -1416,7 +1416,7 @@ function ClusteringFactorDiagram({ lang }: { lang: 'ko' | 'en' }) {
   }
 
   return (
-    <div className="my-4 overflow-x-auto rounded-xl border bg-slate-50 p-2">
+    <div className="my-4 overflow-x-auto rounded-panel border bg-paper-sunk p-2">
       <svg viewBox={`0 0 ${W} ${H}`} className="w-full max-w-2xl mx-auto"
         aria-label={isKo ? 'Clustering Factor 비교 다이어그램' : 'Clustering Factor comparison diagram'}>
         <defs>
@@ -1430,7 +1430,7 @@ function ClusteringFactorDiagram({ lang }: { lang: 'ko' | 'en' }) {
 
         {/* 세로 구분선 */}
         <line x1={W / 2} y1={8} x2={W / 2} y2={H - 18}
-          stroke="#e2e8f0" strokeWidth={1.5} strokeDasharray="5,3" />
+          stroke="var(--color-rail)" strokeWidth={1.5} strokeDasharray="5,3" />
 
         {renderSide(
           LEFT_LEAF_X, lowCfEntries, lowCfBlocks, 2,
@@ -1446,13 +1446,13 @@ function ClusteringFactorDiagram({ lang }: { lang: 'ko' | 'en' }) {
 
         {/* 범례 */}
         <rect x={40} y={H - 18} width={9} height={9} rx={2} fill={B1F} stroke={B1S} strokeWidth={1} />
-        <text x={53} y={H - 11} fontSize={9} fill="#64748b">{isKo ? '블록 1' : 'Block 1'}</text>
+        <text x={53} y={H - 11} fontSize={9} fill="var(--color-ink-2)">{isKo ? '블록 1' : 'Block 1'}</text>
         <rect x={105} y={H - 18} width={9} height={9} rx={2} fill={B2F} stroke={B2S} strokeWidth={1} />
-        <text x={118} y={H - 11} fontSize={9} fill="#64748b">{isKo ? '블록 2' : 'Block 2'}</text>
+        <text x={118} y={H - 11} fontSize={9} fill="var(--color-ink-2)">{isKo ? '블록 2' : 'Block 2'}</text>
         <line x1={175} y1={H - 14} x2={190} y2={H - 14} stroke={GOOD} strokeWidth={1.5} strokeDasharray="3,2" />
-        <text x={194} y={H - 11} fontSize={9} fill="#059669">{isKo ? '집중 I/O (낮은 CF)' : 'Clustered I/O'}</text>
+        <text x={194} y={H - 11} fontSize={9} fill="var(--color-green)">{isKo ? '집중 I/O (낮은 CF)' : 'Clustered I/O'}</text>
         <line x1={330} y1={H - 14} x2={345} y2={H - 14} stroke={BAD} strokeWidth={1.5} strokeDasharray="3,2" />
-        <text x={349} y={H - 11} fontSize={9} fill="#dc2626">{isKo ? '분산 I/O (높은 CF)' : 'Scattered I/O'}</text>
+        <text x={349} y={H - 11} fontSize={9} fill="var(--color-red)">{isKo ? '분산 I/O (높은 CF)' : 'Scattered I/O'}</text>
       </svg>
     </div>
   )

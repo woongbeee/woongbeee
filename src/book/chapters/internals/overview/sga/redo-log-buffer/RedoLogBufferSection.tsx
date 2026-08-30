@@ -226,60 +226,60 @@ const T = {
 function WalSection({ lang }: { lang: 'ko' | 'en' }) {
   const t = T[lang]
   return (
-    <div className="rounded-xl border-2 border-orange-200 bg-orange-50/40 p-5">
+    <div className="rounded-panel border-2 border-amber/30 bg-amber/5 p-5">
       <div className="mb-3 flex items-center gap-2">
-        <span className="rounded bg-orange-500 px-2.5 py-0.5 text-xs font-bold text-white">WAL</span>
-        <span className="text-sm font-bold text-foreground/90">{t.walTitle}</span>
+        <span className="rounded bg-amber px-2.5 py-0.5 text-xs font-bold text-paper">WAL</span>
+        <span className="text-sm font-bold text-ink/90">{t.walTitle}</span>
       </div>
       <div className="space-y-2">
-        <p className="text-sm leading-relaxed text-muted-foreground">{t.walDesc}</p>
+        <p className="text-sm leading-relaxed text-ink-2">{t.walDesc}</p>
         <ol className="list-none space-y-1.5">
-          <li className="flex items-start gap-2 text-sm text-muted-foreground">
-            <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-amber-500 text-[10px] font-bold text-white">
+          <li className="flex items-start gap-2 text-sm text-ink-2">
+            <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-amber text-[10px] font-bold text-paper">
               1
             </span>
             <span>
-              <strong className="font-semibold text-foreground">{t.walStep1}</strong>{' '}
+              <strong className="font-semibold text-ink">{t.walStep1}</strong>{' '}
               — {t.walStep1Desc}
             </span>
           </li>
-          <li className="flex items-start gap-2 text-sm text-muted-foreground">
-            <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-blue-500 text-[10px] font-bold text-white">
+          <li className="flex items-start gap-2 text-sm text-ink-2">
+            <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-blue text-[10px] font-bold text-paper">
               2
             </span>
             <span>
-              <strong className="font-semibold text-foreground">{t.walStep2}</strong>{' '}
+              <strong className="font-semibold text-ink">{t.walStep2}</strong>{' '}
               — {t.walStep2Desc}
             </span>
           </li>
         </ol>
-        <p className="text-sm leading-relaxed text-muted-foreground">
-          <strong className="font-semibold text-foreground">{t.walConclusion}</strong>
+        <p className="text-sm leading-relaxed text-ink-2">
+          <strong className="font-semibold text-ink">{t.walConclusion}</strong>
         </p>
       </div>
       <div className="mt-4 flex flex-col gap-2">
-        <p className="mb-1 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">
+        <p className="mb-1 text-[10px] font-bold uppercase tracking-widest text-ink-2/60">
           {t.walMemOrder}
         </p>
         <div className="flex items-center gap-2">
-          <div className="flex-1 rounded-lg border-2 border-amber-300 bg-amber-50 px-3 py-2 text-center text-xs font-bold text-amber-700">
+          <div className="flex-1 rounded-card border-2 border-amber/50 bg-amber/5 px-3 py-2 text-center text-xs font-bold text-amber">
             ① Redo Log Buffer
           </div>
-          <span className="text-sm text-muted-foreground">→</span>
-          <div className="flex-1 rounded-lg border-2 border-blue-300 bg-blue-50 px-3 py-2 text-center text-xs font-bold text-blue-700">
+          <span className="text-sm text-ink-2">→</span>
+          <div className="flex-1 rounded-card border-2 border-blue/50 bg-blue/5 px-3 py-2 text-center text-xs font-bold text-blue">
             ② Buffer Cache
           </div>
         </div>
-        <p className="mb-1 mt-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">
+        <p className="mb-1 mt-2 text-[10px] font-bold uppercase tracking-widest text-ink-2/60">
           {t.walDiskOrder}
         </p>
         <div className="flex items-center gap-2">
-          <div className="flex-1 rounded-lg border-2 border-orange-300 bg-orange-50 px-3 py-2 text-center text-xs font-bold text-orange-700">
+          <div className="flex-1 rounded-card border-2 border-amber/50 bg-amber/5 px-3 py-2 text-center text-xs font-bold text-amber">
             ① Redo Log File
             <div className="mt-0.5 text-[10px] font-normal opacity-70">{t.walLgwr}</div>
           </div>
-          <span className="text-sm text-muted-foreground">→</span>
-          <div className="flex-1 rounded-lg border-2 border-slate-300 bg-slate-50 px-3 py-2 text-center text-xs font-bold text-slate-700">
+          <span className="text-sm text-ink-2">→</span>
+          <div className="flex-1 rounded-card border-2 border-line-2 bg-paper-sunk px-3 py-2 text-center text-xs font-bold text-ink">
             ② Data File
             <div className="mt-0.5 text-[10px] font-normal opacity-70">{t.walDbwn}</div>
           </div>
@@ -319,17 +319,17 @@ function CircularBufferDiagram({ lang }: { lang: 'ko' | 'en' }) {
     <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-start sm:gap-8">
       <svg viewBox="0 0 200 200" className="w-52 shrink-0">
         {/* Center label */}
-        <text x={CX} y={CY - 6} textAnchor="middle" fontSize={8} fontFamily="monospace" fontWeight="bold" fill="#64748b">
+        <text x={CX} y={CY - 6} textAnchor="middle" fontSize={8} fontFamily="monospace" fontWeight="bold" fill="var(--color-ink-2)">
           Redo Log
         </text>
-        <text x={CX} y={CY + 6} textAnchor="middle" fontSize={8} fontFamily="monospace" fontWeight="bold" fill="#64748b">
+        <text x={CX} y={CY + 6} textAnchor="middle" fontSize={8} fontFamily="monospace" fontWeight="bold" fill="var(--color-ink-2)">
           Buffer
         </text>
 
         {/* Slots */}
         {slots.map((s, i) => {
-          const fill = s.state === 'written' ? '#fdba74' : s.state === 'pending' ? '#fcd34d' : '#f1f5f9'
-          const stroke = s.state === 'written' ? '#f97316' : s.state === 'pending' ? '#f59e0b' : '#cbd5e1'
+          const fill = s.state === 'written' ? 'var(--color-amber)' : s.state === 'pending' ? 'var(--color-amber)' : 'var(--color-rail)'
+          const stroke = s.state === 'written' ? 'var(--color-amber)' : s.state === 'pending' ? 'var(--color-amber)' : 'var(--color-line)'
           return (
             <rect
               key={i}
@@ -351,7 +351,7 @@ function CircularBufferDiagram({ lang }: { lang: 'ko' | 'en' }) {
           cy={headSlot.y}
           r={SLOT_W / 2 + 4}
           fill="none"
-          stroke="#f97316"
+          stroke="var(--color-amber)"
           strokeWidth={1.5}
           strokeDasharray="3 2"
         />
@@ -360,7 +360,7 @@ function CircularBufferDiagram({ lang }: { lang: 'ko' | 'en' }) {
           cy={headSlot.y}
           r={SLOT_W / 2 + 4}
           fill="none"
-          stroke="#f97316"
+          stroke="var(--color-amber)"
           strokeWidth={1.5}
           strokeDasharray="3 2"
           animate={{ opacity: [1, 0.3, 1] }}
@@ -373,7 +373,7 @@ function CircularBufferDiagram({ lang }: { lang: 'ko' | 'en' }) {
           fontSize={7}
           fontFamily="monospace"
           fontWeight="bold"
-          fill="#ea580c"
+          fill="var(--color-amber)"
         >
           LGWR
         </text>
@@ -382,33 +382,33 @@ function CircularBufferDiagram({ lang }: { lang: 'ko' | 'en' }) {
         <path
           d={`M ${CX + 18} ${CY - 6} A 18 18 0 0 1 ${CX + 18} ${CY + 6}`}
           fill="none"
-          stroke="#94a3b8"
+          stroke="var(--color-ink-3)"
           strokeWidth={1}
           markerEnd="url(#arrowGray)"
         />
         <defs>
           <marker id="arrowGray" markerWidth="5" markerHeight="5" refX="2.5" refY="2.5" orient="auto">
-            <path d="M0,0 L5,2.5 L0,5 Z" fill="#94a3b8" />
+            <path d="M0,0 L5,2.5 L0,5 Z" fill="var(--color-ink-3)" />
           </marker>
         </defs>
       </svg>
 
       {/* Legend */}
-      <div className="flex flex-col gap-2 text-xs text-muted-foreground">
+      <div className="flex flex-col gap-2 text-xs text-ink-2">
         <div className="flex items-center gap-2">
-          <div className="h-3 w-5 shrink-0 rounded-sm border border-orange-400 bg-orange-200" />
+          <div className="h-3 w-5 shrink-0 rounded-chip border border-amber/50 bg-amber/15" />
           <span>{t.slotWritten}</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="h-3 w-5 shrink-0 rounded-sm border border-amber-400 bg-amber-200" />
+          <div className="h-3 w-5 shrink-0 rounded-chip border border-amber/50 bg-amber/15" />
           <span>{t.slotPending}</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="h-3 w-5 shrink-0 rounded-sm border border-slate-300 bg-slate-100" />
+          <div className="h-3 w-5 shrink-0 rounded-chip border border-line-2 bg-paper-sunk" />
           <span>{t.slotFree}</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="h-3 w-5 shrink-0 rounded-sm border border-dashed border-orange-400 bg-transparent" />
+          <div className="h-3 w-5 shrink-0 rounded-chip border border-dashed border-amber/50 bg-transparent" />
           <span>{t.lgwrHead}</span>
         </div>
         <p className="mt-2 max-w-[220px] text-[11px] leading-relaxed">{t.circularFull}</p>
@@ -420,21 +420,21 @@ function CircularBufferDiagram({ lang }: { lang: 'ko' | 'en' }) {
 function FlushSection({ lang }: { lang: 'ko' | 'en' }) {
   const t = T[lang]
   const colorMap = {
-    rose:   { bg: 'bg-rose-50',   border: 'border-rose-200',   badge: 'bg-rose-500'   },
-    amber:  { bg: 'bg-amber-50',  border: 'border-amber-200',  badge: 'bg-amber-500'  },
-    blue:   { bg: 'bg-blue-50',   border: 'border-blue-200',   badge: 'bg-blue-500'   },
-    slate:  { bg: 'bg-slate-50',  border: 'border-slate-200',  badge: 'bg-slate-400'  },
+    rose:   { bg: 'bg-red/5',   border: 'border-red/30',   badge: 'bg-red'   },
+    amber:  { bg: 'bg-amber/5',  border: 'border-amber/30',  badge: 'bg-amber'  },
+    blue:   { bg: 'bg-blue/5',   border: 'border-blue/30',   badge: 'bg-blue'   },
+    slate:  { bg: 'bg-paper-sunk',  border: 'border-line',  badge: 'bg-line-2'  },
   }
   return (
     <div className="space-y-2">
       {t.flushTriggers.map((trigger) => {
         const c = colorMap[trigger.color]
         return (
-          <div key={trigger.label} className={cn('flex items-start gap-3 rounded-xl border px-4 py-3', c.bg, c.border)}>
-            <span className={cn('mt-0.5 shrink-0 rounded px-2 py-0.5 font-mono text-[10px] font-bold text-white whitespace-nowrap', c.badge)}>
+          <div key={trigger.label} className={cn('flex items-start gap-3 rounded-panel border px-4 py-3', c.bg, c.border)}>
+            <span className={cn('mt-0.5 shrink-0 rounded px-2 py-0.5 font-mono text-[10px] font-bold text-paper whitespace-nowrap', c.badge)}>
               {trigger.label}
             </span>
-            <p className="text-xs leading-relaxed text-muted-foreground">{trigger.desc}</p>
+            <p className="text-xs leading-relaxed text-ink-2">{trigger.desc}</p>
           </div>
         )
       })}
@@ -457,16 +457,16 @@ function IoComparisonSection({ lang }: { lang: 'ko' | 'en' }) {
       title: t.ioRandomTitle,
       desc: t.ioRandomDesc,
       visual: (
-        <div className="relative h-28 w-full overflow-hidden rounded-lg border border-slate-200 bg-slate-50">
+        <div className="relative h-28 w-full overflow-hidden rounded-card border border-line bg-paper-sunk">
           <div className="absolute inset-0 flex items-center justify-center gap-0">
             {(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'] as const).map((label, i) => (
               <div
                 key={label}
                 className={cn(
-                  'flex h-10 w-10 shrink-0 items-center justify-center border-r border-slate-200 font-mono text-xs font-bold',
+                  'flex h-10 w-10 shrink-0 items-center justify-center border-r border-line font-mono text-xs font-bold',
                   ['A', 'C', 'F'].includes(label)
-                    ? 'bg-amber-100 text-amber-700'
-                    : 'bg-white text-slate-400',
+                    ? 'bg-amber/10 text-amber'
+                    : 'bg-paper text-ink-2',
                   i === 7 && 'border-r-0',
                 )}
               >
@@ -477,13 +477,13 @@ function IoComparisonSection({ lang }: { lang: 'ko' | 'en' }) {
           <svg className="pointer-events-none absolute inset-0 h-full w-full" viewBox="0 0 320 112">
             <defs>
               <marker id="arrowAmber2" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
-                <path d="M0,0 L6,3 L0,6 Z" fill="#f59e0b" />
+                <path d="M0,0 L6,3 L0,6 Z" fill="var(--color-amber)" />
               </marker>
             </defs>
-            <path d="M20 56 C 20 20, 200 20, 200 56" stroke="#f59e0b" strokeWidth="1.5" fill="none" strokeDasharray="4 2" markerEnd="url(#arrowAmber2)" />
-            <path d="M200 56 C 200 90, 100 90, 100 56" stroke="#f59e0b" strokeWidth="1.5" fill="none" strokeDasharray="4 2" markerEnd="url(#arrowAmber2)" />
+            <path d="M20 56 C 20 20, 200 20, 200 56" stroke="var(--color-amber)" strokeWidth="1.5" fill="none" strokeDasharray="4 2" markerEnd="url(#arrowAmber2)" />
+            <path d="M200 56 C 200 90, 100 90, 100 56" stroke="var(--color-amber)" strokeWidth="1.5" fill="none" strokeDasharray="4 2" markerEnd="url(#arrowAmber2)" />
           </svg>
-          <div className="absolute bottom-2 left-0 right-0 text-center text-[10px] text-slate-400">
+          <div className="absolute bottom-2 left-0 right-0 text-center text-[10px] text-ink-2">
             {t.ioRandomVisualLabel}
           </div>
         </div>
@@ -494,14 +494,14 @@ function IoComparisonSection({ lang }: { lang: 'ko' | 'en' }) {
       title: t.ioAppendTitle,
       desc: t.ioAppendDesc,
       visual: (
-        <div className="relative h-28 w-full overflow-hidden rounded-lg border border-orange-200 bg-orange-50">
+        <div className="relative h-28 w-full overflow-hidden rounded-card border border-amber/30 bg-amber/5">
           <div className="absolute inset-0 flex items-center justify-center gap-0">
             {[1, 2, 3, 4, 5, 6, 7, 8].map((n, i) => (
               <div
                 key={n}
                 className={cn(
-                  'flex h-10 w-10 shrink-0 items-center justify-center border-r border-orange-200 font-mono text-xs font-bold',
-                  n <= 5 ? 'bg-orange-100 text-orange-700' : n === 6 ? 'bg-orange-300 text-white ring-2 ring-orange-400' : 'bg-white text-slate-300',
+                  'flex h-10 w-10 shrink-0 items-center justify-center border-r border-amber/30 font-mono text-xs font-bold',
+                  n <= 5 ? 'bg-amber/10 text-amber' : n === 6 ? 'bg-amber/25 text-paper ring-2 ring-amber/50' : 'bg-paper text-ink-3',
                   i === 7 && 'border-r-0',
                 )}
               >
@@ -509,7 +509,7 @@ function IoComparisonSection({ lang }: { lang: 'ko' | 'en' }) {
               </div>
             ))}
           </div>
-          <div className="absolute bottom-2 left-0 right-0 text-center text-[10px] text-orange-500">
+          <div className="absolute bottom-2 left-0 right-0 text-center text-[10px] text-amber">
             {t.ioAppendVisualLabel}
           </div>
         </div>
@@ -521,20 +521,20 @@ function IoComparisonSection({ lang }: { lang: 'ko' | 'en' }) {
 
   return (
     <div>
-      <div className="mb-1 text-sm font-bold text-foreground/90">{t.ioTitle}</div>
-      <p className="mb-3 text-sm leading-relaxed text-muted-foreground">{t.ioSubTitle}</p>
+      <div className="mb-1 text-sm font-bold text-ink/90">{t.ioTitle}</div>
+      <p className="mb-3 text-sm leading-relaxed text-ink-2">{t.ioSubTitle}</p>
       <div className="mb-4 flex gap-2">
         {ioModes.map((m) => (
           <button
             key={m.id}
             onClick={() => setActiveIo(m.id)}
             className={cn(
-              'rounded-lg border px-4 py-2 text-xs font-bold transition-all',
+              'rounded-card border px-4 py-2 text-xs font-bold transition-all',
               activeIo === m.id
                 ? m.id === 'random'
-                  ? 'border-amber-400 bg-amber-500 text-white shadow-sm'
-                  : 'border-orange-400 bg-orange-500 text-white shadow-sm'
-                : 'border-border bg-card text-muted-foreground hover:border-slate-400 hover:text-foreground',
+                  ? 'border-amber/50 bg-amber text-paper '
+                  : 'border-amber/50 bg-amber text-paper '
+                : 'border-line bg-paper text-ink-2 hover:border-line-2 hover:text-ink',
             )}
           >
             {m.label}
@@ -548,13 +548,13 @@ function IoComparisonSection({ lang }: { lang: 'ko' | 'en' }) {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -6 }}
           transition={{ duration: 0.18 }}
-          className="overflow-hidden rounded-xl border border-border bg-card"
+          className="overflow-hidden rounded-panel border border-line bg-paper"
         >
-          <div className={cn('flex items-center gap-2.5 border-b border-border px-5 py-3', activeIo === 'random' ? 'bg-amber-50/60' : 'bg-orange-50/60')}>
-            <span className={cn('rounded px-2.5 py-0.5 text-xs font-bold text-white', activeIo === 'random' ? 'bg-amber-500' : 'bg-orange-500')}>
+          <div className={cn('flex items-center gap-2.5 border-b border-line px-5 py-3', activeIo === 'random' ? 'bg-amber/5' : 'bg-amber/5')}>
+            <span className={cn('rounded px-2.5 py-0.5 text-xs font-bold text-paper', activeIo === 'random' ? 'bg-amber' : 'bg-amber')}>
               {active.badge}
             </span>
-            <span className="text-sm font-bold text-foreground">{active.title}</span>
+            <span className="text-sm font-bold text-ink">{active.title}</span>
           </div>
           <div className="space-y-4 px-5 py-4">
             {active.visual}
@@ -562,7 +562,7 @@ function IoComparisonSection({ lang }: { lang: 'ko' | 'en' }) {
           </div>
         </motion.div>
       </AnimatePresence>
-      <div className="mt-3 rounded-lg border border-border bg-muted/30 px-4 py-2.5 text-xs text-muted-foreground">
+      <div className="mt-3 rounded-card border border-line bg-rail px-4 py-2.5 text-xs text-ink-2">
         💡 {t.ioFootnote}
       </div>
     </div>
@@ -594,13 +594,13 @@ export function RedoLogBufferSection() {
       {/* ── Redo Entry structure ── */}
       <SectionTitle>{t.entryTitle}</SectionTitle>
       <Prose className="mb-4">{t.entryDesc}</Prose>
-      <div className="mb-4 overflow-hidden rounded-xl border bg-card">
+      <div className="mb-4 overflow-hidden rounded-panel border bg-paper">
         {t.entryFields.map((f, i) => (
           <div key={f.label} className={cn('flex items-start gap-4 px-5 py-3', i > 0 && 'border-t')}>
-            <code className="mt-0.5 shrink-0 rounded bg-orange-100 px-2 py-0.5 font-mono text-[11px] font-bold text-orange-700 whitespace-nowrap">
+            <code className="mt-0.5 shrink-0 rounded bg-amber/10 px-2 py-0.5 font-mono text-[11px] font-bold text-amber whitespace-nowrap">
               {f.label}
             </code>
-            <p className="text-xs leading-relaxed text-muted-foreground">{f.desc}</p>
+            <p className="text-xs leading-relaxed text-ink-2">{f.desc}</p>
           </div>
         ))}
       </div>
@@ -637,24 +637,24 @@ export function RedoLogBufferSection() {
 
       {/* ── Parameters ── */}
       <SectionTitle>{t.paramsTitle}</SectionTitle>
-      <div className="mb-6 overflow-hidden rounded-xl border bg-card">
+      <div className="mb-6 overflow-hidden rounded-panel border bg-paper">
         {t.params.map((p, i) => (
           <div key={p.name} className={cn('flex items-start gap-4 px-5 py-3', i > 0 && 'border-t')}>
-            <code className="mt-0.5 shrink-0 rounded bg-orange-100 px-2 py-0.5 font-mono text-[11px] font-bold text-orange-700">
+            <code className="mt-0.5 shrink-0 rounded bg-amber/10 px-2 py-0.5 font-mono text-[11px] font-bold text-amber">
               {p.name}
             </code>
-            <p className="text-xs leading-relaxed text-muted-foreground">{p.desc}</p>
+            <p className="text-xs leading-relaxed text-ink-2">{p.desc}</p>
           </div>
         ))}
       </div>
 
       {/* ── Summary ── */}
-      <div className="rounded-2xl border bg-gradient-to-br from-slate-50 to-orange-50/30 px-6 py-5">
+      <div className="rounded-panel border border-line border-l-[3px] border-l-amber bg-paper-sunk px-6 py-5">
         <div className="mb-3"><SubTitle>{t.summaryTitle}</SubTitle></div>
         <ul className="space-y-1.5">
           {t.summaryItems.map((item, i) => (
-            <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
-              <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-orange-400" />
+            <li key={i} className="flex items-start gap-2 text-sm text-ink-2">
+              <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-amber" />
               {item}
             </li>
           ))}

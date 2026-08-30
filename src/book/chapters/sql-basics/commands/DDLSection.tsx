@@ -346,7 +346,7 @@ export function DDLSection() {
   const t = T[lang]
   return (
     <PageContainer>
-      <ChapterTitle icon={<IconTable size={36} color="#f59e0b" stroke={1.5} />} title={t.chapterTitle} subtitle={t.chapterSubtitle} />
+      <ChapterTitle icon={<IconTable size={36} color="var(--color-amber)" stroke={1.5} />} title={t.chapterTitle} subtitle={t.chapterSubtitle} />
 
       <div className="mt-6">
         {/* 데이터 타입 & 제약 조건 */}

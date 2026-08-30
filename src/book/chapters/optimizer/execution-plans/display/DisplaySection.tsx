@@ -109,7 +109,7 @@ export function DisplaySection() {
   return (
     <PageContainer>
       <ChapterTitle
-        icon={<IconLayoutList size={36} stroke={1.5} className="text-orange-500" />}
+        icon={<IconLayoutList size={36} stroke={1.5} className="text-amber" />}
         title={t.title}
         subtitle={t.subtitle}
       />

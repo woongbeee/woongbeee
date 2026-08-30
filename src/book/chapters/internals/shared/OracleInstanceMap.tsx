@@ -41,117 +41,117 @@ const COMPONENT_COLORS: Record<string, {
   label: string
 }> = {
   'server-process': {
-    base:      'border-teal-200 bg-teal-50/70 text-teal-700',
-    highlight: 'border-teal-500 bg-teal-100 ring-2 ring-teal-300 shadow-md text-teal-800',
-    dim:       'border-border/30 bg-muted/20 text-muted-foreground/30',
+    base:      'border-green/30 bg-green/5 text-green',
+    highlight: 'border-green bg-green/10 ring-2 ring-green/50  text-green',
+    dim:       'border-line/30 bg-rail text-ink-2/30',
     label:     'Server Process',
   },
   pga: {
-    base:      'border-teal-200 bg-teal-50/70 text-teal-700',
-    highlight: 'border-teal-500 bg-teal-100 ring-2 ring-teal-300 shadow-md text-teal-800',
-    dim:       'border-border/30 bg-muted/20 text-muted-foreground/30',
+    base:      'border-green/30 bg-green/5 text-green',
+    highlight: 'border-green bg-green/10 ring-2 ring-green/50  text-green',
+    dim:       'border-line/30 bg-rail text-ink-2/30',
     label:     'PGA',
   },
   sga: {
-    base:      'border-blue-300 bg-blue-50/50',
-    highlight: 'border-blue-500 bg-blue-100/80 ring-2 ring-blue-300 shadow-md',
-    dim:       'border-border/20 bg-muted/10',
+    base:      'border-blue/50 bg-blue/5',
+    highlight: 'border-blue bg-blue/10 ring-2 ring-blue/50 ',
+    dim:       'border-line/20 bg-rail',
     label:     'SGA',
   },
   'shared-pool': {
-    base:      'border-indigo-200 bg-indigo-50/70',
-    highlight: 'border-indigo-400 bg-indigo-100/80 ring-2 ring-indigo-300 shadow-md',
-    dim:       'border-border/20 bg-muted/10',
+    base:      'border-blue/30 bg-blue/5',
+    highlight: 'border-blue/50 bg-blue/10 ring-2 ring-blue/50 ',
+    dim:       'border-line/20 bg-rail',
     label:     'Shared Pool',
   },
   'library-cache': {
-    base:      'border-indigo-200 bg-indigo-50/60 text-indigo-700',
-    highlight: 'border-indigo-500 bg-indigo-100 ring-2 ring-indigo-300 shadow-md text-indigo-800',
-    dim:       'border-border/30 bg-muted/20 text-muted-foreground/30',
+    base:      'border-blue/30 bg-blue/5 text-blue',
+    highlight: 'border-blue bg-blue/10 ring-2 ring-blue/50  text-blue',
+    dim:       'border-line/30 bg-rail text-ink-2/30',
     label:     'Library Cache',
   },
   'dict-cache': {
-    base:      'border-indigo-200 bg-indigo-50/60 text-indigo-700',
-    highlight: 'border-indigo-500 bg-indigo-100 ring-2 ring-indigo-300 shadow-md text-indigo-800',
-    dim:       'border-border/30 bg-muted/20 text-muted-foreground/30',
+    base:      'border-blue/30 bg-blue/5 text-blue',
+    highlight: 'border-blue bg-blue/10 ring-2 ring-blue/50  text-blue',
+    dim:       'border-line/30 bg-rail text-ink-2/30',
     label:     'Dict Cache',
   },
   'buffer-cache': {
-    base:      'border-blue-200 bg-blue-50/60 text-blue-700',
-    highlight: 'border-blue-500 bg-blue-100 ring-2 ring-blue-300 shadow-md text-blue-800',
-    dim:       'border-border/30 bg-muted/20 text-muted-foreground/30',
+    base:      'border-blue/30 bg-blue/5 text-blue',
+    highlight: 'border-blue bg-blue/10 ring-2 ring-blue/50  text-blue',
+    dim:       'border-line/30 bg-rail text-ink-2/30',
     label:     'Buffer Cache',
   },
   'redo-buffer': {
-    base:      'border-orange-200 bg-orange-50/60 text-orange-700',
-    highlight: 'border-orange-500 bg-orange-100 ring-2 ring-orange-300 shadow-md text-orange-800',
-    dim:       'border-border/30 bg-muted/20 text-muted-foreground/30',
+    base:      'border-amber/30 bg-amber/5 text-amber',
+    highlight: 'border-amber bg-amber/10 ring-2 ring-amber/50  text-amber',
+    dim:       'border-line/30 bg-rail text-ink-2/30',
     label:     'Log Buffer',
   },
   undo: {
-    base:      'border-amber-200 bg-amber-50/60 text-amber-700',
-    highlight: 'border-amber-500 bg-amber-100 ring-2 ring-amber-300 shadow-md text-amber-800',
-    dim:       'border-border/30 bg-muted/20 text-muted-foreground/30',
+    base:      'border-amber/30 bg-amber/5 text-amber',
+    highlight: 'border-amber bg-amber/10 ring-2 ring-amber/50  text-amber',
+    dim:       'border-line/30 bg-rail text-ink-2/30',
     label:     'Undo Segment',
   },
   dbwr: {
-    base:      'border-amber-200 bg-amber-50/60 text-amber-700',
-    highlight: 'border-amber-500 bg-amber-100 ring-2 ring-amber-300 shadow-md text-amber-800',
-    dim:       'border-border/30 bg-muted/20 text-muted-foreground/30',
+    base:      'border-amber/30 bg-amber/5 text-amber',
+    highlight: 'border-amber bg-amber/10 ring-2 ring-amber/50  text-amber',
+    dim:       'border-line/30 bg-rail text-ink-2/30',
     label:     'DBWn',
   },
   lgwr: {
-    base:      'border-amber-200 bg-amber-50/60 text-amber-700',
-    highlight: 'border-amber-500 bg-amber-100 ring-2 ring-amber-300 shadow-md text-amber-800',
-    dim:       'border-border/30 bg-muted/20 text-muted-foreground/30',
+    base:      'border-amber/30 bg-amber/5 text-amber',
+    highlight: 'border-amber bg-amber/10 ring-2 ring-amber/50  text-amber',
+    dim:       'border-line/30 bg-rail text-ink-2/30',
     label:     'LGWR',
   },
   ckpt: {
-    base:      'border-amber-200 bg-amber-50/60 text-amber-700',
-    highlight: 'border-amber-500 bg-amber-100 ring-2 ring-amber-300 shadow-md text-amber-800',
-    dim:       'border-border/30 bg-muted/20 text-muted-foreground/30',
+    base:      'border-amber/30 bg-amber/5 text-amber',
+    highlight: 'border-amber bg-amber/10 ring-2 ring-amber/50  text-amber',
+    dim:       'border-line/30 bg-rail text-ink-2/30',
     label:     'CKPT',
   },
   smon: {
-    base:      'border-amber-200 bg-amber-50/60 text-amber-700',
-    highlight: 'border-amber-500 bg-amber-100 ring-2 ring-amber-300 shadow-md text-amber-800',
-    dim:       'border-border/30 bg-muted/20 text-muted-foreground/30',
+    base:      'border-amber/30 bg-amber/5 text-amber',
+    highlight: 'border-amber bg-amber/10 ring-2 ring-amber/50  text-amber',
+    dim:       'border-line/30 bg-rail text-ink-2/30',
     label:     'SMON',
   },
   pmon: {
-    base:      'border-amber-200 bg-amber-50/60 text-amber-700',
-    highlight: 'border-amber-500 bg-amber-100 ring-2 ring-amber-300 shadow-md text-amber-800',
-    dim:       'border-border/30 bg-muted/20 text-muted-foreground/30',
+    base:      'border-amber/30 bg-amber/5 text-amber',
+    highlight: 'border-amber bg-amber/10 ring-2 ring-amber/50  text-amber',
+    dim:       'border-line/30 bg-rail text-ink-2/30',
     label:     'PMON',
   },
   arcn: {
-    base:      'border-amber-200 bg-amber-50/60 text-amber-700',
-    highlight: 'border-amber-500 bg-amber-100 ring-2 ring-amber-300 shadow-md text-amber-800',
-    dim:       'border-border/30 bg-muted/20 text-muted-foreground/30',
+    base:      'border-amber/30 bg-amber/5 text-amber',
+    highlight: 'border-amber bg-amber/10 ring-2 ring-amber/50  text-amber',
+    dim:       'border-line/30 bg-rail text-ink-2/30',
     label:     'ARCn',
   },
   disk: {
-    base:      'border-slate-200 bg-slate-50/60 text-slate-600',
-    highlight: 'border-slate-500 bg-slate-100 ring-2 ring-slate-300 shadow-md text-slate-800',
-    dim:       'border-border/30 bg-muted/20 text-muted-foreground/30',
+    base:      'border-line bg-paper-sunk text-ink',
+    highlight: 'border-line-2 bg-paper-sunk ring-2 ring-line-2  text-ink',
+    dim:       'border-line/30 bg-rail text-ink-2/30',
     label:     'Data Files',
   },
   'redo-log-file': {
-    base:      'border-slate-200 bg-slate-50/60 text-slate-600',
-    highlight: 'border-slate-500 bg-slate-100 ring-2 ring-slate-300 shadow-md text-slate-800',
-    dim:       'border-border/30 bg-muted/20 text-muted-foreground/30',
+    base:      'border-line bg-paper-sunk text-ink',
+    highlight: 'border-line-2 bg-paper-sunk ring-2 ring-line-2  text-ink',
+    dim:       'border-line/30 bg-rail text-ink-2/30',
     label:     'Redo Logs',
   },
   'control-file': {
-    base:      'border-slate-200 bg-slate-50/60 text-slate-600',
-    highlight: 'border-slate-500 bg-slate-100 ring-2 ring-slate-300 shadow-md text-slate-800',
-    dim:       'border-border/30 bg-muted/20 text-muted-foreground/30',
+    base:      'border-line bg-paper-sunk text-ink',
+    highlight: 'border-line-2 bg-paper-sunk ring-2 ring-line-2  text-ink',
+    dim:       'border-line/30 bg-rail text-ink-2/30',
     label:     'Control File',
   },
   'archive-log': {
-    base:      'border-slate-200 bg-slate-50/60 text-slate-600',
-    highlight: 'border-slate-500 bg-slate-100 ring-2 ring-slate-300 shadow-md text-slate-800',
-    dim:       'border-border/30 bg-muted/20 text-muted-foreground/30',
+    base:      'border-line bg-paper-sunk text-ink',
+    highlight: 'border-line-2 bg-paper-sunk ring-2 ring-line-2  text-ink',
+    dim:       'border-line/30 bg-rail text-ink-2/30',
     label:     'Archive Logs',
   },
 }
@@ -186,14 +186,14 @@ function MapBlock({
           : { scale: 1 }
       }
       className={cn(
-        'relative cursor-pointer rounded-lg border-2 px-2 py-2 transition-all duration-300',
+        'relative cursor-pointer rounded-card border-2 px-2 py-2 transition-all duration-300',
         isHighlighted ? c.highlight : isDimmed ? c.dim : c.base,
         className
       )}
     >
       {isHighlighted && (
         <motion.div
-          className="absolute -top-2 -right-2 flex h-4 w-4 items-center justify-center rounded-full bg-blue-500 text-white"
+          className="absolute -top-2 -right-2 flex h-4 w-4 items-center justify-center rounded-full bg-blue text-paper"
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ type: 'spring', stiffness: 400 }}
@@ -248,7 +248,7 @@ export function OracleInstanceMap({ highlightIds, callout, horizontal = false, h
         key={callout}
         initial={{ opacity: 0, x: -6 }}
         animate={{ opacity: 1, x: 0 }}
-        className="font-mono text-[10px] text-muted-foreground"
+        className="font-mono text-[10px] text-ink-2"
       >
         {callout}
       </motion.span>
@@ -263,12 +263,12 @@ export function OracleInstanceMap({ highlightIds, callout, horizontal = false, h
   const layerClient = (
     <div
       className={cn(
-        'rounded-xl border-2 transition-all duration-300',
+        'rounded-panel border-2 transition-all duration-300',
         spHighlighted
-          ? 'border-teal-500 bg-teal-50 ring-2 ring-teal-300 shadow-md'
+          ? 'border-green bg-green/5 ring-2 ring-green/50 '
           : clientDimmed
-          ? 'border-border/20 bg-muted/10'
-          : 'border-teal-300 bg-teal-50/30'
+          ? 'border-line/20 bg-rail'
+          : 'border-green/50 bg-green/5'
       )}
     >
       {/* ── Server Process 헤더 영역 ── */}
@@ -276,7 +276,7 @@ export function OracleInstanceMap({ highlightIds, callout, horizontal = false, h
         <div className="flex items-center gap-1.5">
           {spHighlighted && (
             <motion.span
-              className="inline-flex h-3.5 w-3.5 items-center justify-center rounded-full bg-blue-500 text-white"
+              className="inline-flex h-3.5 w-3.5 items-center justify-center rounded-full bg-blue text-paper"
               initial={{ scale: 0 }} animate={{ scale: 1 }}
               transition={{ type: 'spring', stiffness: 400 }}
             >
@@ -285,14 +285,14 @@ export function OracleInstanceMap({ highlightIds, callout, horizontal = false, h
           )}
           <span className={cn(
             'font-mono text-[11px] font-bold leading-tight',
-            spHighlighted ? 'text-teal-800' : clientDimmed ? 'text-muted-foreground/20' : 'text-teal-700'
+            spHighlighted ? 'text-green' : clientDimmed ? 'text-ink-2/20' : 'text-green'
           )}>
             Server Process
           </span>
         </div>
         <span className={cn(
           'font-mono text-[8px]',
-          clientDimmed ? 'text-muted-foreground/20' : 'text-teal-500/80'
+          clientDimmed ? 'text-ink-2/20' : 'text-green'
         )}>
           {lang === 'ko' ? '↔ SGA 공유 접근' : '↔ shared SGA access'}
         </span>
@@ -308,14 +308,14 @@ export function OracleInstanceMap({ highlightIds, callout, horizontal = false, h
               : { scale: 1 }
           }
           className={cn(
-            'relative rounded-xl transition-all duration-300',
-            pgaHighlighted ? 'ring-2 ring-violet-400 shadow-md' : '',
+            'relative rounded-panel transition-all duration-300',
+            pgaHighlighted ? 'ring-2 ring-purple/50 ' : '',
             clientDimmed ? 'opacity-20 pointer-events-none' : 'opacity-100'
           )}
         >
           {pgaHighlighted && (
             <motion.div
-              className="absolute -top-2 -right-2 z-10 flex h-4 w-4 items-center justify-center rounded-full bg-blue-500 text-white"
+              className="absolute -top-2 -right-2 z-10 flex h-4 w-4 items-center justify-center rounded-full bg-blue text-paper"
               initial={{ scale: 0 }} animate={{ scale: 1 }}
               transition={{ type: 'spring', stiffness: 400 }}
             >
@@ -347,12 +347,12 @@ export function OracleInstanceMap({ highlightIds, callout, horizontal = false, h
     <div
       data-component-id="dbwr"
       className={cn(
-        'rounded-xl border-2 p-3 transition-all duration-300',
+        'rounded-panel border-2 p-3 transition-all duration-300',
         bgProcessHighlighted
-          ? 'border-amber-300 bg-amber-50/60 shadow-sm'
+          ? 'border-amber/50 bg-amber/5 '
           : bgDimmed
-          ? 'border-border/20 bg-muted/10'
-          : 'border-amber-200/70 bg-amber-50/20'
+          ? 'border-line/20 bg-rail'
+          : 'border-amber/30 bg-amber/5'
       )}
     >
       <SectionLabel dimmed={bgDimmed}>Background Processes</SectionLabel>
@@ -368,12 +368,12 @@ export function OracleInstanceMap({ highlightIds, callout, horizontal = false, h
     <div
       data-component-id="disk"
       className={cn(
-        'rounded-xl border-2 p-3 transition-all duration-300',
+        'rounded-panel border-2 p-3 transition-all duration-300',
         diskHighlighted
-          ? 'border-slate-400 bg-slate-100/60 shadow-sm'
+          ? 'border-line-2 bg-paper-sunk '
           : diskDimmed
-          ? 'border-border/20 bg-muted/10'
-          : 'border-slate-300/70 bg-slate-50/40'
+          ? 'border-line/20 bg-rail'
+          : 'border-line-2 bg-paper-sunk'
       )}
     >
       <SectionLabel dimmed={diskDimmed}>Disk Storage</SectionLabel>

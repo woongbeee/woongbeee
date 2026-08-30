@@ -1,15 +1,18 @@
 # Codebase Concerns
 
 **Analysis Date:** 2026-08-29
-**Last updated:** 2026-08-29 — orphaned-files + optimizer-barrel cleanup applied
-(commits `86d58e7`, `5e51edb`); resolved items marked inline.
+**Last updated:** 2026-08-30 — design-system refactor: token CSS + theme toggle
+shipped; all 10 chapters mechanically token-migrated. Several 2026-08-29 concerns
+resolved/updated inline; a new "mechanical migration needs visual QA" item added.
+(Earlier: orphaned-files + optimizer-barrel cleanup, commits `86d58e7`, `5e51edb`.)
 
 This is an educational SPA (interactive Oracle textbook). There is no backend, no
 user data, no auth, and no database — so classic production risks (secrets, PII,
 SQL injection, scaling) are mostly absent. The remaining concerns are **stale
 documentation**, **incomplete chapters**, a **regex SQL "parser"** that only has
-to look plausible, the **absence of routing / persistence / tests**, and an
-**in-flight design refactor** touching `theme.ts` / `index.css` / `shared.tsx`.
+to look plausible, the **absence of routing / tests**, **uncommitted work**
+(the whole design refactor + chapter migration sits in the working tree, not a
+commit), and **visual QA debt** from the mechanical token migration.
 
 ---
 
@@ -24,23 +27,17 @@ Resolved 2026-08-29 (commit `86d58e7`): deleted `src/components/LandingPage.tsx`
 `optimizer-plan-reading` import/branch and the duplicate `optimizer-join-overview`
 branch from `optimizer/index.tsx`.
 
-**Still open — `#root.landing` CSS block** (`src/index.css`)
-- The `#root.landing { … }` rule is dead (nothing adds the `.landing` class since
-  the landing/book toggle was removed from `App.tsx`).
-- Left in the working tree because `src/index.css` has an in-flight design-refactor
-  diff (font swap, `--color-brand-*` vars). Remove this block when committing that
-  refactor.
-- Also update the CLAUDE.md "앱 진입점 및 뷰 전환" section (still describes the
-  removed toggle).
+**Resolved 2026-08-30 — `#root.landing` CSS block**
+- `src/index.css` was rewritten (`@import`s + structural rules only); the dead
+  `#root.landing { … }` rule is gone.
+- CLAUDE.md's "앱 진입점 및 뷰 전환" section still describes a landing/book toggle
+  that `App.tsx` no longer has — still needs a sweep.
 
 ### Stale documentation (multiple sources disagree with the code)
 
-**`README.md`**
-- Chapter list is wrong: README says "1 SQL 기본 문법 … 9 병렬 처리" (9 chapters,
-  different order). Actual app (`bookStructure.tsx`, CLAUDE.md) is "0 Introduction,
-  1 Data Modeling, 2 SQL Basics, 3 Internals, 4 Join, 5 Index, 6 Partition,
-  7 Parallel, 8 Optimizer, 9 SQL Tuning".
-- Fix approach: Regenerate the chapter table from `BOOK_CHAPTERS`.
+**`README.md`** — Resolved 2026-08-30
+- Chapter table regenerated from `BOOK_CHAPTERS` (0–9); tech-stack section updated
+  (token design system, theme toggle, font stack); `DESIGN.md` cross-referenced.
 
 **`CLAUDE.md`**
 - "앱 진입점 및 뷰 전환" describes a landing/book view toggle in `App.tsx` that no
@@ -113,44 +110,66 @@ relative paths). Underlying functions are unchanged in their own modules.
 - `src/store/simulationStore.ts` exports `useLangStore` and a "legacy alias"
   `useSimulationStore = useLangStore`. CLAUDE.md: "새 코드에서는 `useLangStore`를
   사용할 것".
-- Reality: **117** files import `useSimulationStore`, only **16** import
-  `useLangStore`. The migration is ~12% done and stalled.
-- The file is also misnamed: `simulationStore.ts` holds only `{ lang, setLang }`;
-  the actual simulation state lives in `internalsStore.ts`.
+- Reality (2026-08-30): **114** files import `useSimulationStore`, **17** import
+  `useLangStore`. The migration is ~13% done and stalled.
+- The file is now even more misnamed: `simulationStore.ts` holds `{ lang, setLang,
+  theme, setTheme, toggleTheme }` (global app state, no simulation); the actual
+  simulation state lives in `internalsStore.ts`.
 - Fix approach: Codemod all `useSimulationStore` → `useLangStore`, delete the
-  alias, rename the file to `langStore.ts`.
+  alias, rename the file to `appStore.ts` (or `langStore.ts`).
 
-### Incomplete CSS-variable migration & dead dark-mode styling
+### Theme shipped via `[data-theme]`; `dark:` variants still dead
 
-- `src/index.css:42-56` — a block of "legacy aliases — kept for gradual migration"
-  (`--bg-base`, `--sapphire-bright`, `--tangerine`, …). Half-migrated to shadcn vars.
-- `@custom-variant dark (&:is(.dark *))` is defined and **7 files** use `dark:`
-  classes (`OptimizerSimulator.tsx`, `shared.tsx`, `GlossaryPanel.tsx`,
-  `sql-basics/dml-more/JoinSection.tsx`, `SqlHighlight.tsx`, `ui/badge.tsx`,
-  `ui/button.tsx`), but **nothing ever applies the `.dark` class** and
-  `color-scheme: light` is hardcoded (`src/index.css:7`). All `dark:` variants are
-  dead.
-- Fix approach: Either ship a theme toggle or strip `dark:` classes and the
-  `@custom-variant dark` line; finish or remove the legacy-alias block.
+- Theme toggle now exists: `src/store/simulationStore.ts` `theme` → `App.tsx`
+  writes `<html data-theme>` → `src/styles/tokens.css` `[data-theme="dark"]` /
+  `[data-theme="light"]` re-point tokens. `localStorage['oracle-book-theme']`.
+- But `src/index.css:5` still has `@custom-variant dark (&:is(.dark *))` and 4
+  files still carry `dark:` classes (`OptimizerSimulator.tsx`,
+  `sql-basics/dml-more/JoinSection.tsx`, `ui/badge.tsx`, `ui/button.tsx`).
+  **Nothing applies a `.dark` class** (the mechanism is `[data-theme]`, not
+  `.dark`), so every `dark:` variant is still dead — a maintainer editing them is
+  editing nothing.
+- Fix approach: repoint `@custom-variant dark` to `[data-theme="dark"]` (so
+  `dark:` variants actually work) or strip all `dark:` classes + the
+  `@custom-variant` line.
 
-### Uncommitted design refactor in flight
+### Legacy CSS-var families still in `tokens.css` §1
 
-- Working tree (as of analysis) has un-committed edits: `src/App.tsx`,
-  `src/book/BookContent.tsx`, `src/book/bookStructure.tsx`,
-  `src/book/chapters/introduction/IntroductionPage.tsx`, `src/book/chapters/shared.tsx`,
-  `src/index.css`, `index.html`, plus untracked `src/lib/theme.ts`.
-- The change centralizes chapter colors into `src/lib/theme.ts` (`ACCENT_COLORS`),
-  removes the inline `COLOR_MAP` / `COLOR_CARD` / `SQL_BADGE` maps, adds a
-  `--font-sans-ko` / `--font-sans-en` swap driven by `document.documentElement.lang`,
-  and adds `--color-brand-*` hex vars.
-- Concern: `IntroductionPage.tsx:310,343` now do `ACCENT_COLORS[s.color as AccentColor]`
-  / `ACCENT_COLORS[card.color as AccentColor]` with **no `?? fallback`**. The `as`
-  cast bypasses the type check; a data typo (`'blu'`) yields `c = undefined` →
-  `c.bg` throws at render. `shared.tsx:339` got this right
-  (`ACCENT_COLORS[badgeColor as AccentColor] ?? ACCENT_COLORS.blue`).
-- Fix approach: Add the same `?? ACCENT_COLORS.blue` fallback in `IntroductionPage`,
-  or type the `strengths[].color` / `userCards[].color` fields as `AccentColor` so
-  the cast is unnecessary.
+- shadcn HSL vars, `--sapphire-*`, `--tangerine`, `--gold*`, `--active-*` /
+  `--warn-*` / `--ok-*`, and `--color-ios-*` / `--color-brand-*` are kept for:
+  `src/index.css` `.react-flow__*` overrides (shadcn HSL), and any not-yet-swept
+  references. Chapter files no longer use `ios-*` / `brand-*`.
+- Fix approach (Phase 3, `DESIGN.md §7`): migrate the react-flow overrides to
+  `var(--color-*)`, then delete these blocks and `ACCENT_COLORS`.
+
+### Mechanical token migration needs visual QA
+
+- 2026-08-30: ~114 chapter files were token-migrated by script
+  (`scratchpad/migrate_tokens.py` — not committed): shadcn tokens, raw Tailwind
+  palette classes (11 hues folded to 6: `blue green red amber purple slate`;
+  teal/cyan → green), SVG/inline hex (HSL-classified), `ios-*`/`brand-*`,
+  `rounded-*` → `chip/card/panel`, `shadow-*` removed. `npm run build` passes.
+- Known lossy transforms, **not yet eyeballed per screen**:
+  - Pale tint card backgrounds (`bg-blue-50` etc.) folded to neutral
+    `bg-rail`/`bg-paper-sunk` — intentional (Notion), but flattens diagrams that
+    used light fills to distinguish regions (e.g.
+    `optimizer/shared/diagrams.tsx` stage cards).
+  - Lists that used 7+ distinct hues now have collisions (e.g.
+    `query-transform/overview` cyan→green duplicates another card).
+- Fix approach: walk each chapter in `npm run dev` with the theme toggle;
+  re-assign hues or restore a tint where a diagram lost meaning. Tracked in
+  `DESIGN.md §6` ("육안 QA 잔여").
+
+### Whole refactor is uncommitted
+
+- The design system (`src/styles/tokens.css`, `src/lib/theme.tsx`,
+  `DESIGN.md`, rewritten `shared.tsx` / `index.css` / frame files) plus the
+  10-chapter token migration all sit in the working tree — no commit.
+- A safety snapshot exists: git tag `pre-migration-safety`
+  (`git stash create` commit) captures the state just before the chapter
+  migration. `git add -A` keeps the index at the good state.
+- Fix approach: commit in reviewable chunks (tokens+theme+frame; shared.tsx;
+  Ch0/Ch1; the mechanical chapter pass) once visual QA is done.
 
 ---
 
@@ -546,5 +565,10 @@ backend, no concurrent users, no data store. The only "scaling" axis is:
 
 *Concerns audit: 2026-08-29*
 *Updated 2026-08-29: resolved "Orphaned / dead files", "Accidentally-committed
-scratch files", and "Dead public API surface" sections after cleanup commits
-`86d58e7` and `5e51edb`.*
+scratch files", and "Dead public API surface" after cleanup commits `86d58e7` /
+`5e51edb`.*
+*Updated 2026-08-30 (design refactor): resolved "#root.landing CSS block",
+"README chapter list", and the "IntroductionPage `ACCENT_COLORS` no-fallback"
+sub-concern (file rewritten). Reworked the dark-mode concern (theme shipped via
+`[data-theme]`, `dark:` variants still dead). Added "mechanical token migration
+needs visual QA" and "whole refactor is uncommitted".*

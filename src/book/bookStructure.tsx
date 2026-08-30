@@ -1,6 +1,7 @@
 // Book structure — Table of Contents definition
 // Each chapter has sections; sections can have a simulator slot
 import type { ReactNode } from 'react'
+import type { AccentColor } from '@/lib/theme'
 import {
   IconDatabase,
   IconCode,
@@ -31,7 +32,7 @@ export interface BookChapter {
   num: number
   title: { ko: string; en: string }
   icon: ReactNode
-  color: string // tailwind color key
+  color: AccentColor
   sections: BookSection[]
 }
 

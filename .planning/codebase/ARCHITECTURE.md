@@ -2,6 +2,7 @@
 # Architecture
 
 **Analysis Date:** 2026-08-29
+**Updated:** 2026-08-30 — theming section rewritten for the token design system + `data-theme` swap
 
 ## System Overview
 
@@ -48,8 +49,8 @@
 │  data:   `src/data/` (HR + CO schemas, large synthetic dataset)         │
 └─────────────────────────────────────────────────────────────────────────┘
 
-Global state:  `src/store/simulationStore.ts` → useLangStore (lang only)
-Theme tokens:  `src/lib/theme.ts` (ACCENT_COLORS) + `src/index.css` (CSS vars)
+Global state:  `src/store/simulationStore.ts` → useLangStore (lang + theme, theme persisted)
+Design tokens: `src/styles/tokens.css` (color/font/radius vars, light + [data-theme]) + `src/lib/theme.tsx` (TS mapping)
 ```
 
 ## Component Responsibilities
@@ -64,11 +65,11 @@ Theme tokens:  `src/lib/theme.ts` (ACCENT_COLORS) + `src/index.css` (CSS vars)
 | `bookStructure.tsx` | Single source of truth for TOC: `BOOK_CHAPTERS`, `getSectionById`, `getAdjacentSections`, `flattenSections` (recursive) | `src/book/bookStructure.tsx` |
 | Chapter page (`XxxPage`) | Second-level router: `sectionId` → individual section component via `if` chain | `src/book/chapters/<chapter>/index.tsx` |
 | Section component | One rendered page. Owns its inline `T` (ko/en) object + JSX | `src/book/chapters/<chapter>/<parent>/<child>/ChildSection.tsx` |
-| `shared.tsx` | Chapter UI primitives (`PageContainer`, `ChapterTitle`, `SectionTitle`, `Prose`, `InfoBox`, `Table`, `ConceptGrid`, `SqlBlock`, `StepList`, `AccordionSection`, `WipBanner`, `SimulatorPlaceholder`, `TermPopup`) | `src/book/chapters/shared.tsx` |
+| `shared.tsx` | Chapter UI primitives — all token-driven (`PageContainer`, `ChapterTitle`, `SectionTitle`, `SubTitle`, `Prose`, `InfoBox`, `Table`, `ResultTable`, `ConceptGrid`, `SqlBlock`, `StepList`, `AccordionSection`, `WipBanner`, `SimulatorPlaceholder`, `TermPopup`, `Divider`) | `src/book/chapters/shared.tsx` |
 | `GlossaryPanel` | Right-side panel; reads `GLOSSARY`, filters by `sectionId`; remounts on section change via `key` | `src/book/GlossaryPanel.tsx` |
 | `SchemaPanel` | Right-side panel shown only for `optimizer-simulator` | `src/book/SchemaPanel.tsx` |
 | `internalsStore` | Internals Simulator state machine: `currentStep`, `activeComponents`, `stepLog`, `stepSummary`, `cachedQueries`, `bufferFlushed`; drives `startSimulation()` step loop | `src/store/internalsStore.ts` |
-| `useLangStore` | Global `lang: 'ko' \| 'en'` + `setLang`. Exported also as legacy alias `useSimulationStore` | `src/store/simulationStore.ts` |
+| `useLangStore` | Global app state: `lang: 'ko'\|'en'` + `setLang`, `theme: 'light'\|'dark'` + `setTheme`/`toggleTheme` (theme → `localStorage['oracle-book-theme']`). Legacy alias `useSimulationStore` | `src/store/simulationStore.ts` |
 | optimizer engine | Pure-TS CBO: `optimize(sql)` → `OptimizerResult` (3 phases) | `src/lib/optimizer/planGenerator.ts` (+ `parser.ts`, `estimator.ts`, `stats.ts`) |
 | `OracleDiagram` | SVG/DOM diagram of Oracle instance; blocks highlight from `activeComponents` | `src/components/OracleDiagram.tsx` |
 | `QueryInput` | SQL input, live log (`stepLog`), summary timeline (`stepSummary`) | `src/components/QueryInput.tsx` |
@@ -102,8 +103,8 @@ Theme tokens:  `src/lib/theme.ts` (ACCENT_COLORS) + `src/index.css` (CSS vars)
 **Book shell layer:**
 - Purpose: own navigation state + chrome (header, resizable TOC, right panel)
 - Location: `src/book/BookLayout.tsx`, `TableOfContents.tsx`, `BookContent.tsx`
-- Contains: `useState` for `activeSectionId` and panel flags, drag-to-resize handler, `framer-motion` panel transitions
-- Depends on: `bookStructure.tsx`, `useLangStore`, `useInternalsStore` (RUNNING badge only), `src/lib/theme.ts`
+- Contains: `useState` for `activeSectionId` and panel flags, drag-to-resize handler, `framer-motion` panel transitions, header theme-toggle button (`toggleTheme`)
+- Depends on: `bookStructure.tsx`, `useLangStore` (lang + theme), `useInternalsStore` (RUNNING badge only), `src/lib/theme.tsx`
 - Used by: `App`
 
 **Content routing layer:**
@@ -164,9 +165,15 @@ Theme tokens:  `src/lib/theme.ts` (ACCENT_COLORS) + `src/index.css` (CSS vars)
 
 ### Language Toggle Flow
 
-1. Header button → `setLang(lang === 'ko' ? 'en' : 'ko')` (`src/book/BookLayout.tsx:72`)
+1. Header button → `setLang(lang === 'ko' ? 'en' : 'ko')` (`src/book/BookLayout.tsx`)
 2. `useLangStore` updates; every component subscribed via `useSimulationStore(s => s.lang)` / `useLangStore(s => s.lang)` re-renders with its `T[lang]`
-3. `App` effect syncs `document.documentElement.lang` (`src/App.tsx:21-23`)
+3. `App` effect syncs `document.documentElement.lang` → `:root:lang(en)` in `tokens.css` swaps `--font-sans-active` / `--font-read-active` to the EN faces
+
+### Theme Toggle Flow
+
+1. Header button → `toggleTheme()` (`src/store/simulationStore.ts`); new value written to `localStorage['oracle-book-theme']`
+2. `App` effect sets `document.documentElement.dataset.theme` → `tokens.css` `[data-theme="dark"]` / `[data-theme="light"]` re-point every surface/ink/line/content-color token
+3. `BookContent` renders the content scroll container with `data-theme="light"` **unless** the section's prefix is in `DARK_READY` (currently all chapters) — a nested `[data-theme]` subtree re-theme, so unmigrated content can stay light while the shell goes dark
 
 **State Management:**
 - Global: `useLangStore` (zustand) — `lang` only. Legacy alias `useSimulationStore` still used at many call sites; new code should import `useLangStore` from `src/store/simulationStore.ts`.
@@ -216,7 +223,7 @@ Theme tokens:  `src/lib/theme.ts` (ACCENT_COLORS) + `src/index.css` (CSS vars)
 **`App`:**
 - Location: `src/App.tsx`
 - Triggers: rendered by `main.tsx`
-- Responsibilities: branch on `window.location.hash === '#simulator'` (standalone simulator), `?print=partition-*` / `?print=qt-*` (single-section print render for PDF export scripts), else `<BookLayout />`; sync `document.documentElement.lang`
+- Responsibilities: branch on `window.location.hash === '#simulator'` (standalone simulator), `?print=partition-*` / `?print=qt-*` (single-section print render for PDF export scripts), else `<BookLayout />`; sync `document.documentElement.lang` (from `lang`) and `document.documentElement.dataset.theme` (from `theme`)
 
 **Standalone simulator window:**
 - Location: opened via header button `window.open(pathname + '#simulator', ...)` (`src/book/BookLayout.tsx:117`); rendered by `App` → `InternalsSimulatorSection` (`src/book/chapters/internals/shared/SimulatorSection.tsx`)
@@ -243,7 +250,7 @@ Theme tokens:  `src/lib/theme.ts` (ACCENT_COLORS) + `src/index.css` (CSS vars)
 - **Stats/schema name coupling:** `TABLE_STATS` keys in `src/lib/optimizer/stats.ts` must match table names in `src/data/hrSchema.ts` / `coSchema.ts` or the CBO produces `통계 정보 없음` warnings.
 - **TOC readiness gate:** `TableOfContents.tsx` hardcodes `isReady = chapter.num <= 7`; chapters 8–9 render but are visually disabled in the TOC.
 - **TypeScript strict flags:** `noUnusedLocals`, `noUnusedParameters`, `erasableSyntaxOnly` (no `enum`/`namespace` — use `const` object + `as const`), `verbatimModuleSyntax` (type-only imports must use `import type`). `@typescript-eslint/no-explicit-any` is `error`.
-- **Styling:** Tailwind utility classes only; no custom CSS files except theme variables in `src/index.css`. React Flow overrides allowed only under `.react-flow` selectors in `index.css`.
+- **Styling:** Tailwind utility classes only. Color/font/radius values exist in exactly one file, `src/styles/tokens.css` (`@theme`); `src/lib/theme.tsx` is the one TS mapping module (zero hex). Components use token utilities — no hex or `font-family` literals. `src/index.css` holds only `@import`s + structural rules; React Flow overrides live under `.react-flow__*` there (Phase 3: still via shadcn HSL).
 
 ## Anti-Patterns
 
@@ -295,9 +302,9 @@ Theme tokens:  `src/lib/theme.ts` (ACCENT_COLORS) + `src/index.css` (CSS vars)
 
 **Validation:** Only the toy SQL parser in `src/lib/optimizer/parser.ts` (SELECT-only, `AND`/`OR` treated alike, regex-based). No form/schema validation elsewhere.
 
-**Internationalization:** Manual. `useLangStore` + inline `T` objects everywhere. `document.documentElement.lang` synced in `App`. Fonts swap per language via CSS variables in `src/index.css`.
+**Internationalization:** Manual. `useLangStore` + inline `T` objects everywhere. `document.documentElement.lang` synced in `App`. Fonts swap per language via `:root:lang(en)` overriding `--font-sans-active` / `--font-read-active` in `src/styles/tokens.css` (KO = Noto Sans KR; EN = Inter + Newsreader).
 
-**Theming:** `src/lib/theme.ts` `ACCENT_COLORS` maps an `AccentColor` union to Tailwind class sets; each chapter declares its `color` in `BOOK_CHAPTERS`. Base palette + status colors are HSL CSS variables in `src/index.css` (shadcn `base-nova` style).
+**Theming:** Single design source `src/styles/tokens.css` (`@theme` color/font/radius vars). Light is the bare `:root`; `[data-theme="dark"]` / `[data-theme="light"]` / `@media (prefers-color-scheme: dark)` re-point the same token names. `src/store/simulationStore.ts` holds `theme` (persisted to `localStorage`); `App.tsx` writes `<html data-theme>`. `BookContent.tsx` `DARK_READY` gates whether a chapter's content follows the theme or is pinned light via a nested `data-theme="light"`. `src/lib/theme.tsx` maps semantics to token classes (`INFOBOX_VARIANT`) and `var(--color-*)` strings for SVG (`DIAGRAM`, `DATA_PALETTE`, `CODE`). `ACCENT_COLORS` is legacy (values dead; only the `AccentColor` type is used). shadcn HSL vars + `--sapphire-*`/`--ios-*`/`--brand-*` survive in `tokens.css` §1 for react-flow / not-yet-removed references (Phase 3).
 
 **Animation:** `framer-motion` for panel open/close, page transitions (`AnimatePresence mode="wait"` in `BookContent`), TOC chevrons, and simulator step transitions.
 

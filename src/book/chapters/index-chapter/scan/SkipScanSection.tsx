@@ -49,8 +49,8 @@ function buildConfig(mode: Mode, isKo: boolean): ScanConfig {
     scanArrows: [],
     keyLabel: 'G/SAL',
     legend: mode === 'scan' ? [
-      { color: 'bg-emerald-400', label: isKo ? '조건 충족 (SALARY ≥ 6000)' : 'Matched (SALARY ≥ 6000)' },
-      { color: 'bg-slate-200',   label: isKo ? '건너뜀 (SALARY < 6000)' : 'Skipped (SALARY < 6000)' },
+      { color: 'bg-green', label: isKo ? '조건 충족 (SALARY ≥ 6000)' : 'Matched (SALARY ≥ 6000)' },
+      { color: 'bg-rail',   label: isKo ? '건너뜀 (SALARY < 6000)' : 'Skipped (SALARY < 6000)' },
     ] : [],
   }
 }
@@ -145,7 +145,7 @@ export function SkipScanSection() {
   return (
     <PageContainer className="max-w-5xl">
       <ChapterTitle
-        icon={<IconPlayerSkipForward size={36} color="#7c3aed" stroke={1.5} />}
+        icon={<IconPlayerSkipForward size={36} color="var(--color-purple)" stroke={1.5} />}
         title={t.title}
         subtitle={t.subtitle}
       />
@@ -159,35 +159,35 @@ export function SkipScanSection() {
 
       <div className="mb-4 flex items-stretch gap-3">
         <div className="flex flex-col items-center">
-          <div className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber-400 font-mono text-[11px] font-bold text-white">1</div>
-          <div className="mt-1 flex-1 border-l-2 border-dashed border-amber-300" />
+          <div className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber font-mono text-[11px] font-bold text-paper">1</div>
+          <div className="mt-1 flex-1 border-l-2 border-dashed border-amber/50" />
         </div>
         <div className="pb-2">
-          <p className="mb-0.5 font-mono text-[11px] font-bold text-amber-700">{t.step1Title}</p>
-          <p className="text-[11px] leading-relaxed text-muted-foreground">{t.step1Desc}</p>
+          <p className="mb-0.5 font-mono text-[11px] font-bold text-amber">{t.step1Title}</p>
+          <p className="text-[11px] leading-relaxed text-ink-2">{t.step1Desc}</p>
         </div>
       </div>
 
       <div className="mb-5 flex items-start gap-3">
-        <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-violet-400 font-mono text-[11px] font-bold text-white">2</div>
+        <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-purple font-mono text-[11px] font-bold text-paper">2</div>
         <div>
-          <p className="mb-0.5 font-mono text-[11px] font-bold text-violet-700">{t.step2Title}</p>
-          <p className="text-[11px] leading-relaxed text-muted-foreground">{t.step2Desc}</p>
+          <p className="mb-0.5 font-mono text-[11px] font-bold text-purple">{t.step2Title}</p>
+          <p className="text-[11px] leading-relaxed text-ink-2">{t.step2Desc}</p>
         </div>
       </div>
 
-      <div className="mb-3 rounded-lg border bg-slate-900 px-3 py-2">
-        <p className="mb-1 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-500">{t.sqlLabel}</p>
-        <pre className="font-mono text-[11px] leading-relaxed text-slate-300">{t.sql}</pre>
+      <div className="mb-3 rounded-card border bg-ink px-3 py-2">
+        <p className="mb-1 font-mono text-[10px] font-bold uppercase tracking-widest text-ink-2">{t.sqlLabel}</p>
+        <pre className="font-mono text-[11px] leading-relaxed text-ink-3">{t.sql}</pre>
       </div>
       <div className="mb-4 flex gap-2">
         <button
           onClick={() => setMode(mode === 'scan' ? 'idle' : 'scan')}
           className={[
-            'rounded-lg border px-3 py-1.5 font-mono text-[11px] font-semibold transition-all',
+            'rounded-card border px-3 py-1.5 font-mono text-[11px] font-semibold transition-all',
             mode === 'scan'
-              ? 'border-violet-400 bg-violet-100 text-violet-800 shadow-sm'
-              : 'border-border text-muted-foreground hover:border-violet-300 hover:text-foreground',
+              ? 'border-purple/50 bg-purple/10 text-purple '
+              : 'border-line text-ink-2 hover:border-purple/50 hover:text-ink',
           ].join(' ')}
         >
           {mode === 'scan' ? t.resetBtn : t.showBtn}
@@ -200,10 +200,10 @@ export function SkipScanSection() {
       <SectionTitle>{t.traitTitle}</SectionTitle>
       <div className="mb-4 grid gap-3 sm:grid-cols-3">
         {t.traits.map((tr, i) => (
-          <div key={i} className="rounded-xl border bg-card p-4">
+          <div key={i} className="rounded-panel border bg-paper p-4">
             <div className="mb-2 text-lg">{tr.icon}</div>
             <div className="mb-1 text-xs font-bold">{tr.title}</div>
-            <p className="text-[11px] leading-snug text-muted-foreground">{tr.desc}</p>
+            <p className="text-[11px] leading-snug text-ink-2">{tr.desc}</p>
           </div>
         ))}
       </div>

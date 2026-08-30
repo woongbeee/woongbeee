@@ -28,22 +28,22 @@ const T = {
     concepts: '핵심 개념',
     conceptItems: [
       {
-        icon: <IconEye size={20} stroke={1.5} className="text-blue-500" />,
+        icon: <IconEye size={20} stroke={1.5} className="text-blue" />,
         title: 'Read Consistency',
         desc: '각 사용자는 커밋된 데이터만 보는 일관된 스냅샷을 봐요. Oracle은 어떤 격리 수준에서도 Dirty Read(미커밋 데이터 읽기)를 허용하지 않아요.',
       },
       {
-        icon: <IconHistory size={20} stroke={1.5} className="text-indigo-500" />,
+        icon: <IconHistory size={20} stroke={1.5} className="text-blue" />,
         title: 'MVCC',
         desc: 'Multi-Version Concurrency Control(다중 버전 동시성 제어) — 데이터의 여러 버전을 동시에 유지해서 읽기와 쓰기가 서로를 방해하지 않아요.',
       },
       {
-        icon: <IconLock size={20} stroke={1.5} className="text-amber-500" />,
+        icon: <IconLock size={20} stroke={1.5} className="text-amber" />,
         title: 'Locking',
         desc: 'DML은 수정된 행에만 Row Lock을 걸어 쓰기 충돌을 막아요. 읽기는 절대 쓰기를 막지 않아요.',
       },
       {
-        icon: <IconArrowsShuffle size={20} stroke={1.5} className="text-violet-500" />,
+        icon: <IconArrowsShuffle size={20} stroke={1.5} className="text-purple" />,
         title: 'SCN',
         desc: 'System Change Number(시스템 변경 번호) — Oracle이 시간 순서를 추적하는 계속 증가하는 숫자예요. MVCC에서 "어떤 시점"을 기준 삼는 도구예요.',
       },
@@ -83,22 +83,22 @@ const T = {
     concepts: 'Key Concepts',
     conceptItems: [
       {
-        icon: <IconEye size={20} stroke={1.5} className="text-blue-500" />,
+        icon: <IconEye size={20} stroke={1.5} className="text-blue" />,
         title: 'Read Consistency',
         desc: 'Each user sees a consistent snapshot of only committed data. Oracle never permits dirty reads at any isolation level.',
       },
       {
-        icon: <IconHistory size={20} stroke={1.5} className="text-indigo-500" />,
+        icon: <IconHistory size={20} stroke={1.5} className="text-blue" />,
         title: 'MVCC',
         desc: 'Multiversion Concurrency Control — readers and writers never block each other. Multiple versions of the same block can coexist.',
       },
       {
-        icon: <IconLock size={20} stroke={1.5} className="text-amber-500" />,
+        icon: <IconLock size={20} stroke={1.5} className="text-amber" />,
         title: 'Locking',
         desc: 'DML places Row Locks only on modified rows to prevent write conflicts. Reads never block writes.',
       },
       {
-        icon: <IconArrowsShuffle size={20} stroke={1.5} className="text-violet-500" />,
+        icon: <IconArrowsShuffle size={20} stroke={1.5} className="text-purple" />,
         title: 'SCN',
         desc: "System Change Number — Oracle's monotonically increasing counter for tracking time order. The reference point for MVCC.",
       },
@@ -153,77 +153,77 @@ const ConcurrencyOverviewDiagram = ({ lang }: { lang: 'ko' | 'en' }) => {
       aria-label="Oracle concurrency model overview"
     >
       {/* 중앙 Oracle 엔진 */}
-      <rect x="230" y="80" width="160" height="60" rx="10" fill="#1e3a5f" stroke="#3b82f6" strokeWidth="2" />
+      <rect x="230" y="80" width="160" height="60" rx="10" fill="var(--color-blue)" stroke="var(--color-blue)" strokeWidth="2" />
       <text x="310" y="105" fontSize="11" fill="white" textAnchor="middle" fontWeight="bold">
         Oracle Database
       </text>
-      <text x="310" y="122" fontSize="9" fill="#93c5fd" textAnchor="middle">
+      <text x="310" y="122" fontSize="9" fill="var(--color-blue)" textAnchor="middle">
         MVCC + Row-Level Locking
       </text>
 
       {/* Reader */}
-      <rect x="20" y="30" width="130" height="50" rx="8" fill="#eff6ff" stroke="#bfdbfe" strokeWidth="1.5" />
-      <text x="85" y="50" fontSize="10" fill="#1d4ed8" textAnchor="middle" fontWeight="bold">
+      <rect x="20" y="30" width="130" height="50" rx="8" fill="var(--color-rail)" stroke="var(--color-blue)" strokeWidth="1.5" />
+      <text x="85" y="50" fontSize="10" fill="var(--color-blue)" textAnchor="middle" fontWeight="bold">
         {isKo ? '읽기 (SELECT)' : 'Reader (SELECT)'}
       </text>
-      <text x="85" y="67" fontSize="8" fill="#3b82f6" textAnchor="middle">
+      <text x="85" y="67" fontSize="8" fill="var(--color-blue)" textAnchor="middle">
         {isKo ? '락 없음, CR Clone 반환' : 'No lock — CR Clone returned'}
       </text>
 
       {/* Writer */}
-      <rect x="20" y="140" width="130" height="50" rx="8" fill="#fef9c3" stroke="#fde68a" strokeWidth="1.5" />
-      <text x="85" y="160" fontSize="10" fill="#92400e" textAnchor="middle" fontWeight="bold">
+      <rect x="20" y="140" width="130" height="50" rx="8" fill="var(--color-amber)" stroke="var(--color-amber)" strokeWidth="1.5" />
+      <text x="85" y="160" fontSize="10" fill="var(--color-amber)" textAnchor="middle" fontWeight="bold">
         {isKo ? '쓰기 (DML)' : 'Writer (DML)'}
       </text>
-      <text x="85" y="177" fontSize="8" fill="#d97706" textAnchor="middle">
+      <text x="85" y="177" fontSize="8" fill="var(--color-amber)" textAnchor="middle">
         {isKo ? '행 락 획득, Undo 생성' : 'Acquires row lock, writes Undo'}
       </text>
 
       {/* Undo Segment */}
-      <rect x="470" y="30" width="130" height="50" rx="8" fill="#fef9c3" stroke="#fde68a" strokeWidth="1.5" />
-      <text x="535" y="50" fontSize="10" fill="#92400e" textAnchor="middle" fontWeight="bold">
+      <rect x="470" y="30" width="130" height="50" rx="8" fill="var(--color-amber)" stroke="var(--color-amber)" strokeWidth="1.5" />
+      <text x="535" y="50" fontSize="10" fill="var(--color-amber)" textAnchor="middle" fontWeight="bold">
         Undo Segment
       </text>
-      <text x="535" y="67" fontSize="8" fill="#d97706" textAnchor="middle">
+      <text x="535" y="67" fontSize="8" fill="var(--color-amber)" textAnchor="middle">
         {isKo ? '이전 버전 보관' : 'Stores prior versions'}
       </text>
 
       {/* Data Block */}
-      <rect x="470" y="140" width="130" height="50" rx="8" fill="#f0fdf4" stroke="#86efac" strokeWidth="1.5" />
-      <text x="535" y="160" fontSize="10" fill="#15803d" textAnchor="middle" fontWeight="bold">
+      <rect x="470" y="140" width="130" height="50" rx="8" fill="var(--color-rail)" stroke="var(--color-green)" strokeWidth="1.5" />
+      <text x="535" y="160" fontSize="10" fill="var(--color-green)" textAnchor="middle" fontWeight="bold">
         {isKo ? '데이터 블록' : 'Data Block'}
       </text>
-      <text x="535" y="177" fontSize="8" fill="#16a34a" textAnchor="middle">
+      <text x="535" y="177" fontSize="8" fill="var(--color-green)" textAnchor="middle">
         {isKo ? '현재 버전' : 'Current version'}
       </text>
 
       {/* 화살표들 */}
       {/* Reader → Oracle */}
-      <polyline points="150,55 230,100" stroke="#3b82f6" strokeWidth="1.5" fill="none" markerEnd="url(#ov-arr1)" />
+      <polyline points="150,55 230,100" stroke="var(--color-blue)" strokeWidth="1.5" fill="none" markerEnd="url(#ov-arr1)" />
       {/* Writer → Oracle */}
-      <polyline points="150,165 230,110" stroke="#d97706" strokeWidth="1.5" fill="none" markerEnd="url(#ov-arr2)" />
+      <polyline points="150,165 230,110" stroke="var(--color-amber)" strokeWidth="1.5" fill="none" markerEnd="url(#ov-arr2)" />
       {/* Oracle → Undo */}
-      <polyline points="390,95 470,55" stroke="#fbbf24" strokeWidth="1.5" fill="none" markerEnd="url(#ov-arr3)" />
+      <polyline points="390,95 470,55" stroke="var(--color-amber)" strokeWidth="1.5" fill="none" markerEnd="url(#ov-arr3)" />
       {/* Oracle → Block */}
-      <polyline points="390,115 470,165" stroke="#22c55e" strokeWidth="1.5" fill="none" markerEnd="url(#ov-arr4)" />
+      <polyline points="390,115 470,165" stroke="var(--color-green)" strokeWidth="1.5" fill="none" markerEnd="url(#ov-arr4)" />
 
       {/* 레이블 */}
-      <text x="185" y="70" fontSize="8" fill="#3b82f6" textAnchor="middle">
+      <text x="185" y="70" fontSize="8" fill="var(--color-blue)" textAnchor="middle">
         {isKo ? '읽기 요청' : 'read request'}
       </text>
-      <text x="185" y="148" fontSize="8" fill="#d97706" textAnchor="middle">
+      <text x="185" y="148" fontSize="8" fill="var(--color-amber)" textAnchor="middle">
         {isKo ? '쓰기 요청' : 'write request'}
       </text>
-      <text x="435" y="65" fontSize="8" fill="#d97706" textAnchor="middle">
+      <text x="435" y="65" fontSize="8" fill="var(--color-amber)" textAnchor="middle">
         {isKo ? 'Undo 저장' : 'save undo'}
       </text>
-      <text x="435" y="148" fontSize="8" fill="#16a34a" textAnchor="middle">
+      <text x="435" y="148" fontSize="8" fill="var(--color-green)" textAnchor="middle">
         {isKo ? '블록 수정' : 'modify block'}
       </text>
 
       {/* 하단 설명 */}
-      <rect x="140" y="188" width="340" height="24" rx="5" fill="#eff6ff" stroke="#bfdbfe" strokeWidth="1" />
-      <text x="310" y="204" fontSize="9" fill="#1d4ed8" textAnchor="middle" fontWeight="bold">
+      <rect x="140" y="188" width="340" height="24" rx="5" fill="var(--color-rail)" stroke="var(--color-blue)" strokeWidth="1" />
+      <text x="310" y="204" fontSize="9" fill="var(--color-blue)" textAnchor="middle" fontWeight="bold">
         {isKo
           ? 'Reader는 Writer를 기다리지 않고, Writer는 Reader를 막지 않아요'
           : 'Readers never wait for writers — writers never block readers'}
@@ -231,16 +231,16 @@ const ConcurrencyOverviewDiagram = ({ lang }: { lang: 'ko' | 'en' }) => {
 
       <defs>
         <marker id="ov-arr1" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
-          <path d="M0,0 L0,6 L6,3 z" fill="#3b82f6" />
+          <path d="M0,0 L0,6 L6,3 z" fill="var(--color-blue)" />
         </marker>
         <marker id="ov-arr2" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
-          <path d="M0,0 L0,6 L6,3 z" fill="#d97706" />
+          <path d="M0,0 L0,6 L6,3 z" fill="var(--color-amber)" />
         </marker>
         <marker id="ov-arr3" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
-          <path d="M0,0 L0,6 L6,3 z" fill="#fbbf24" />
+          <path d="M0,0 L0,6 L6,3 z" fill="var(--color-amber)" />
         </marker>
         <marker id="ov-arr4" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
-          <path d="M0,0 L0,6 L6,3 z" fill="#22c55e" />
+          <path d="M0,0 L0,6 L6,3 z" fill="var(--color-green)" />
         </marker>
       </defs>
     </svg>
@@ -254,7 +254,7 @@ export function ConcurrencySection() {
   return (
     <PageContainer>
       <ChapterTitle
-        icon={<IconLayersLinked size={36} stroke={1.5} className="text-blue-500" />}
+        icon={<IconLayersLinked size={36} stroke={1.5} className="text-blue" />}
         title={t.title}
         subtitle={t.subtitle}
       />
@@ -277,9 +277,9 @@ export function ConcurrencySection() {
       <SectionTitle>{t.howTitle}</SectionTitle>
       <div className="grid sm:grid-cols-2 gap-3 mb-6">
         {t.howItems.map((item, i) => (
-          <div key={i} className="rounded-lg border border-border bg-muted/30 p-3">
-            <p className="text-sm font-semibold text-foreground mb-1">{item.label}</p>
-            <p className="text-xs text-muted-foreground leading-relaxed">{item.desc}</p>
+          <div key={i} className="rounded-card border border-line bg-rail p-3">
+            <p className="text-sm font-semibold text-ink mb-1">{item.label}</p>
+            <p className="text-xs text-ink-2 leading-relaxed">{item.desc}</p>
           </div>
         ))}
       </div>

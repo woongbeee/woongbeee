@@ -202,7 +202,7 @@ export function ParallelDopSection() {
   return (
     <PageContainer>
       <ChapterTitle
-        icon={<IconGitFork size={36} stroke={1.5} className="text-teal-500" />}
+        icon={<IconGitFork size={36} stroke={1.5} className="text-green" />}
         title={t.title}
         subtitle={t.subtitle}
       />

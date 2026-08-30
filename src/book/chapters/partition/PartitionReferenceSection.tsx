@@ -177,7 +177,7 @@ export function PartitionReferenceSection() {
   return (
     <PageContainer>
       <ChapterTitle
-        icon={<IconLink size={36} stroke={1.5} className="text-amber-500" />}
+        icon={<IconLink size={36} stroke={1.5} className="text-amber" />}
         title={t.title}
         subtitle={t.subtitle}
       />

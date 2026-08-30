@@ -279,14 +279,14 @@ function CautionCard({ caution, lang }: {
   lang: 'ko' | 'en'
 }) {
   return (
-    <div className="overflow-hidden rounded-xl border border-rose-200 bg-rose-50/40">
+    <div className="overflow-hidden rounded-panel border border-red/30 bg-red/5">
       {/* 제목 */}
-      <div className="flex items-center gap-2 border-b border-rose-200 bg-rose-50 px-4 py-3">
-        <span className="font-mono text-xs font-bold text-rose-600">✗</span>
-        <span className="text-xs font-bold text-rose-700">{caution.title}</span>
+      <div className="flex items-center gap-2 border-b border-red/30 bg-red/5 px-4 py-3">
+        <span className="font-mono text-xs font-bold text-red">✗</span>
+        <span className="text-xs font-bold text-red">{caution.title}</span>
       </div>
       {/* 설명 */}
-      <p className="px-4 pt-3 pb-1 text-xs leading-relaxed text-muted-foreground">{caution.desc}</p>
+      <p className="px-4 pt-3 pb-1 text-xs leading-relaxed text-ink-2">{caution.desc}</p>
       {/* Bad / Good SQL 나란히 */}
       <div className="grid gap-3 p-4 md:grid-cols-2">
         <SqlBlock
@@ -313,7 +313,7 @@ export function IndexUsageSection() {
   return (
     <PageContainer>
       <ChapterTitle
-        icon={<IconZoomCode size={36} stroke={1.5} className="text-violet-500" />}
+        icon={<IconZoomCode size={36} stroke={1.5} className="text-purple" />}
         title={t.pageTitle}
         subtitle={t.pageSubtitle}
       />

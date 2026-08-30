@@ -1,6 +1,7 @@
 # Coding Conventions
 
 **Analysis Date:** 2026-08-29
+**Updated:** 2026-08-30 — styling conventions rewritten for the token design system
 
 This is a React 19 + Vite 8 + TypeScript 5.9 single-page app — an interactive Oracle DB education book ("Dynamic Oracle 교육서"). All source lives under `src/`. There is **no test framework** (see `TESTING.md`); `npm run build` (`tsc -b && vite build`) is the only correctness gate.
 
@@ -127,14 +128,21 @@ Icon imports from `@tabler/icons-react` are frequently multi-line and destructur
 
 ## Styling Conventions
 
-- **Tailwind utility classes only.** No component-level CSS files. The only stylesheet is `src/index.css` (theme CSS variables, `@import "tailwindcss"`, and `.react-flow` overrides). `src/App.css` exists but is essentially empty (35 bytes).
+- **Tailwind utility classes only.** No component-level CSS files. Two stylesheets: `src/styles/tokens.css` (**the design source** — `@theme` color/font/radius vars, light default + `[data-theme="dark"]` / `[data-theme="light"]` + `@media (prefers-color-scheme: dark)`) and `src/index.css` (`@import` lines, `body`, `#root`, bare-`border` default color, `.react-flow__*` overrides). `src/App.css` is a 35-byte placeholder.
 - Conditional / merged class names go through **`cn()`** from `src/lib/utils.ts` (`twMerge(clsx(inputs))`). Always use `cn(...)` when combining a base class string with conditionals — never string concatenation.
   ```ts
-  className={cn('mt-4 mb-4 rounded-lg border p-4', def.color)}
+  className={cn('mb-4 rounded-card border border-line p-4', d.border)}
   className={cn('flex items-start gap-3', interactive && 'cursor-pointer')}
   ```
-- **Color is centralized.** `src/lib/theme.ts` `ACCENT_COLORS: Record<AccentColor, AccentColorSet>` maps 13 accent keys (`blue`, `violet`, `emerald`, `orange`, `cyan`, `rose`, `amber`, `teal`, `brand-navy`, `brand-teal`, `brand-pink`, `brand-orange`, `brand-salmon`) to `{ icon, text, border, bg, dot, badge }` class strings. Chapter/section components pick an `AccentColor` and read the set — they do not write `text-blue-600` etc. inline for chapter theming. `index.css` also defines an `ios-*` palette (`bg-ios-blue-light`, `text-ios-orange-dark`, …) used by `InfoBox` and `shared.tsx` step colors.
-- Prefer the shared layout primitives in `src/book/chapters/shared.tsx` (`PageContainer`, `ChapterTitle`, `SectionTitle`, `Prose`, `Divider`, `InfoBox`, `Table`, `ConceptGrid`, `SqlBlock`, `StepList`, `AccordionSection`, `WipBanner`) instead of hand-rolling `div`/`ul`. CLAUDE.md: "새 UI를 만들기 전에 반드시 이 목록을 먼저 확인하라."
+- **Color/font values live in exactly one place: `src/styles/tokens.css`.** Components never write a hex or `font-family` literal. Use token utilities:
+  - surfaces `bg-paper` / `bg-paper-sunk` / `bg-rail`; ink `text-ink` / `text-ink-2` / `text-ink-3`; lines `border-line` / `border-line-2`
+  - content accents `text-blue` / `bg-blue/10` / `border-l-amber` … — 6 colors only: `blue green red amber purple slate` (no teal, no per-shade classes)
+  - radius `rounded-chip` (3px) / `rounded-card` (6px) / `rounded-panel` (8px); **no shadows** (Notion-flat)
+  - fonts `font-sans` (UI/headings) / `font-read` (long-form body) / `font-mono` (code, numbers, identifiers, short English eyebrow labels — **never Korean**: JetBrains Mono has no Hangul and falls back)
+- **`src/lib/theme.tsx`** is the one TS module that maps to tokens: `INFOBOX_VARIANT` / `INFOBOX_LEGACY_COLOR` (InfoBox left-bar + label color + ko/en label), `DIAGRAM` / `DATA_PALETTE` / `CODE` (`var(--color-*)` strings for SVG). It contains **zero hex**. `ACCENT_COLORS` is legacy — its values are dead; only the `AccentColor` union type is still consumed (`bookStructure.tsx`).
+- SVG diagrams: `fill="var(--color-blue)"`, `style={{ fontFamily: 'var(--font-sans-active)' }}`. Both inherit through the SVG cascade.
+- Theme: `src/store/simulationStore.ts` holds `theme`; `App.tsx` writes `<html data-theme>`. Content pages follow the theme when their `sectionId` prefix is in `BookContent.tsx` `DARK_READY` (currently every chapter); otherwise pinned `data-theme="light"`.
+- Prefer the shared layout primitives in `src/book/chapters/shared.tsx` (`PageContainer`, `ChapterTitle`, `SectionTitle`, `SubTitle`, `Prose`, `Divider`, `InfoBox`, `Table`, `ResultTable`, `ConceptGrid`, `SqlBlock`, `StepList`, `AccordionSection`, `WipBanner`, `SimulatorPlaceholder`, `TermPopup`) instead of hand-rolling `div`/`ul`. `<Table>` = concept/comparison (reading, all `font-sans`); `<ResultTable>` = query-result grid (monospace, PK/FK badges, tone colors). CLAUDE.md: "새 UI를 만들기 전에 반드시 이 목록을 먼저 확인하라."
 - Page layout spacing rules (from CLAUDE.md): `<Divider />` only *between* sections, never right after `<ChapterTitle>` or after the last section; don't stack `mt-N` wrappers on top of `SectionTitle` (its `mt-8` is built in); final summary `InfoBox` gets an `mt-8` wrapper.
 
 ## Icons
@@ -171,7 +179,7 @@ Korean copy follows CLAUDE.md tone rules: friendly `~해요 / ~거예요 / ~거�
 ## State Management
 
 - **zustand v5**, `create<T>()` in `src/store/`. Two stores, deliberately split:
-  - `simulationStore.ts` — global `{ lang, setLang }` only. Canonical hook `useLangStore`; `useSimulationStore` is a back-compat alias.
+  - `simulationStore.ts` — global app state: `{ lang, setLang, theme, setTheme, toggleTheme }`. Canonical hook `useLangStore`; `useSimulationStore` is a back-compat alias. `theme` is persisted to `localStorage['oracle-book-theme']` (helper `persistTheme`, try/catch); `lang` is not persisted.
   - `internalsStore.ts` — Internals Simulator state + actions (`startSimulation`, `resetSimulation`, `flushBuffers`, `setStep`, `addLog`, `setHighlightedStep`).
 - Store shape convention: separate `interface XxxState` and `interface XxxActions`, a module-level `const initialState: XxxState`, then `create<XxxState & XxxActions>((set, get) => ({ ...initialState, action: () => set(...) }))`.
 - Reads use a selector: `useInternalsStore((s) => s.stepLog)`, `useSimulationStore((s) => s.lang)` — never destructure the whole store.
@@ -210,7 +218,7 @@ Minimal by design — this is a client-only educational app with no network call
 - Inline `//` comments explain *why* (formula source, Oracle behavior being modeled), e.g. `// sel = 1 / NDV  (Oracle formula)`, `// Oracle multiplies independent selectivities`.
 - JSDoc `/** ... */` is used for: file headers in `scripts/*.mjs`, individual props in prop interfaces (`SqlBlock`'s `title`/`desc`), and the `build-env.d.ts` global. It is **not** used comprehensively on functions/components.
 - Korean and English comments are both acceptable; CLAUDE.md and many section headers are Korean.
-- No `TODO` / `FIXME` / `HACK` / `XXX` markers exist in `src/` (verified) — incomplete sections are marked in the UI with `<WipBanner />` instead (currently `BitmapSection`, `CompositeSection`, and `sql-tuning-*` wrapper routes).
+- No `TODO` / `FIXME` / `HACK` / `XXX` markers exist in `src/` (verified) — incomplete sections are marked in the UI with `<WipBanner />` instead (per CLAUDE.md: `BitmapSection`, `CompositeSection`, and `sql-tuning-*` wrapper routes; verify against `src/` before relying on this).
 
 ## Function Design
 

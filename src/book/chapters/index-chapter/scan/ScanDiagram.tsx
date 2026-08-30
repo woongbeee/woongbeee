@@ -43,19 +43,19 @@ export interface ScanConfig {
 
 function entryColors(state: EntryState) {
   switch (state) {
-    case 'matched':  return { row: 'bg-emerald-50',  key: 'text-emerald-700 font-bold', rowid: 'text-emerald-500' }
-    case 'visited':  return { row: 'bg-blue-50',     key: 'text-blue-600',              rowid: 'text-blue-400' }
-    case 'skipped':  return { row: 'bg-slate-50',    key: 'text-slate-300',             rowid: 'text-slate-200' }
-    default:         return { row: '',               key: 'text-slate-600',             rowid: 'text-slate-400' }
+    case 'matched':  return { row: 'bg-green/5',  key: 'text-green font-bold', rowid: 'text-green' }
+    case 'visited':  return { row: 'bg-blue/5',     key: 'text-blue',              rowid: 'text-blue' }
+    case 'skipped':  return { row: 'bg-paper-sunk',    key: 'text-ink-3',             rowid: 'text-ink-3' }
+    default:         return { row: '',               key: 'text-ink',             rowid: 'text-ink-2' }
   }
 }
 
 function blockBorder(state: 'idle' | 'active' | 'matched' | 'skipped') {
   switch (state) {
-    case 'active':   return 'border-violet-400 shadow-violet-100 shadow-md'
-    case 'matched':  return 'border-emerald-400 shadow-emerald-100 shadow-md'
-    case 'skipped':  return 'border-slate-200'
-    default:         return 'border-slate-300'
+    case 'active':   return 'border-purple/50  '
+    case 'matched':  return 'border-green/50  '
+    case 'skipped':  return 'border-line'
+    default:         return 'border-line-2'
   }
 }
 
@@ -79,16 +79,16 @@ function LeafBlockCard({
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.04, duration: 0.2 }}
-      className={`w-36 rounded-xl border-2 bg-white transition-all duration-300 ${blockBorder(blockState)}`}
+      className={`w-36 rounded-panel border-2 bg-paper transition-all duration-300 ${blockBorder(blockState)}`}
     >
       {/* 헤더 */}
-      <div className="rounded-t-[10px] bg-slate-100 px-3 py-1 text-center font-mono text-[10px] font-bold text-slate-500">
+      <div className="rounded-t-[10px] bg-paper-sunk px-3 py-1 text-center font-mono text-[10px] font-bold text-ink-2">
         LEAF {block.id}
       </div>
       {/* 컬럼 헤더 */}
-      <div className="flex border-b border-slate-100 px-3 pt-1.5">
-        <span className="w-14 shrink-0 font-mono text-[9px] font-bold text-slate-400">{keyLabel}</span>
-        <span className="font-mono text-[9px] font-bold text-slate-400">ROWID</span>
+      <div className="flex border-b border-line px-3 pt-1.5">
+        <span className="w-14 shrink-0 font-mono text-[9px] font-bold text-ink-2">{keyLabel}</span>
+        <span className="font-mono text-[9px] font-bold text-ink-2">ROWID</span>
       </div>
       {/* 항목 */}
       {block.entries.map((entry) => {
@@ -115,21 +115,21 @@ export function ScanDiagram({ config, title }: { config: ScanConfig; title: stri
   const { leaves, entryStates, blockStates, keyLabel, legend } = config
 
   return (
-    <div className="overflow-x-auto rounded-2xl border bg-slate-50">
+    <div className="overflow-x-auto rounded-panel border bg-paper-sunk">
       <div className="px-6 py-5">
         {/* 제목 */}
-        <p className="mb-4 text-center font-mono text-[11px] font-bold uppercase tracking-widest text-slate-400">
+        <p className="mb-4 text-center font-mono text-[11px] font-bold uppercase tracking-widest text-ink-2">
           {title}
         </p>
 
         {/* Root/Branch 간략 표현 */}
         <div className="mb-5 flex justify-center">
-          <div className="flex items-center gap-2 rounded-lg border border-amber-300 bg-amber-50 px-4 py-1.5">
-            <div className="rounded bg-amber-200 px-2 py-0.5 font-mono text-[9px] font-bold text-amber-700">ROOT</div>
-            <span className="text-slate-300">→</span>
-            <div className="rounded bg-blue-100 px-2 py-0.5 font-mono text-[9px] font-bold text-blue-600">BRANCH</div>
-            <span className="text-slate-300">→</span>
-            <span className="font-mono text-[9px] text-slate-400">Leaf 블록들</span>
+          <div className="flex items-center gap-2 rounded-card border border-amber/50 bg-amber/5 px-4 py-1.5">
+            <div className="rounded bg-amber/15 px-2 py-0.5 font-mono text-[9px] font-bold text-amber">ROOT</div>
+            <span className="text-ink-3">→</span>
+            <div className="rounded bg-blue/10 px-2 py-0.5 font-mono text-[9px] font-bold text-blue">BRANCH</div>
+            <span className="text-ink-3">→</span>
+            <span className="font-mono text-[9px] text-ink-2">Leaf 블록들</span>
           </div>
         </div>
 
@@ -148,16 +148,16 @@ export function ScanDiagram({ config, title }: { config: ScanConfig; title: stri
               {i < leaves.length - 1 && (
                 <div className="flex w-10 shrink-0 flex-col items-center gap-0.5">
                   <div className="flex w-full items-center">
-                    <div className="h-px flex-1 bg-slate-300" />
-                    <svg width="8" height="8" viewBox="0 0 8 8" className="shrink-0 text-slate-400">
+                    <div className="h-px flex-1 bg-line-2" />
+                    <svg width="8" height="8" viewBox="0 0 8 8" className="shrink-0 text-ink-2">
                       <polygon points="0,0 8,4 0,8" fill="currentColor" />
                     </svg>
                   </div>
                   <div className="flex w-full items-center">
-                    <svg width="8" height="8" viewBox="0 0 8 8" className="shrink-0 text-slate-400">
+                    <svg width="8" height="8" viewBox="0 0 8 8" className="shrink-0 text-ink-2">
                       <polygon points="8,0 0,4 8,8" fill="currentColor" />
                     </svg>
-                    <div className="h-px flex-1 bg-slate-300" />
+                    <div className="h-px flex-1 bg-line-2" />
                   </div>
                 </div>
               )}
@@ -171,7 +171,7 @@ export function ScanDiagram({ config, title }: { config: ScanConfig; title: stri
             {legend.map((item) => (
               <div key={item.label} className="flex items-center gap-1.5">
                 <div className={`h-2.5 w-2.5 rounded-full ${item.color}`} />
-                <span className="font-mono text-[10px] text-slate-500">{item.label}</span>
+                <span className="font-mono text-[10px] text-ink-2">{item.label}</span>
               </div>
             ))}
           </div>
@@ -199,14 +199,14 @@ export function ScanStepList({ steps }: { steps: ScanStep[] }) {
           initial={{ opacity: 0, x: -6 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: i * 0.06, duration: 0.2 }}
-          className="flex items-start gap-3 rounded-xl border bg-card px-4 py-3"
+          className="flex items-start gap-3 rounded-panel border bg-paper px-4 py-3"
         >
-          <span className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full font-mono text-[11px] font-bold text-white ${s.color}`}>
+          <span className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full font-mono text-[11px] font-bold text-paper ${s.color}`}>
             {i + 1}
           </span>
           <div>
-            <p className="mb-0.5 font-mono text-[11px] font-bold text-foreground">{s.label}</p>
-            <p className="text-[11px] leading-relaxed text-muted-foreground">{s.detail}</p>
+            <p className="mb-0.5 font-mono text-[11px] font-bold text-ink">{s.label}</p>
+            <p className="text-[11px] leading-relaxed text-ink-2">{s.detail}</p>
           </div>
         </motion.div>
       ))}

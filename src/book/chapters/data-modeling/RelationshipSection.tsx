@@ -213,7 +213,7 @@ const T = {
 
 function RelationshipNameDiagram({ lang }: { lang: 'ko' | 'en' }) {
   const isKo = lang === 'ko'
-  const W = 560; const EW = 100; const EH = 34; const ER = 5
+  const W = 560; const EW = 100; const EH = 34; const IE_R = 2; const BK_R = 8
   const E1x = 56; const E2x = W - EW - 16
   const lineL = E1x + EW; const lineR = E2x
   const midX = (lineL + lineR) / 2
@@ -223,44 +223,44 @@ function RelationshipNameDiagram({ lang }: { lang: 'ko' | 'en' }) {
   const ieLineY = ieY + EH / 2
   const barLineY = barY + EH / 2
 
-  const C_IE = '#6366f1'; const C_BK = '#0d9488'
+  const C_IE = 'var(--color-blue)'; const C_BK = 'var(--color-purple)'
   const lA = isKo ? '고객' : 'Customer'
   const lB = isKo ? '주문' : 'Order'
   const nameForward  = isKo ? '주문을 한다' : 'places'
   const nameBackward = isKo ? '에 의해 됨' : 'is placed by'
 
   return (
-    <svg viewBox={`0 0 ${W} 175`} className="w-full" style={{ fontFamily: 'monospace' }}>
+    <svg viewBox={`0 0 ${W} 175`} className="w-full" style={{ fontFamily: 'var(--font-sans-active)' }}>
       {/* ── IE 행 ── */}
-      <text x={4} y={ieLineY + 4} fontSize={9} fontWeight="bold" fill={C_IE}>IE</text>
+      <text x={4} y={ieLineY + 4} fontSize={9} fontWeight={600} fill={C_IE}>IE</text>
       {/* 왼쪽 엔터티 */}
-      <rect x={E1x} y={ieY} width={EW} height={EH} rx={ER} fill={C_IE + '14'} stroke={C_IE} strokeWidth={1.5} />
-      <text x={E1x + EW/2} y={ieLineY + 4} textAnchor="middle" fontSize={11} fontWeight="bold" fill={C_IE}>{lA}</text>
+      <rect x={E1x} y={ieY} width={EW} height={EH} rx={IE_R} fill={C_IE} fillOpacity={0.08} stroke={C_IE} strokeOpacity={0.5} strokeWidth={1} />
+      <text x={E1x + EW/2} y={ieLineY + 4} textAnchor="middle" fontSize={11} fontWeight={600} fill={C_IE}>{lA}</text>
       {/* 관계선 */}
       <line x1={lineL} y1={ieLineY} x2={lineR} y2={ieLineY} stroke={C_IE} strokeWidth={1.5} />
       {/* 관계명 (선 위) */}
       <text x={midX} y={ieLineY - 7} textAnchor="middle" fontSize={10} fill={C_IE}>{nameForward}</text>
       {/* 오른쪽 엔터티 */}
-      <rect x={E2x} y={ieY} width={EW} height={EH} rx={ER} fill={C_IE + '14'} stroke={C_IE} strokeWidth={1.5} />
-      <text x={E2x + EW/2} y={ieLineY + 4} textAnchor="middle" fontSize={11} fontWeight="bold" fill={C_IE}>{lB}</text>
+      <rect x={E2x} y={ieY} width={EW} height={EH} rx={IE_R} fill={C_IE} fillOpacity={0.08} stroke={C_IE} strokeOpacity={0.5} strokeWidth={1} />
+      <text x={E2x + EW/2} y={ieLineY + 4} textAnchor="middle" fontSize={11} fontWeight={600} fill={C_IE}>{lB}</text>
 
       {/* ── 바커 행 ── */}
-      <text x={4} y={barLineY + 4} fontSize={9} fontWeight="bold" fill={C_BK}>{isKo ? '바커' : 'Barker'}</text>
+      <text x={4} y={barLineY + 4} fontSize={9} fontWeight={600} fill={C_BK}>{isKo ? '바커' : 'Barker'}</text>
       {/* 왼쪽 엔터티 */}
-      <rect x={E1x} y={barY} width={EW} height={EH} rx={ER} fill={C_BK + '14'} stroke={C_BK} strokeWidth={1.5} />
-      <text x={E1x + EW/2} y={barLineY + 4} textAnchor="middle" fontSize={11} fontWeight="bold" fill={C_BK}>{lA}</text>
+      <rect x={E1x} y={barY} width={EW} height={EH} rx={BK_R} fill={C_BK} fillOpacity={0.08} stroke={C_BK} strokeOpacity={0.5} strokeWidth={1} />
+      <text x={E1x + EW/2} y={barLineY + 4} textAnchor="middle" fontSize={11} fontWeight={600} fill={C_BK}>{lA}</text>
       {/* 관계선 */}
       <line x1={lineL} y1={barLineY} x2={lineR} y2={barLineY} stroke={C_BK} strokeWidth={1.5} />
       {/* 바커: 능동 동사(선 위 왼쪽), 수동 동사(선 아래 오른쪽) */}
       <text x={midX - 30} y={barLineY - 7} textAnchor="middle" fontSize={10} fill={C_BK}>{nameForward}</text>
       <text x={midX + 30} y={barLineY + 17} textAnchor="middle" fontSize={10} fill={C_BK}>{nameBackward}</text>
       {/* 오른쪽 엔터티 */}
-      <rect x={E2x} y={barY} width={EW} height={EH} rx={ER} fill={C_BK + '14'} stroke={C_BK} strokeWidth={1.5} />
-      <text x={E2x + EW/2} y={barLineY + 4} textAnchor="middle" fontSize={11} fontWeight="bold" fill={C_BK}>{lB}</text>
+      <rect x={E2x} y={barY} width={EW} height={EH} rx={BK_R} fill={C_BK} fillOpacity={0.08} stroke={C_BK} strokeOpacity={0.5} strokeWidth={1} />
+      <text x={E2x + EW/2} y={barLineY + 4} textAnchor="middle" fontSize={11} fontWeight={600} fill={C_BK}>{lB}</text>
 
       {/* 범례 */}
-      <rect x={E1x} y={155} width={lineR - E1x} height={14} rx={3} fill="#f3f4f6" />
-      <text x={E1x + 6} y={165} fontSize={8} fill="#6b7280">
+      <rect x={E1x} y={155} width={lineR - E1x} height={14} rx={3} fill="var(--color-paper)" stroke="var(--color-line)" strokeWidth={1} />
+      <text x={E1x + 8} y={165} fontSize={8} fill="var(--color-ink-2)">
         {isKo
           ? 'IE: 관계선 위에 관계명 표기  |  바커: 선 위(능동) · 선 아래(수동) 동사구 표기'
           : 'IE: name above the line  |  Barker: active verb above · passive verb below'}
@@ -279,7 +279,7 @@ function RelationshipNameDiagram({ lang }: { lang: 'ko' | 'en' }) {
 
 function CardinalityDiagram({ lang }: { lang: 'ko' | 'en' }) {
   const isKo = lang === 'ko'
-  const W = 560; const EW = 96; const EH = 32; const ER = 5; const SYM = 20
+  const W = 560; const EW = 96; const EH = 32; const IE_R = 2; const BK_R = 8; const SYM = 20
   const LABEL_W = 36 // 왼쪽 차수 레이블 공간
   const E1x = LABEL_W + 4
   const E2x = W - EW - 8
@@ -288,7 +288,7 @@ function CardinalityDiagram({ lang }: { lang: 'ko' | 'en' }) {
   const sym2L = E2x - SYM       // 오른쪽 기호 왼쪽 끝 (= 선 끝)
   const midX = (sym1R + sym2L) / 2
 
-  const C_IE = '#6366f1'; const C_BK = '#0d9488'
+  const C_IE = 'var(--color-blue)'; const C_BK = 'var(--color-purple)'
   const ROW_H = 108 // 각 차수 그룹 높이
   const IE_OFF = 8  // 그룹 내 IE행 y offset
   const BK_OFF = 58 // 그룹 내 바커행 y offset
@@ -302,9 +302,9 @@ function CardinalityDiagram({ lang }: { lang: 'ko' | 'en' }) {
   const H = HEADER_H + groups.length * ROW_H + 4
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ fontFamily: 'monospace' }}>
+    <svg viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ fontFamily: 'var(--font-sans-active)' }}>
       {/* 헤더 */}
-      <text x={midX} y={12} textAnchor="middle" fontSize={8} fill="#9ca3af">
+      <text x={midX} y={12} textAnchor="middle" fontSize={8} fill="var(--color-ink-3)">
         {isKo ? '위: IE 표기법  /  아래: 바커 표기법' : 'Top: IE Notation  /  Bottom: Barker Notation'}
       </text>
 
@@ -381,14 +381,14 @@ function CardinalityDiagram({ lang }: { lang: 'ko' | 'en' }) {
         return (
           <g key={g.card}>
             {/* 차수 레이블 */}
-            <text x={2} y={baseY + ROW_H / 2} fontSize={11} fontWeight="bold" fill="#374151" dominantBaseline="middle">{g.card}</text>
+            <text x={2} y={baseY + ROW_H / 2} fontSize={11} fontWeight={600} fill="var(--color-ink)" dominantBaseline="middle">{g.card}</text>
 
             {/* ── IE 행 ── */}
             {/* 엔터티 */}
-            <rect x={E1x} y={ieY} width={EW} height={EH} rx={ER} fill={C_IE + '14'} stroke={C_IE} strokeWidth={1.5} />
-            <text x={E1x + EW/2} y={ieLY + 4} textAnchor="middle" fontSize={10} fontWeight="bold" fill={C_IE}>{g.lA}</text>
-            <rect x={E2x} y={ieY} width={EW} height={EH} rx={ER} fill={C_IE + '14'} stroke={C_IE} strokeWidth={1.5} />
-            <text x={E2x + EW/2} y={ieLY + 4} textAnchor="middle" fontSize={10} fontWeight="bold" fill={C_IE}>{g.lB}</text>
+            <rect x={E1x} y={ieY} width={EW} height={EH} rx={IE_R} fill={C_IE} fillOpacity={0.08} stroke={C_IE} strokeOpacity={0.5} strokeWidth={1} />
+            <text x={E1x + EW/2} y={ieLY + 4} textAnchor="middle" fontSize={10} fontWeight={600} fill={C_IE}>{g.lA}</text>
+            <rect x={E2x} y={ieY} width={EW} height={EH} rx={IE_R} fill={C_IE} fillOpacity={0.08} stroke={C_IE} strokeOpacity={0.5} strokeWidth={1} />
+            <text x={E2x + EW/2} y={ieLY + 4} textAnchor="middle" fontSize={10} fontWeight={600} fill={C_IE}>{g.lB}</text>
             {/* 관계선 */}
             <line x1={sym1R} y1={ieLY} x2={sym2L} y2={ieLY} stroke={C_IE} strokeWidth={1.5} />
             {/* 기호 */}
@@ -398,10 +398,10 @@ function CardinalityDiagram({ lang }: { lang: 'ko' | 'en' }) {
             <text x={midX} y={ieLY - 8} textAnchor="middle" fontSize={8} fill={C_IE}>IE</text>
 
             {/* ── 바커 행 ── */}
-            <rect x={E1x} y={bkY} width={EW} height={EH} rx={ER} fill={C_BK + '14'} stroke={C_BK} strokeWidth={1.5} />
-            <text x={E1x + EW/2} y={bkLY + 4} textAnchor="middle" fontSize={10} fontWeight="bold" fill={C_BK}>{g.lA}</text>
-            <rect x={E2x} y={bkY} width={EW} height={EH} rx={ER} fill={C_BK + '14'} stroke={C_BK} strokeWidth={1.5} />
-            <text x={E2x + EW/2} y={bkLY + 4} textAnchor="middle" fontSize={10} fontWeight="bold" fill={C_BK}>{g.lB}</text>
+            <rect x={E1x} y={bkY} width={EW} height={EH} rx={BK_R} fill={C_BK} fillOpacity={0.08} stroke={C_BK} strokeOpacity={0.5} strokeWidth={1} />
+            <text x={E1x + EW/2} y={bkLY + 4} textAnchor="middle" fontSize={10} fontWeight={600} fill={C_BK}>{g.lA}</text>
+            <rect x={E2x} y={bkY} width={EW} height={EH} rx={BK_R} fill={C_BK} fillOpacity={0.08} stroke={C_BK} strokeOpacity={0.5} strokeWidth={1} />
+            <text x={E2x + EW/2} y={bkLY + 4} textAnchor="middle" fontSize={10} fontWeight={600} fill={C_BK}>{g.lB}</text>
             {/* 관계선 */}
             <line x1={sym1R} y1={bkLY} x2={sym2L} y2={bkLY} stroke={C_BK} strokeWidth={1.5} />
             {/* 기호 */}
@@ -413,7 +413,7 @@ function CardinalityDiagram({ lang }: { lang: 'ko' | 'en' }) {
             {/* 구분선 */}
             {gi < groups.length - 1 && (
               <line x1={LABEL_W} y1={baseY + ROW_H - 2} x2={W - 4} y2={baseY + ROW_H - 2}
-                stroke="#e5e7eb" strokeWidth={1} strokeDasharray="4 3" />
+                stroke="var(--color-rail)" strokeWidth={1} strokeDasharray="4 3" />
             )}
           </g>
         )
@@ -431,14 +431,14 @@ function CardinalityDiagram({ lang }: { lang: 'ko' | 'en' }) {
 
 function OptionalityDiagram({ lang }: { lang: 'ko' | 'en' }) {
   const isKo = lang === 'ko'
-  const W = 560; const EW = 90; const EH = 32; const ER = 5; const SYM = 20
+  const W = 560; const EW = 90; const EH = 32; const IE_R = 2; const BK_R = 8; const SYM = 20
   const E1x = 8
   const E2x = W - EW - 8
   const sym1R = E1x + EW + SYM
   const sym2L = E2x - SYM
   const midX  = (sym1R + sym2L) / 2
 
-  const C_IE = '#6366f1'; const C_BK = '#0d9488'
+  const C_IE = 'var(--color-blue)'; const C_BK = 'var(--color-purple)'
   const ROW_H = 110
   const IE_OFF = 6
   const BK_OFF = 50
@@ -473,8 +473,8 @@ function OptionalityDiagram({ lang }: { lang: 'ko' | 'en' }) {
   const BAR_H = 9; const CR = 6 // 원 반지름
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ fontFamily: 'monospace' }}>
-      <text x={midX} y={12} textAnchor="middle" fontSize={8} fill="#9ca3af">
+    <svg viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ fontFamily: 'var(--font-sans-active)' }}>
+      <text x={midX} y={12} textAnchor="middle" fontSize={8} fill="var(--color-ink-3)">
         {isKo
           ? '위: IE 표기법 ( | 필수 · ○ 선택 )   /   아래: 바커 표기법 ( 실선 필수 · 점선 선택 )'
           : 'Top: IE ( | mandatory · ○ optional )   /   Bottom: Barker ( solid mandatory · dashed optional )'}
@@ -513,33 +513,33 @@ function OptionalityDiagram({ lang }: { lang: 'ko' | 'en' }) {
         return (
           <g key={i}>
             {/* ── IE 행 ── */}
-            <rect x={E1x} y={ieY} width={EW} height={EH} rx={ER} fill={C_IE + '14'} stroke={C_IE} strokeWidth={1.5} />
-            <text x={E1x + EW/2} y={ieLY + 4} textAnchor="middle" fontSize={10} fontWeight="bold" fill={C_IE}>{row.lA}</text>
+            <rect x={E1x} y={ieY} width={EW} height={EH} rx={IE_R} fill={C_IE} fillOpacity={0.08} stroke={C_IE} strokeOpacity={0.5} strokeWidth={1} />
+            <text x={E1x + EW/2} y={ieLY + 4} textAnchor="middle" fontSize={10} fontWeight={600} fill={C_IE}>{row.lA}</text>
             <line x1={sym1R + (row.oL === 'O' ? CR : 0)} y1={ieLY}
                   x2={sym2L - (row.oR === 'O' ? CR : 0)} y2={ieLY}
                   stroke={C_IE} strokeWidth={1.5} />
             {ieSymL}
             {ieSymR}
             <text x={midX} y={ieLY - 8} textAnchor="middle" fontSize={8} fill={C_IE}>IE</text>
-            <rect x={E2x} y={ieY} width={EW} height={EH} rx={ER} fill={C_IE + '14'} stroke={C_IE} strokeWidth={1.5} />
-            <text x={E2x + EW/2} y={ieLY + 4} textAnchor="middle" fontSize={10} fontWeight="bold" fill={C_IE}>{row.lB}</text>
+            <rect x={E2x} y={ieY} width={EW} height={EH} rx={IE_R} fill={C_IE} fillOpacity={0.08} stroke={C_IE} strokeOpacity={0.5} strokeWidth={1} />
+            <text x={E2x + EW/2} y={ieLY + 4} textAnchor="middle" fontSize={10} fontWeight={600} fill={C_IE}>{row.lB}</text>
 
             {/* ── 바커 행 ── */}
-            <rect x={E1x} y={bkY} width={EW} height={EH} rx={ER} fill={C_BK + '14'} stroke={C_BK} strokeWidth={1.5} />
-            <text x={E1x + EW/2} y={bkLY + 4} textAnchor="middle" fontSize={10} fontWeight="bold" fill={C_BK}>{row.lA}</text>
+            <rect x={E1x} y={bkY} width={EW} height={EH} rx={BK_R} fill={C_BK} fillOpacity={0.08} stroke={C_BK} strokeOpacity={0.5} strokeWidth={1} />
+            <text x={E1x + EW/2} y={bkLY + 4} textAnchor="middle" fontSize={10} fontWeight={600} fill={C_BK}>{row.lA}</text>
             {bkLineL}
             {bkLineR}
             <text x={midX} y={bkLY - 8} textAnchor="middle" fontSize={8} fill={C_BK}>{isKo ? '바커' : 'Barker'}</text>
-            <rect x={E2x} y={bkY} width={EW} height={EH} rx={ER} fill={C_BK + '14'} stroke={C_BK} strokeWidth={1.5} />
-            <text x={E2x + EW/2} y={bkLY + 4} textAnchor="middle" fontSize={10} fontWeight="bold" fill={C_BK}>{row.lB}</text>
+            <rect x={E2x} y={bkY} width={EW} height={EH} rx={BK_R} fill={C_BK} fillOpacity={0.08} stroke={C_BK} strokeOpacity={0.5} strokeWidth={1} />
+            <text x={E2x + EW/2} y={bkLY + 4} textAnchor="middle" fontSize={10} fontWeight={600} fill={C_BK}>{row.lB}</text>
 
             {/* 설명 텍스트 (그룹 하단) */}
-            <text x={E1x} y={baseY + DESC_OFF} fontSize={8} fill="#6b7280">{row.desc}</text>
+            <text x={E1x} y={baseY + DESC_OFF} fontSize={8} fill="var(--color-ink-2)">{row.desc}</text>
 
             {/* 구분선 */}
             {i < rows.length - 1 && (
               <line x1={0} y1={baseY + ROW_H - 2} x2={W} y2={baseY + ROW_H - 2}
-                stroke="#e5e7eb" strokeWidth={1} strokeDasharray="4 3" />
+                stroke="var(--color-rail)" strokeWidth={1} strokeDasharray="4 3" />
             )}
           </g>
         )
@@ -557,7 +557,7 @@ export function RelationshipSection() {
   return (
     <PageContainer>
       <ChapterTitle
-        icon={<IconSitemap size={36} stroke={1.5} className="text-indigo-500" />}
+        icon={<IconSitemap size={36} stroke={1.5} className="text-blue" />}
         title={t.title}
         subtitle={t.subtitle}
       />
@@ -578,9 +578,9 @@ export function RelationshipSection() {
       <SectionTitle>{t.nameTitle}</SectionTitle>
       <Prose>{t.nameDesc}</Prose>
       <StepList steps={t.nameRules} />
-      <p className="mb-2 mt-6 text-xs font-bold text-muted-foreground">{t.nameNotationLabel}</p>
+      <p className="mb-2 mt-6 font-sans text-[11px] font-semibold text-ink-2">{t.nameNotationLabel}</p>
       <Prose>{t.nameNotationDesc}</Prose>
-      <div className="mt-3 overflow-hidden rounded-xl border bg-muted/20 p-4">
+      <div className="mt-3 overflow-hidden rounded-panel border bg-rail p-4">
         <RelationshipNameDiagram lang={lang} />
       </div>
 
@@ -590,9 +590,9 @@ export function RelationshipSection() {
       <SectionTitle>{t.cardTitle}</SectionTitle>
       <Prose>{t.cardDesc}</Prose>
       <Table headers={t.cardHeaders} rows={t.cardRows} />
-      <p className="mb-2 mt-6 text-xs font-bold text-muted-foreground">{t.cardNotationLabel}</p>
+      <p className="mb-2 mt-6 font-sans text-[11px] font-semibold text-ink-2">{t.cardNotationLabel}</p>
       <Prose>{t.cardNotationDesc}</Prose>
-      <div className="mt-3 overflow-hidden rounded-xl border bg-muted/20 p-4">
+      <div className="mt-3 overflow-hidden rounded-panel border bg-rail p-4">
         <CardinalityDiagram lang={lang} />
       </div>
 
@@ -602,9 +602,9 @@ export function RelationshipSection() {
       <SectionTitle>{t.optTitle}</SectionTitle>
       <Prose>{t.optDesc}</Prose>
       <Table headers={t.optHeaders} rows={t.optRows} />
-      <p className="mb-2 mt-6 text-xs font-bold text-muted-foreground">{t.optNotationLabel}</p>
+      <p className="mb-2 mt-6 font-sans text-[11px] font-semibold text-ink-2">{t.optNotationLabel}</p>
       <Prose>{t.optNotationDesc}</Prose>
-      <div className="mt-3 overflow-hidden rounded-xl border bg-muted/20 p-4">
+      <div className="mt-3 overflow-hidden rounded-panel border bg-rail p-4">
         <OptionalityDiagram lang={lang} />
       </div>
 

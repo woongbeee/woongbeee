@@ -38,9 +38,9 @@ interface SimQuery {
 
 // ── 헬퍼: 조건절/프로젝션/통계 블록 렌더러 ───────────────────────────────────
 
-function DarkBlock({ lines, color = '#94a3b8' }: { lines: string[]; color?: string }) {
+function DarkBlock({ lines, color = 'var(--color-ink-3)' }: { lines: string[]; color?: string }) {
   return (
-    <pre className="overflow-x-auto rounded-xl bg-[#0f172a] px-5 py-4 font-mono text-xs leading-relaxed">
+    <pre className="overflow-x-auto rounded-panel bg-[var(--color-ink)] px-5 py-4 font-mono text-xs leading-relaxed">
       {lines.map((l, i) => (
         <span key={i} className="block whitespace-pre" style={{ color }}>
           {l || ' '}
@@ -54,19 +54,19 @@ function AnnotationPanel({ annotations, lang }: { annotations: AnnotatedLine[]; 
   const rows = annotations.filter((a) => (lang === 'ko' ? a.noteKo : a.noteEn))
   if (rows.length === 0) return null
   return (
-    <div className="mt-3 overflow-hidden rounded-xl border border-sky-200 bg-sky-50 dark:border-sky-900/40 dark:bg-sky-950/20">
-      <div className="border-b border-sky-200 bg-sky-100/60 px-4 py-2 dark:border-sky-900/40 dark:bg-sky-900/20">
-        <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-sky-600 dark:text-sky-400">
+    <div className="mt-3 overflow-hidden rounded-panel border border-blue/30 bg-blue/5 dark:border-blue dark:bg-blue">
+      <div className="border-b border-blue/30 bg-blue/10 px-4 py-2 dark:border-blue dark:bg-blue">
+        <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-blue dark:text-blue">
           {lang === 'ko' ? '라인별 설명' : 'Line-by-line Notes'}
         </span>
       </div>
-      <div className="divide-y divide-sky-100 dark:divide-sky-900/30">
+      <div className="divide-y divide-blue/30 dark:divide-blue">
         {rows.map((a, i) => (
           <div key={i} className="flex gap-3 px-4 py-2.5">
-            <code className="mt-0.5 shrink-0 max-w-[180px] truncate rounded bg-sky-100 px-1.5 py-0.5 font-mono text-[10px] text-sky-700 dark:bg-sky-900/40 dark:text-sky-300">
+            <code className="mt-0.5 shrink-0 max-w-[180px] truncate rounded bg-blue/10 px-1.5 py-0.5 font-mono text-[10px] text-blue dark:bg-blue dark:text-blue">
               {a.line}
             </code>
-            <span className="text-xs leading-relaxed text-foreground/70">
+            <span className="text-xs leading-relaxed text-ink/70">
               {lang === 'ko' ? a.noteKo : a.noteEn}
             </span>
           </div>
@@ -90,10 +90,10 @@ function PlanAreaBlock({
   children: React.ReactNode
 }) {
   return (
-    <div className="rounded-xl border border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-900/40">
-      <div className="flex items-center gap-2 border-b border-slate-200 px-4 py-2.5 dark:border-slate-700">
-        <span className="text-base font-bold text-slate-700 dark:text-slate-200">{num}</span>
-        <span className="text-sm font-semibold text-slate-600 dark:text-slate-300">
+    <div className="rounded-panel border border-line bg-paper-sunk dark:border-line-2 dark:bg-ink">
+      <div className="flex items-center gap-2 border-b border-line px-4 py-2.5 dark:border-line-2">
+        <span className="text-base font-bold text-ink dark:text-ink-3">{num}</span>
+        <span className="text-sm font-semibold text-ink dark:text-ink-3">
           {lang === 'ko' ? labelKo : labelEn}
         </span>
       </div>
@@ -1404,9 +1404,9 @@ Why EMPLOYEES is scanned twice (⑤ and ⑧):
 // ── 난이도 배지 ────────────────────────────────────────────────────────────────
 
 const DIFF_STYLE = {
-  simple:  'bg-emerald-100 text-emerald-700 border-emerald-200',
-  medium:  'bg-amber-100   text-amber-700   border-amber-200',
-  complex: 'bg-rose-100    text-rose-700    border-rose-200',
+  simple:  'bg-green/10 text-green border-green/30',
+  medium:  'bg-amber/10   text-amber   border-amber/30',
+  complex: 'bg-red/10    text-red    border-red/30',
 }
 const DIFF_LABEL = {
   ko: { simple: '기본', medium: '중급', complex: '고급' },
@@ -1425,21 +1425,21 @@ export function OptimizerSimulator() {
   return (
     <div className="flex h-full min-h-0 overflow-hidden">
       {/* ── 좌측 쿼리 목록 ── */}
-      <aside className="flex w-64 shrink-0 flex-col gap-1 overflow-y-auto border-r border-slate-200 p-3 dark:border-slate-700">
-        <p className="mb-2 px-2 text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
+      <aside className="flex w-64 shrink-0 flex-col gap-1 overflow-y-auto border-r border-line p-3 dark:border-line-2">
+        <p className="mb-2 px-2 text-[11px] font-bold uppercase tracking-widest text-ink-2">
           {isKo ? '예제 쿼리' : 'Example Queries'}
         </p>
         {QUERIES.map((qry) => (
           <button
             key={qry.id}
             onClick={() => setSelected(qry.id)}
-            className={`flex w-full flex-col items-start gap-1 rounded-lg px-3 py-2.5 text-left transition-colors ${
+            className={`flex w-full flex-col items-start gap-1 rounded-card px-3 py-2.5 text-left transition-colors ${
               selected === qry.id
-                ? 'bg-orange-50 ring-1 ring-orange-300 dark:bg-orange-950/30'
-                : 'hover:bg-slate-100 dark:hover:bg-slate-800'
+                ? 'bg-amber/5 ring-1 ring-amber/50 dark:bg-amber'
+                : 'hover:bg-paper-sunk dark:hover:bg-ink'
             }`}
           >
-            <span className="text-xs font-semibold text-foreground">
+            <span className="text-xs font-semibold text-ink">
               {isKo ? qry.labelKo : qry.labelEn}
             </span>
             <span className={`rounded border px-1.5 py-0.5 text-[10px] font-bold ${DIFF_STYLE[qry.difficulty]}`}>
@@ -1455,19 +1455,19 @@ export function OptimizerSimulator() {
 
           {/* SQL */}
           <div>
-            <p className="mb-2 text-[11px] font-bold uppercase tracking-widest text-muted-foreground">SQL</p>
-            <pre className="overflow-x-auto rounded-xl bg-[#0f172a] px-5 py-4 font-mono text-xs leading-relaxed text-[#94a3b8]">
+            <p className="mb-2 text-[11px] font-bold uppercase tracking-widest text-ink-2">SQL</p>
+            <pre className="overflow-x-auto rounded-panel bg-[var(--color-ink)] px-5 py-4 font-mono text-xs leading-relaxed text-[var(--color-ink-3)]">
               {q.sql}
             </pre>
           </div>
 
           {/* 왜 이런 실행 계획인가 */}
-          <div className="rounded-xl border border-orange-200 bg-orange-50/60 px-5 py-4 dark:border-orange-900/40 dark:bg-orange-950/20">
-            <p className="mb-2 flex items-center gap-2 text-xs font-bold text-orange-700 dark:text-orange-400">
+          <div className="rounded-panel border border-amber/30 bg-amber/5 px-5 py-4 dark:border-amber dark:bg-amber">
+            <p className="mb-2 flex items-center gap-2 text-xs font-bold text-amber dark:text-amber">
               <IconPlayerPlay size={13} />
               {isKo ? '왜 이런 실행 계획인가?' : 'Why this execution plan?'}
             </p>
-            <pre className="whitespace-pre-wrap font-mono text-xs leading-relaxed text-foreground/80">
+            <pre className="whitespace-pre-wrap font-mono text-xs leading-relaxed text-ink/80">
               {isKo ? q.reasonKo : q.reasonEn}
             </pre>
           </div>
@@ -1476,7 +1476,7 @@ export function OptimizerSimulator() {
 
           {/* ① Call Statistics */}
           <PlanAreaBlock num="①" labelKo="Call Statistics (TKPROF)" labelEn="Call Statistics (TKPROF)" lang={lang}>
-            <DarkBlock lines={(isKo ? q.callStatsKo : q.callStatsEn).split('\n')} color="#94a3b8" />
+            <DarkBlock lines={(isKo ? q.callStatsKo : q.callStatsEn).split('\n')} color="var(--color-ink-3)" />
             {q.callStatsAnnotations && <AnnotationPanel annotations={q.callStatsAnnotations} lang={lang} />}
           </PlanAreaBlock>
 
@@ -1487,19 +1487,19 @@ export function OptimizerSimulator() {
 
           {/* ③ Predicate Information */}
           <PlanAreaBlock num="③" labelKo="Predicate Information" labelEn="Predicate Information" lang={lang}>
-            <DarkBlock lines={isKo ? q.predicatesKo : q.predicatesEn} color="#fbbf24" />
+            <DarkBlock lines={isKo ? q.predicatesKo : q.predicatesEn} color="var(--color-amber)" />
             {q.predicateAnnotations && <AnnotationPanel annotations={q.predicateAnnotations} lang={lang} />}
           </PlanAreaBlock>
 
           {/* ④ Column Projection */}
           <PlanAreaBlock num="④" labelKo="Column Projection" labelEn="Column Projection" lang={lang}>
-            <DarkBlock lines={isKo ? q.projectionKo : q.projectionEn} color="#86efac" />
+            <DarkBlock lines={isKo ? q.projectionKo : q.projectionEn} color="var(--color-green)" />
             {q.projectionAnnotations && <AnnotationPanel annotations={q.projectionAnnotations} lang={lang} />}
           </PlanAreaBlock>
 
           {/* ⑤ Statistics */}
           <PlanAreaBlock num="⑤" labelKo="Statistics (AUTOTRACE)" labelEn="Statistics (AUTOTRACE)" lang={lang}>
-            <DarkBlock lines={isKo ? q.statsKo : q.statsEn} color="#94a3b8" />
+            <DarkBlock lines={isKo ? q.statsKo : q.statsEn} color="var(--color-ink-3)" />
             {q.statsAnnotations && <AnnotationPanel annotations={q.statsAnnotations} lang={lang} />}
           </PlanAreaBlock>
 

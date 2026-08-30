@@ -374,26 +374,26 @@ function SemiJoinSim({ lang }: { lang: 'ko' | 'en' }) {
   }
 
   const PLAY_BTN_COLOR = mode === 'semi'
-    ? (playing ? 'border-amber-300 bg-amber-50 text-amber-700 hover:bg-amber-100' : 'border-emerald-300 bg-emerald-50 text-emerald-700 hover:bg-emerald-100')
-    : (playing ? 'border-amber-300 bg-amber-50 text-amber-700 hover:bg-amber-100' : 'border-rose-300 bg-rose-50 text-rose-700 hover:bg-rose-100')
+    ? (playing ? 'border-amber/50 bg-amber/5 text-amber hover:bg-amber/10' : 'border-green/50 bg-green/5 text-green hover:bg-green/10')
+    : (playing ? 'border-amber/50 bg-amber/5 text-amber hover:bg-amber/10' : 'border-red/50 bg-red/5 text-red hover:bg-red/10')
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-slate-50 p-5">
-      <p className="mb-1 font-mono text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+    <div className="rounded-panel border border-line bg-paper-sunk p-5">
+      <p className="mb-1 font-mono text-[11px] font-bold uppercase tracking-wider text-ink-2">
         {t.simTitle}
       </p>
 
       {/* Mode tabs + play button */}
       <div className="mb-4 flex flex-wrap items-center gap-2">
-        {([['semi', t.labelSemiMode, 'border-emerald-400 bg-emerald-100 text-emerald-700'],
-           ['anti', t.labelAntiMode, 'border-rose-400 bg-rose-100 text-rose-700']] as const).map(([key, label, activeClass]) => (
+        {([['semi', t.labelSemiMode, 'border-green/50 bg-green/10 text-green'],
+           ['anti', t.labelAntiMode, 'border-red/50 bg-red/10 text-red']] as const).map(([key, label, activeClass]) => (
           <button
             key={key}
             onClick={() => changeMode(key)}
             disabled={playing}
             className={cn(
               'rounded-full border px-4 py-1.5 font-mono text-xs font-bold transition-all disabled:opacity-50',
-              mode === key ? activeClass : 'border-slate-200 text-muted-foreground hover:bg-muted',
+              mode === key ? activeClass : 'border-line text-ink-2 hover:bg-rail',
             )}
           >
             {label}
@@ -401,13 +401,13 @@ function SemiJoinSim({ lang }: { lang: 'ko' | 'en' }) {
         ))}
         <button
           onClick={togglePlay}
-          className={cn('ml-auto rounded-lg border px-4 py-1.5 font-mono text-xs font-bold transition-all', PLAY_BTN_COLOR)}
+          className={cn('ml-auto rounded-card border px-4 py-1.5 font-mono text-xs font-bold transition-all', PLAY_BTN_COLOR)}
         >
           {playing ? t.btnPause : t.btnPlay}
         </button>
       </div>
 
-      <p className="mb-4 text-[12px] leading-relaxed text-muted-foreground">
+      <p className="mb-4 text-[12px] leading-relaxed text-ink-2">
         {mode === 'semi' ? t.simDesc : t.simAntiDesc}
       </p>
 
@@ -421,14 +421,14 @@ function SemiJoinSim({ lang }: { lang: 'ko' | 'en' }) {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.15 }}
             className={cn(
-              'mb-4 rounded-lg border px-3 py-2 font-mono text-[11px] font-bold',
+              'mb-4 rounded-card border px-3 py-2 font-mono text-[11px] font-bold',
               isStopped
-                ? 'border-amber-300 bg-amber-50 text-amber-700'
+                ? 'border-amber/50 bg-amber/5 text-amber'
                 : isMatched
                   ? mode === 'semi'
-                    ? 'border-emerald-300 bg-emerald-50 text-emerald-700'
-                    : 'border-rose-300 bg-rose-50 text-rose-600'
-                  : 'border-slate-200 bg-white text-muted-foreground',
+                    ? 'border-green/50 bg-green/5 text-green'
+                    : 'border-red/50 bg-red/5 text-red'
+                  : 'border-line bg-paper text-ink-2',
             )}
           >
             {isStopped
@@ -440,7 +440,7 @@ function SemiJoinSim({ lang }: { lang: 'ko' | 'en' }) {
         </AnimatePresence>
       )}
       {done && (
-        <div className="mb-4 rounded-lg border border-emerald-300 bg-emerald-50 px-3 py-2 font-mono text-[11px] font-bold text-emerald-700">
+        <div className="mb-4 rounded-card border border-green/50 bg-green/5 px-3 py-2 font-mono text-[11px] font-bold text-green">
           ✓ {t.statusDone}
         </div>
       )}
@@ -448,7 +448,7 @@ function SemiJoinSim({ lang }: { lang: 'ko' | 'en' }) {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-[1fr_auto_1fr_auto_1fr]">
         {/* OUTER */}
         <div>
-          <p className="mb-2 font-mono text-[10px] font-bold text-blue-600">{t.labelOuter}</p>
+          <p className="mb-2 font-mono text-[10px] font-bold text-blue">{t.labelOuter}</p>
           <div className="flex flex-col gap-1.5">
             {OUTER_ROWS.map((row, i) => {
               const isActive = curOuterIdx === i
@@ -457,26 +457,26 @@ function SemiJoinSim({ lang }: { lang: 'ko' | 'en' }) {
                 <motion.div
                   key={row.dept_id}
                   animate={
-                    isActive          ? { backgroundColor: '#bfdbfe', scale: 1.02 }
-                    : result === 'included' ? { backgroundColor: '#d1fae5', scale: 1 }
-                    : result === 'excluded' ? { backgroundColor: '#f1f5f9', scale: 1 }
-                    :                         { backgroundColor: '#ffffff', scale: 1 }
+                    isActive          ? { backgroundColor: 'var(--color-blue)', scale: 1.02 }
+                    : result === 'included' ? { backgroundColor: 'var(--color-line)', scale: 1 }
+                    : result === 'excluded' ? { backgroundColor: 'var(--color-rail)', scale: 1 }
+                    :                         { backgroundColor: 'var(--color-paper)', scale: 1 }
                   }
                   transition={{ duration: 0.18 }}
                   className={cn(
-                    'rounded-lg border px-3 py-2 font-mono text-xs',
-                    isActive            ? 'border-blue-400 font-bold text-blue-800'
-                    : result === 'included' ? 'border-emerald-300 text-emerald-700'
-                    : result === 'excluded' ? 'border-slate-100 text-slate-400'
-                    :                         'border-border text-muted-foreground',
+                    'rounded-card border px-3 py-2 font-mono text-xs',
+                    isActive            ? 'border-blue/50 font-bold text-blue'
+                    : result === 'included' ? 'border-green/50 text-green'
+                    : result === 'excluded' ? 'border-line text-ink-2'
+                    :                         'border-line text-ink-2',
                   )}
                 >
-                  {isActive && <span className="mr-1 text-blue-600 font-bold">▶</span>}
+                  {isActive && <span className="mr-1 text-blue font-bold">▶</span>}
                   <span className="text-[10px] opacity-60 mr-1">dept_id=</span>
                   <span className="font-bold">{row.dept_id}</span>
                   <span className="ml-1 text-[10px] opacity-70">{row.dept_name}</span>
-                  {result === 'included' && <span className="ml-auto text-[9px] text-emerald-600 font-bold"> ✓</span>}
-                  {result === 'excluded' && <span className="ml-auto text-[9px] text-slate-400"> ✗</span>}
+                  {result === 'included' && <span className="ml-auto text-[9px] text-green font-bold"> ✓</span>}
+                  {result === 'excluded' && <span className="ml-auto text-[9px] text-ink-2"> ✗</span>}
                 </motion.div>
               )
             })}
@@ -486,14 +486,14 @@ function SemiJoinSim({ lang }: { lang: 'ko' | 'en' }) {
         {/* Arrow */}
         <div className="hidden sm:flex items-center justify-center pt-6">
           <div className="flex flex-col items-center gap-0.5">
-            <span className="text-xl text-muted-foreground/30">→</span>
-            <span className="font-mono text-[9px] text-muted-foreground">EXISTS?</span>
+            <span className="text-xl text-ink-2/30">→</span>
+            <span className="font-mono text-[9px] text-ink-2">EXISTS?</span>
           </div>
         </div>
 
         {/* INNER */}
         <div>
-          <p className="mb-2 font-mono text-[10px] font-bold text-orange-600">{t.labelInner}</p>
+          <p className="mb-2 font-mono text-[10px] font-bold text-amber">{t.labelInner}</p>
           <div className="flex flex-col gap-1.5">
             {INNER_ROWS.map((row, i) => {
               const state = getInnerState(i)
@@ -501,37 +501,37 @@ function SemiJoinSim({ lang }: { lang: 'ko' | 'en' }) {
                 <motion.div
                   key={row.emp_id}
                   animate={
-                    state === 'matched-stop' ? { backgroundColor: '#fef08a', scale: 1.03 }
-                    : state === 'current'      ? { backgroundColor: '#fed7aa', scale: 1.02 }
-                    : state === 'scanned'      ? { backgroundColor: '#f8fafc', scale: 1 }
-                    :                            { backgroundColor: '#ffffff', scale: 1 }
+                    state === 'matched-stop' ? { backgroundColor: 'var(--color-amber)', scale: 1.03 }
+                    : state === 'current'      ? { backgroundColor: 'var(--color-amber)', scale: 1.02 }
+                    : state === 'scanned'      ? { backgroundColor: 'var(--color-paper-sunk)', scale: 1 }
+                    :                            { backgroundColor: 'var(--color-paper)', scale: 1 }
                   }
                   transition={{ duration: 0.18 }}
                   className={cn(
-                    'rounded-lg border px-3 py-2 font-mono text-xs',
-                    state === 'matched-stop' ? 'border-yellow-400 font-bold text-yellow-800'
-                    : state === 'current'      ? 'border-orange-400 font-bold text-orange-800'
-                    : state === 'scanned'      ? 'border-slate-100 text-slate-400'
-                    :                            'border-border text-muted-foreground',
+                    'rounded-card border px-3 py-2 font-mono text-xs',
+                    state === 'matched-stop' ? 'border-amber/50 font-bold text-amber'
+                    : state === 'current'      ? 'border-amber/50 font-bold text-amber'
+                    : state === 'scanned'      ? 'border-line text-ink-2'
+                    :                            'border-line text-ink-2',
                   )}
                 >
                   <span className="text-[10px] opacity-60 mr-1">dept_id=</span>
                   <span className="font-bold">{row.dept_id}</span>
                   <span className="ml-1 text-[10px]">{row.first_name}</span>
                   {state === 'matched-stop' && (
-                    <span className="ml-2 rounded bg-amber-200 px-1 text-[9px] font-bold text-amber-800">
+                    <span className="ml-2 rounded bg-amber/15 px-1 text-[9px] font-bold text-amber">
                       {t.labelScanStop}
                     </span>
                   )}
                   {state === 'current' && curOuterIdx !== null && row.dept_id === OUTER_ROWS[curOuterIdx].dept_id && !isStopped && (
-                    <span className="ml-2 text-[9px] font-bold text-emerald-600">✓</span>
+                    <span className="ml-2 text-[9px] font-bold text-green">✓</span>
                   )}
                 </motion.div>
               )
             })}
           </div>
           {curOuterIdx !== null && currentStep && !isStopped && (
-            <p className="mt-1.5 font-mono text-[9px] text-muted-foreground">
+            <p className="mt-1.5 font-mono text-[9px] text-ink-2">
               {t.labelInnerProgress(
                 steps.filter((s) => s.outerIdx === curOuterIdx && !s.stopped && steps.indexOf(s) < stepIdx).length,
                 INNER_ROWS.length,
@@ -539,18 +539,18 @@ function SemiJoinSim({ lang }: { lang: 'ko' | 'en' }) {
             </p>
           )}
           {isStopped && (
-            <p className="mt-1.5 font-mono text-[9px] font-bold text-amber-600">{t.labelEarlyStop}</p>
+            <p className="mt-1.5 font-mono text-[9px] font-bold text-amber">{t.labelEarlyStop}</p>
           )}
         </div>
 
         {/* Arrow */}
         <div className="hidden sm:flex items-center justify-center pt-6">
-          <span className="text-xl text-muted-foreground/30">→</span>
+          <span className="text-xl text-ink-2/30">→</span>
         </div>
 
         {/* RESULT */}
         <div>
-          <p className="mb-2 font-mono text-[10px] font-bold text-emerald-600">{t.labelResult}</p>
+          <p className="mb-2 font-mono text-[10px] font-bold text-green">{t.labelResult}</p>
           <div className="flex flex-col gap-1.5 min-h-[40px]">
             <AnimatePresence initial={false}>
               {resultRows.map((row) => (
@@ -560,10 +560,10 @@ function SemiJoinSim({ lang }: { lang: 'ko' | 'en' }) {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0 }}
                   className={cn(
-                    'rounded-lg border px-3 py-2 font-mono text-[10px]',
+                    'rounded-card border px-3 py-2 font-mono text-[10px]',
                     mode === 'semi'
-                      ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
-                      : 'border-rose-200 bg-rose-50 text-rose-800',
+                      ? 'border-green/30 bg-green/5 text-green'
+                      : 'border-red/30 bg-red/5 text-red',
                   )}
                 >
                   <span className="font-bold">{row.dept_id}</span>
@@ -572,7 +572,7 @@ function SemiJoinSim({ lang }: { lang: 'ko' | 'en' }) {
               ))}
             </AnimatePresence>
             {resultRows.length === 0 && stepIdx === 0 && (
-              <p className="font-mono text-[10px] text-muted-foreground/40 italic">—</p>
+              <p className="font-mono text-[10px] text-ink-2/40 italic">—</p>
             )}
           </div>
         </div>
@@ -583,17 +583,17 @@ function SemiJoinSim({ lang }: { lang: 'ko' | 'en' }) {
         <button
           onClick={() => { if (!playing && stepIdx > 0) setStepIdx((s) => s - 1) }}
           disabled={playing || stepIdx === 0}
-          className="rounded-lg border border-slate-200 px-3 py-1.5 font-mono text-xs text-muted-foreground hover:bg-muted disabled:opacity-30"
+          className="rounded-card border border-line px-3 py-1.5 font-mono text-xs text-ink-2 hover:bg-rail disabled:opacity-30"
         >{t.btnPrev}</button>
         <button
           onClick={() => { if (!playing && !done) setStepIdx((s) => s + 1) }}
           disabled={playing || done}
-          className="rounded-lg border border-slate-200 px-3 py-1.5 font-mono text-xs text-muted-foreground hover:bg-muted disabled:opacity-30"
+          className="rounded-card border border-line px-3 py-1.5 font-mono text-xs text-ink-2 hover:bg-rail disabled:opacity-30"
         >{t.btnNext}</button>
         <button onClick={reset}
-          className="rounded-lg border border-slate-200 px-3 py-1.5 font-mono text-xs text-muted-foreground hover:bg-muted"
+          className="rounded-card border border-line px-3 py-1.5 font-mono text-xs text-ink-2 hover:bg-rail"
         >{t.btnReset}</button>
-        <span className="ml-auto font-mono text-[10px] text-muted-foreground">
+        <span className="ml-auto font-mono text-[10px] text-ink-2">
           {done ? t.statusDone : stepIdx > 0 ? `${stepIdx} / ${steps.length}` : ''}
         </span>
       </div>
@@ -610,7 +610,7 @@ export function JoinSemiSection() {
   return (
     <PageContainer>
       <ChapterTitle
-        icon={<IconArrowMerge size={36} stroke={1.5} className="text-emerald-500" />}
+        icon={<IconArrowMerge size={36} stroke={1.5} className="text-green" />}
         title={t.title}
         subtitle={t.subtitle}
       />
@@ -631,7 +631,7 @@ export function JoinSemiSection() {
       <Divider />
 
       <SectionTitle>{t.sqlTitle}</SectionTitle>
-      <p className="mb-3 text-sm text-muted-foreground">{t.sqlDesc}</p>
+      <p className="mb-3 text-sm text-ink-2">{t.sqlDesc}</p>
 
       <SubTitle>Semi Join — EXISTS / IN</SubTitle>
       <div className="mt-2 grid gap-3 sm:grid-cols-2">
@@ -648,7 +648,7 @@ export function JoinSemiSection() {
       <Divider />
 
       <SectionTitle>{t.compTitle}</SectionTitle>
-      <p className="mb-3 text-sm text-muted-foreground">{t.compDesc}</p>
+      <p className="mb-3 text-sm text-ink-2">{t.compDesc}</p>
       <Table headers={t.compTableHeaders} rows={t.compTableRows} />
 
       <Divider />

@@ -114,7 +114,7 @@ export function OptimizerJoinOverviewPage() {
   return (
     <PageContainer>
       <ChapterTitle
-        icon={<IconArrowMerge size={36} stroke={1.5} className="text-orange-500" />}
+        icon={<IconArrowMerge size={36} stroke={1.5} className="text-amber" />}
         title={t.title}
         subtitle={t.subtitle}
       />

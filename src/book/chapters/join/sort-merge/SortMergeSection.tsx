@@ -282,24 +282,24 @@ function SortMergeSim({ lang }: { lang: 'ko' | 'en' }) {
   }
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-slate-50 p-5">
-      <p className="mb-1 font-mono text-[11px] font-bold uppercase tracking-wider text-muted-foreground">{t.simTitle}</p>
-      <p className="mb-4 text-[12px] leading-relaxed text-muted-foreground">{t.simDesc}</p>
+    <div className="rounded-panel border border-line bg-paper-sunk p-5">
+      <p className="mb-1 font-mono text-[11px] font-bold uppercase tracking-wider text-ink-2">{t.simTitle}</p>
+      <p className="mb-4 text-[12px] leading-relaxed text-ink-2">{t.simDesc}</p>
 
       {/* Action label */}
       {currentStep && (
         <div className={cn(
-          'mb-4 rounded-lg border px-3 py-2 font-mono text-[11px] font-bold',
-          currentStep.action === 'match'     ? 'border-emerald-300 bg-emerald-50 text-emerald-700'
-          : currentStep.action === 'adv-left'  ? 'border-blue-300 bg-blue-50 text-blue-700'
-          :                                     'border-orange-300 bg-orange-50 text-orange-700',
+          'mb-4 rounded-card border px-3 py-2 font-mono text-[11px] font-bold',
+          currentStep.action === 'match'     ? 'border-green/50 bg-green/5 text-green'
+          : currentStep.action === 'adv-left'  ? 'border-blue/50 bg-blue/5 text-blue'
+          :                                     'border-amber/50 bg-amber/5 text-amber',
         )}>
           key1={currentStep.leftKey} {currentStep.action === 'match' ? '=' : currentStep.action === 'adv-left' ? '<' : '>'} key2={currentStep.rightKey}
           &nbsp;→&nbsp;{ACTION_LABEL[currentStep.action]}
         </div>
       )}
       {done && (
-        <div className="mb-4 rounded-lg border border-emerald-300 bg-emerald-50 px-3 py-2 font-mono text-[11px] font-bold text-emerald-700">
+        <div className="mb-4 rounded-card border border-green/50 bg-green/5 px-3 py-2 font-mono text-[11px] font-bold text-green">
           ✓ {t.statusDone}
         </div>
       )}
@@ -307,7 +307,7 @@ function SortMergeSim({ lang }: { lang: 'ko' | 'en' }) {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-[1fr_auto_1fr_auto_1fr]">
         {/* LEFT */}
         <div>
-          <p className="mb-2 font-mono text-[10px] font-bold text-blue-600">{t.labelLeft}</p>
+          <p className="mb-2 font-mono text-[10px] font-bold text-blue">{t.labelLeft}</p>
           <div className="flex flex-col gap-1.5">
             {LEFT_ROWS.map((row, i) => {
               const isActive  = !done && lPtr === i
@@ -317,21 +317,21 @@ function SortMergeSim({ lang }: { lang: 'ko' | 'en' }) {
                 <motion.div
                   key={row.dept_id}
                   animate={
-                    isActive   ? { backgroundColor: '#bfdbfe', scale: 1.02 }
-                    : wasMatched ? { backgroundColor: '#d1fae5', scale: 1 }
-                    : isPassed   ? { backgroundColor: '#f8fafc', scale: 1 }
-                    :              { backgroundColor: '#ffffff', scale: 1 }
+                    isActive   ? { backgroundColor: 'var(--color-blue)', scale: 1.02 }
+                    : wasMatched ? { backgroundColor: 'var(--color-line)', scale: 1 }
+                    : isPassed   ? { backgroundColor: 'var(--color-paper-sunk)', scale: 1 }
+                    :              { backgroundColor: 'var(--color-paper)', scale: 1 }
                   }
                   transition={{ duration: 0.18 }}
                   className={cn(
-                    'rounded-lg border px-3 py-2 font-mono text-xs',
-                    isActive    ? 'border-blue-400 font-bold text-blue-800'
-                    : wasMatched  ? 'border-emerald-200 text-emerald-700'
-                    : isPassed    ? 'border-slate-100 text-slate-400'
-                    :               'border-border text-muted-foreground',
+                    'rounded-card border px-3 py-2 font-mono text-xs',
+                    isActive    ? 'border-blue/50 font-bold text-blue'
+                    : wasMatched  ? 'border-green/30 text-green'
+                    : isPassed    ? 'border-line text-ink-2'
+                    :               'border-line text-ink-2',
                   )}
                 >
-                  {isActive && <span className="mr-1 text-blue-600 font-bold">{t.labelPtr}</span>}
+                  {isActive && <span className="mr-1 text-blue font-bold">{t.labelPtr}</span>}
                   <span className="text-[10px] opacity-60 mr-1">dept_id=</span>
                   <span className="font-bold">{row.dept_id}</span>
                   <span className="ml-1 text-[10px] opacity-70">{row.dept_name}</span>
@@ -344,14 +344,14 @@ function SortMergeSim({ lang }: { lang: 'ko' | 'en' }) {
         {/* Compare arrow */}
         <div className="hidden sm:flex items-center justify-center pt-6">
           <div className="flex flex-col items-center gap-0.5">
-            <span className="text-xl text-muted-foreground/30">↔</span>
-            <span className="font-mono text-[9px] text-muted-foreground">{t.labelCompare}</span>
+            <span className="text-xl text-ink-2/30">↔</span>
+            <span className="font-mono text-[9px] text-ink-2">{t.labelCompare}</span>
           </div>
         </div>
 
         {/* RIGHT */}
         <div>
-          <p className="mb-2 font-mono text-[10px] font-bold text-orange-600">{t.labelRight}</p>
+          <p className="mb-2 font-mono text-[10px] font-bold text-amber">{t.labelRight}</p>
           <div className="flex flex-col gap-1.5">
             {RIGHT_ROWS.map((row, i) => {
               const isActive   = !done && rPtr === i
@@ -361,21 +361,21 @@ function SortMergeSim({ lang }: { lang: 'ko' | 'en' }) {
                 <motion.div
                   key={row.emp_id}
                   animate={
-                    isActive    ? { backgroundColor: '#fed7aa', scale: 1.02 }
-                    : wasMatched  ? { backgroundColor: '#d1fae5', scale: 1 }
-                    : isPassed    ? { backgroundColor: '#f8fafc', scale: 1 }
-                    :               { backgroundColor: '#ffffff', scale: 1 }
+                    isActive    ? { backgroundColor: 'var(--color-amber)', scale: 1.02 }
+                    : wasMatched  ? { backgroundColor: 'var(--color-line)', scale: 1 }
+                    : isPassed    ? { backgroundColor: 'var(--color-paper-sunk)', scale: 1 }
+                    :               { backgroundColor: 'var(--color-paper)', scale: 1 }
                   }
                   transition={{ duration: 0.18 }}
                   className={cn(
-                    'rounded-lg border px-3 py-2 font-mono text-xs',
-                    isActive    ? 'border-orange-400 font-bold text-orange-800'
-                    : wasMatched  ? 'border-emerald-200 text-emerald-700'
-                    : isPassed    ? 'border-slate-100 text-slate-400'
-                    :               'border-border text-muted-foreground',
+                    'rounded-card border px-3 py-2 font-mono text-xs',
+                    isActive    ? 'border-amber/50 font-bold text-amber'
+                    : wasMatched  ? 'border-green/30 text-green'
+                    : isPassed    ? 'border-line text-ink-2'
+                    :               'border-line text-ink-2',
                   )}
                 >
-                  {isActive && <span className="mr-1 text-orange-600 font-bold">{t.labelPtr}</span>}
+                  {isActive && <span className="mr-1 text-amber font-bold">{t.labelPtr}</span>}
                   <span className="text-[10px] opacity-60 mr-1">dept_id=</span>
                   <span className="font-bold">{row.dept_id}</span>
                   <span className="ml-1 text-[10px]">{row.first_name}</span>
@@ -383,17 +383,17 @@ function SortMergeSim({ lang }: { lang: 'ko' | 'en' }) {
               )
             })}
           </div>
-          <p className="mt-2 font-mono text-[9px] text-amber-600">{t.noteNoRestart}</p>
+          <p className="mt-2 font-mono text-[9px] text-amber">{t.noteNoRestart}</p>
         </div>
 
         {/* Arrow */}
         <div className="hidden sm:flex items-center justify-center pt-6">
-          <span className="text-xl text-muted-foreground/30">→</span>
+          <span className="text-xl text-ink-2/30">→</span>
         </div>
 
         {/* Result */}
         <div>
-          <p className="mb-2 font-mono text-[10px] font-bold text-emerald-600">{t.labelResult}</p>
+          <p className="mb-2 font-mono text-[10px] font-bold text-green">{t.labelResult}</p>
           <div className="flex flex-col gap-1.5 min-h-[40px]">
             <AnimatePresence initial={false}>
               {results.map((r, i) => (
@@ -402,9 +402,9 @@ function SortMergeSim({ lang }: { lang: 'ko' | 'en' }) {
                   initial={{ opacity: 0, y: -4 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0 }}
-                  className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 font-mono text-[10px] text-emerald-800"
+                  className="rounded-card border border-green/30 bg-green/5 px-3 py-2 font-mono text-[10px] text-green"
                 >
-                  <span className="font-bold text-[10px] text-emerald-600 mr-1">{r.key}</span>
+                  <span className="font-bold text-[10px] text-green mr-1">{r.key}</span>
                   <span className="opacity-70">{r.leftName.slice(0, 3)}</span>
                   <span className="mx-1 opacity-40">↔</span>
                   <span className="font-bold">{r.rightName}</span>
@@ -412,7 +412,7 @@ function SortMergeSim({ lang }: { lang: 'ko' | 'en' }) {
               ))}
             </AnimatePresence>
             {results.length === 0 && stepIdx === 0 && (
-              <p className="font-mono text-[10px] text-muted-foreground/40 italic">—</p>
+              <p className="font-mono text-[10px] text-ink-2/40 italic">—</p>
             )}
           </div>
         </div>
@@ -423,21 +423,21 @@ function SortMergeSim({ lang }: { lang: 'ko' | 'en' }) {
         <button
           onClick={togglePlay}
           className={cn(
-            'rounded-lg border px-4 py-1.5 font-mono text-xs font-bold transition-all',
+            'rounded-card border px-4 py-1.5 font-mono text-xs font-bold transition-all',
             playing
-              ? 'border-amber-300 bg-amber-50 text-amber-700 hover:bg-amber-100'
-              : 'border-violet-300 bg-violet-50 text-violet-700 hover:bg-violet-100',
+              ? 'border-amber/50 bg-amber/5 text-amber hover:bg-amber/10'
+              : 'border-purple/50 bg-purple/5 text-purple hover:bg-purple/10',
           )}
         >
           {playing ? t.btnPause : t.btnPlay}
         </button>
         <button onClick={stepBackward} disabled={playing || stepIdx === 0}
-          className="rounded-lg border border-slate-200 px-3 py-1.5 font-mono text-xs text-muted-foreground hover:bg-muted disabled:opacity-30">{t.btnPrev}</button>
+          className="rounded-card border border-line px-3 py-1.5 font-mono text-xs text-ink-2 hover:bg-rail disabled:opacity-30">{t.btnPrev}</button>
         <button onClick={stepForward} disabled={playing || done}
-          className="rounded-lg border border-slate-200 px-3 py-1.5 font-mono text-xs text-muted-foreground hover:bg-muted disabled:opacity-30">{t.btnNext}</button>
+          className="rounded-card border border-line px-3 py-1.5 font-mono text-xs text-ink-2 hover:bg-rail disabled:opacity-30">{t.btnNext}</button>
         <button onClick={reset}
-          className="rounded-lg border border-slate-200 px-3 py-1.5 font-mono text-xs text-muted-foreground hover:bg-muted">{t.btnReset}</button>
-        <span className="ml-auto font-mono text-[10px] text-muted-foreground">
+          className="rounded-card border border-line px-3 py-1.5 font-mono text-xs text-ink-2 hover:bg-rail">{t.btnReset}</button>
+        <span className="ml-auto font-mono text-[10px] text-ink-2">
           {done ? t.statusDone : t.labelProgress(stepIdx)}
         </span>
       </div>
@@ -453,7 +453,7 @@ export function JoinSortMergeSection() {
   return (
     <PageContainer>
       <ChapterTitle
-        icon={<IconArrowMerge size={36} stroke={1.5} className="text-violet-500" />}
+        icon={<IconArrowMerge size={36} stroke={1.5} className="text-purple" />}
         title={t.title}
         subtitle={t.subtitle}
       />

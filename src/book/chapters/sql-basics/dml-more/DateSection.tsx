@@ -415,14 +415,14 @@ const FUNC_ITEMS: FuncItem[] = [
 
 function ResultTable({ headers, rows }: { headers: string[]; rows: string[][] }) {
   return (
-    <div className="overflow-x-auto rounded-lg border text-xs">
+    <div className="overflow-x-auto rounded-card border text-xs">
       <table className="w-max min-w-full">
         <thead>
-          <tr className="border-b bg-muted/60">
+          <tr className="border-b bg-rail">
             {headers.map((h) => (
               <th
                 key={h}
-                className="whitespace-nowrap px-2.5 py-1.5 text-left font-mono text-[10px] font-bold text-muted-foreground"
+                className="whitespace-nowrap px-2.5 py-1.5 text-left font-mono text-[10px] font-bold text-ink-2"
               >
                 {h}
               </th>
@@ -435,7 +435,7 @@ function ResultTable({ headers, rows }: { headers: string[]; rows: string[][] })
               {row.map((cell, ci) => (
                 <td
                   key={ci}
-                  className="whitespace-nowrap px-2.5 py-1 font-mono text-[11px] text-foreground/80"
+                  className="whitespace-nowrap px-2.5 py-1 font-mono text-[11px] text-ink/80"
                 >
                   {cell}
                 </td>
@@ -453,24 +453,24 @@ function ResultTable({ headers, rows }: { headers: string[]; rows: string[][] })
 function FormatMaskTable({ title, rows, lang }: { title: { ko: string; en: string }; rows: FormatMaskRow[]; lang: 'ko' | 'en' }) {
   return (
     <div>
-      <p className="mb-1.5 font-mono text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+      <p className="mb-1.5 font-mono text-[11px] font-bold uppercase tracking-wider text-ink-2">
         {title[lang]}
       </p>
-      <div className="inline-block rounded-lg border text-xs">
+      <div className="inline-block rounded-card border text-xs">
         <table className="w-auto">
           <thead>
-            <tr className="border-b bg-muted/60">
-              <th className="whitespace-nowrap px-2.5 py-1.5 text-left font-mono text-[10px] font-bold text-muted-foreground">{lang === 'ko' ? '마스크' : 'Mask'}</th>
-              <th className="whitespace-nowrap px-2.5 py-1.5 text-left font-mono text-[10px] font-bold text-muted-foreground">{lang === 'ko' ? '출력 예' : 'Output'}</th>
-              <th className="whitespace-nowrap px-2.5 py-1.5 text-left font-mono text-[10px] font-bold text-muted-foreground">{lang === 'ko' ? '설명' : 'Note'}</th>
+            <tr className="border-b bg-rail">
+              <th className="whitespace-nowrap px-2.5 py-1.5 text-left font-mono text-[10px] font-bold text-ink-2">{lang === 'ko' ? '마스크' : 'Mask'}</th>
+              <th className="whitespace-nowrap px-2.5 py-1.5 text-left font-mono text-[10px] font-bold text-ink-2">{lang === 'ko' ? '출력 예' : 'Output'}</th>
+              <th className="whitespace-nowrap px-2.5 py-1.5 text-left font-mono text-[10px] font-bold text-ink-2">{lang === 'ko' ? '설명' : 'Note'}</th>
             </tr>
           </thead>
           <tbody>
             {rows.map((r) => (
               <tr key={r.mask} className="border-b last:border-0">
-                <td className="whitespace-nowrap px-2.5 py-1 font-mono text-[11px] font-bold text-blue-700">{r.mask}</td>
-                <td className="whitespace-nowrap px-2.5 py-1 font-mono text-[11px] text-foreground/80">{r.example}</td>
-                <td className="whitespace-nowrap px-2.5 py-1 font-mono text-[11px] text-foreground/70">{r.desc[lang]}</td>
+                <td className="whitespace-nowrap px-2.5 py-1 font-mono text-[11px] font-bold text-blue">{r.mask}</td>
+                <td className="whitespace-nowrap px-2.5 py-1 font-mono text-[11px] text-ink/80">{r.example}</td>
+                <td className="whitespace-nowrap px-2.5 py-1 font-mono text-[11px] text-ink/70">{r.desc[lang]}</td>
               </tr>
             ))}
           </tbody>
@@ -485,24 +485,24 @@ function FormatMaskTable({ title, rows, lang }: { title: { ko: string; en: strin
 function ArithTable({ title, rows, lang }: { title: { ko: string; en: string }; rows: ArithRow[]; lang: 'ko' | 'en' }) {
   return (
     <div>
-      <p className="mb-1.5 font-mono text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+      <p className="mb-1.5 font-mono text-[11px] font-bold uppercase tracking-wider text-ink-2">
         {title[lang]}
       </p>
-      <div className="inline-block rounded-lg border text-xs">
+      <div className="inline-block rounded-card border text-xs">
         <table className="w-auto">
           <thead>
-            <tr className="border-b bg-muted/60">
-              <th className="whitespace-nowrap px-2.5 py-1.5 text-left font-mono text-[10px] font-bold text-muted-foreground">식</th>
-              <th className="whitespace-nowrap px-2.5 py-1.5 text-left font-mono text-[10px] font-bold text-muted-foreground">{lang === 'ko' ? '결과' : 'Result'}</th>
-              <th className="whitespace-nowrap px-2.5 py-1.5 text-left font-mono text-[10px] font-bold text-muted-foreground">{lang === 'ko' ? '설명' : 'Note'}</th>
+            <tr className="border-b bg-rail">
+              <th className="whitespace-nowrap px-2.5 py-1.5 text-left font-mono text-[10px] font-bold text-ink-2">식</th>
+              <th className="whitespace-nowrap px-2.5 py-1.5 text-left font-mono text-[10px] font-bold text-ink-2">{lang === 'ko' ? '결과' : 'Result'}</th>
+              <th className="whitespace-nowrap px-2.5 py-1.5 text-left font-mono text-[10px] font-bold text-ink-2">{lang === 'ko' ? '설명' : 'Note'}</th>
             </tr>
           </thead>
           <tbody>
             {rows.map((r) => (
               <tr key={r.expr} className="border-b last:border-0">
-                <td className="whitespace-nowrap px-2.5 py-1 font-mono text-[11px] text-blue-700">{r.expr}</td>
-                <td className="whitespace-nowrap px-2.5 py-1 font-mono text-[11px] text-foreground/80">{r.result}</td>
-                <td className="whitespace-nowrap px-2.5 py-1 font-mono text-[11px] text-foreground/70">{r.desc[lang]}</td>
+                <td className="whitespace-nowrap px-2.5 py-1 font-mono text-[11px] text-blue">{r.expr}</td>
+                <td className="whitespace-nowrap px-2.5 py-1 font-mono text-[11px] text-ink/80">{r.result}</td>
+                <td className="whitespace-nowrap px-2.5 py-1 font-mono text-[11px] text-ink/70">{r.desc[lang]}</td>
               </tr>
             ))}
           </tbody>
@@ -548,7 +548,7 @@ function FuncContent({ item, lang, t }: { item: FuncItem; lang: 'ko' | 'en'; t: 
     <div className="flex flex-col gap-4">
       {/* 시그니처 */}
       <div>
-        <span className="inline-block rounded border bg-ios-blue-light px-2 py-0.5 font-mono text-[11px] text-ios-blue-dark">
+        <span className="inline-block rounded border bg-blue/10 px-2 py-0.5 font-mono text-[11px] text-blue">
           {item.signature}
         </span>
       </div>
@@ -582,17 +582,17 @@ function FuncContent({ item, lang, t }: { item: FuncItem; lang: 'ko' | 'en'; t: 
 
       {/* 예시 쿼리 */}
       <div>
-        <p className="mb-1.5 font-mono text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+        <p className="mb-1.5 font-mono text-[11px] font-bold uppercase tracking-wider text-ink-2">
           {t.exampleQuery}
         </p>
-        <div className="rounded-xl border bg-muted/30 px-4 py-3">
+        <div className="rounded-panel border bg-rail px-4 py-3">
           <SqlHighlight sql={item.example} />
         </div>
       </div>
 
       {/* 실행 결과 */}
       <div>
-        <p className="mb-2 font-mono text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+        <p className="mb-2 font-mono text-[11px] font-bold uppercase tracking-wider text-ink-2">
           {t.result}
         </p>
         <ResultTable headers={item.resultHeaders} rows={item.resultRows} />
@@ -601,10 +601,10 @@ function FuncContent({ item, lang, t }: { item: FuncItem; lang: 'ko' | 'en'; t: 
       {/* SYSDATE ↔ TIMESTAMP 변환 예시 */}
       {item.castExample && (
         <div>
-          <p className="mb-1.5 font-mono text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+          <p className="mb-1.5 font-mono text-[11px] font-bold uppercase tracking-wider text-ink-2">
             {lang === 'ko' ? 'SYSDATE ↔ TIMESTAMP 변환' : 'SYSDATE ↔ TIMESTAMP Conversion'}
           </p>
-          <div className="mb-3 rounded-xl border bg-muted/30 px-4 py-3">
+          <div className="mb-3 rounded-panel border bg-rail px-4 py-3">
             <SqlHighlight sql={item.castExample.sql} />
           </div>
           <ResultTable headers={item.castExample.headers} rows={item.castExample.rows} />
@@ -619,10 +619,10 @@ function FuncContent({ item, lang, t }: { item: FuncItem; lang: 'ko' | 'en'; t: 
       {/* SYSTIMESTAMP 끼리의 연산 예시 */}
       {item.arith2 && (
         <div>
-          <p className="mb-1.5 font-mono text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+          <p className="mb-1.5 font-mono text-[11px] font-bold uppercase tracking-wider text-ink-2">
             {t.arith2Title}
           </p>
-          <div className="mb-3 rounded-xl border bg-muted/30 px-4 py-3">
+          <div className="mb-3 rounded-panel border bg-rail px-4 py-3">
             <SqlHighlight sql={
               "-- 두 SYSTIMESTAMP 값 사이의 경과 시간 측정\nSELECT ts_end - ts_start                              AS diff_interval,\n       EXTRACT(MINUTE FROM ts_end - ts_start)          AS diff_min,\n       EXTRACT(SECOND FROM ts_end - ts_start)          AS diff_sec\nFROM (\n  SELECT SYSTIMESTAMP                          AS ts_start,\n         SYSTIMESTAMP + INTERVAL '0:2:35.847' MINUTE TO SECOND AS ts_end\n  FROM DUAL\n)"
             } />
@@ -636,13 +636,13 @@ function FuncContent({ item, lang, t }: { item: FuncItem; lang: 'ko' | 'en'; t: 
         <>
           <Divider />
           <div>
-            <p className="mb-2 font-mono text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+            <p className="mb-2 font-mono text-[11px] font-bold uppercase tracking-wider text-ink-2">
               {t.tzConvertTitle}
             </p>
-            <div className="mb-3 rounded-xl border bg-card px-4 py-3">
+            <div className="mb-3 rounded-panel border bg-paper px-4 py-3">
               <Prose>{item.tzConvert.desc[lang]}</Prose>
             </div>
-            <div className="mb-3 rounded-xl border bg-muted/30 px-4 py-3">
+            <div className="mb-3 rounded-panel border bg-rail px-4 py-3">
               <SqlHighlight sql={item.tzConvert.example} />
             </div>
             <ResultTable headers={item.tzConvert.resultHeaders} rows={item.tzConvert.resultRows} />
@@ -650,19 +650,19 @@ function FuncContent({ item, lang, t }: { item: FuncItem; lang: 'ko' | 'en'; t: 
 
           {item.tzConvert.tzSetup.map((block) => (
             <div key={block.title.ko}>
-              <p className="mb-1.5 font-mono text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+              <p className="mb-1.5 font-mono text-[11px] font-bold uppercase tracking-wider text-ink-2">
                 {block.title[lang]}
               </p>
-              <div className="overflow-x-auto rounded-xl border bg-muted/30 px-4 py-3">
+              <div className="overflow-x-auto rounded-panel border bg-rail px-4 py-3">
                 <table className="w-full text-xs">
                   <tbody>
                     {block.lines.map((line, i) => (
                       <tr key={i}>
-                        <td className="whitespace-nowrap py-0.5 pr-4 font-mono text-[11px] text-blue-700">
+                        <td className="whitespace-nowrap py-0.5 pr-4 font-mono text-[11px] text-blue">
                           {line.code}
                         </td>
                         {line.comment[lang] && (
-                          <td className="py-0.5 font-mono text-[11px] text-muted-foreground">
+                          <td className="py-0.5 font-mono text-[11px] text-ink-2">
                             {`-- ${line.comment[lang]}`}
                           </td>
                         )}
@@ -697,7 +697,7 @@ function FuncContent({ item, lang, t }: { item: FuncItem; lang: 'ko' | 'en'; t: 
 
       {/* 참고 */}
       {item.note && (
-        <div className="rounded-xl border bg-muted/40 px-4 py-3 text-xs leading-relaxed text-foreground/80">
+        <div className="rounded-panel border bg-rail px-4 py-3 text-xs leading-relaxed text-ink/80">
           <span className="mr-1.5 font-bold">💡</span>{item.note[lang]}
         </div>
       )}
@@ -714,7 +714,7 @@ export function DateSection() {
   return (
     <PageContainer className="max-w-5xl">
       <ChapterTitle
-        icon={<IconCalendarEvent size={36} color="#0ea5e9" stroke={1.5} />}
+        icon={<IconCalendarEvent size={36} color="var(--color-blue)" stroke={1.5} />}
         title={t.chapterTitle}
         subtitle={t.chapterSubtitle}
       />

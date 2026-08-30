@@ -24,21 +24,13 @@ interface Props {
   onNavigate: (sectionId: string) => void
 }
 
-const COLOR_MAP: Record<string, { text: string; border: string; bg: string; dot: string }> = {
-  blue:         { text: 'text-blue-600',          border: 'border-blue-200',          bg: 'bg-blue-50',          dot: 'bg-blue-400' },
-  violet:       { text: 'text-violet-600',        border: 'border-violet-200',        bg: 'bg-violet-50',        dot: 'bg-violet-400' },
-  emerald:      { text: 'text-emerald-600',       border: 'border-emerald-200',       bg: 'bg-emerald-50',       dot: 'bg-emerald-400' },
-  orange:       { text: 'text-orange-600',        border: 'border-orange-200',        bg: 'bg-orange-50',        dot: 'bg-orange-400' },
-  cyan:         { text: 'text-cyan-600',          border: 'border-cyan-200',          bg: 'bg-cyan-50',          dot: 'bg-cyan-400' },
-  rose:         { text: 'text-rose-600',          border: 'border-rose-200',          bg: 'bg-rose-50',          dot: 'bg-rose-400' },
-  amber:        { text: 'text-amber-600',         border: 'border-amber-200',         bg: 'bg-amber-50',         dot: 'bg-amber-400' },
-  teal:         { text: 'text-teal-600',          border: 'border-teal-200',          bg: 'bg-teal-50',          dot: 'bg-teal-400' },
-  'brand-pink': { text: 'text-brand-pink-dark',   border: 'border-brand-pink/30',     bg: 'bg-brand-pink-light', dot: 'bg-brand-pink' },
-  'brand-navy': { text: 'text-brand-navy-dark',   border: 'border-brand-navy/25',     bg: 'bg-brand-navy-light', dot: 'bg-brand-navy' },
-  'brand-teal': { text: 'text-brand-teal-dark',   border: 'border-brand-teal/30',     bg: 'bg-brand-teal-light', dot: 'bg-brand-teal' },
-  'brand-orange':{ text: 'text-brand-orange-dark',border: 'border-brand-orange/30',   bg: 'bg-brand-orange-light',dot: 'bg-brand-orange' },
-  'brand-salmon':{ text: 'text-brand-salmon-dark',border: 'border-brand-salmon/30',   bg: 'bg-brand-salmon-light',dot: 'bg-brand-salmon' },
-}
+// Chapters migrated to the token system (dark-capable). Others are pinned light
+// via data-theme="light" until they migrate (DESIGN.md §6).
+const DARK_READY = [
+  'intro-', 'dm-', 'sql-basics-', 'internals-', 'join-', 'index-',
+  'partition-', 'parallel-', 'optimizer-', 'qt-', 'sort-', 'sql-tuning-',
+]
+const isDarkReady = (id: string) => DARK_READY.some((p) => id.startsWith(p))
 
 export const BookContent = memo(function BookContent({ sectionId, onNavigate }: Props) {
   const lang = useSimulationStore((s) => s.lang)
@@ -53,27 +45,28 @@ export const BookContent = memo(function BookContent({ sectionId, onNavigate }: 
   if (!info) return null
 
   const { chapter } = info
-  const c = COLOR_MAP[chapter.color] ?? COLOR_MAP.blue
 
   return (
-    <div className="flex h-full flex-col overflow-hidden">
-      {/* Breadcrumb */}
-      <div className="flex h-[35px] shrink-0 items-center gap-1.5 border-b bg-muted/30 px-6">
-        <span className={cn('flex items-center gap-1 font-mono text-[10px] font-medium', c.text)}>
+    <div className="flex h-full flex-col overflow-hidden bg-paper">
+      {/* Breadcrumb — mono chrome */}
+      <div className="flex h-11 shrink-0 items-center gap-1.5 border-b border-line bg-rail px-6">
+        <span className="flex items-center gap-1.5 font-mono text-[10px] font-medium text-ink-2 [&_svg]:size-3.5 [&_svg]:text-ink-3">
           {chapter.icon}
           {chapter.num > 0 ? `${chapter.num.toString().padStart(2, '0')}.` : ''} {chapter.title[lang]}
         </span>
-        <IconChevronRight size={11} className="text-muted-foreground/50" />
-        <span className="font-mono text-[10px] text-muted-foreground">
-          {info.section.title[lang]}
-        </span>
+        <IconChevronRight size={11} className="text-ink-3/50" />
+        <span className="font-mono text-[10px] text-ink-3">{info.section.title[lang]}</span>
       </div>
 
-      {/* Content area */}
-      <div ref={scrollRef} className={cn(
-        'min-h-0 flex-1',
-        sectionId === 'optimizer-simulator' ? 'overflow-hidden' : 'overflow-x-hidden overflow-y-auto',
-      )}>
+      {/* Content area — migrated chapters follow the theme; others pinned light */}
+      <div
+        ref={scrollRef}
+        data-theme={isDarkReady(sectionId) ? undefined : 'light'}
+        className={cn(
+          'min-h-0 flex-1 bg-paper-sunk text-ink',
+          sectionId === 'optimizer-simulator' ? 'overflow-hidden' : 'overflow-x-hidden overflow-y-auto',
+        )}
+      >
         <AnimatePresence mode="wait">
           <motion.div
             key={sectionId}
@@ -88,20 +81,20 @@ export const BookContent = memo(function BookContent({ sectionId, onNavigate }: 
         </AnimatePresence>
       </div>
 
-      {/* Prev / Next navigation */}
-      <div className="flex h-[52px] shrink-0 items-center justify-between border-t bg-card px-6">
+      {/* Prev / Next navigation — mono chrome */}
+      <div className="flex h-[52px] shrink-0 items-center justify-between border-t border-line bg-paper px-6">
         <div className="flex-1">
           {adjacent.prev && (
             <button
               onClick={() => onNavigate(adjacent.prev!.section.id)}
               className="group flex items-center gap-2 text-left"
             >
-              <IconArrowLeft size={14} className="text-muted-foreground transition-colors group-hover:text-foreground" />
+              <IconArrowLeft size={14} className="text-ink-3 transition-colors group-hover:text-ink" />
               <div className="flex flex-col">
-                <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground/50">
+                <span className="font-mono text-[9px] uppercase tracking-widest text-ink-3/60">
                   {lang === 'ko' ? '이전' : 'Previous'}
                 </span>
-                <span className="font-mono text-xs text-muted-foreground transition-colors group-hover:text-foreground">
+                <span className="font-mono text-xs text-ink-2 transition-colors group-hover:text-ink">
                   {adjacent.prev.section.title[lang]}
                 </span>
               </div>
@@ -116,14 +109,14 @@ export const BookContent = memo(function BookContent({ sectionId, onNavigate }: 
               className="group ml-auto flex items-center justify-end gap-2 text-right"
             >
               <div className="flex flex-col">
-                <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground/50">
+                <span className="font-mono text-[9px] uppercase tracking-widest text-ink-3/60">
                   {lang === 'ko' ? '다음' : 'Next'}
                 </span>
-                <span className="font-mono text-xs text-muted-foreground transition-colors group-hover:text-foreground">
+                <span className="font-mono text-xs text-ink-2 transition-colors group-hover:text-ink">
                   {adjacent.next.section.title[lang]}
                 </span>
               </div>
-              <IconArrowRight size={14} className="text-muted-foreground transition-colors group-hover:text-foreground" />
+              <IconArrowRight size={14} className="text-ink-3 transition-colors group-hover:text-ink" />
             </button>
           )}
         </div>

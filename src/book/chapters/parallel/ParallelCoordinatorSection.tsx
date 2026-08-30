@@ -219,7 +219,7 @@ export function ParallelCoordinatorSection() {
   return (
     <PageContainer>
       <ChapterTitle
-        icon={<IconGitFork size={36} stroke={1.5} className="text-teal-500" />}
+        icon={<IconGitFork size={36} stroke={1.5} className="text-green" />}
         title={t.title}
         subtitle={t.subtitle}
       />
@@ -328,7 +328,7 @@ function ParallelArchDiagram({ lang }: { lang: 'ko' | 'en' }) {
   const consLeftX  = CONS_GRP_X                 // Consumer 그룹 왼쪽 끝
 
   return (
-    <div className="my-6 overflow-x-auto rounded-xl border bg-muted/20 p-3">
+    <div className="my-6 overflow-x-auto rounded-panel border bg-rail p-3">
       <svg
         viewBox={`0 0 ${W} ${H}`}
         className="mx-auto w-full"
@@ -336,27 +336,27 @@ function ParallelArchDiagram({ lang }: { lang: 'ko' | 'en' }) {
       >
         <defs>
           <marker id="arr-v" markerWidth={6} markerHeight={6} refX={5} refY={3} orient="auto">
-            <path d="M0,0 L0,6 L6,3 z" fill="#8b5cf6" />
+            <path d="M0,0 L0,6 L6,3 z" fill="var(--color-purple)" />
           </marker>
           <marker id="arr-g" markerWidth={6} markerHeight={6} refX={5} refY={3} orient="auto">
-            <path d="M0,0 L0,6 L6,3 z" fill="#16a34a" />
+            <path d="M0,0 L0,6 L6,3 z" fill="var(--color-green)" />
           </marker>
           <marker id="arr-b" markerWidth={6} markerHeight={6} refX={5} refY={3} orient="auto">
-            <path d="M0,0 L0,6 L6,3 z" fill="#2563eb" />
+            <path d="M0,0 L0,6 L6,3 z" fill="var(--color-blue)" />
           </marker>
         </defs>
 
         {/* ── 왼쪽 QC ─────────────────────────────────────── */}
         <rect x={QC_X} y={QC_Y} width={QC_W} height={QC_H} rx={8}
-          fill="#ede9fe" stroke="#8b5cf6" strokeWidth={1.5} />
+          fill="var(--color-rail)" stroke="var(--color-purple)" strokeWidth={1.5} />
         <text x={QC_X + QC_W / 2} y={QC_Y + QC_H / 2 - 8}
-          textAnchor="middle" fontSize={11} fontWeight="bold" fill="#6d28d9">QC</text>
+          textAnchor="middle" fontSize={11} fontWeight="bold" fill="var(--color-purple)">QC</text>
         <text x={QC_X + QC_W / 2} y={QC_Y + QC_H / 2 + 6}
-          textAnchor="middle" fontSize={7.5} fill="#7c3aed">
+          textAnchor="middle" fontSize={7.5} fill="var(--color-purple)">
           {isKo ? '작업' : 'Dispatch'}
         </text>
         <text x={QC_X + QC_W / 2} y={QC_Y + QC_H / 2 + 17}
-          textAnchor="middle" fontSize={7.5} fill="#7c3aed">
+          textAnchor="middle" fontSize={7.5} fill="var(--color-purple)">
           {isKo ? '분배' : 'work'}
         </text>
 
@@ -364,17 +364,17 @@ function ParallelArchDiagram({ lang }: { lang: 'ko' | 'en' }) {
         <line
           x1={QC_X + QC_W} y1={QC_Y + QC_H / 2}
           x2={PROD_GRP_X - 1} y2={QC_Y + QC_H / 2}
-          stroke="#8b5cf6" strokeWidth={1.5} strokeDasharray="5 3"
+          stroke="var(--color-purple)" strokeWidth={1.5} strokeDasharray="5 3"
           markerEnd="url(#arr-v)"
         />
 
         {/* ── Producer 그룹 박스 ──────────────────────────── */}
         <rect x={PROD_GRP_X} y={PROD_GRP_Y} width={PROD_GRP_W} height={PROD_GRP_H}
-          rx={8} fill="#f0fdf4" stroke="#16a34a" strokeWidth={1.5} />
+          rx={8} fill="var(--color-rail)" stroke="var(--color-green)" strokeWidth={1.5} />
         {/* 그룹 레이블 — 박스 상단 배경 위에 렌더 */}
-        <rect x={PROD_GRP_X + 6} y={PROD_GRP_Y - 8} width={78} height={14} rx={3} fill="#f0fdf4" />
+        <rect x={PROD_GRP_X + 6} y={PROD_GRP_Y - 8} width={78} height={14} rx={3} fill="var(--color-rail)" />
         <text x={PROD_GRP_X + 10} y={PROD_GRP_Y + 2}
-          fontSize={8} fontWeight="bold" fill="#15803d">
+          fontSize={8} fontWeight="bold" fill="var(--color-green)">
           Producer PX
         </text>
 
@@ -384,10 +384,10 @@ function ParallelArchDiagram({ lang }: { lang: 'ko' | 'en' }) {
             <rect
               x={PROD_GRP_X + GRP_PAD} y={pxY(i)}
               width={PX_W} height={PX_H} rx={5}
-              fill="#dcfce7" stroke="#16a34a" strokeWidth={1}
+              fill="var(--color-rail)" stroke="var(--color-green)" strokeWidth={1}
             />
             <text x={PROD_GRP_X + GRP_PAD + PX_W / 2} y={pxY(i) + PX_H / 2 + 4}
-              textAnchor="middle" fontSize={9} fontWeight="bold" fill="#15803d">
+              textAnchor="middle" fontSize={9} fontWeight="bold" fill="var(--color-green)">
               PX {i + 1}
             </text>
           </g>
@@ -401,7 +401,7 @@ function ParallelArchDiagram({ lang }: { lang: 'ko' | 'en' }) {
             <polyline
               key={`prod-tq-${i}`}
               points={`${prodRightX},${y} ${midX},${y} ${midX},${TQ_Y + TQ_H / 2} ${tqLeftX},${TQ_Y + TQ_H / 2}`}
-              fill="none" stroke="#16a34a" strokeWidth={1.2}
+              fill="none" stroke="var(--color-green)" strokeWidth={1.2}
               markerEnd="url(#arr-g)"
             />
           )
@@ -409,20 +409,20 @@ function ParallelArchDiagram({ lang }: { lang: 'ko' | 'en' }) {
 
         {/* ── TABLE QUEUE 세로 버스 ───────────────────────── */}
         <rect x={TQ_X} y={TQ_Y} width={TQ_W} height={TQ_H}
-          rx={6} fill="#fef3c7" stroke="#d97706" strokeWidth={1.5} />
+          rx={6} fill="var(--color-amber)" stroke="var(--color-amber)" strokeWidth={1.5} />
         <text x={TQ_CX} y={TQ_Y + TQ_H / 2 - 18}
-          textAnchor="middle" fontSize={8} fontWeight="bold" fill="#92400e">TABLE</text>
+          textAnchor="middle" fontSize={8} fontWeight="bold" fill="var(--color-amber)">TABLE</text>
         <text x={TQ_CX} y={TQ_Y + TQ_H / 2 - 7}
-          textAnchor="middle" fontSize={8} fontWeight="bold" fill="#92400e">QUEUE</text>
+          textAnchor="middle" fontSize={8} fontWeight="bold" fill="var(--color-amber)">QUEUE</text>
         {/* 구분선 */}
         <line x1={TQ_X + 6} y1={TQ_Y + TQ_H / 2 + 2} x2={TQ_X + TQ_W - 6} y2={TQ_Y + TQ_H / 2 + 2}
-          stroke="#d97706" strokeWidth={0.8} strokeDasharray="3 2" />
+          stroke="var(--color-amber)" strokeWidth={0.8} strokeDasharray="3 2" />
         <text x={TQ_CX} y={TQ_Y + TQ_H / 2 + 14}
-          textAnchor="middle" fontSize={7} fill="#a16207">PX SEND</text>
+          textAnchor="middle" fontSize={7} fill="var(--color-amber)">PX SEND</text>
         <text x={TQ_CX} y={TQ_Y + TQ_H / 2 + 24}
-          textAnchor="middle" fontSize={7} fill="#a16207">↕</text>
+          textAnchor="middle" fontSize={7} fill="var(--color-amber)">↕</text>
         <text x={TQ_CX} y={TQ_Y + TQ_H / 2 + 34}
-          textAnchor="middle" fontSize={7} fill="#a16207">PX RECV</text>
+          textAnchor="middle" fontSize={7} fill="var(--color-amber)">PX RECV</text>
 
         {/* TQ 오른쪽 벽 → Consumer fan-out 선 */}
         {Array.from({ length: N }, (_, i) => {
@@ -432,7 +432,7 @@ function ParallelArchDiagram({ lang }: { lang: 'ko' | 'en' }) {
             <polyline
               key={`tq-cons-${i}`}
               points={`${tqRightX},${TQ_Y + TQ_H / 2} ${midX},${TQ_Y + TQ_H / 2} ${midX},${y} ${consLeftX},${y}`}
-              fill="none" stroke="#2563eb" strokeWidth={1.2}
+              fill="none" stroke="var(--color-blue)" strokeWidth={1.2}
               markerEnd="url(#arr-b)"
             />
           )
@@ -440,10 +440,10 @@ function ParallelArchDiagram({ lang }: { lang: 'ko' | 'en' }) {
 
         {/* ── Consumer 그룹 박스 ──────────────────────────── */}
         <rect x={CONS_GRP_X} y={CONS_GRP_Y} width={CONS_GRP_W} height={CONS_GRP_H}
-          rx={8} fill="#eff6ff" stroke="#2563eb" strokeWidth={1.5} />
-        <rect x={CONS_GRP_X + 6} y={CONS_GRP_Y - 8} width={80} height={14} rx={3} fill="#eff6ff" />
+          rx={8} fill="var(--color-rail)" stroke="var(--color-blue)" strokeWidth={1.5} />
+        <rect x={CONS_GRP_X + 6} y={CONS_GRP_Y - 8} width={80} height={14} rx={3} fill="var(--color-rail)" />
         <text x={CONS_GRP_X + 10} y={CONS_GRP_Y + 2}
-          fontSize={8} fontWeight="bold" fill="#1d4ed8">
+          fontSize={8} fontWeight="bold" fill="var(--color-blue)">
           Consumer PX
         </text>
 
@@ -453,10 +453,10 @@ function ParallelArchDiagram({ lang }: { lang: 'ko' | 'en' }) {
             <rect
               x={cpxX} y={pxY(i)}
               width={PX_W} height={PX_H} rx={5}
-              fill="#dbeafe" stroke="#2563eb" strokeWidth={1}
+              fill="var(--color-rail)" stroke="var(--color-blue)" strokeWidth={1}
             />
             <text x={cpxX + PX_W / 2} y={pxY(i) + PX_H / 2 + 4}
-              textAnchor="middle" fontSize={9} fontWeight="bold" fill="#1d4ed8">
+              textAnchor="middle" fontSize={9} fontWeight="bold" fill="var(--color-blue)">
               PX {i + 1}
             </text>
           </g>
@@ -466,25 +466,25 @@ function ParallelArchDiagram({ lang }: { lang: 'ko' | 'en' }) {
         <line
           x1={CONS_GRP_X + CONS_GRP_W} y1={CONS_GRP_Y + CONS_GRP_H / 2}
           x2={QC2_X - 1} y2={QC2_Y + QC_H / 2}
-          stroke="#8b5cf6" strokeWidth={1.5} strokeDasharray="5 3"
+          stroke="var(--color-purple)" strokeWidth={1.5} strokeDasharray="5 3"
           markerEnd="url(#arr-v)"
         />
 
         {/* ── 오른쪽 QC (결과 수집) ───────────────────────── */}
         <rect x={QC2_X} y={QC2_Y} width={QC_W} height={QC_H} rx={8}
-          fill="#ede9fe" stroke="#8b5cf6" strokeWidth={1.5} />
+          fill="var(--color-rail)" stroke="var(--color-purple)" strokeWidth={1.5} />
         <text x={QC2_X + QC_W / 2} y={QC2_Y + QC_H / 2 - 8}
-          textAnchor="middle" fontSize={11} fontWeight="bold" fill="#6d28d9">QC</text>
+          textAnchor="middle" fontSize={11} fontWeight="bold" fill="var(--color-purple)">QC</text>
         <text x={QC2_X + QC_W / 2} y={QC2_Y + QC_H / 2 + 6}
-          textAnchor="middle" fontSize={7.5} fill="#7c3aed">
+          textAnchor="middle" fontSize={7.5} fill="var(--color-purple)">
           {isKo ? '결과' : 'Merge'}
         </text>
         <text x={QC2_X + QC_W / 2} y={QC2_Y + QC_H / 2 + 17}
-          textAnchor="middle" fontSize={7.5} fill="#7c3aed">
+          textAnchor="middle" fontSize={7.5} fill="var(--color-purple)">
           {isKo ? '수집' : '→ Client'}
         </text>
       </svg>
-      <p className="mt-2 text-center font-mono text-[10px] text-muted-foreground">
+      <p className="mt-2 text-center font-mono text-[10px] text-ink-2">
         {isKo
           ? 'QC(작업 분배) → Producer PX 집합 → TABLE QUEUE → Consumer PX 집합 → QC(결과 수집)'
           : 'QC (dispatch) → Producer PX set → TABLE QUEUE → Consumer PX set → QC (merge)'}

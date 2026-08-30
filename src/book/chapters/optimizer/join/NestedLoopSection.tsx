@@ -153,7 +153,7 @@ export function OptimizerJoinNestedLoopPage() {
   return (
     <PageContainer>
       <ChapterTitle
-        icon={<IconArrowMerge size={36} stroke={1.5} className="text-blue-500" />}
+        icon={<IconArrowMerge size={36} stroke={1.5} className="text-blue" />}
         title={t.title}
         subtitle={t.subtitle}
       />
@@ -167,10 +167,10 @@ export function OptimizerJoinNestedLoopPage() {
       <div className="mt-4 space-y-2">
         {t.selectItems.map((item, i) => (
           <div key={i} className="flex items-start gap-3">
-            <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-blue-100 font-mono text-[10px] font-bold text-blue-600">
+            <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-blue/10 font-mono text-[10px] font-bold text-blue">
               {i + 1}
             </span>
-            <p className="text-sm leading-relaxed text-muted-foreground">{item}</p>
+            <p className="text-sm leading-relaxed text-ink-2">{item}</p>
           </div>
         ))}
       </div>

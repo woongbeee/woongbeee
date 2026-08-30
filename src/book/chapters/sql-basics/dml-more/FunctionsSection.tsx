@@ -131,7 +131,7 @@ const FUNC_ITEMS: FuncItem[] = [
   },
 ]
 
-const C = { bg: 'bg-muted/40', border: 'border-border', text: 'text-foreground/80', active: 'bg-ios-blue-light text-ios-blue-dark', code: 'bg-muted/30 border-border' }
+const C = { bg: 'bg-rail', border: 'border-line', text: 'text-ink/80', active: 'bg-blue/10 text-blue', code: 'bg-rail border-line' }
 
 // ── MiniTable ───────────────────────────────────────────────────────────────
 
@@ -141,18 +141,18 @@ function MiniTable({ headers, rows, highlightLast }: {
   highlightLast?: boolean
 }) {
   return (
-    <div className="overflow-hidden rounded-lg border text-xs">
+    <div className="overflow-hidden rounded-card border text-xs">
       <table className="w-full">
         <thead>
-          <tr className="border-b bg-muted/60">
+          <tr className="border-b bg-rail">
             {headers.map((h, i) => (
               <th
                 key={h}
                 className={cn(
                   'px-2.5 py-1.5 text-left font-mono text-[10px] font-bold',
                   highlightLast && i === headers.length - 1
-                    ? 'text-ios-blue-dark'
-                    : 'text-muted-foreground',
+                    ? 'text-blue'
+                    : 'text-ink-2',
                 )}
               >
                 {h}
@@ -171,9 +171,9 @@ function MiniTable({ headers, rows, highlightLast }: {
                     key={ci}
                     className={cn(
                       'px-2.5 py-1 font-mono text-[11px]',
-                      isNull       ? 'italic text-muted-foreground/40' :
-                      isHighlight  ? 'font-bold text-ios-blue-dark'      :
-                                     'text-foreground/80',
+                      isNull       ? 'italic text-ink-2/40' :
+                      isHighlight  ? 'font-bold text-blue'      :
+                                     'text-ink/80',
                     )}
                   >
                     {isNull ? 'NULL' : cell}
@@ -210,7 +210,7 @@ export function FunctionsSection() {
 
       <div className="grid grid-cols-[160px_1fr] items-start gap-4">
         {/* LEFT: 함수 목록 */}
-        <div className="flex flex-col gap-1 rounded-xl border bg-muted/30 p-2">
+        <div className="flex flex-col gap-1 rounded-panel border bg-rail p-2">
           {FUNC_ITEMS.map((f) => {
             const isActive = f.name === openItem
             return (
@@ -218,8 +218,8 @@ export function FunctionsSection() {
                 key={f.name}
                 onClick={() => setOpenItem(f.name)}
                 className={cn(
-                  'rounded-lg px-3 py-2 text-left font-mono text-xs font-bold transition-all',
-                  isActive ? C.active : 'text-muted-foreground hover:bg-muted',
+                  'rounded-card px-3 py-2 text-left font-mono text-xs font-bold transition-all',
+                  isActive ? C.active : 'text-ink-2 hover:bg-rail',
                 )}
               >
                 {f.name}
@@ -239,7 +239,7 @@ export function FunctionsSection() {
             className="flex flex-col gap-4"
           >
             {/* 헤더 */}
-            <div className={cn('rounded-xl border px-4 py-3', C.bg, C.border, C.text)}>
+            <div className={cn('rounded-panel border px-4 py-3', C.bg, C.border, C.text)}>
               <div className="mb-1 font-mono text-[10px] font-bold uppercase tracking-wider opacity-60">
                 {lang === 'ko' ? '조건 / NULL 처리 함수' : 'Conditional / NULL Functions'}
               </div>
@@ -250,23 +250,23 @@ export function FunctionsSection() {
             </div>
 
             {/* 설명 */}
-            <div className="rounded-xl border bg-card px-4 py-3">
+            <div className="rounded-panel border bg-paper px-4 py-3">
               <Prose>{item.desc[lang]}</Prose>
             </div>
 
             {/* 예시 쿼리 */}
             <div>
-              <p className="mb-1.5 font-mono text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+              <p className="mb-1.5 font-mono text-[11px] font-bold uppercase tracking-wider text-ink-2">
                 {lang === 'ko' ? '예시 쿼리' : 'Example Query'}
               </p>
-              <div className={cn('rounded-xl border px-4 py-3', C.code)}>
+              <div className={cn('rounded-panel border px-4 py-3', C.code)}>
                 <SqlHighlight sql={item.example} />
               </div>
             </div>
 
             {/* 실행 결과 */}
             <div>
-              <p className="mb-2 font-mono text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+              <p className="mb-2 font-mono text-[11px] font-bold uppercase tracking-wider text-ink-2">
                 {lang === 'ko' ? '실행 결과' : 'Result'}
               </p>
               <MiniTable
@@ -280,7 +280,7 @@ export function FunctionsSection() {
             {item.note && (
               <>
                 <Divider />
-                <div className={cn('rounded-xl border px-4 py-3 text-xs leading-relaxed', C.bg, C.border, C.text)}>
+                <div className={cn('rounded-panel border px-4 py-3 text-xs leading-relaxed', C.bg, C.border, C.text)}>
                   <span className="mr-1.5 font-bold">💡</span>{item.note[lang]}
                 </div>
               </>

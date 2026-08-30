@@ -11,12 +11,12 @@ function BufferCacheMini() {
         <div
           key={i}
           className={cn(
-            'rounded-sm border',
+            'rounded-chip border',
             i % 5 === 0
-              ? 'border-amber-400 bg-amber-200'
+              ? 'border-amber/50 bg-amber/15'
               : i % 7 === 3
-                ? 'border-teal-400 bg-teal-100'
-                : 'border-blue-300 bg-blue-100',
+                ? 'border-green/50 bg-green/10'
+                : 'border-blue/50 bg-blue/10',
           )}
         />
       ))}
@@ -27,11 +27,11 @@ function BufferCacheMini() {
 function SharedPoolMini() {
   return (
     <div className="mt-3 flex flex-1 flex-col gap-1.5">
-      <div className="flex flex-1 items-center rounded-md border border-violet-300 bg-violet-100/70 px-2 py-1">
-        <div className="font-mono text-[9px] font-bold text-violet-700">Library Cache</div>
+      <div className="flex flex-1 items-center rounded-card border border-purple/50 bg-purple/10 px-2 py-1">
+        <div className="font-mono text-[9px] font-bold text-purple">Library Cache</div>
       </div>
-      <div className="flex flex-1 items-center rounded-md border border-slate-300 bg-slate-100/70 px-2 py-1">
-        <div className="font-mono text-[9px] font-bold text-slate-500">Dictionary Cache</div>
+      <div className="flex flex-1 items-center rounded-card border border-line-2 bg-paper-sunk px-2 py-1">
+        <div className="font-mono text-[9px] font-bold text-ink-2">Dictionary Cache</div>
       </div>
     </div>
   )
@@ -57,7 +57,7 @@ function RedoLogBufferMini() {
             cx={x}
             cy={y}
             r={SLOT_R}
-            className={i < HEAD ? 'fill-orange-300 stroke-orange-500' : 'fill-slate-100 stroke-slate-300'}
+            className={i < HEAD ? 'fill-amber stroke-amber' : 'fill-[var(--color-paper-sunk)] stroke-[var(--color-line-2)]'}
             strokeWidth={1}
           />
         )
@@ -67,14 +67,14 @@ function RedoLogBufferMini() {
         cy={CY + R * Math.sin((2 * Math.PI * HEAD) / SLOTS - Math.PI / 2)}
         r={SLOT_R + 2}
         fill="none"
-        stroke="#f97316"
+        stroke="var(--color-amber)"
         strokeWidth={1.5}
         strokeDasharray="4 2"
         animate={{ rotate: 360 }}
         transition={{ repeat: Infinity, duration: 4, ease: 'linear' }}
         style={{ transformOrigin: `${CX}px ${CY}px` }}
       />
-      <text x={CX} y={CY + 1} textAnchor="middle" dominantBaseline="middle" fontSize={7} fontFamily="monospace" fill="#94a3b8">
+      <text x={CX} y={CY + 1} textAnchor="middle" dominantBaseline="middle" fontSize={7} fontFamily="monospace" fill="var(--color-ink-3)">
         LGWR
       </text>
     </svg>
@@ -85,8 +85,8 @@ function LargePoolMini() {
   return (
     <div className="mt-3 flex flex-1 flex-col gap-1.5">
       {['RMAN', 'Parallel', 'UGA'].map((label) => (
-        <div key={label} className="flex flex-1 items-center rounded-md border border-teal-200 bg-teal-50 px-2 py-1">
-          <div className="font-mono text-[9px] font-bold text-teal-600">{label}</div>
+        <div key={label} className="flex flex-1 items-center rounded-card border border-green/30 bg-green/5 px-2 py-1">
+          <div className="font-mono text-[9px] font-bold text-green">{label}</div>
         </div>
       ))}
     </div>
@@ -104,29 +104,29 @@ const COMPONENTS: {
     id: 'buffer-cache',
     label: 'Buffer Cache',
     flex: 'flex-[2]',
-    highlight: { border: 'border-blue-500', bg: 'bg-blue-100', ring: 'ring-2 ring-blue-300', text: 'text-blue-800' },
-    dim: 'border-border/30 bg-muted/20 text-muted-foreground/40',
+    highlight: { border: 'border-blue', bg: 'bg-blue/10', ring: 'ring-2 ring-blue/50', text: 'text-blue' },
+    dim: 'border-line/30 bg-rail text-ink-2/40',
   },
   {
     id: 'shared-pool',
     label: 'Shared Pool',
     flex: 'flex-[2]',
-    highlight: { border: 'border-violet-500', bg: 'bg-violet-100', ring: 'ring-2 ring-violet-300', text: 'text-violet-800' },
-    dim: 'border-border/30 bg-muted/20 text-muted-foreground/40',
+    highlight: { border: 'border-purple', bg: 'bg-purple/10', ring: 'ring-2 ring-purple/50', text: 'text-purple' },
+    dim: 'border-line/30 bg-rail text-ink-2/40',
   },
   {
     id: 'redo-log-buffer',
     label: 'Redo Log Buffer',
     flex: 'flex-[2]',
-    highlight: { border: 'border-orange-500', bg: 'bg-orange-100', ring: 'ring-2 ring-orange-300', text: 'text-orange-800' },
-    dim: 'border-border/30 bg-muted/20 text-muted-foreground/40',
+    highlight: { border: 'border-amber', bg: 'bg-amber/10', ring: 'ring-2 ring-amber/50', text: 'text-amber' },
+    dim: 'border-line/30 bg-rail text-ink-2/40',
   },
   {
     id: 'large-pool',
     label: 'Large Pool',
     flex: 'flex-[2]',
-    highlight: { border: 'border-teal-500', bg: 'bg-teal-100', ring: 'ring-2 ring-teal-300', text: 'text-teal-800' },
-    dim: 'border-border/30 bg-muted/20 text-muted-foreground/40',
+    highlight: { border: 'border-green', bg: 'bg-green/10', ring: 'ring-2 ring-green/50', text: 'text-green' },
+    dim: 'border-line/30 bg-rail text-ink-2/40',
   },
 ]
 
@@ -136,15 +136,15 @@ interface Props {
 
 export function SgaPositionDiagram({ activeId }: Props) {
   return (
-    <div className="mb-8 rounded-2xl border-2 border-border bg-muted/20 p-5">
-      <div className="mb-3 font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">
+    <div className="mb-8 rounded-panel border-2 border-line bg-rail p-5">
+      <div className="mb-3 font-mono text-[10px] font-bold uppercase tracking-widest text-ink-2/60">
         SGA — System Global Area
       </div>
       <div className="flex h-[140px] gap-2">
         {COMPONENTS.map((c) => {
           const isActive = c.id === activeId
           const colorCls = isActive
-            ? `${c.highlight.border} ${c.highlight.bg} ${c.highlight.ring} ${c.highlight.text} shadow-md`
+            ? `${c.highlight.border} ${c.highlight.bg} ${c.highlight.ring} ${c.highlight.text} `
             : activeId === null
               ? `${c.highlight.border} ${c.highlight.bg} ${c.highlight.text}`
               : c.dim
@@ -153,7 +153,7 @@ export function SgaPositionDiagram({ activeId }: Props) {
               key={c.id}
               animate={isActive ? { scale: [1, 1.03, 1] } : { scale: 1 }}
               transition={isActive ? { repeat: Infinity, duration: 1.4, repeatDelay: 0.4 } : {}}
-              className={cn(c.flex, 'relative flex flex-col rounded-xl border-2 px-3 py-3 transition-all', colorCls)}
+              className={cn(c.flex, 'relative flex flex-col rounded-panel border-2 px-3 py-3 transition-all', colorCls)}
             >
               <div className="font-mono text-xs font-bold leading-tight">{c.label}</div>
               {c.id === 'buffer-cache' && <BufferCacheMini />}

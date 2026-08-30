@@ -533,22 +533,22 @@ const FRAME_ITEMS: FrameFuncItem[] = [
 
 // ── Color maps ─────────────────────────────────────────────────────────────
 
-const C = { bg: 'bg-muted/40', border: 'border-border', text: 'text-foreground/80', active: 'bg-ios-blue-light text-ios-blue-dark', code: 'bg-muted/30 border-border' }
+const C = { bg: 'bg-rail', border: 'border-line', text: 'text-ink/80', active: 'bg-blue/10 text-blue', code: 'bg-rail border-line' }
 
 // ── ResultTable ──────────────────────────────────────────────────────────────
 
 function ResultTable({ headers, rows }: { headers: string[]; rows: (string | null)[][] }) {
   return (
-    <div className="overflow-x-auto rounded-lg border text-xs">
+    <div className="overflow-x-auto rounded-card border text-xs">
       <table className="w-full">
         <thead>
-          <tr className="border-b bg-muted/60">
+          <tr className="border-b bg-rail">
             {headers.map((h, i) => (
               <th
                 key={h}
                 className={cn(
                   'px-2.5 py-1.5 text-left font-mono text-[10px] font-bold whitespace-nowrap',
-                  i === headers.length - 1 ? 'text-emerald-700' : 'text-muted-foreground',
+                  i === headers.length - 1 ? 'text-green' : 'text-ink-2',
                 )}
               >
                 {h}
@@ -567,9 +567,9 @@ function ResultTable({ headers, rows }: { headers: string[]; rows: (string | nul
                     key={ci}
                     className={cn(
                       'px-2.5 py-1 font-mono text-[11px] whitespace-nowrap',
-                      isNull ? 'italic text-muted-foreground/40' :
-                      isLast ? 'font-bold text-emerald-700'      :
-                               'text-foreground/80',
+                      isNull ? 'italic text-ink-2/40' :
+                      isLast ? 'font-bold text-green'      :
+                               'text-ink/80',
                     )}
                   >
                     {isNull ? 'NULL' : cell}
@@ -620,16 +620,16 @@ function FrameSummaryDesc({ lang }: { lang: 'ko' | 'en' }) {
   return (
     <div className="flex flex-col gap-3">
       {/* Frame 적용 */}
-      <div className="overflow-hidden rounded-xl border border-emerald-200">
-        <div className="bg-emerald-50 px-4 py-2">
-          <span className="font-mono text-[11px] font-bold text-emerald-700">✓ {d.applied}</span>
+      <div className="overflow-hidden rounded-panel border border-green/30">
+        <div className="bg-green/5 px-4 py-2">
+          <span className="font-mono text-[11px] font-bold text-green">✓ {d.applied}</span>
         </div>
         <table className="w-full">
           <tbody>
             {d.appliedRows.map((r) => (
-              <tr key={r.name} className="border-t border-emerald-100 last:border-0">
-                <td className="px-4 py-2 font-mono text-[12px] font-bold text-emerald-900">{r.name}</td>
-                <td className="px-4 py-2 text-right text-[11px] text-emerald-600">{r.type}</td>
+              <tr key={r.name} className="border-t border-green/30 last:border-0">
+                <td className="px-4 py-2 font-mono text-[12px] font-bold text-green">{r.name}</td>
+                <td className="px-4 py-2 text-right text-[11px] text-green">{r.type}</td>
               </tr>
             ))}
           </tbody>
@@ -637,23 +637,23 @@ function FrameSummaryDesc({ lang }: { lang: 'ko' | 'en' }) {
       </div>
 
       {/* Frame 무시 */}
-      <div className="overflow-hidden rounded-xl border border-rose-200">
-        <div className="bg-rose-50 px-4 py-2">
-          <span className="font-mono text-[11px] font-bold text-rose-700">✗ {d.ignored}</span>
+      <div className="overflow-hidden rounded-panel border border-red/30">
+        <div className="bg-red/5 px-4 py-2">
+          <span className="font-mono text-[11px] font-bold text-red">✗ {d.ignored}</span>
         </div>
         <table className="w-full">
           <tbody>
             {d.ignoredRows.map((r) => (
-              <tr key={r.name} className="border-t border-rose-100 last:border-0">
-                <td className="px-4 py-2 font-mono text-[12px] font-bold text-rose-900">{r.name}</td>
-                <td className="px-4 py-2 text-right text-[11px] text-rose-600">{r.type}</td>
+              <tr key={r.name} className="border-t border-red/30 last:border-0">
+                <td className="px-4 py-2 font-mono text-[12px] font-bold text-red">{r.name}</td>
+                <td className="px-4 py-2 text-right text-[11px] text-red">{r.type}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
 
-      <p className="text-xs leading-relaxed text-muted-foreground">{d.note}</p>
+      <p className="text-xs leading-relaxed text-ink-2">{d.note}</p>
     </div>
   )
 }
@@ -679,7 +679,7 @@ function DetailPanel({
         transition={{ duration: 0.18 }}
         className="flex flex-col gap-4"
       >
-        <div className={cn('rounded-xl border px-4 py-3', C.bg, C.border, C.text)}>
+        <div className={cn('rounded-panel border px-4 py-3', C.bg, C.border, C.text)}>
           <div className="mb-1 font-mono text-[10px] font-bold uppercase tracking-wider opacity-60">
             {labels.categoryLabel}
           </div>
@@ -689,7 +689,7 @@ function DetailPanel({
           </div>
         </div>
 
-        <div className="rounded-xl border bg-card px-4 py-3">
+        <div className="rounded-panel border bg-paper px-4 py-3">
           {item.name === 'Frame 적용 함수 정리'
             ? <FrameSummaryDesc lang={lang} />
             : <Prose>{item.desc[lang]}</Prose>
@@ -697,17 +697,17 @@ function DetailPanel({
         </div>
 
         <div>
-          <p className="mb-1.5 font-mono text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+          <p className="mb-1.5 font-mono text-[11px] font-bold uppercase tracking-wider text-ink-2">
             {labels.exampleQuery}
           </p>
-          <p className="mb-2 text-xs leading-relaxed text-foreground/70">{item.queryDesc[lang]}</p>
-          <div className={cn('rounded-xl border px-4 py-3', C.code)}>
+          <p className="mb-2 text-xs leading-relaxed text-ink/70">{item.queryDesc[lang]}</p>
+          <div className={cn('rounded-panel border px-4 py-3', C.code)}>
             <SqlHighlight sql={item.example} />
           </div>
         </div>
 
         <div>
-          <p className="mb-2 font-mono text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+          <p className="mb-2 font-mono text-[11px] font-bold uppercase tracking-wider text-ink-2">
             {labels.result}
           </p>
           <ResultTable headers={item.resultHeaders} rows={item.resultRows} />
@@ -716,7 +716,7 @@ function DetailPanel({
         {item.note && (
           <>
             <Divider />
-            <div className={cn('rounded-xl border px-4 py-3 text-xs leading-relaxed', C.bg, C.border, C.text)}>
+            <div className={cn('rounded-panel border px-4 py-3 text-xs leading-relaxed', C.bg, C.border, C.text)}>
               <span className="mr-1.5 font-bold">💡</span>{item.note[lang]}
             </div>
           </>
@@ -833,7 +833,7 @@ export function WindowFuncSection() {
   return (
     <PageContainer className="max-w-5xl">
       <ChapterTitle
-        icon={<IconChartBar size={36} color="#8b5cf6" stroke={1.5} />}
+        icon={<IconChartBar size={36} color="var(--color-purple)" stroke={1.5} />}
         title={t.chapterTitle}
         subtitle={t.chapterSubtitle}
       />
@@ -841,20 +841,20 @@ export function WindowFuncSection() {
       {/* ── Part 1 ─────────────────────────────────────────────────────── */}
       <SectionTitle>{t.part1Title}</SectionTitle>
 
-      <div className="mb-4 flex flex-col gap-3 rounded-xl border bg-muted/30 px-5 py-4">
+      <div className="mb-4 flex flex-col gap-3 rounded-panel border bg-rail px-5 py-4">
         <Prose>{t.part1Desc}</Prose>
         <div>
-          <p className="mb-1.5 font-mono text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+          <p className="mb-1.5 font-mono text-[10px] font-bold uppercase tracking-wider text-ink-2">
             {t.syntaxBoxLabel}
           </p>
-          <div className="rounded-lg border bg-white px-4 py-3">
+          <div className="rounded-card border bg-paper px-4 py-3">
             <SqlHighlight sql={SYNTAX_SQL} />
           </div>
         </div>
       </div>
 
       <div className="grid grid-cols-[160px_1fr] items-start gap-4">
-        <div className="flex flex-col gap-1 rounded-xl border bg-muted/30 p-2">
+        <div className="flex flex-col gap-1 rounded-panel border bg-rail p-2">
           {FUNC_ITEMS.map((f) => {
             const isActive = f.name === openFunc
             return (
@@ -862,8 +862,8 @@ export function WindowFuncSection() {
                 key={f.name}
                 onClick={() => setOpenFunc(f.name)}
                 className={cn(
-                  'rounded-lg px-3 py-2 text-left font-mono text-xs font-bold transition-all',
-                  isActive ? C.active : 'text-muted-foreground hover:bg-muted',
+                  'rounded-card px-3 py-2 text-left font-mono text-xs font-bold transition-all',
+                  isActive ? C.active : 'text-ink-2 hover:bg-rail',
                 )}
               >
                 {f.name}
@@ -884,31 +884,31 @@ export function WindowFuncSection() {
       {/* ── Part 2 ─────────────────────────────────────────────────────── */}
       <SectionTitle>{t.part2Title}</SectionTitle>
 
-      <div className="mb-4 flex flex-col gap-3 rounded-xl border bg-muted/30 px-5 py-4">
+      <div className="mb-4 flex flex-col gap-3 rounded-panel border bg-rail px-5 py-4">
         <Prose>{t.part2Desc}</Prose>
         <div>
-          <p className="mb-1.5 font-mono text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+          <p className="mb-1.5 font-mono text-[10px] font-bold uppercase tracking-wider text-ink-2">
             {t.frameBoxLabel}
           </p>
-          <div className="rounded-lg border bg-white px-4 py-3">
+          <div className="rounded-card border bg-paper px-4 py-3">
             <SqlHighlight sql={FRAME_KEYWORDS_SQL} />
           </div>
         </div>
       </div>
 
       {/* 키워드 어원 카드 */}
-      <p className="mb-3 font-mono text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+      <p className="mb-3 font-mono text-[10px] font-bold uppercase tracking-wider text-ink-2">
         {t.wordSectionTitle}
       </p>
       <div className="mb-6 grid grid-cols-2 gap-3">
         {(t.words as WordEntry[]).map((w) => (
-          <div key={w.word} className="flex flex-col gap-1.5 rounded-xl border bg-card px-4 py-3">
+          <div key={w.word} className="flex flex-col gap-1.5 rounded-panel border bg-paper px-4 py-3">
             <div className="flex items-baseline gap-2">
-              <span className="font-mono text-sm font-black text-foreground">{w.word}</span>
-              <span className="text-xs italic text-muted-foreground">{w.literal}</span>
+              <span className="font-mono text-sm font-black text-ink">{w.word}</span>
+              <span className="text-xs italic text-ink-2">{w.literal}</span>
             </div>
-            <p className="text-xs leading-relaxed text-foreground/80">{w.meaning}</p>
-            <div className="mt-0.5 rounded-md border bg-muted/40 px-2.5 py-1.5 font-mono text-[11px] text-muted-foreground">
+            <p className="text-xs leading-relaxed text-ink/80">{w.meaning}</p>
+            <div className="mt-0.5 rounded-card border bg-rail px-2.5 py-1.5 font-mono text-[11px] text-ink-2">
               {w.example}
             </div>
           </div>
@@ -916,7 +916,7 @@ export function WindowFuncSection() {
       </div>
 
       <div className="grid grid-cols-[220px_1fr] items-start gap-4">
-        <div className="flex flex-col gap-1 rounded-xl border bg-muted/30 p-2">
+        <div className="flex flex-col gap-1 rounded-panel border bg-rail p-2">
           {FRAME_ITEMS.map((f) => {
             const isActive = f.name === openFrame
             return (
@@ -924,8 +924,8 @@ export function WindowFuncSection() {
                 key={f.name}
                 onClick={() => setOpenFrame(f.name)}
                 className={cn(
-                  'rounded-lg px-3 py-2 text-left font-mono text-xs font-bold transition-all',
-                  isActive ? C.active : 'text-muted-foreground hover:bg-muted',
+                  'rounded-card px-3 py-2 text-left font-mono text-xs font-bold transition-all',
+                  isActive ? C.active : 'text-ink-2 hover:bg-rail',
                 )}
               >
                 {f.name}

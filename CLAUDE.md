@@ -315,7 +315,8 @@ SVG 레이아웃 상수는 **의존 관계 순서대로** 선언한다 — 버�
 
 - TypeScript strict 모드, `any` 타입 금지 (ESLint에서 error)
 - named export만 사용 (`App.tsx`의 `export default App`은 Vite entry 요구사항 예외)
-- CSS: Tailwind 유틸리티 클래스만 사용, 커스텀 CSS 파일 금지 (`index.css` 테마 변수 제외)
+- CSS: Tailwind 유틸리티 클래스만 사용, 커스텀 CSS 파일 금지 (`index.css`·`src/styles/tokens.css` 제외)
+- 색 hex·`font-family` 리터럴은 `src/styles/tokens.css` 에만. 컴포넌트에서 로컬 색상 맵(`Record<…,{bg,text,border}>`)을 만들지 말고 `@/lib/theme` 에서 import (아래 "테마 / 스타일링")
 - Path alias: `@/` → `src/`
 
 ### TypeScript 엄격 플래그 주의사항
@@ -342,12 +343,21 @@ SVG 레이아웃 상수는 **의존 관계 순서대로** 선언한다 — 버�
 - `tailwindcss` v4 — CSS-first 설정 방식 (`@import "tailwindcss"` in `index.css`)
 - `react-scan` — 개발 전용 렌더링 성능 모니터. 프로덕션 빌드에 포함되지 않도록 주의
 
-## 테마 / 스타일링
+## 테마 / 스타일링 — 디자인 소스 단일화
 
-`index.css`의 CSS 변수로 전역 테마 정의:
-- Sapphire(파란계열), Tangerine(주황), Gold 액센트 컬러 사용
-- shadcn/ui 스타일: `base-nova`
-- React Flow 커스텀 오버라이드는 `index.css` 내 `.react-flow` 셀렉터에만 허용
+**색·폰트 값의 유일한 원본은 `src/styles/tokens.css` 한 파일.** 전체 디자인 스펙(색표·타입 스케일·컴포넌트 사양·Phase 2~4 마이그레이션 계획)은 리포 루트의 **`DESIGN.md`**.
+
+- **`src/styles/tokens.css`** — `@theme` 블록, 세 층:
+  - **§1 레거시** — shadcn 중립 HSL(`--background` 등), 시뮬레이터 상태색(`--active-*`/`--warn-*`/`--ok-*`), `--sapphire-*`/`--tangerine`/`--gold*` 별칭. `body`·react-flow·생 Tailwind 색 클래스 2,500여 곳이 아직 참조 → **값 불변**. Phase 3에서 삭제 예정.
+  - **§2a/2b** — `--color-ios-*`(5색×3) / `--color-brand-*`(5색×3). `shared.tsx`의 `INFOBOX_VARIANT`·`ACCENT_COLORS` 클래스 문자열이 참조 중.
+  - **§2c** — 목표 디자인 시스템(Claude Design 캔버스 "Database Learning Book", **다크 우선**): `--color-accent`, `--color-ok|warn|danger|info|coral`, `--color-data-1..8`, `--color-code-*`, `--radius-chip|btn|card|hero`(Tailwind 기본 `--radius-*` 안 건드림), 테마 종속 `--color-canvas|surface|chrome|ink|ink-muted|line|line-strong|chip|field|hover|track|thead`. **아직 소비처 없음** — Phase 2에서 연결.
+  - **§3** — `:root[data-theme="light"]`가 §2c 서피스 토큰을 라이트로 override.
+- **`src/lib/theme.tsx`** (구 `theme.ts` — JSX 아이콘 때문에 `.tsx`) — 색을 다루는 **유일한 TS 매핑 모듈**: `ACCENT_COLORS`(챕터 액센트 클래스 세트), `INFOBOX_VARIANT`+`INFOBOX_LEGACY_COLOR`, `CONCEPT_TINT`, `SIMULATOR_TINT`, `STEP_COLORS`, `DIAGRAM`/`DATA_PALETTE`/`CODE`(SVG용 `var(--color-*)` 문자열). importer: `shared.tsx`, `BookContent.tsx`, `IntroductionPage.tsx`, `bookStructure.tsx`.
+- **`src/index.css`** — `@import` 3줄(tailwindcss, `./styles/tokens.css`, tw-animate-css) + 구조 규칙(`body`, `#root`, `.react-flow__*` 오버라이드)만. React Flow 커스텀은 여기 `.react-flow__*` 셀렉터에만.
+- **폰트** — `IBM Plex Sans KR`(본문·제목·라벨) + `IBM Plex Mono`(코드·수치·표·뱃지·브레드크럼). `index.html`의 Google Fonts `<link>`로 로드. 스택은 `tokens.css`의 `--font-sans-ko`/`--font-sans-en`/`--font-mono`에만 정의. `App.tsx`가 `<html lang>`을 `useLangStore`와 동기화 → `:root:lang(en)`이 `--font-sans-active` 스왑.
+- shadcn 스타일 프리셋: `base-nova` (`components.json`).
+
+**진행 상태:** 디자인 리팩터링 Phase 0/1 완료(토큰 구조·`shared.tsx` 배선·폰트 교체). **앱 화면은 아직 라이트로 렌더**되고(`body`가 shadcn HSL 참조), 다크 우선 전환·`body`↔`--color-*` 연결·2,500여 클래스 이관·테마 토글은 **Phase 2+** (`DESIGN.md §7·§9`).
 
 ## 문장·말투·번역 지침
 

@@ -289,7 +289,7 @@ export function PartitionWiseJoinSection() {
   return (
     <PageContainer>
       <ChapterTitle
-        icon={<IconArrowsJoin size={36} stroke={1.5} className="text-amber-500" />}
+        icon={<IconArrowsJoin size={36} stroke={1.5} className="text-amber" />}
         title={t.title}
         subtitle={t.subtitle}
       />

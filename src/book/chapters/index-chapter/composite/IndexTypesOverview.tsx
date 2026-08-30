@@ -175,18 +175,18 @@ const T = {
 // ── Color maps ─────────────────────────────────────────────────────────────────
 
 const TYPE_COLOR: Record<string, { border: string; bg: string; badge: string; icon: string; heading: string }> = {
-  violet:  { border: 'border-violet-200',  bg: 'bg-violet-50/60',  badge: 'bg-violet-100 text-violet-700',   icon: 'bg-violet-100',  heading: 'text-violet-800' },
-  emerald: { border: 'border-emerald-200', bg: 'bg-emerald-50/60', badge: 'bg-emerald-100 text-emerald-700', icon: 'bg-emerald-100', heading: 'text-emerald-800' },
-  orange:  { border: 'border-orange-200',  bg: 'bg-orange-50/60',  badge: 'bg-orange-100 text-orange-700',   icon: 'bg-orange-100',  heading: 'text-orange-800' },
-  purple:  { border: 'border-purple-200',  bg: 'bg-purple-50/60',  badge: 'bg-purple-100 text-purple-700',   icon: 'bg-purple-100',  heading: 'text-purple-800' },
-  rose:    { border: 'border-rose-200',    bg: 'bg-rose-50/60',    badge: 'bg-rose-100 text-rose-700',       icon: 'bg-rose-100',    heading: 'text-rose-800' },
-  amber:   { border: 'border-amber-200',   bg: 'bg-amber-50/60',   badge: 'bg-amber-100 text-amber-700',     icon: 'bg-amber-100',   heading: 'text-amber-800' },
+  violet:  { border: 'border-purple/30',  bg: 'bg-purple/5',  badge: 'bg-purple/10 text-purple',   icon: 'bg-purple/10',  heading: 'text-purple' },
+  emerald: { border: 'border-green/30', bg: 'bg-green/5', badge: 'bg-green/10 text-green', icon: 'bg-green/10', heading: 'text-green' },
+  orange:  { border: 'border-amber/30',  bg: 'bg-amber/5',  badge: 'bg-amber/10 text-amber',   icon: 'bg-amber/10',  heading: 'text-amber' },
+  purple:  { border: 'border-purple/30',  bg: 'bg-purple/5',  badge: 'bg-purple/10 text-purple',   icon: 'bg-purple/10',  heading: 'text-purple' },
+  rose:    { border: 'border-red/30',    bg: 'bg-red/5',    badge: 'bg-red/10 text-red',       icon: 'bg-red/10',    heading: 'text-red' },
+  amber:   { border: 'border-amber/30',   bg: 'bg-amber/5',   badge: 'bg-amber/10 text-amber',     icon: 'bg-amber/10',   heading: 'text-amber' },
 }
 
 const BADGE_COLOR: Record<string, string> = {
-  emerald: 'bg-emerald-100 text-emerald-700 border-emerald-200',
-  rose:    'bg-rose-100 text-rose-700 border-rose-200',
-  amber:   'bg-amber-100 text-amber-700 border-amber-200',
+  emerald: 'bg-green/10 text-green border-green/30',
+  rose:    'bg-red/10 text-red border-red/30',
+  amber:   'bg-amber/10 text-amber border-amber/30',
 }
 
 const fadeUp = {
@@ -204,23 +204,23 @@ type StateHeaders = { aspect: string; dml: string; optimizer: string; space: str
 
 function StateTable({ rows, headers }: { rows: StateRow[]; headers: StateHeaders }) {
   return (
-    <div className="mb-5 overflow-hidden rounded-xl border text-xs">
-      <div className="grid grid-cols-[110px_1fr_1fr_1fr_1fr] divide-x border-b bg-muted/40 font-mono text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+    <div className="mb-5 overflow-hidden rounded-panel border text-xs">
+      <div className="grid grid-cols-[110px_1fr_1fr_1fr_1fr] divide-x border-b bg-rail font-mono text-[10px] font-bold uppercase tracking-wider text-ink-2">
         {[headers.aspect, headers.dml, headers.optimizer, headers.space, headers.use].map((h, i) => (
           <div key={i} className="px-3 py-2">{h}</div>
         ))}
       </div>
       {rows.map((row, i) => (
-        <div key={i} className={cn('grid grid-cols-[110px_1fr_1fr_1fr_1fr] divide-x', i % 2 === 1 && 'bg-muted/20')}>
+        <div key={i} className={cn('grid grid-cols-[110px_1fr_1fr_1fr_1fr] divide-x', i % 2 === 1 && 'bg-rail')}>
           <div className="flex items-center px-3 py-2.5">
             <span className={cn('rounded-full border px-2 py-0.5 font-mono text-[10px] font-bold', BADGE_COLOR[row.badge])}>
               {row.state}
             </span>
           </div>
-          <div className="px-3 py-2.5 font-mono text-[11px] text-muted-foreground">{row.dml}</div>
-          <div className="px-3 py-2.5 font-mono text-[11px] text-muted-foreground">{row.optimizer}</div>
-          <div className="px-3 py-2.5 font-mono text-[11px] text-muted-foreground">{row.space}</div>
-          <div className="px-3 py-2.5 font-mono text-[11px] text-muted-foreground">{row.use}</div>
+          <div className="px-3 py-2.5 font-mono text-[11px] text-ink-2">{row.dml}</div>
+          <div className="px-3 py-2.5 font-mono text-[11px] text-ink-2">{row.optimizer}</div>
+          <div className="px-3 py-2.5 font-mono text-[11px] text-ink-2">{row.space}</div>
+          <div className="px-3 py-2.5 font-mono text-[11px] text-ink-2">{row.use}</div>
         </div>
       ))}
     </div>
@@ -263,10 +263,10 @@ export function IndexTypesOverview() {
             variants={fadeUp}
             initial="hidden"
             animate="visible"
-            className="flex items-start gap-3 rounded-lg border bg-card px-4 py-3"
+            className="flex items-start gap-3 rounded-card border bg-paper px-4 py-3"
           >
             <span className="mt-0.5 text-base leading-none">{p.icon}</span>
-            <p className="text-xs leading-relaxed text-muted-foreground">{p.text}</p>
+            <p className="text-xs leading-relaxed text-ink-2">{p.text}</p>
           </motion.div>
         ))}
       </div>
@@ -285,23 +285,23 @@ export function IndexTypesOverview() {
             initial="hidden"
             animate="visible"
             className={cn(
-              'rounded-xl border p-4',
-              item.ok ? 'border-emerald-200 bg-emerald-50/50' : 'border-rose-200 bg-rose-50/40',
+              'rounded-panel border p-4',
+              item.ok ? 'border-green/30 bg-green/5' : 'border-red/30 bg-red/5',
             )}
           >
             <div className="mb-1.5 flex items-center gap-2">
-              <span className={cn('text-sm font-bold', item.ok ? 'text-emerald-500' : 'text-rose-500')}>
+              <span className={cn('text-sm font-bold', item.ok ? 'text-green' : 'text-red')}>
                 {item.ok ? '✓' : '✗'}
               </span>
-              <span className={cn('text-xs font-bold', item.ok ? 'text-emerald-700' : 'text-rose-700')}>
+              <span className={cn('text-xs font-bold', item.ok ? 'text-green' : 'text-red')}>
                 {item.ok ? t.whenOk : t.whenNo}
               </span>
             </div>
-            <p className="mb-2 text-xs font-semibold text-foreground">{item.title}</p>
-            <p className="mb-2 text-[11px] leading-relaxed text-muted-foreground">{item.desc}</p>
+            <p className="mb-2 text-xs font-semibold text-ink">{item.title}</p>
+            <p className="mb-2 text-[11px] leading-relaxed text-ink-2">{item.desc}</p>
             <code className={cn(
               'block rounded px-2 py-1 font-mono text-[10px]',
-              item.ok ? 'bg-emerald-100/60 text-emerald-800' : 'bg-rose-100/60 text-rose-800',
+              item.ok ? 'bg-green/10 text-green' : 'bg-red/10 text-red',
             )}>
               {item.example}
             </code>
@@ -322,11 +322,11 @@ export function IndexTypesOverview() {
             variants={fadeUp}
             initial="hidden"
             animate="visible"
-            className="flex flex-col gap-2 rounded-xl border bg-card p-4"
+            className="flex flex-col gap-2 rounded-panel border bg-paper p-4"
           >
             <span className="text-xl">{item.icon}</span>
             <p className="text-xs font-bold">{item.title}</p>
-            <p className="text-[11px] leading-relaxed text-muted-foreground">{item.desc}</p>
+            <p className="text-[11px] leading-relaxed text-ink-2">{item.desc}</p>
           </motion.div>
         ))}
       </div>
@@ -349,12 +349,12 @@ export function IndexTypesOverview() {
               initial="hidden"
               animate="visible"
               className={cn(
-                'flex flex-col gap-3 rounded-xl border p-5',
+                'flex flex-col gap-3 rounded-panel border p-5',
                 c.border, c.bg,
               )}
             >
               <div className="flex items-start justify-between">
-                <div className={cn('flex h-9 w-9 items-center justify-center rounded-lg text-lg', c.icon)}>
+                <div className={cn('flex h-9 w-9 items-center justify-center rounded-card text-lg', c.icon)}>
                   {type.icon}
                 </div>
                 <span className={cn('rounded-full px-2 py-0.5 font-mono text-[10px] font-bold', c.badge)}>
@@ -362,7 +362,7 @@ export function IndexTypesOverview() {
                 </span>
               </div>
               <div className={cn('text-sm font-bold', c.heading)}>{type.name}</div>
-              <p className="text-[11px] leading-snug text-muted-foreground">{type.desc}</p>
+              <p className="text-[11px] leading-snug text-ink-2">{type.desc}</p>
             </motion.div>
           )
         })}

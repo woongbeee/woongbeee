@@ -26,50 +26,50 @@ const T = {
     transforms: [
       {
         id: 'OR Expansion',
-        color: 'border-blue-200 bg-blue-50/50',
-        badge: 'bg-blue-100 text-blue-700',
+        color: 'border-blue/30 bg-blue/5',
+        badge: 'bg-blue/10 text-blue',
         title: 'OR Expansion',
         desc: 'OR 조건이 있는 쿼리를 UNION ALL로 분리해서 각 브랜치마다 인덱스를 활용할 수 있게 해요.',
       },
       {
         id: 'View Merging',
-        color: 'border-orange-200 bg-orange-50/50',
-        badge: 'bg-orange-100 text-orange-700',
+        color: 'border-amber/30 bg-amber/5',
+        badge: 'bg-amber/10 text-amber',
         title: 'View Merging',
         desc: '인라인 뷰나 저장 뷰를 바깥 쿼리 블록에 병합해서 더 넓은 범위의 최적화가 가능하게 해요.',
       },
       {
         id: 'Predicate Pushing',
-        color: 'border-violet-200 bg-violet-50/50',
-        badge: 'bg-violet-100 text-violet-700',
+        color: 'border-purple/30 bg-purple/5',
+        badge: 'bg-purple/10 text-purple',
         title: 'Predicate Pushing',
         desc: '뷰를 Merge할 수 없을 때, 외부 WHERE 조건을 뷰 내부로 밀어 넣어 처리 행 수를 줄여요.',
       },
       {
         id: 'Subquery Unnesting',
-        color: 'border-emerald-200 bg-emerald-50/50',
-        badge: 'bg-emerald-100 text-emerald-700',
+        color: 'border-green/30 bg-green/5',
+        badge: 'bg-green/10 text-green',
         title: 'Subquery Unnesting',
         desc: 'WHERE 절의 서브쿼리를 조인으로 변환해서 CBO가 조인 순서와 방법을 자유롭게 선택할 수 있게 해요.',
       },
       {
         id: 'Query Rewrite with MVs',
-        color: 'border-amber-200 bg-amber-50/50',
-        badge: 'bg-amber-100 text-amber-700',
+        color: 'border-amber/30 bg-amber/5',
+        badge: 'bg-amber/10 text-amber',
         title: 'Query Rewrite with Materialized Views',
         desc: '미리 집계된 결과가 담긴 Materialized View를 활용하도록 쿼리를 자동으로 재작성해요.',
       },
       {
         id: 'Star Transformation',
-        color: 'border-cyan-200 bg-cyan-50/50',
-        badge: 'bg-cyan-100 text-cyan-700',
+        color: 'border-green/30 bg-green/5',
+        badge: 'bg-green/10 text-green',
         title: 'Star Transformation',
         desc: 'Star 스키마 쿼리에서 팩트 테이블 Full Scan을 피하기 위해 Bitmap 세미조인 조건을 추가해요.',
       },
       {
         id: 'Join Factorization',
-        color: 'border-rose-200 bg-rose-50/50',
-        badge: 'bg-rose-100 text-rose-700',
+        color: 'border-red/30 bg-red/5',
+        badge: 'bg-red/10 text-red',
         title: 'Join Factorization',
         desc: 'UNION ALL 브랜치에서 공통으로 참조되는 테이블을 인수분해해서 반복 스캔을 없애요.',
       },
@@ -92,50 +92,50 @@ const T = {
     transforms: [
       {
         id: 'OR Expansion',
-        color: 'border-blue-200 bg-blue-50/50',
-        badge: 'bg-blue-100 text-blue-700',
+        color: 'border-blue/30 bg-blue/5',
+        badge: 'bg-blue/10 text-blue',
         title: 'OR Expansion',
         desc: 'Splits a query with top-level OR conditions into UNION ALL branches so each branch can use its own index.',
       },
       {
         id: 'View Merging',
-        color: 'border-orange-200 bg-orange-50/50',
-        badge: 'bg-orange-100 text-orange-700',
+        color: 'border-amber/30 bg-amber/5',
+        badge: 'bg-amber/10 text-amber',
         title: 'View Merging',
         desc: 'Merges inline or stored views into the outer query block, exposing a larger scope for join reordering and access path selection.',
       },
       {
         id: 'Predicate Pushing',
-        color: 'border-violet-200 bg-violet-50/50',
-        badge: 'bg-violet-100 text-violet-700',
+        color: 'border-purple/30 bg-purple/5',
+        badge: 'bg-purple/10 text-purple',
         title: 'Predicate Pushing',
         desc: "When view merging is not possible, pushes the outer WHERE predicates inside the view to reduce the number of rows the view processes.",
       },
       {
         id: 'Subquery Unnesting',
-        color: 'border-emerald-200 bg-emerald-50/50',
-        badge: 'bg-emerald-100 text-emerald-700',
+        color: 'border-green/30 bg-green/5',
+        badge: 'bg-green/10 text-green',
         title: 'Subquery Unnesting',
         desc: 'Converts WHERE subqueries into joins so the CBO can freely choose the join order and method.',
       },
       {
         id: 'Query Rewrite with MVs',
-        color: 'border-amber-200 bg-amber-50/50',
-        badge: 'bg-amber-100 text-amber-700',
+        color: 'border-amber/30 bg-amber/5',
+        badge: 'bg-amber/10 text-amber',
         title: 'Query Rewrite with Materialized Views',
         desc: 'Automatically rewrites a query to use a materialized view that contains precomputed aggregate results.',
       },
       {
         id: 'Star Transformation',
-        color: 'border-cyan-200 bg-cyan-50/50',
-        badge: 'bg-cyan-100 text-cyan-700',
+        color: 'border-green/30 bg-green/5',
+        badge: 'bg-green/10 text-green',
         title: 'Star Transformation',
         desc: 'Avoids full table scans of fact tables in star schema queries by adding bitmap semijoin predicates.',
       },
       {
         id: 'Join Factorization',
-        color: 'border-rose-200 bg-rose-50/50',
-        badge: 'bg-rose-100 text-rose-700',
+        color: 'border-red/30 bg-red/5',
+        badge: 'bg-red/10 text-red',
         title: 'Join Factorization',
         desc: 'Factors out common table references from UNION ALL branches to eliminate repetitive large table scans.',
       },
@@ -153,7 +153,7 @@ export function QtOverviewSection() {
   return (
     <PageContainer>
       <ChapterTitle
-        icon={<IconTransform size={36} stroke={1.5} className="text-cyan-500" />}
+        icon={<IconTransform size={36} stroke={1.5} className="text-green" />}
         title={t.title}
         subtitle={t.subtitle}
       />
@@ -171,15 +171,15 @@ export function QtOverviewSection() {
       <SectionTitle>{t.transformsTitle}</SectionTitle>
       <div className="mb-4 grid gap-3 sm:grid-cols-2">
         {t.transforms.map((item) => (
-          <div key={item.id} className={cn('rounded-xl border-2 p-4', item.color)}>
+          <div key={item.id} className={cn('rounded-panel border-2 p-4', item.color)}>
             <div className="mb-2 flex items-center gap-2">
-              <IconBolt size={14} className="shrink-0 text-muted-foreground" />
+              <IconBolt size={14} className="shrink-0 text-ink-2" />
               <span className={cn('rounded px-1.5 py-0.5 font-mono text-[10px] font-bold', item.badge)}>
                 {item.id}
               </span>
             </div>
-            <p className="mb-1 font-mono text-xs font-bold text-foreground/80">{item.title}</p>
-            <p className="text-xs leading-relaxed text-muted-foreground">{item.desc}</p>
+            <p className="mb-1 font-mono text-xs font-bold text-ink/80">{item.title}</p>
+            <p className="text-xs leading-relaxed text-ink-2">{item.desc}</p>
           </div>
         ))}
       </div>

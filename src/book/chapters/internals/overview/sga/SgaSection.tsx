@@ -104,7 +104,7 @@ const SGA_COMPONENTS: SgaComponent[] = [
     id: 'buffer-cache',
     labelKo: 'Buffer Cache',
     labelEn: 'Buffer Cache',
-    tagColor: 'bg-blue-500',
+    tagColor: 'bg-blue',
     descKo: '디스크에서 읽어온 데이터 블록(기본 8KB)을 메모리에 보관하는 캐시예요. 같은 블록이 다시 필요할 때 디스크에 가지 않고 메모리에서 바로 꺼내 써요. SGA 안에서 가장 큰 비중을 차지하고, Oracle 성능의 핵심 지표인 Buffer Cache Hit Ratio에 직접 영향을 줘요.',
     descEn: 'A cache that holds data blocks (8 KB by default) read from disk. When the same block is needed again, Oracle serves it from memory instead of hitting disk. It is the largest component in the SGA and directly determines the Buffer Cache Hit Ratio — Oracle\'s most watched performance metric.',
     detailsKo: [
@@ -122,7 +122,7 @@ const SGA_COMPONENTS: SgaComponent[] = [
     id: 'shared-pool',
     labelKo: 'Shared Pool',
     labelEn: 'Shared Pool',
-    tagColor: 'bg-indigo-500',
+    tagColor: 'bg-blue',
     descKo: 'SQL 파싱 결과(실행 계획)와 테이블·컬럼 메타데이터를 캐시하는 영역이에요. Library Cache와 Dictionary Cache(Row Cache)로 구성돼요. 같은 SQL이 다시 들어오면 파싱을 건너뛰고 Library Cache의 커서를 재사용(Soft Parse)해서 CPU를 아껴요.',
     descEn: 'Caches SQL parse results (execution plans) and table/column metadata. Consists of the Library Cache and Dictionary Cache (Row Cache). When the same SQL arrives again, Oracle skips parsing and reuses the cached cursor (Soft Parse), saving CPU.',
     detailsKo: [
@@ -140,7 +140,7 @@ const SGA_COMPONENTS: SgaComponent[] = [
     id: 'redo-buffer',
     labelKo: 'Redo Log Buffer',
     labelEn: 'Redo Log Buffer',
-    tagColor: 'bg-orange-500',
+    tagColor: 'bg-amber',
     descKo: '데이터 변경 내역("이 블록의 이 값을 저 값으로 바꿨다")을 순서대로 기록하는 메모리 링 버퍼예요. LGWR(로그 라이터)가 주기적으로, 그리고 COMMIT 시 즉시 디스크 Redo Log File에 써요. 크기가 작은 편이고 빠른 순차 쓰기를 위해 설계됐어요.',
     descEn: 'A circular memory buffer that records data change vectors ("change this value in this block to that value") in sequence. LGWR periodically flushes it to disk, and always flushes it immediately at COMMIT. It is intentionally small and designed for fast sequential writes.',
     detailsKo: [
@@ -158,7 +158,7 @@ const SGA_COMPONENTS: SgaComponent[] = [
     id: 'large-pool',
     labelKo: 'Large Pool',
     labelEn: 'Large Pool',
-    tagColor: 'bg-teal-500',
+    tagColor: 'bg-green',
     descKo: 'RMAN(Recovery Manager) 백업·복구, 병렬 쿼리, Shared Server의 UGA처럼 크고 일회성인 메모리 요청을 전담하는 선택적 영역이에요. 이런 작업을 Shared Pool에서 처리하면 Library Cache가 밀려날 수 있어서 따로 분리해 둔 거예요.',
     descEn: 'An optional area dedicated to large, one-time memory requests such as RMAN backup/recovery, parallel query execution, and UGA for Shared Server. Isolating these from the Shared Pool prevents them from crowding out the Library Cache.',
     detailsKo: [
@@ -195,15 +195,15 @@ function ServerModeCard({
     <button
       onClick={onClick}
       className={cn(
-        'flex-1 rounded-xl border-2 p-4 text-left transition-all',
-        active ? accentCls : 'border-border bg-card hover:border-slate-300',
+        'flex-1 rounded-panel border-2 p-4 text-left transition-all',
+        active ? accentCls : 'border-line bg-paper hover:border-line-2',
       )}
     >
       <div className="flex items-center gap-2 mb-2">
         <span className={cn('shrink-0', active ? '' : 'opacity-50')}>{icon}</span>
-        <span className={cn('font-mono text-xs font-bold', active ? '' : 'text-muted-foreground')}>{label}</span>
+        <span className={cn('font-mono text-xs font-bold', active ? '' : 'text-ink-2')}>{label}</span>
       </div>
-      <p className="text-xs leading-relaxed text-muted-foreground">{desc}</p>
+      <p className="text-xs leading-relaxed text-ink-2">{desc}</p>
     </button>
   )
 }
@@ -228,7 +228,7 @@ export function SgaSection() {
   return (
     <div className="mx-auto max-w-screen-2xl px-10 py-10">
       <ChapterTitle
-        icon={<IconCpu size={36} stroke={1.5} className="text-blue-500" />}
+        icon={<IconCpu size={36} stroke={1.5} className="text-blue" />}
         title={t.title}
         subtitle={t.subtitle}
       />
@@ -261,10 +261,10 @@ export function SgaSection() {
               key={c.id}
               onClick={() => handleComponentSelect(c.id)}
               className={cn(
-                'rounded-lg border px-4 py-2 font-mono text-xs font-bold transition-all',
+                'rounded-card border px-4 py-2 font-mono text-xs font-bold transition-all',
                 isActive
-                  ? `${c.tagColor} border-transparent text-white shadow-sm`
-                  : 'border-border bg-card text-muted-foreground hover:border-slate-400 hover:text-foreground',
+                  ? `${c.tagColor} border-transparent text-paper `
+                  : 'border-line bg-paper text-ink-2 hover:border-line-2 hover:text-ink',
               )}
             >
               {lang === 'ko' ? c.labelKo : c.labelEn}
@@ -282,15 +282,15 @@ export function SgaSection() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -6 }}
             transition={{ duration: 0.18 }}
-            className="mb-4 rounded-xl border border-border bg-card overflow-hidden"
+            className="mb-4 rounded-panel border border-line bg-paper overflow-hidden"
           >
-            <div className="flex items-center gap-2.5 border-b border-border bg-muted/40 px-5 py-3">
-              <span className={cn('rounded px-2.5 py-0.5 font-mono text-xs font-bold text-white', activeComponent.tagColor)}>
+            <div className="flex items-center gap-2.5 border-b border-line bg-rail px-5 py-3">
+              <span className={cn('rounded px-2.5 py-0.5 font-mono text-xs font-bold text-paper', activeComponent.tagColor)}>
                 {lang === 'ko' ? activeComponent.labelKo : activeComponent.labelEn}
               </span>
             </div>
-            <div className="px-5 py-4 border-b border-border">
-              <p className="text-sm leading-relaxed text-muted-foreground">
+            <div className="px-5 py-4 border-b border-line">
+              <p className="text-sm leading-relaxed text-ink-2">
                 {lang === 'ko' ? activeComponent.descKo : activeComponent.descEn}
               </p>
             </div>
@@ -299,34 +299,34 @@ export function SgaSection() {
               const normal = details.filter((r) => !r.isParam)
               const params = details.filter((r) => r.isParam)
               return (
-                <div className="flex flex-col divide-y divide-border">
+                <div className="flex flex-col divide-y divide-line">
                   {normal.map((row, i) => (
                     <div key={i} className="grid grid-cols-[180px_1fr] text-xs">
-                      <div className="flex items-center border-r border-border bg-muted/30 px-4 py-2.5">
-                        <span className="font-mono font-bold text-slate-600">{row.term}</span>
+                      <div className="flex items-center border-r border-line bg-rail px-4 py-2.5">
+                        <span className="font-mono font-bold text-ink">{row.term}</span>
                       </div>
                       <div className="flex items-center px-4 py-2.5">
-                        <span className="leading-snug text-muted-foreground">{row.desc}</span>
+                        <span className="leading-snug text-ink-2">{row.desc}</span>
                       </div>
                     </div>
                   ))}
                   {params.length > 0 && (
                     <>
-                      <div className="flex items-center gap-2 bg-slate-50/80 px-4 py-1.5 border-t border-border">
-                        <span className="rounded border border-slate-300 bg-slate-100 px-1.5 py-0.5 font-mono text-[9px] font-bold uppercase tracking-wider text-slate-500">
+                      <div className="flex items-center gap-2 bg-paper-sunk px-4 py-1.5 border-t border-line">
+                        <span className="rounded border border-line-2 bg-paper-sunk px-1.5 py-0.5 font-mono text-[9px] font-bold uppercase tracking-wider text-ink-2">
                           PARAMETER
                         </span>
-                        <span className="text-[10px] text-slate-400">
+                        <span className="text-[10px] text-ink-2">
                           {lang === 'ko' ? '관련 초기화 파라미터' : 'Initialization parameter'}
                         </span>
                       </div>
                       {params.map((row, i) => (
-                        <div key={i} className="grid grid-cols-[180px_1fr] text-xs bg-slate-50/40">
-                          <div className="flex items-center border-r border-border bg-slate-100/60 px-4 py-2.5">
-                            <span className="font-mono font-bold text-slate-500">{row.term}</span>
+                        <div key={i} className="grid grid-cols-[180px_1fr] text-xs bg-paper-sunk">
+                          <div className="flex items-center border-r border-line bg-paper-sunk px-4 py-2.5">
+                            <span className="font-mono font-bold text-ink-2">{row.term}</span>
                           </div>
                           <div className="flex items-center px-4 py-2.5">
-                            <span className="leading-snug text-muted-foreground">{row.desc}</span>
+                            <span className="leading-snug text-ink-2">{row.desc}</span>
                           </div>
                         </div>
                       ))}
@@ -342,9 +342,9 @@ export function SgaSection() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="mb-4 flex h-16 items-center justify-center rounded-xl border-2 border-dashed border-border"
+            className="mb-4 flex h-16 items-center justify-center rounded-panel border-2 border-dashed border-line"
           >
-            <span className="font-mono text-sm text-muted-foreground">↑ {t.clickHint}</span>
+            <span className="font-mono text-sm text-ink-2">↑ {t.clickHint}</span>
           </motion.div>
         )}
       </AnimatePresence>
@@ -357,20 +357,20 @@ export function SgaSection() {
 
       <div className="flex gap-3 mb-6">
         <ServerModeCard
-          icon={<IconServer size={16} className="text-teal-600" />}
+          icon={<IconServer size={16} className="text-green" />}
           label={t.dedicatedLabel}
           desc={t.dedicatedDesc}
           active={serverMode === 'dedicated'}
           onClick={() => setServerMode('dedicated')}
-          accentCls="border-teal-400 bg-teal-50/60"
+          accentCls="border-green/50 bg-green/5"
         />
         <ServerModeCard
-          icon={<IconNetwork size={16} className="text-violet-600" />}
+          icon={<IconNetwork size={16} className="text-purple" />}
           label={t.racLabel}
           desc={t.racDesc}
           active={serverMode === 'rac'}
           onClick={() => setServerMode('rac')}
-          accentCls="border-violet-400 bg-violet-50/60"
+          accentCls="border-purple/50 bg-purple/5"
         />
       </div>
 
@@ -383,38 +383,38 @@ export function SgaSection() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -6 }}
             transition={{ duration: 0.18 }}
-            className="mb-6 rounded-xl border border-teal-200 bg-teal-50/40 p-5"
+            className="mb-6 rounded-panel border border-green/30 bg-green/5 p-5"
           >
             <div className="mb-3 flex items-center gap-2">
-              <IconServer size={14} className="text-teal-600" />
-              <span className="font-mono text-xs font-bold text-teal-700">
+              <IconServer size={14} className="text-green" />
+              <span className="font-mono text-xs font-bold text-green">
                 {lang === 'ko' ? '단일 서버 · 단일 인스턴스' : 'Single Server · Single Instance'}
               </span>
             </div>
             <div className="flex gap-4 items-center">
               {/* Server box */}
-              <div className="flex-1 rounded-xl border-2 border-teal-300 bg-white/80 p-4">
-                <div className="mb-2 font-mono text-[10px] font-bold uppercase text-teal-600/60">Server</div>
-                <div className="rounded-lg border-2 border-blue-300 bg-blue-50/40 p-3">
-                  <div className="mb-1.5 font-mono text-[10px] font-bold text-blue-600/70 uppercase">Oracle Instance</div>
+              <div className="flex-1 rounded-panel border-2 border-green/50 bg-paper/80 p-4">
+                <div className="mb-2 font-mono text-[10px] font-bold uppercase text-green">Server</div>
+                <div className="rounded-card border-2 border-blue/50 bg-blue/5 p-3">
+                  <div className="mb-1.5 font-mono text-[10px] font-bold text-blue uppercase">Oracle Instance</div>
                   <div className="grid grid-cols-2 gap-1.5 mb-1.5">
-                    <div className="rounded-md border border-blue-200 bg-blue-100/60 px-2 py-1.5 font-mono text-[10px] font-bold text-blue-700 text-center">SGA</div>
-                    <div className="rounded-md border border-teal-200 bg-teal-100/60 px-2 py-1.5 font-mono text-[10px] font-bold text-teal-700 text-center">PGA × N</div>
+                    <div className="rounded-card border border-blue/30 bg-blue/10 px-2 py-1.5 font-mono text-[10px] font-bold text-blue text-center">SGA</div>
+                    <div className="rounded-card border border-green/30 bg-green/10 px-2 py-1.5 font-mono text-[10px] font-bold text-green text-center">PGA × N</div>
                   </div>
                   <div className="flex gap-1.5">
                     {['Session 1', 'Session 2', 'Session 3'].map((s) => (
-                      <div key={s} className="flex-1 rounded border border-teal-200 bg-teal-50 px-1.5 py-1 font-mono text-[9px] text-teal-600 text-center">{s}</div>
+                      <div key={s} className="flex-1 rounded border border-green/30 bg-green/5 px-1.5 py-1 font-mono text-[9px] text-green text-center">{s}</div>
                     ))}
                   </div>
                 </div>
               </div>
               {/* Arrow + DB files */}
-              <div className="flex flex-col items-center gap-1 text-slate-400">
+              <div className="flex flex-col items-center gap-1 text-ink-2">
                 <span className="font-mono text-[10px]">I/O</span>
                 <span className="text-lg">⟷</span>
               </div>
-              <div className="rounded-xl border-2 border-slate-300 bg-slate-50/60 px-5 py-4 font-mono text-[10px] text-slate-500 text-center">
-                <IconDatabase size={20} className="mx-auto mb-1 text-slate-400" />
+              <div className="rounded-panel border-2 border-line-2 bg-paper-sunk px-5 py-4 font-mono text-[10px] text-ink-2 text-center">
+                <IconDatabase size={20} className="mx-auto mb-1 text-ink-2" />
                 {lang === 'ko' ? '공유 DB 파일' : 'DB Files'}
               </div>
             </div>
@@ -426,11 +426,11 @@ export function SgaSection() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -6 }}
             transition={{ duration: 0.18 }}
-            className="mb-6 rounded-xl border border-violet-200 bg-violet-50/40 p-5"
+            className="mb-6 rounded-panel border border-purple/30 bg-purple/5 p-5"
           >
             <div className="mb-3 flex items-center gap-2">
-              <IconNetwork size={14} className="text-violet-600" />
-              <span className="font-mono text-xs font-bold text-violet-700">
+              <IconNetwork size={14} className="text-purple" />
+              <span className="font-mono text-xs font-bold text-purple">
                 {lang === 'ko' ? '다중 노드 · 각자 독립적인 SGA' : 'Multiple Nodes · Independent SGA per Node'}
               </span>
             </div>
@@ -440,35 +440,35 @@ export function SgaSection() {
                 lang === 'ko' ? '노드 1' : 'Node 1',
                 lang === 'ko' ? '노드 2' : 'Node 2',
               ].map((nodeLabel, ni) => (
-                <div key={ni} className="flex-1 rounded-xl border-2 border-violet-300 bg-white/80 p-3">
-                  <div className="mb-2 font-mono text-[10px] font-bold uppercase text-violet-600/70">{nodeLabel}</div>
-                  <div className="rounded-lg border-2 border-blue-300 bg-blue-50/40 p-2">
-                    <div className="mb-1 font-mono text-[9px] font-bold text-blue-600/60 uppercase">Instance {ni + 1}</div>
+                <div key={ni} className="flex-1 rounded-panel border-2 border-purple/50 bg-paper/80 p-3">
+                  <div className="mb-2 font-mono text-[10px] font-bold uppercase text-purple">{nodeLabel}</div>
+                  <div className="rounded-card border-2 border-blue/50 bg-blue/5 p-2">
+                    <div className="mb-1 font-mono text-[9px] font-bold text-blue uppercase">Instance {ni + 1}</div>
                     <div className="grid grid-cols-2 gap-1 mb-1">
-                      <div className="rounded border border-blue-200 bg-blue-100/60 px-1.5 py-1 font-mono text-[9px] font-bold text-blue-700 text-center">SGA</div>
-                      <div className="rounded border border-teal-200 bg-teal-100/60 px-1.5 py-1 font-mono text-[9px] font-bold text-teal-700 text-center">PGA</div>
+                      <div className="rounded border border-blue/30 bg-blue/10 px-1.5 py-1 font-mono text-[9px] font-bold text-blue text-center">SGA</div>
+                      <div className="rounded border border-green/30 bg-green/10 px-1.5 py-1 font-mono text-[9px] font-bold text-green text-center">PGA</div>
                     </div>
                   </div>
                 </div>
               ))}
               {/* Interconnect */}
               <div className="flex flex-col items-center gap-0.5 px-1">
-                <span className="font-mono text-[9px] text-violet-500">Cache</span>
-                <span className="font-mono text-[9px] text-violet-500">Fusion</span>
-                <span className="text-violet-400 text-sm">⟷</span>
+                <span className="font-mono text-[9px] text-purple">Cache</span>
+                <span className="font-mono text-[9px] text-purple">Fusion</span>
+                <span className="text-purple text-sm">⟷</span>
               </div>
               {/* Arrow + shared DB */}
-              <div className="flex flex-col items-center gap-1 text-slate-400">
+              <div className="flex flex-col items-center gap-1 text-ink-2">
                 <span className="font-mono text-[10px]">I/O</span>
                 <span className="text-lg">⟷</span>
               </div>
-              <div className="rounded-xl border-2 border-slate-300 bg-slate-50/60 px-4 py-3 font-mono text-[10px] text-slate-500 text-center">
-                <IconDatabase size={18} className="mx-auto mb-1 text-slate-400" />
+              <div className="rounded-panel border-2 border-line-2 bg-paper-sunk px-4 py-3 font-mono text-[10px] text-ink-2 text-center">
+                <IconDatabase size={18} className="mx-auto mb-1 text-ink-2" />
                 {lang === 'ko' ? '공유 DB 파일' : 'Shared DB'}
-                <div className="mt-0.5 text-[9px] text-violet-500">{lang === 'ko' ? '(모든 노드 공유)' : '(all nodes)'}</div>
+                <div className="mt-0.5 text-[9px] text-purple">{lang === 'ko' ? '(모든 노드 공유)' : '(all nodes)'}</div>
               </div>
             </div>
-            <p className="mt-3 text-[11px] text-violet-600/80">
+            <p className="mt-3 text-[11px] text-purple">
               {lang === 'ko'
                 ? '⚡ Cache Fusion: 노드 1이 수정한 블록을 노드 2가 필요하면 디스크 대신 네트워크 인터커넥트로 직접 전달해요.'
                 : '⚡ Cache Fusion: If Node 2 needs a block modified by Node 1, Oracle sends it over the interconnect directly — no disk involved.'}
@@ -478,12 +478,12 @@ export function SgaSection() {
       </AnimatePresence>
 
       {/* Comparison table */}
-      <div className="overflow-hidden rounded-xl border mb-2">
+      <div className="overflow-hidden rounded-panel border mb-2">
         <table className="w-full text-xs">
           <thead>
-            <tr className="border-b bg-muted/60">
+            <tr className="border-b bg-rail">
               {t.tableHeaders.map((h, i) => (
-                <th key={i} className={cn('px-4 py-2.5 text-left font-mono font-bold text-muted-foreground', i === 0 ? 'w-[160px]' : '')}>
+                <th key={i} className={cn('px-4 py-2.5 text-left font-mono font-bold text-ink-2', i === 0 ? 'w-[160px]' : '')}>
                   {h}
                 </th>
               ))}
@@ -491,9 +491,9 @@ export function SgaSection() {
           </thead>
           <tbody>
             {comparisonRows.map((row, ri) => (
-              <tr key={ri} className={cn('border-b last:border-0', ri % 2 === 0 ? 'bg-background' : 'bg-muted/20')}>
+              <tr key={ri} className={cn('border-b last:border-0', ri % 2 === 0 ? 'bg-paper' : 'bg-rail')}>
                 {row.map((cell, ci) => (
-                  <td key={ci} className={cn('px-4 py-2 font-mono text-[11px]', ci === 0 ? 'font-bold text-foreground/80' : 'text-muted-foreground')}>
+                  <td key={ci} className={cn('px-4 py-2 font-mono text-[11px]', ci === 0 ? 'font-bold text-ink/80' : 'text-ink-2')}>
                     {cell}
                   </td>
                 ))}

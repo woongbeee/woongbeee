@@ -195,13 +195,13 @@ const ICON_MAP = {
 }
 
 const COLOR_CLS = {
-  violet:  { bg: 'bg-violet-50/60',  border: 'border-violet-200',  badge: 'bg-violet-100 text-violet-700'  },
-  blue:    { bg: 'bg-blue-50/60',    border: 'border-blue-200',    badge: 'bg-blue-100 text-blue-700'      },
-  teal:    { bg: 'bg-teal-50/60',    border: 'border-teal-200',    badge: 'bg-teal-100 text-teal-700'      },
-  emerald: { bg: 'bg-emerald-50/60', border: 'border-emerald-200', badge: 'bg-emerald-100 text-emerald-700'},
-  amber:   { bg: 'bg-amber-50/60',   border: 'border-amber-200',   badge: 'bg-amber-100 text-amber-700'    },
-  rose:    { bg: 'bg-rose-50/60',    border: 'border-rose-200',    badge: 'bg-rose-100 text-rose-700'      },
-  slate:   { bg: 'bg-slate-50/60',   border: 'border-slate-200',   badge: 'bg-slate-100 text-slate-600'    },
+  violet:  { bg: 'bg-purple/5',  border: 'border-purple/30',  badge: 'bg-purple/10 text-purple'  },
+  blue:    { bg: 'bg-blue/5',    border: 'border-blue/30',    badge: 'bg-blue/10 text-blue'      },
+  teal:    { bg: 'bg-green/5',    border: 'border-green/30',    badge: 'bg-green/10 text-green'      },
+  emerald: { bg: 'bg-green/5', border: 'border-green/30', badge: 'bg-green/10 text-green'},
+  amber:   { bg: 'bg-amber/5',   border: 'border-amber/30',   badge: 'bg-amber/10 text-amber'    },
+  rose:    { bg: 'bg-red/5',    border: 'border-red/30',    badge: 'bg-red/10 text-red'      },
+  slate:   { bg: 'bg-paper-sunk',   border: 'border-line',   badge: 'bg-paper-sunk text-ink'    },
 }
 
 function ComponentCard({
@@ -211,14 +211,14 @@ function ComponentCard({
 }) {
   const cls = COLOR_CLS[color]
   return (
-    <div className={cn('rounded-xl border p-4', cls.bg, cls.border)}>
+    <div className={cn('rounded-panel border p-4', cls.bg, cls.border)}>
       <div className="mb-2 flex items-center gap-2">
-        <span className={cn('flex h-6 w-6 shrink-0 items-center justify-center rounded-md', cls.badge)}>
+        <span className={cn('flex h-6 w-6 shrink-0 items-center justify-center rounded-card', cls.badge)}>
           {ICON_MAP[icon as keyof typeof ICON_MAP]}
         </span>
         <span className="text-sm font-bold">{label}</span>
       </div>
-      <p className="text-xs leading-relaxed text-muted-foreground">{desc}</p>
+      <p className="text-xs leading-relaxed text-ink-2">{desc}</p>
     </div>
   )
 }
@@ -228,11 +228,11 @@ export function PgaComponentDiagram({ lang }: { lang: 'ko' | 'en' }) {
   const isKo = lang === 'ko'
 
   return (
-    <div className="w-full rounded-xl border-2 border-violet-400 bg-violet-50/40 p-3">
+    <div className="w-full rounded-panel border-2 border-purple/50 bg-purple/5 p-3">
       {/* PGA 헤더 */}
       <div className="mb-2 flex items-center gap-2">
-        <span className="rounded bg-violet-600 px-2 py-0.5 font-mono text-xs font-bold text-white">PGA</span>
-        <span className="font-mono text-xs text-violet-600">
+        <span className="rounded bg-purple px-2 py-0.5 font-mono text-xs font-bold text-paper">PGA</span>
+        <span className="font-mono text-xs text-purple">
           {isKo ? '서버 프로세스 전용 메모리 — 다른 프로세스 접근 불가' : 'per-process private memory — no sharing between processes'}
         </span>
       </div>
@@ -241,29 +241,29 @@ export function PgaComponentDiagram({ lang }: { lang: 'ko' | 'en' }) {
       <div className="grid grid-cols-[2fr_3fr_1.4fr] gap-2">
 
         {/* ── 열 1: Private SQL Area ── */}
-        <div className="flex flex-col gap-1.5 rounded-lg border-2 border-violet-300 bg-violet-100/60 p-2">
+        <div className="flex flex-col gap-1.5 rounded-card border-2 border-purple/50 bg-purple/10 p-2">
           <div className="flex items-center gap-1.5">
-            <span className="rounded bg-violet-500 px-1.5 py-0.5 font-mono text-[10px] font-bold text-white">Private SQL Area</span>
+            <span className="rounded bg-purple px-1.5 py-0.5 font-mono text-[10px] font-bold text-paper">Private SQL Area</span>
           </div>
-          <p className="font-mono text-[9px] text-violet-600">
+          <p className="font-mono text-[9px] text-purple">
             {isKo ? '커서(Cursor) 1개당 1개 생성' : '1 per open cursor'}
           </p>
           <div className="flex flex-1 flex-col gap-1.5">
-            <div className="flex-1 rounded border border-violet-300 bg-violet-200/70 px-2 py-1.5">
-              <div className="font-mono text-[10px] font-bold text-violet-800">Persistent Area</div>
-              <div className="mt-0.5 font-mono text-[9px] text-violet-600">
+            <div className="flex-1 rounded border border-purple/50 bg-purple/15 px-2 py-1.5">
+              <div className="font-mono text-[10px] font-bold text-purple">Persistent Area</div>
+              <div className="mt-0.5 font-mono text-[9px] text-purple">
                 {isKo ? '바인드 변수 값 저장' : 'bind variable values'}
               </div>
-              <div className="mt-0.5 font-mono text-[8px] text-violet-400">
+              <div className="mt-0.5 font-mono text-[8px] text-purple">
                 {isKo ? '커서 닫힐 때 해제' : 'freed on cursor close'}
               </div>
             </div>
-            <div className="flex-1 rounded border border-violet-300 bg-violet-200/70 px-2 py-1.5">
-              <div className="font-mono text-[10px] font-bold text-violet-800">Runtime Area</div>
-              <div className="mt-0.5 font-mono text-[9px] text-violet-600">
+            <div className="flex-1 rounded border border-purple/50 bg-purple/15 px-2 py-1.5">
+              <div className="font-mono text-[10px] font-bold text-purple">Runtime Area</div>
+              <div className="mt-0.5 font-mono text-[9px] text-purple">
                 {isKo ? '실행 상태 · 페치 위치' : 'exec state · fetch pos'}
               </div>
-              <div className="mt-0.5 font-mono text-[8px] text-violet-400">
+              <div className="mt-0.5 font-mono text-[8px] text-purple">
                 {isKo ? 'SQL 종료 시 해제' : 'freed on SQL close'}
               </div>
             </div>
@@ -271,40 +271,40 @@ export function PgaComponentDiagram({ lang }: { lang: 'ko' | 'en' }) {
         </div>
 
         {/* ── 열 2: SQL Work Area ── */}
-        <div className="flex flex-col gap-1.5 rounded-lg border-2 border-blue-300 bg-blue-100/60 p-2">
+        <div className="flex flex-col gap-1.5 rounded-card border-2 border-blue/50 bg-blue/10 p-2">
           <div className="flex items-center gap-1.5">
-            <span className="rounded bg-blue-500 px-1.5 py-0.5 font-mono text-[10px] font-bold text-white">SQL Work Area</span>
+            <span className="rounded bg-blue px-1.5 py-0.5 font-mono text-[10px] font-bold text-paper">SQL Work Area</span>
           </div>
-          <p className="font-mono text-[9px] text-blue-600">
+          <p className="font-mono text-[9px] text-blue">
             {isKo ? '메모리 집약 연산 · 부족 시 Temp 스필' : 'memory-intensive ops · spills to Temp'}
           </p>
           <div className="flex flex-1 flex-col gap-1.5">
-            <div className="flex-1 rounded border border-blue-300 bg-blue-200/70 px-2 py-1.5">
-              <div className="font-mono text-[10px] font-bold text-blue-800">Sort Area</div>
-              <div className="mt-0.5 font-mono text-[9px] text-blue-600">ORDER BY / GROUP BY / {isKo ? '인덱스 빌드' : 'index build'}</div>
+            <div className="flex-1 rounded border border-blue/50 bg-blue/15 px-2 py-1.5">
+              <div className="font-mono text-[10px] font-bold text-blue">Sort Area</div>
+              <div className="mt-0.5 font-mono text-[9px] text-blue">ORDER BY / GROUP BY / {isKo ? '인덱스 빌드' : 'index build'}</div>
             </div>
-            <div className="flex-1 rounded border border-emerald-300 bg-emerald-100/70 px-2 py-1.5">
-              <div className="font-mono text-[10px] font-bold text-emerald-800">Hash Area</div>
-              <div className="mt-0.5 font-mono text-[9px] text-emerald-600">Hash Join {isKo ? 'Build Input' : 'build input'}</div>
+            <div className="flex-1 rounded border border-green/50 bg-green/10 px-2 py-1.5">
+              <div className="font-mono text-[10px] font-bold text-green">Hash Area</div>
+              <div className="mt-0.5 font-mono text-[9px] text-green">Hash Join {isKo ? 'Build Input' : 'build input'}</div>
             </div>
-            <div className="flex-1 rounded border border-amber-300 bg-amber-100/70 px-2 py-1.5">
-              <div className="font-mono text-[10px] font-bold text-amber-800">Bitmap Merge Area</div>
-              <div className="mt-0.5 font-mono text-[9px] text-amber-600">{isKo ? 'Bitmap Index 다중 스캔 병합' : 'Bitmap Index multi-scan merge'}</div>
+            <div className="flex-1 rounded border border-amber/50 bg-amber/10 px-2 py-1.5">
+              <div className="font-mono text-[10px] font-bold text-amber">Bitmap Merge Area</div>
+              <div className="mt-0.5 font-mono text-[9px] text-amber">{isKo ? 'Bitmap Index 다중 스캔 병합' : 'Bitmap Index multi-scan merge'}</div>
             </div>
           </div>
         </div>
 
         {/* ── 열 3: UGA ── */}
-        <div className="flex flex-col gap-1.5 rounded-lg border-2 border-teal-300 bg-teal-100/60 p-2">
+        <div className="flex flex-col gap-1.5 rounded-card border-2 border-green/50 bg-green/10 p-2">
           <div className="flex items-center gap-1.5">
-            <span className="rounded bg-teal-500 px-1.5 py-0.5 font-mono text-[10px] font-bold text-white">UGA</span>
+            <span className="rounded bg-green px-1.5 py-0.5 font-mono text-[10px] font-bold text-paper">UGA</span>
           </div>
-          <p className="font-mono text-[9px] text-teal-600">User Global Area</p>
-          <div className="flex flex-1 flex-col gap-1 font-mono text-[9px] text-teal-700">
+          <p className="font-mono text-[9px] text-green">User Global Area</p>
+          <div className="flex flex-1 flex-col gap-1 font-mono text-[9px] text-green">
             <div>{isKo ? '세션 변수' : 'Session vars'}</div>
             <div>{isKo ? '로그인 정보' : 'Logon info'}</div>
             <div>{isKo ? '세션 상태' : 'Session state'}</div>
-            <div className="mt-1 border-t border-teal-300 pt-1 text-[8px] text-teal-500">
+            <div className="mt-1 border-t border-green/50 pt-1 text-[8px] text-green">
               <div>▸ Dedicated: {isKo ? 'PGA 안에 위치' : 'lives in PGA'}</div>
               <div className="mt-0.5">▸ Shared: {isKo ? 'Large Pool (SGA)으로 이동' : 'moves to Large Pool (SGA)'}</div>
             </div>
@@ -322,20 +322,20 @@ export function PgaCompactBlock({ lang }: { lang: 'ko' | 'en' }) {
   const isKo = lang === 'ko'
   const rows = isKo
     ? [
-        { label: 'Private SQL Area', sub: 'Persistent · Runtime', color: 'bg-violet-100 border-violet-300 text-violet-800' },
-        { label: 'SQL Work Area',    sub: 'Sort · Hash · Bitmap', color: 'bg-blue-100 border-blue-300 text-blue-800' },
-        { label: 'UGA',              sub: '세션 변수 · 로그인',     color: 'bg-teal-100 border-teal-300 text-teal-800' },
+        { label: 'Private SQL Area', sub: 'Persistent · Runtime', color: 'bg-purple/10 border-purple/50 text-purple' },
+        { label: 'SQL Work Area',    sub: 'Sort · Hash · Bitmap', color: 'bg-blue/10 border-blue/50 text-blue' },
+        { label: 'UGA',              sub: '세션 변수 · 로그인',     color: 'bg-green/10 border-green/50 text-green' },
       ]
     : [
-        { label: 'Private SQL Area', sub: 'Persistent · Runtime', color: 'bg-violet-100 border-violet-300 text-violet-800' },
-        { label: 'SQL Work Area',    sub: 'Sort · Hash · Bitmap', color: 'bg-blue-100 border-blue-300 text-blue-800' },
-        { label: 'UGA',              sub: 'session vars · logon',  color: 'bg-teal-100 border-teal-300 text-teal-800' },
+        { label: 'Private SQL Area', sub: 'Persistent · Runtime', color: 'bg-purple/10 border-purple/50 text-purple' },
+        { label: 'SQL Work Area',    sub: 'Sort · Hash · Bitmap', color: 'bg-blue/10 border-blue/50 text-blue' },
+        { label: 'UGA',              sub: 'session vars · logon',  color: 'bg-green/10 border-green/50 text-green' },
       ]
   return (
-    <div className="rounded-lg border-2 border-violet-300 bg-violet-50/40 p-2">
+    <div className="rounded-card border-2 border-purple/50 bg-purple/5 p-2">
       <div className="mb-1.5 flex items-center gap-1.5">
-        <span className="rounded bg-violet-600 px-1.5 py-0.5 font-mono text-[9px] font-bold text-white">PGA</span>
-        <span className="font-mono text-[9px] text-violet-600">
+        <span className="rounded bg-purple px-1.5 py-0.5 font-mono text-[9px] font-bold text-paper">PGA</span>
+        <span className="font-mono text-[9px] text-purple">
           {isKo ? '전용 메모리' : 'Private Memory'}
         </span>
       </div>
@@ -379,22 +379,22 @@ function DedicatedSharedDiagram({ lang }: { lang: 'ko' | 'en' }) {
   const SGA_H_SHR = BOX_H - 68
 
   return (
-    <div className="overflow-x-auto rounded-xl border bg-card">
+    <div className="overflow-x-auto rounded-panel border bg-paper">
       <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ maxWidth: W, display: 'block', margin: '0 auto' }}>
 
         {/* column headers */}
         <text x={DED_X + HALF_W / 2} y={PAD + 16} fontFamily="monospace" fontSize={11}
-          fontWeight="bold" fill="#1d4ed8" textAnchor="middle">
+          fontWeight="bold" fill="var(--color-blue)" textAnchor="middle">
           {isKo ? 'Dedicated Server' : 'Dedicated Server'}
         </text>
         <text x={SHR_X + HALF_W / 2} y={PAD + 16} fontFamily="monospace" fontSize={11}
-          fontWeight="bold" fill="#065f46" textAnchor="middle">
+          fontWeight="bold" fill="var(--color-green)" textAnchor="middle">
           {isKo ? 'Shared Server' : 'Shared Server'}
         </text>
 
         {/* divider */}
         <line x1={W / 2} y1={PAD} x2={W / 2} y2={H - PAD}
-          stroke="#e2e8f0" strokeWidth={1.5} strokeDasharray="4 3" />
+          stroke="var(--color-rail)" strokeWidth={1.5} strokeDasharray="4 3" />
 
         {/* ── Dedicated side: 3 PGAs ── */}
         {[0, 1, 2].map((i) => {
@@ -404,19 +404,19 @@ function DedicatedSharedDiagram({ lang }: { lang: 'ko' | 'en' }) {
             <g key={i}>
               {/* PGA box */}
               <rect x={DED_X + 8} y={py} width={HALF_W - 16} height={PGA_H} rx={7}
-                fill="#faf5ff" stroke="#7c3aed" strokeWidth={1.5} strokeDasharray="5 3" />
+                fill="var(--color-paper-sunk)" stroke="var(--color-purple)" strokeWidth={1.5} strokeDasharray="5 3" />
               <text x={DED_X + 18} y={py + 16} fontFamily="monospace" fontSize={9.5}
-                fontWeight="bold" fill="#7c3aed">PGA — {sessionLabel}</text>
+                fontWeight="bold" fill="var(--color-purple)">PGA — {sessionLabel}</text>
               {/* UGA inside PGA */}
               <rect x={DED_X + 18} y={py + 24} width={(HALF_W - 36) * 0.52} height={28} rx={4}
-                fill="#d1fae5" stroke="#6ee7b7" strokeWidth={1} />
+                fill="var(--color-line)" stroke="var(--color-green)" strokeWidth={1} />
               <text x={DED_X + 18 + ((HALF_W - 36) * 0.52) / 2} y={py + 42}
-                fontFamily="monospace" fontSize={9} fontWeight="bold" fill="#065f46" textAnchor="middle">UGA</text>
+                fontFamily="monospace" fontSize={9} fontWeight="bold" fill="var(--color-green)" textAnchor="middle">UGA</text>
               {/* Work Area */}
               <rect x={DED_X + 18 + (HALF_W - 36) * 0.52 + 6} y={py + 24} width={(HALF_W - 36) * 0.44} height={28} rx={4}
-                fill="#dbeafe" stroke="#93c5fd" strokeWidth={1} />
+                fill="var(--color-rail)" stroke="var(--color-blue)" strokeWidth={1} />
               <text x={DED_X + 18 + (HALF_W - 36) * 0.52 + 6 + ((HALF_W - 36) * 0.44) / 2} y={py + 42}
-                fontFamily="monospace" fontSize={9} fontWeight="bold" fill="#1d4ed8" textAnchor="middle">Work Area</text>
+                fontFamily="monospace" fontSize={9} fontWeight="bold" fill="var(--color-blue)" textAnchor="middle">Work Area</text>
             </g>
           )
         })}
@@ -424,19 +424,19 @@ function DedicatedSharedDiagram({ lang }: { lang: 'ko' | 'en' }) {
         {/* ── Shared side ── */}
         {/* Server processes (shared, small) */}
         <rect x={SHR_X + 8} y={SHR_Y} width={HALF_W - 16} height={44} rx={7}
-          fill="#f1f5f9" stroke="#94a3b8" strokeWidth={1.5} />
+          fill="var(--color-rail)" stroke="var(--color-ink-3)" strokeWidth={1.5} />
         <text x={SHR_X + HALF_W / 2} y={SHR_Y + 16} fontFamily="monospace" fontSize={9.5}
-          fontWeight="bold" fill="#475569" textAnchor="middle">
+          fontWeight="bold" fill="var(--color-ink-2)" textAnchor="middle">
           {isKo ? '공유 서버 프로세스 (여러 세션 처리)' : 'Shared Server Processes (multi-session)'}
         </text>
         <text x={SHR_X + HALF_W / 2} y={SHR_Y + 30} fontFamily="monospace" fontSize={8.5}
-          fill="#94a3b8" textAnchor="middle">PGA → {isKo ? 'Work Area만 포함' : 'Work Area only'}</text>
+          fill="var(--color-ink-3)" textAnchor="middle">PGA → {isKo ? 'Work Area만 포함' : 'Work Area only'}</text>
 
         {/* SGA box on shared side */}
         <rect x={SHR_X + 8} y={SGA_Y_SHR} width={HALF_W - 16} height={SGA_H_SHR} rx={7}
-          fill="#f8fafc" stroke="#94a3b8" strokeWidth={1.5} strokeDasharray="6 3" />
+          fill="var(--color-paper-sunk)" stroke="var(--color-ink-3)" strokeWidth={1.5} strokeDasharray="6 3" />
         <text x={SHR_X + 18} y={SGA_Y_SHR + 18} fontFamily="monospace" fontSize={10}
-          fontWeight="bold" fill="#64748b">SGA — Large Pool</text>
+          fontWeight="bold" fill="var(--color-ink-2)">SGA — Large Pool</text>
 
         {/* UGA blocks inside SGA */}
         {[0, 1, 2].map((i) => {
@@ -444,9 +444,9 @@ function DedicatedSharedDiagram({ lang }: { lang: 'ko' | 'en' }) {
           return (
             <g key={i}>
               <rect x={SHR_X + 18} y={uy} width={HALF_W - 36} height={26} rx={4}
-                fill="#d1fae5" stroke="#6ee7b7" strokeWidth={1} />
+                fill="var(--color-line)" stroke="var(--color-green)" strokeWidth={1} />
               <text x={SHR_X + 18 + (HALF_W - 36) / 2} y={uy + 17} fontFamily="monospace"
-                fontSize={9} fontWeight="bold" fill="#065f46" textAnchor="middle">
+                fontSize={9} fontWeight="bold" fill="var(--color-green)" textAnchor="middle">
                 UGA — {isKo ? `세션 ${i + 1}` : `Session ${i + 1}`}
               </text>
             </g>
@@ -454,10 +454,10 @@ function DedicatedSharedDiagram({ lang }: { lang: 'ko' | 'en' }) {
         })}
 
         {/* legend */}
-        <rect x={DED_X + 8} y={H - 18} width={10} height={8} rx={2} fill="#d1fae5" stroke="#6ee7b7" strokeWidth={1} />
-        <text x={DED_X + 22} y={H - 11} fontFamily="monospace" fontSize={8.5} fill="#6b7280">UGA</text>
-        <rect x={DED_X + 60} y={H - 18} width={10} height={8} rx={2} fill="#dbeafe" stroke="#93c5fd" strokeWidth={1} />
-        <text x={DED_X + 74} y={H - 11} fontFamily="monospace" fontSize={8.5} fill="#6b7280">Work Area</text>
+        <rect x={DED_X + 8} y={H - 18} width={10} height={8} rx={2} fill="var(--color-line)" stroke="var(--color-green)" strokeWidth={1} />
+        <text x={DED_X + 22} y={H - 11} fontFamily="monospace" fontSize={8.5} fill="var(--color-ink-2)">UGA</text>
+        <rect x={DED_X + 60} y={H - 18} width={10} height={8} rx={2} fill="var(--color-rail)" stroke="var(--color-blue)" strokeWidth={1} />
+        <text x={DED_X + 74} y={H - 11} fontFamily="monospace" fontSize={8.5} fill="var(--color-ink-2)">Work Area</text>
       </svg>
     </div>
   )
@@ -498,13 +498,13 @@ export function PgaSection() {
       <SectionTitle>{t.privateSqlTitle}</SectionTitle>
       <Prose className="mb-4">{t.privateSqlDesc}</Prose>
       <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <div className="rounded-xl border-2 border-violet-200 bg-violet-50/50 p-4">
-          <div className="mb-1 font-mono text-[10px] font-bold uppercase tracking-widest text-violet-500">Persistent Area</div>
-          <p className="text-xs leading-relaxed text-muted-foreground">{t.persistentDesc}</p>
+        <div className="rounded-panel border-2 border-purple/30 bg-purple/5 p-4">
+          <div className="mb-1 font-mono text-[10px] font-bold uppercase tracking-widest text-purple">Persistent Area</div>
+          <p className="text-xs leading-relaxed text-ink-2">{t.persistentDesc}</p>
         </div>
-        <div className="rounded-xl border-2 border-violet-200 bg-violet-50/50 p-4">
-          <div className="mb-1 font-mono text-[10px] font-bold uppercase tracking-widest text-violet-500">Runtime Area</div>
-          <p className="text-xs leading-relaxed text-muted-foreground">{t.runtimeDesc}</p>
+        <div className="rounded-panel border-2 border-purple/30 bg-purple/5 p-4">
+          <div className="mb-1 font-mono text-[10px] font-bold uppercase tracking-widest text-purple">Runtime Area</div>
+          <p className="text-xs leading-relaxed text-ink-2">{t.runtimeDesc}</p>
         </div>
       </div>
       <InfoBox variant="note">{t.privateSqlNote}</InfoBox>
@@ -528,11 +528,11 @@ export function PgaSection() {
           {t.spillModes.map((m) => {
             const cls = COLOR_CLS[m.color]
             return (
-              <div key={m.label} className={cn('rounded-xl border p-4', cls.bg, cls.border)}>
+              <div key={m.label} className={cn('rounded-panel border p-4', cls.bg, cls.border)}>
                 <div className={cn('mb-1.5 inline-block rounded-full px-2.5 py-0.5 font-mono text-xs font-bold', cls.badge)}>
                   {m.label}
                 </div>
-                <p className="text-xs leading-relaxed text-muted-foreground">{m.desc}</p>
+                <p className="text-xs leading-relaxed text-ink-2">{m.desc}</p>
               </div>
             )
           })}
@@ -550,37 +550,37 @@ export function PgaSection() {
 
       {/* ── Parameters ── */}
       <SectionTitle>{t.paramsTitle}</SectionTitle>
-      <div className="mb-4 overflow-hidden rounded-xl border bg-card">
+      <div className="mb-4 overflow-hidden rounded-panel border bg-paper">
         {t.params.map((p, i) => (
           <div key={p.name} className={cn('flex items-start gap-4 px-5 py-3', i > 0 && 'border-t')}>
-            <code className="mt-0.5 shrink-0 rounded bg-violet-100 px-2 py-0.5 font-mono text-[11px] font-bold text-violet-700">
+            <code className="mt-0.5 shrink-0 rounded bg-purple/10 px-2 py-0.5 font-mono text-[11px] font-bold text-purple">
               {p.name}
             </code>
-            <p className="text-xs leading-relaxed text-muted-foreground">{p.desc}</p>
+            <p className="text-xs leading-relaxed text-ink-2">{p.desc}</p>
           </div>
         ))}
       </div>
 
       {/* ── Monitoring ── */}
       <SectionTitle>{t.monitorTitle}</SectionTitle>
-      <div className="mb-6 overflow-hidden rounded-xl border bg-card">
+      <div className="mb-6 overflow-hidden rounded-panel border bg-paper">
         {t.monitors.map((m, i) => (
           <div key={m.name} className={cn('flex items-start gap-4 px-5 py-3', i > 0 && 'border-t')}>
-            <code className="mt-0.5 shrink-0 rounded bg-blue-100 px-2 py-0.5 font-mono text-[11px] font-bold text-blue-700">
+            <code className="mt-0.5 shrink-0 rounded bg-blue/10 px-2 py-0.5 font-mono text-[11px] font-bold text-blue">
               {m.name}
             </code>
-            <p className="text-xs leading-relaxed text-muted-foreground">{m.desc}</p>
+            <p className="text-xs leading-relaxed text-ink-2">{m.desc}</p>
           </div>
         ))}
       </div>
 
       {/* ── Summary ── */}
-      <div className="mt-8 rounded-2xl border bg-gradient-to-br from-slate-50 to-violet-50/30 px-6 py-5">
+      <div className="mt-8 rounded-panel border border-line border-l-[3px] border-l-purple bg-paper-sunk px-6 py-5">
         <div className="mb-3"><SubTitle>{t.summaryTitle}</SubTitle></div>
         <ul className="space-y-1.5">
           {t.summaryItems.map((item, i) => (
-            <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
-              <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-violet-400" />
+            <li key={i} className="flex items-start gap-2 text-sm text-ink-2">
+              <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-purple" />
               {item}
             </li>
           ))}

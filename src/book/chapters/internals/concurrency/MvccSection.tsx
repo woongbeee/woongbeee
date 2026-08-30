@@ -25,19 +25,19 @@ const T = {
     guaranteeItems: [
       {
         num: '1',
-        color: 'bg-blue-500',
+        color: 'bg-blue',
         title: '커밋된 데이터만 읽어요',
         text: 'Oracle은 Dirty Read(커밋되지 않은 데이터를 읽는 것)를 절대 허용하지 않아요. 미커밋 데이터를 읽는 일 자체가 불가능해요.',
       },
       {
         num: '2',
-        color: 'bg-indigo-500',
+        color: 'bg-blue',
         title: '단일 시점 일관성',
         text: '쿼리가 반환하는 데이터는 단 하나의 시점에 커밋된 일관된 데이터예요. 쿼리가 실행되는 중에 다른 트랜잭션이 커밋해도 그 변경은 보이지 않아요.',
       },
       {
         num: '3',
-        color: 'bg-violet-500',
+        color: 'bg-purple',
         title: '읽기와 쓰기는 서로를 막지 않아요',
         text: 'Oracle의 쿼리는 다른 쿼리나 DML을 절대 기다리게 하지 않아요. 읽기가 쓰기를 막지 않고, 쓰기도 읽기를 막지 않아요.',
       },
@@ -70,19 +70,19 @@ const T = {
     guaranteeItems: [
       {
         num: '1',
-        color: 'bg-blue-500',
+        color: 'bg-blue',
         title: 'Only committed data is read',
         text: 'Oracle never permits a dirty read, which occurs when a transaction reads uncommitted data in another transaction.',
       },
       {
         num: '2',
-        color: 'bg-indigo-500',
+        color: 'bg-blue',
         title: 'Single point-in-time consistency',
         text: 'Data returned by a query is committed and consistent for a single point in time. Changes committed while the query runs are not visible.',
       },
       {
         num: '3',
-        color: 'bg-violet-500',
+        color: 'bg-purple',
         title: 'Readers and writers never block each other',
         text: "Oracle's queries never force other queries or DML to wait. Readers don't block writers, and writers don't block readers.",
       },
@@ -136,9 +136,9 @@ const CRCloneDiagram = ({ lang }: { lang: 'ko' | 'en' }) => {
   const BLK_GAP = 80
   const BLK_W = (W - BLK_PAD * 2 - BLK_GAP * 2) / 3
   const BLK = [
-    { x: BLK_PAD,                         w: BLK_W, fill: '#fee2e2', stroke: '#fca5a5' },
-    { x: BLK_PAD + BLK_W + BLK_GAP,       w: BLK_W, fill: '#fef9c3', stroke: '#fde68a' },
-    { x: BLK_PAD + (BLK_W + BLK_GAP) * 2, w: BLK_W, fill: '#dcfce7', stroke: '#86efac' },
+    { x: BLK_PAD,                         w: BLK_W, fill: 'var(--color-rail)', stroke: 'var(--color-red)' },
+    { x: BLK_PAD + BLK_W + BLK_GAP,       w: BLK_W, fill: 'var(--color-amber)', stroke: 'var(--color-amber)' },
+    { x: BLK_PAD + (BLK_W + BLK_GAP) * 2, w: BLK_W, fill: 'var(--color-rail)', stroke: 'var(--color-green)' },
   ]
   const blkCx = (i: number) => BLK[i].x + BLK[i].w / 2
 
@@ -159,70 +159,70 @@ const CRCloneDiagram = ({ lang }: { lang: 'ko' | 'en' }) => {
     >
       <defs>
         <marker id="mvcc-arr1" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
-          <path d="M0,0 L0,6 L6,3 z" fill="#f87171" />
+          <path d="M0,0 L0,6 L6,3 z" fill="var(--color-red)" />
         </marker>
         <marker id="mvcc-arr2" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
-          <path d="M0,0 L0,6 L6,3 z" fill="#fbbf24" />
+          <path d="M0,0 L0,6 L6,3 z" fill="var(--color-amber)" />
         </marker>
       </defs>
 
       {/* ── SCN 타임라인 ── */}
-      <line x1="60" y1={TIMELINE_Y} x2={W - 30} y2={TIMELINE_Y} stroke="#94a3b8" strokeWidth="3" />
-      <text x="52" y={TIMELINE_Y - 10} fontSize="18" fill="#64748b" textAnchor="end" fontWeight="bold">SCN</text>
+      <line x1="60" y1={TIMELINE_Y} x2={W - 30} y2={TIMELINE_Y} stroke="var(--color-ink-3)" strokeWidth="3" />
+      <text x="52" y={TIMELINE_Y - 10} fontSize="18" fill="var(--color-ink-2)" textAnchor="end" fontWeight="bold">SCN</text>
       {[10020, 10021, 10022, 10023, 10024, 10025].map((scn, i) => (
         <g key={scn}>
-          <line x1={scnX(i)} y1={TIMELINE_Y - 8} x2={scnX(i)} y2={TIMELINE_Y + 8} stroke="#94a3b8" strokeWidth="2.5" />
-          <text x={scnX(i)} y={TIMELINE_Y + 28} fontSize="16" fill="#64748b" textAnchor="middle">{scn}</text>
+          <line x1={scnX(i)} y1={TIMELINE_Y - 8} x2={scnX(i)} y2={TIMELINE_Y + 8} stroke="var(--color-ink-3)" strokeWidth="2.5" />
+          <text x={scnX(i)} y={TIMELINE_Y + 28} fontSize="16" fill="var(--color-ink-2)" textAnchor="middle">{scn}</text>
         </g>
       ))}
 
       {/* ── SELECT 시작 (SCN 10023) ── */}
-      <circle cx={SEL_CX} cy={TIMELINE_Y} r="13" fill="#3b82f6" />
-      <line x1={SEL_CX} y1={TIMELINE_Y + 13} x2={SEL_CX} y2={SEL_BOX_Y} stroke="#3b82f6" strokeWidth="2.5" strokeDasharray="6,5" />
-      <rect x={SEL_BOX_X} y={SEL_BOX_Y} width={SEL_BOX_W} height={SEL_BOX_H} rx="11" fill="#eff6ff" stroke="#bfdbfe" strokeWidth="2.5" />
-      <text x={SEL_CX} y={SEL_BOX_Y + 26} fontSize="19" fill="#1d4ed8" textAnchor="middle" fontWeight="bold">
+      <circle cx={SEL_CX} cy={TIMELINE_Y} r="13" fill="var(--color-blue)" />
+      <line x1={SEL_CX} y1={TIMELINE_Y + 13} x2={SEL_CX} y2={SEL_BOX_Y} stroke="var(--color-blue)" strokeWidth="2.5" strokeDasharray="6,5" />
+      <rect x={SEL_BOX_X} y={SEL_BOX_Y} width={SEL_BOX_W} height={SEL_BOX_H} rx="11" fill="var(--color-rail)" stroke="var(--color-blue)" strokeWidth="2.5" />
+      <text x={SEL_CX} y={SEL_BOX_Y + 26} fontSize="19" fill="var(--color-blue)" textAnchor="middle" fontWeight="bold">
         {isKo ? 'SELECT 시작' : 'SELECT starts'}
       </text>
-      <text x={SEL_CX} y={SEL_BOX_Y + 50} fontSize="17" fill="#3b82f6" textAnchor="middle">SCN = 10023</text>
+      <text x={SEL_CX} y={SEL_BOX_Y + 50} fontSize="17" fill="var(--color-blue)" textAnchor="middle">SCN = 10023</text>
 
       {/* ── 다른 세션 UPDATE (SCN 10024) ── */}
-      <circle cx={UPD_CX} cy={TIMELINE_Y} r="13" fill="#f59e0b" />
-      <line x1={UPD_CX} y1={TIMELINE_Y + 13} x2={UPD_CX} y2={UPD_BOX_Y} stroke="#f59e0b" strokeWidth="2.5" strokeDasharray="6,5" />
-      <rect x={UPD_BOX_X} y={UPD_BOX_Y} width={UPD_BOX_W} height={UPD_BOX_H} rx="11" fill="#fffbeb" stroke="#fde68a" strokeWidth="2.5" />
-      <text x={UPD_CX} y={UPD_BOX_Y + 26} fontSize="19" fill="#d97706" textAnchor="middle" fontWeight="bold">
+      <circle cx={UPD_CX} cy={TIMELINE_Y} r="13" fill="var(--color-amber)" />
+      <line x1={UPD_CX} y1={TIMELINE_Y + 13} x2={UPD_CX} y2={UPD_BOX_Y} stroke="var(--color-amber)" strokeWidth="2.5" strokeDasharray="6,5" />
+      <rect x={UPD_BOX_X} y={UPD_BOX_Y} width={UPD_BOX_W} height={UPD_BOX_H} rx="11" fill="var(--color-rail)" stroke="var(--color-amber)" strokeWidth="2.5" />
+      <text x={UPD_CX} y={UPD_BOX_Y + 26} fontSize="19" fill="var(--color-amber)" textAnchor="middle" fontWeight="bold">
         {isKo ? '다른 세션 UPDATE' : 'Another session UPDATE'}
       </text>
-      <text x={UPD_CX} y={UPD_BOX_Y + 50} fontSize="17" fill="#d97706" textAnchor="middle">
+      <text x={UPD_CX} y={UPD_BOX_Y + 50} fontSize="17" fill="var(--color-amber)" textAnchor="middle">
         {isKo ? '블록 SCN → 10024' : 'Block SCN → 10024'}
       </text>
 
       {/* ── 현재 블록 ── */}
       <rect x={BLK[0].x} y={BLOCK_Y} width={BLK[0].w} height={BLOCK_H} rx="14" fill={BLK[0].fill} stroke={BLK[0].stroke} strokeWidth="2.5" />
-      <text x={blkCx(0)} y={BLOCK_Y + 34} fontSize="19" fill="#dc2626" textAnchor="middle" fontWeight="bold">
+      <text x={blkCx(0)} y={BLOCK_Y + 34} fontSize="19" fill="var(--color-red)" textAnchor="middle" fontWeight="bold">
         {isKo ? '현재 블록' : 'Current Block'}
       </text>
-      <text x={blkCx(0)} y={BLOCK_Y + 60} fontSize="17" fill="#ef4444" textAnchor="middle">SCN 10024</text>
-      <text x={blkCx(0)} y={BLOCK_Y + 86} fontSize="17" fill="#ef4444" textAnchor="middle">
+      <text x={blkCx(0)} y={BLOCK_Y + 60} fontSize="17" fill="var(--color-red)" textAnchor="middle">SCN 10024</text>
+      <text x={blkCx(0)} y={BLOCK_Y + 86} fontSize="17" fill="var(--color-red)" textAnchor="middle">
         {isKo ? 'sal = 7000 (변경됨)' : 'sal = 7000 (modified)'}
       </text>
 
       {/* ── Undo Segment ── */}
       <rect x={BLK[1].x} y={BLOCK_Y} width={BLK[1].w} height={BLOCK_H} rx="14" fill={BLK[1].fill} stroke={BLK[1].stroke} strokeWidth="2.5" />
-      <text x={blkCx(1)} y={BLOCK_Y + 34} fontSize="19" fill="#92400e" textAnchor="middle" fontWeight="bold">Undo Segment</text>
-      <text x={blkCx(1)} y={BLOCK_Y + 60} fontSize="17" fill="#92400e" textAnchor="middle">
+      <text x={blkCx(1)} y={BLOCK_Y + 34} fontSize="19" fill="var(--color-amber)" textAnchor="middle" fontWeight="bold">Undo Segment</text>
+      <text x={blkCx(1)} y={BLOCK_Y + 60} fontSize="17" fill="var(--color-amber)" textAnchor="middle">
         {isKo ? '원본: sal = 6200' : 'Original: sal = 6200'}
       </text>
-      <text x={blkCx(1)} y={BLOCK_Y + 86} fontSize="17" fill="#78350f" textAnchor="middle">
+      <text x={blkCx(1)} y={BLOCK_Y + 86} fontSize="17" fill="var(--color-amber)" textAnchor="middle">
         {isKo ? '(SCN 10023 이전 값)' : '(value before SCN 10023)'}
       </text>
 
       {/* ── CR Clone ── */}
       <rect x={BLK[2].x} y={BLOCK_Y} width={BLK[2].w} height={BLOCK_H} rx="14" fill={BLK[2].fill} stroke={BLK[2].stroke} strokeWidth="2.5" />
-      <text x={blkCx(2)} y={BLOCK_Y + 34} fontSize="19" fill="#15803d" textAnchor="middle" fontWeight="bold">CR Clone</text>
-      <text x={blkCx(2)} y={BLOCK_Y + 60} fontSize="17" fill="#16a34a" textAnchor="middle">
+      <text x={blkCx(2)} y={BLOCK_Y + 34} fontSize="19" fill="var(--color-green)" textAnchor="middle" fontWeight="bold">CR Clone</text>
+      <text x={blkCx(2)} y={BLOCK_Y + 60} fontSize="17" fill="var(--color-green)" textAnchor="middle">
         {isKo ? 'sal = 6200 (재구성)' : 'sal = 6200 (reconstructed)'}
       </text>
-      <text x={blkCx(2)} y={BLOCK_Y + 86} fontSize="17" fill="#15803d" textAnchor="middle">
+      <text x={blkCx(2)} y={BLOCK_Y + 86} fontSize="17" fill="var(--color-green)" textAnchor="middle">
         {isKo ? '← SELECT에 반환' : '← returned to SELECT'}
       </text>
 
@@ -230,10 +230,10 @@ const CRCloneDiagram = ({ lang }: { lang: 'ko' | 'en' }) => {
       <line
         x1={BLK[0].x + BLK[0].w} y1={ARR_Y}
         x2={BLK[1].x - 6} y2={ARR_Y}
-        stroke="#f87171" strokeWidth="3" fill="none"
+        stroke="var(--color-red)" strokeWidth="3" fill="none"
         markerEnd="url(#mvcc-arr1)"
       />
-      <text x={(BLK[0].x + BLK[0].w + BLK[1].x) / 2} y={ARR_Y - 10} fontSize="16" fill="#ef4444" textAnchor="middle" fontWeight="bold">
+      <text x={(BLK[0].x + BLK[0].w + BLK[1].x) / 2} y={ARR_Y - 10} fontSize="16" fill="var(--color-red)" textAnchor="middle" fontWeight="bold">
         {isKo ? '복사' : 'copy'}
       </text>
 
@@ -241,21 +241,21 @@ const CRCloneDiagram = ({ lang }: { lang: 'ko' | 'en' }) => {
       <line
         x1={BLK[1].x + BLK[1].w} y1={ARR_Y}
         x2={BLK[2].x - 6} y2={ARR_Y}
-        stroke="#fbbf24" strokeWidth="3" fill="none"
+        stroke="var(--color-amber)" strokeWidth="3" fill="none"
         markerEnd="url(#mvcc-arr2)"
       />
-      <text x={(BLK[1].x + BLK[1].w + BLK[2].x) / 2} y={ARR_Y - 10} fontSize="16" fill="#d97706" textAnchor="middle" fontWeight="bold">
+      <text x={(BLK[1].x + BLK[1].w + BLK[2].x) / 2} y={ARR_Y - 10} fontSize="16" fill="var(--color-amber)" textAnchor="middle" fontWeight="bold">
         {isKo ? 'Undo 적용' : 'apply undo'}
       </text>
 
       {/* ── 하단 요약 박스 ── */}
-      <rect x="24" y={SUM_Y} width={W - 48} height={SUM_H} rx="14" fill="#eff6ff" stroke="#bfdbfe" strokeWidth="2.5" />
-      <text x={W / 2} y={SUM_Y + 30} fontSize="19" fill="#1d4ed8" textAnchor="middle" fontWeight="bold">
+      <rect x="24" y={SUM_Y} width={W - 48} height={SUM_H} rx="14" fill="var(--color-rail)" stroke="var(--color-blue)" strokeWidth="2.5" />
+      <text x={W / 2} y={SUM_Y + 30} fontSize="19" fill="var(--color-blue)" textAnchor="middle" fontWeight="bold">
         {isKo
           ? 'SELECT는 SCN 10023 시점의 일관된 데이터를 봐요 — 대기 없음'
           : 'SELECT sees data consistent as of SCN 10023 — no waiting'}
       </text>
-      <text x={W / 2} y={SUM_Y + 58} fontSize="17" fill="#3b82f6" textAnchor="middle">
+      <text x={W / 2} y={SUM_Y + 58} fontSize="17" fill="var(--color-blue)" textAnchor="middle">
         {isKo
           ? 'UPDATE가 진행 중이어도 SELECT는 즉시 이전 버전을 반환해요'
           : 'Even while UPDATE is in progress, SELECT immediately returns the prior version'}
@@ -271,11 +271,11 @@ export function MvccSection() {
   return (
     <PageContainer>
       <ChapterTitle
-        icon={<IconHistory size={36} stroke={1.5} className="text-blue-500" />}
+        icon={<IconHistory size={36} stroke={1.5} className="text-blue" />}
         title={
           <span className="flex items-baseline gap-2 flex-wrap">
             {t.title}
-            <span className="text-base font-normal text-muted-foreground tracking-normal whitespace-nowrap">
+            <span className="text-base font-normal text-ink-2 tracking-normal whitespace-nowrap">
               {t.titleSub}
             </span>
             <span className="text-2xl whitespace-nowrap">{t.titleDesc}</span>
@@ -292,15 +292,15 @@ export function MvccSection() {
           <div key={item.num} className="flex items-start gap-3">
             <span
               className={cn(
-                'flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white',
+                'flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold text-paper',
                 item.color,
               )}
             >
               {item.num}
             </span>
             <div>
-              <p className="text-sm font-semibold text-foreground">{item.title}</p>
-              <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{item.text}</p>
+              <p className="text-sm font-semibold text-ink">{item.title}</p>
+              <p className="text-xs text-ink-2 mt-0.5 leading-relaxed">{item.text}</p>
             </div>
           </div>
         ))}

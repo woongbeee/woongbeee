@@ -44,8 +44,8 @@ function buildConfig(mode: Mode, isKo: boolean): ScanConfig {
     scanArrows: [],
     keyLabel: 'EMP_ID',
     legend: mode !== 'idle' ? [
-      { color: 'bg-blue-400', label: isKo ? '멀티블록 I/O로 읽은 블록' : 'Blocks read by multi-block I/O' },
-      { color: 'bg-slate-200', label: isKo ? '아직 읽지 않음' : 'Not yet read' },
+      { color: 'bg-blue', label: isKo ? '멀티블록 I/O로 읽은 블록' : 'Blocks read by multi-block I/O' },
+      { color: 'bg-rail', label: isKo ? '아직 읽지 않음' : 'Not yet read' },
     ] : [],
   }
 }
@@ -160,7 +160,7 @@ export function FastFullScanSection() {
   return (
     <PageContainer className="max-w-5xl">
       <ChapterTitle
-        icon={<IconBolt size={36} color="#7c3aed" stroke={1.5} />}
+        icon={<IconBolt size={36} color="var(--color-purple)" stroke={1.5} />}
         title={t.title}
         subtitle={t.subtitle}
       />
@@ -174,32 +174,32 @@ export function FastFullScanSection() {
 
       <div className="mb-4 flex items-stretch gap-3">
         <div className="flex flex-col items-center">
-          <div className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber-400 font-mono text-[11px] font-bold text-white">1</div>
-          <div className="mt-1 flex-1 border-l-2 border-dashed border-amber-300" />
+          <div className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber font-mono text-[11px] font-bold text-paper">1</div>
+          <div className="mt-1 flex-1 border-l-2 border-dashed border-amber/50" />
         </div>
         <div className="pb-2">
-          <p className="mb-0.5 font-mono text-[11px] font-bold text-amber-700">{t.step1Title}</p>
-          <p className="text-[11px] leading-relaxed text-muted-foreground">{t.step1Desc}</p>
+          <p className="mb-0.5 font-mono text-[11px] font-bold text-amber">{t.step1Title}</p>
+          <p className="text-[11px] leading-relaxed text-ink-2">{t.step1Desc}</p>
         </div>
       </div>
 
       <div className="mb-5 flex items-start gap-3">
-        <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-blue-400 font-mono text-[11px] font-bold text-white">2</div>
+        <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-blue font-mono text-[11px] font-bold text-paper">2</div>
         <div>
-          <p className="mb-0.5 font-mono text-[11px] font-bold text-blue-700">{t.step2Title}</p>
-          <p className="text-[11px] leading-relaxed text-muted-foreground">{t.step2Desc}</p>
+          <p className="mb-0.5 font-mono text-[11px] font-bold text-blue">{t.step2Title}</p>
+          <p className="text-[11px] leading-relaxed text-ink-2">{t.step2Desc}</p>
         </div>
       </div>
 
-      <p className="mb-2 font-mono text-[11px] font-bold uppercase tracking-widest text-muted-foreground">{t.batchLabel}</p>
+      <p className="mb-2 font-mono text-[11px] font-bold uppercase tracking-widest text-ink-2">{t.batchLabel}</p>
       <div className="mb-4 flex flex-wrap gap-2">
         {MODES.map((m, i) => (
           <button key={m} onClick={() => setMode(mode === m ? 'idle' : m)}
             className={[
-              'rounded-lg border px-3 py-1.5 font-mono text-[11px] font-semibold transition-all',
+              'rounded-card border px-3 py-1.5 font-mono text-[11px] font-semibold transition-all',
               mode === m
-                ? 'border-blue-400 bg-blue-100 text-blue-800 shadow-sm'
-                : 'border-border text-muted-foreground hover:border-blue-300 hover:text-foreground',
+                ? 'border-blue/50 bg-blue/10 text-blue '
+                : 'border-line text-ink-2 hover:border-blue/50 hover:text-ink',
             ].join(' ')}>
             {t.batches[i]}
           </button>
@@ -212,10 +212,10 @@ export function FastFullScanSection() {
       <SectionTitle>{t.traitTitle}</SectionTitle>
       <div className="mb-4 grid gap-3 sm:grid-cols-3">
         {t.traits.map((tr, i) => (
-          <div key={i} className="rounded-xl border bg-card p-4">
+          <div key={i} className="rounded-panel border bg-paper p-4">
             <div className="mb-2 text-lg">{tr.icon}</div>
             <div className="mb-1 text-xs font-bold">{tr.title}</div>
-            <p className="text-[11px] leading-snug text-muted-foreground">{tr.desc}</p>
+            <p className="text-[11px] leading-snug text-ink-2">{tr.desc}</p>
           </div>
         ))}
       </div>

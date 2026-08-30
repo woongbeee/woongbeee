@@ -211,10 +211,10 @@ WHERE  ROWID NOT IN (
 // ── 색상 매핑 ─────────────────────────────────────────────────────────────────
 
 const PART_COLORS = {
-  violet:  { bg: 'bg-violet-100',  text: 'text-violet-800',  border: 'border-violet-200',  badge: 'bg-violet-200 text-violet-800',  dot: 'bg-violet-400' },
-  blue:    { bg: 'bg-blue-100',    text: 'text-blue-800',    border: 'border-blue-200',    badge: 'bg-blue-200 text-blue-800',      dot: 'bg-blue-400' },
-  emerald: { bg: 'bg-emerald-100', text: 'text-emerald-800', border: 'border-emerald-200', badge: 'bg-emerald-200 text-emerald-800',dot: 'bg-emerald-400' },
-  orange:  { bg: 'bg-orange-100',  text: 'text-orange-800',  border: 'border-orange-200',  badge: 'bg-orange-200 text-orange-800',  dot: 'bg-orange-400' },
+  violet:  { bg: 'bg-purple/10',  text: 'text-purple',  border: 'border-purple/30',  badge: 'bg-purple/15 text-purple',  dot: 'bg-purple' },
+  blue:    { bg: 'bg-blue/10',    text: 'text-blue',    border: 'border-blue/30',    badge: 'bg-blue/15 text-blue',      dot: 'bg-blue' },
+  emerald: { bg: 'bg-green/10', text: 'text-green', border: 'border-green/30', badge: 'bg-green/15 text-green',dot: 'bg-green' },
+  orange:  { bg: 'bg-amber/10',  text: 'text-amber',  border: 'border-amber/30',  badge: 'bg-amber/15 text-amber',  dot: 'bg-amber' },
 }
 
 // ── ROWID 시각화 컴포넌트 ──────────────────────────────────────────────────────
@@ -228,9 +228,9 @@ function RowidVisualizer({ parts, breakdown, decodeNote, isKo }: {
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null)
 
   return (
-    <div className="rounded-2xl border bg-slate-50 px-6 py-5">
+    <div className="rounded-panel border bg-paper-sunk px-6 py-5">
       {/* 포맷 레이블 */}
-      <p className="mb-3 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-400">
+      <p className="mb-3 font-mono text-[10px] font-bold uppercase tracking-widest text-ink-2">
         {isKo ? 'ROWID 포맷 (18자리 Base64)' : 'ROWID Format (18-char Base64)'}
       </p>
 
@@ -247,9 +247,9 @@ function RowidVisualizer({ parts, breakdown, decodeNote, isKo }: {
               animate={{ scale: isHovered ? 1.04 : 1 }}
               transition={{ duration: 0.15 }}
               className={[
-                'rounded-lg border-2 px-3 py-2 text-left transition-shadow',
+                'rounded-card border-2 px-3 py-2 text-left transition-shadow',
                 c.bg, c.border,
-                isHovered ? 'shadow-md' : 'shadow-sm',
+                isHovered ? '' : '',
               ].join(' ')}
             >
               <div className={`font-mono text-lg font-bold tracking-widest ${c.text}`}>{part.label}</div>
@@ -270,25 +270,25 @@ function RowidVisualizer({ parts, breakdown, decodeNote, isKo }: {
               initial={{ opacity: 0, y: 4 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.15 }}
-              className={`rounded-xl border p-3 ${c.bg} ${c.border}`}
+              className={`rounded-panel border p-3 ${c.bg} ${c.border}`}
             >
               <div className="mb-1 flex items-center gap-2">
-                <span className={`rounded-md px-2 py-0.5 font-mono text-[11px] font-bold ${c.badge}`}>{part.label}</span>
+                <span className={`rounded-card px-2 py-0.5 font-mono text-[11px] font-bold ${c.badge}`}>{part.label}</span>
                 <span className={`font-mono text-[11px] font-semibold ${c.text}`}>{part.name}</span>
               </div>
-              <p className="text-[12px] leading-relaxed text-muted-foreground">{part.desc}</p>
+              <p className="text-[12px] leading-relaxed text-ink-2">{part.desc}</p>
             </motion.div>
           )
         })() : (
-          <p className="font-mono text-[11px] text-slate-400">
+          <p className="font-mono text-[11px] text-ink-2">
             {isKo ? '↑ 파트에 마우스를 올리면 설명이 표시됩니다' : '↑ Hover over a part to see its description'}
           </p>
         )}
       </div>
 
       {/* 실제 ROWID 예시 분해 */}
-      <div className="rounded-xl border bg-white px-4 py-3">
-        <p className="mb-2 font-mono text-[10px] font-bold uppercase tracking-widest text-slate-400">
+      <div className="rounded-panel border bg-paper px-4 py-3">
+        <p className="mb-2 font-mono text-[10px] font-bold uppercase tracking-widest text-ink-2">
           {isKo ? '실제 ROWID 예시' : 'Example ROWID'}
         </p>
         <div className="mb-1 flex flex-wrap items-center gap-0.5">
@@ -307,12 +307,12 @@ function RowidVisualizer({ parts, breakdown, decodeNote, isKo }: {
             return (
               <span key={i} className="flex items-center gap-1">
                 <span className={`inline-block h-2 w-2 rounded-full ${c.dot}`} />
-                <span className="font-mono text-[10px] text-muted-foreground">{seg.label}</span>
+                <span className="font-mono text-[10px] text-ink-2">{seg.label}</span>
               </span>
             )
           })}
         </div>
-        <p className="font-mono text-[10px] text-slate-500">{decodeNote}</p>
+        <p className="font-mono text-[10px] text-ink-2">{decodeNote}</p>
       </div>
     </div>
   )
@@ -328,7 +328,7 @@ export function RowidSection() {
   return (
     <PageContainer className="max-w-5xl">
       <ChapterTitle
-        icon={<IconFingerprintScan size={36} color="#7c3aed" stroke={1.5} />}
+        icon={<IconFingerprintScan size={36} color="var(--color-purple)" stroke={1.5} />}
         title={t.pageTitle}
         subtitle={t.pageSubtitle}
       />

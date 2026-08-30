@@ -238,7 +238,7 @@ export function AdaptiveSection() {
   return (
     <PageContainer>
       <ChapterTitle
-        icon={<IconRefresh size={36} stroke={1.5} className="text-orange-500" />}
+        icon={<IconRefresh size={36} stroke={1.5} className="text-amber" />}
         title={t.title}
         subtitle={t.subtitle}
       />
@@ -258,8 +258,8 @@ export function AdaptiveSection() {
       <Prose>{t.adaptivePlanWorkDesc}</Prose>
       <ol className="mt-3 mb-4 space-y-2 pl-4">
         {t.adaptivePlanSteps.map((step, i) => (
-          <li key={i} className="text-sm leading-relaxed text-foreground/80">
-            <span className="font-bold text-orange-600 mr-2">{i + 1}.</span>{step}
+          <li key={i} className="text-sm leading-relaxed text-ink/80">
+            <span className="font-bold text-amber mr-2">{i + 1}.</span>{step}
           </li>
         ))}
       </ol>
@@ -289,7 +289,7 @@ export function AdaptiveSection() {
       <SectionTitle>{t.adaptivePlanEnabledTitle}</SectionTitle>
       <ul className="mt-2 mb-4 space-y-1.5 pl-4">
         {t.adaptivePlanEnabledItems.map((item, i) => (
-          <li key={i} className="font-mono text-sm text-foreground/80 before:mr-2 before:content-['•']">
+          <li key={i} className="font-mono text-sm text-ink/80 before:mr-2 before:content-['•']">
             {item}
           </li>
         ))}
@@ -297,7 +297,7 @@ export function AdaptiveSection() {
       <Prose>{t.controlsLabel}</Prose>
       <ul className="mt-2 mb-4 space-y-1.5 pl-4">
         {t.adaptivePlanControls.map((item, i) => (
-          <li key={i} className="text-sm text-foreground/80 before:mr-2 before:content-['•']">
+          <li key={i} className="text-sm text-ink/80 before:mr-2 before:content-['•']">
             {item}
           </li>
         ))}
@@ -318,8 +318,8 @@ export function AdaptiveSection() {
         <Prose>{t.statsFeedbackDesc}</Prose>
         <ol className="mt-3 mb-4 space-y-2 pl-4">
           {t.statsFeedbackSteps.map((step, i) => (
-            <li key={i} className="text-sm leading-relaxed text-foreground/80">
-              <span className="font-bold text-orange-600 mr-2">{i + 1}.</span>{step}
+            <li key={i} className="text-sm leading-relaxed text-ink/80">
+              <span className="font-bold text-amber mr-2">{i + 1}.</span>{step}
             </li>
           ))}
         </ol>
@@ -338,7 +338,7 @@ export function AdaptiveSection() {
       <SectionTitle>{t.adaptiveStatsEnabledTitle}</SectionTitle>
       <ul className="mt-2 mb-4 space-y-1.5 pl-4">
         {t.adaptiveStatsEnabledItems.map((item, i) => (
-          <li key={i} className="font-mono text-sm text-foreground/80 before:mr-2 before:content-['•']">
+          <li key={i} className="font-mono text-sm text-ink/80 before:mr-2 before:content-['•']">
             {item}
           </li>
         ))}
@@ -346,7 +346,7 @@ export function AdaptiveSection() {
       <Prose>{t.statsControlsLabel}</Prose>
       <ul className="mt-2 mb-4 space-y-1.5 pl-4">
         {t.adaptiveStatsControls.map((item, i) => (
-          <li key={i} className="text-sm text-foreground/80 before:mr-2 before:content-['•']">
+          <li key={i} className="text-sm text-ink/80 before:mr-2 before:content-['•']">
             {item}
           </li>
         ))}

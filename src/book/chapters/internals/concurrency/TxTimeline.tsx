@@ -2,8 +2,8 @@
 
 export type TxSession = {
   id: string        // 표시 이름 (예: 'Session A', 'Transaction 1')
-  color: string     // tailwind text 색상 (예: '#2563eb')
-  bgColor: string   // 헤더 배경 색상 (예: '#eff6ff')
+  color: string     // tailwind text 색상 (예: 'var(--color-blue)')
+  bgColor: string   // 헤더 배경 색상 (예: 'var(--color-rail)')
   borderColor: string
 }
 
@@ -90,9 +90,9 @@ export function TxTimeline({
           return (
             <g key={i}>
               <rect x={TOP_PAD} y={y + 3} width={W - TOP_PAD * 2} height={22} rx="4"
-                fill="#f8fafc" stroke="#e2e8f0" strokeWidth="1" />
+                fill="var(--color-paper-sunk)" stroke="var(--color-rail)" strokeWidth="1" />
               <text x={W / 2} y={y + 18} fontSize="8"
-                fill={step.color ?? '#64748b'} textAnchor="middle" fontWeight="bold">
+                fill={step.color ?? 'var(--color-ink-2)'} textAnchor="middle" fontWeight="bold">
                 {step.label}
               </text>
             </g>
@@ -103,26 +103,26 @@ export function TxTimeline({
         const sess = sessions.find((s) => s.id === step.session)!
         const rectX = cx - COL_W / 2
         const hasHighlight = step.highlight != null
-        const rectFill = step.highlight === 'error' ? '#fef2f2'
-          : step.highlight === 'success' ? '#f0fdf4'
-          : step.highlight === 'warn' ? '#fffbeb'
+        const rectFill = step.highlight === 'error' ? 'var(--color-rail)'
+          : step.highlight === 'success' ? 'var(--color-rail)'
+          : step.highlight === 'warn' ? 'var(--color-rail)'
           : 'white'
-        const rectStroke = step.highlight === 'error' ? '#fecaca'
-          : step.highlight === 'success' ? '#bbf7d0'
-          : step.highlight === 'warn' ? '#fde68a'
-          : '#e2e8f0'
-        const dotColor = step.highlight === 'error' ? '#dc2626'
-          : step.highlight === 'success' ? '#059669'
-          : step.highlight === 'warn' ? '#d97706'
+        const rectStroke = step.highlight === 'error' ? 'var(--color-red)'
+          : step.highlight === 'success' ? 'var(--color-green)'
+          : step.highlight === 'warn' ? 'var(--color-amber)'
+          : 'var(--color-rail)'
+        const dotColor = step.highlight === 'error' ? 'var(--color-red)'
+          : step.highlight === 'success' ? 'var(--color-green)'
+          : step.highlight === 'warn' ? 'var(--color-amber)'
           : sess.color
-        const textColor = step.highlight === 'error' ? '#dc2626'
-          : step.highlight === 'success' ? '#059669'
-          : step.highlight === 'warn' ? '#d97706'
+        const textColor = step.highlight === 'error' ? 'var(--color-red)'
+          : step.highlight === 'success' ? 'var(--color-green)'
+          : step.highlight === 'warn' ? 'var(--color-amber)'
           : sess.color
-        const subColor = step.highlight === 'error' ? '#9f1239'
-          : step.highlight === 'success' ? '#166534'
-          : step.highlight === 'warn' ? '#92400e'
-          : '#64748b'
+        const subColor = step.highlight === 'error' ? 'var(--color-red)'
+          : step.highlight === 'success' ? 'var(--color-green)'
+          : step.highlight === 'warn' ? 'var(--color-amber)'
+          : 'var(--color-ink-2)'
 
         const boxH = step.sub ? 26 : 17
         const dotY = y + 9
@@ -132,7 +132,7 @@ export function TxTimeline({
             <circle cx={cx} cy={dotY} r="4" fill={dotColor} />
             <rect x={rectX} y={y} width={COL_W} height={boxH} rx="3"
               fill={hasHighlight ? rectFill : 'white'}
-              stroke={hasHighlight ? rectStroke : '#e2e8f0'}
+              stroke={hasHighlight ? rectStroke : 'var(--color-rail)'}
               strokeWidth={hasHighlight ? 1.5 : 1} />
             <text x={cx} y={y + 11} fontSize="8" fill={textColor}
               textAnchor="middle" fontWeight="bold">{step.label}</text>
@@ -149,11 +149,11 @@ export function TxTimeline({
       {resultLabel && (
         <g>
           <rect x={TOP_PAD} y={contentTop + contentH + 3} width={W - TOP_PAD * 2} height={20} rx="4"
-            fill={resultIsGood ? '#f0fdf4' : '#fee2e2'}
-            stroke={resultIsGood ? '#bbf7d0' : '#fca5a5'}
+            fill={resultIsGood ? 'var(--color-rail)' : 'var(--color-rail)'}
+            stroke={resultIsGood ? 'var(--color-green)' : 'var(--color-red)'}
             strokeWidth="1.5" />
           <text x={W / 2} y={contentTop + contentH + 16} fontSize="8"
-            fill={resultIsGood ? '#15803d' : '#dc2626'}
+            fill={resultIsGood ? 'var(--color-green)' : 'var(--color-red)'}
             textAnchor="middle" fontWeight="bold">
             {resultLabel}
           </text>

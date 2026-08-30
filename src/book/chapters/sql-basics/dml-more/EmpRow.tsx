@@ -35,8 +35,8 @@ export function EmpRow({
       transition={{ duration: 0.3 }}
       className={cn(
         'border-b last:border-0 transition-colors',
-        highlighted && !deleted && 'bg-ios-blue-light',
-        deleted && 'bg-ios-red-light line-through',
+        highlighted && !deleted && 'bg-blue/10',
+        deleted && 'bg-red/10 line-through',
       )}
     >
       {cols.map((c) => {
@@ -47,8 +47,8 @@ export function EmpRow({
           <td key={c} className="px-3 py-1.5 font-mono text-[11px]">
             {changed ? (
               <span>
-                <span className="text-ios-red line-through mr-1">{origVal}</span>
-                <span className="text-ios-teal-dark font-bold">{val}</span>
+                <span className="text-red line-through mr-1">{origVal}</span>
+                <span className="text-green font-bold">{val}</span>
               </span>
             ) : (
               val

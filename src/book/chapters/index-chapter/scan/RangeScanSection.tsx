@@ -93,8 +93,8 @@ function buildConfig(scenario: Scenario | null, isKo: boolean): ScanConfig {
     scanArrows: [],
     keyLabel: 'EMP_ID',
     legend: scenario ? [
-      { color: 'bg-emerald-400', label: isKo ? '조건 충족 (반환)' : 'Matched (returned)' },
-      { color: 'bg-slate-300',   label: isKo ? '범위 외 (건너뜀)' : 'Out of range (skipped)' },
+      { color: 'bg-green', label: isKo ? '조건 충족 (반환)' : 'Matched (returned)' },
+      { color: 'bg-line-2',   label: isKo ? '범위 외 (건너뜀)' : 'Out of range (skipped)' },
     ] : [],
   }
 }
@@ -200,7 +200,7 @@ export function RangeScanSection() {
   return (
     <PageContainer className="max-w-5xl">
       <ChapterTitle
-        icon={<IconArrowsHorizontal size={36} color="#7c3aed" stroke={1.5} />}
+        icon={<IconArrowsHorizontal size={36} color="var(--color-purple)" stroke={1.5} />}
         title={t.title}
         subtitle={t.subtitle}
       />
@@ -215,26 +215,26 @@ export function RangeScanSection() {
       {/* 수직 탐색 설명 */}
       <div className="mb-4 flex items-stretch gap-3">
         <div className="flex flex-col items-center">
-          <div className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber-400 font-mono text-[11px] font-bold text-white">1</div>
-          <div className="mt-1 flex-1 border-l-2 border-dashed border-amber-300" />
+          <div className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber font-mono text-[11px] font-bold text-paper">1</div>
+          <div className="mt-1 flex-1 border-l-2 border-dashed border-amber/50" />
         </div>
         <div className="pb-2">
-          <p className="mb-0.5 font-mono text-[11px] font-bold text-amber-700">{t.stepVerticalTitle}</p>
-          <p className="text-[11px] leading-relaxed text-muted-foreground">{t.stepVerticalDesc}</p>
+          <p className="mb-0.5 font-mono text-[11px] font-bold text-amber">{t.stepVerticalTitle}</p>
+          <p className="text-[11px] leading-relaxed text-ink-2">{t.stepVerticalDesc}</p>
         </div>
       </div>
 
       <div className="mb-5 flex items-start gap-3">
-        <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-400 font-mono text-[11px] font-bold text-white">2</div>
+        <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-green font-mono text-[11px] font-bold text-paper">2</div>
         <div>
-          <p className="mb-0.5 font-mono text-[11px] font-bold text-emerald-700">{t.stepHorizontalTitle}</p>
-          <p className="text-[11px] leading-relaxed text-muted-foreground">{t.stepHorizontalDesc}</p>
+          <p className="mb-0.5 font-mono text-[11px] font-bold text-green">{t.stepHorizontalTitle}</p>
+          <p className="text-[11px] leading-relaxed text-ink-2">{t.stepHorizontalDesc}</p>
         </div>
       </div>
 
       {/* 시나리오 선택 */}
       <div className="mb-4">
-        <p className="mb-2 font-mono text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
+        <p className="mb-2 font-mono text-[11px] font-bold uppercase tracking-widest text-ink-2">
           {t.scenarioLabel}
         </p>
         <div className="flex flex-wrap gap-2">
@@ -243,10 +243,10 @@ export function RangeScanSection() {
               key={s.id}
               onClick={() => setSelectedScenario(selectedScenario === s.id ? null : s.id)}
               className={[
-                'rounded-lg border px-3 py-1.5 font-mono text-[11px] transition-all',
+                'rounded-card border px-3 py-1.5 font-mono text-[11px] transition-all',
                 selectedScenario === s.id
-                  ? 'border-violet-400 bg-violet-100 font-bold text-violet-800 shadow-sm'
-                  : 'border-border text-muted-foreground hover:border-violet-300 hover:text-foreground',
+                  ? 'border-purple/50 bg-purple/10 font-bold text-purple '
+                  : 'border-line text-ink-2 hover:border-purple/50 hover:text-ink',
               ].join(' ')}
             >
               {isKo ? s.labelKo : s.labelEn}
@@ -254,8 +254,8 @@ export function RangeScanSection() {
           ))}
         </div>
         {scenario && (
-          <div className="mt-3 rounded-lg border bg-slate-900 px-3 py-2">
-            <span className="font-mono text-[11px] text-slate-300">{scenario.sql}</span>
+          <div className="mt-3 rounded-card border bg-ink px-3 py-2">
+            <span className="font-mono text-[11px] text-ink-3">{scenario.sql}</span>
           </div>
         )}
       </div>
@@ -263,19 +263,19 @@ export function RangeScanSection() {
       <ScanDiagram config={config} title={isKo ? 'Leaf 블록 탐색 경로' : 'Leaf Block Traversal'} />
 
       {/* 다이어그램 보충 설명 */}
-      <div className="mt-3 rounded-xl border border-dashed border-slate-200 bg-slate-50/60 px-4 py-3">
-        <p className="font-mono text-[10px] font-bold uppercase tracking-widest text-slate-400">{t.diagramAnnotation}</p>
+      <div className="mt-3 rounded-panel border border-dashed border-line bg-paper-sunk px-4 py-3">
+        <p className="font-mono text-[10px] font-bold uppercase tracking-widest text-ink-2">{t.diagramAnnotation}</p>
         <div className="mt-2 flex flex-wrap gap-x-6 gap-y-1.5">
-          <span className="flex items-center gap-1.5 font-mono text-[11px] text-slate-500">
-            <span className="rounded bg-amber-100 px-1.5 py-0.5 font-bold text-amber-700">ROOT → BRANCH</span>
+          <span className="flex items-center gap-1.5 font-mono text-[11px] text-ink-2">
+            <span className="rounded bg-amber/10 px-1.5 py-0.5 font-bold text-amber">ROOT → BRANCH</span>
             {t.annotationVertical}
           </span>
-          <span className="flex items-center gap-1.5 font-mono text-[11px] text-slate-500">
-            <span className="rounded bg-slate-200 px-1.5 py-0.5 font-bold text-slate-600">← →</span>
+          <span className="flex items-center gap-1.5 font-mono text-[11px] text-ink-2">
+            <span className="rounded bg-rail px-1.5 py-0.5 font-bold text-ink">← →</span>
             {t.annotationHorizontal}
           </span>
-          <span className="flex items-center gap-1.5 font-mono text-[11px] text-slate-500">
-            <span className="h-2.5 w-2.5 rounded-full bg-emerald-400 inline-block" />
+          <span className="flex items-center gap-1.5 font-mono text-[11px] text-ink-2">
+            <span className="h-2.5 w-2.5 rounded-full bg-green inline-block" />
             {t.annotationMatched}
           </span>
         </div>
@@ -287,10 +287,10 @@ export function RangeScanSection() {
       <SectionTitle>{t.traitTitle}</SectionTitle>
       <div className="mb-4 grid gap-3 sm:grid-cols-3">
         {t.traits.map((tr, i) => (
-          <div key={i} className="rounded-xl border bg-card p-4">
+          <div key={i} className="rounded-panel border bg-paper p-4">
             <div className="mb-2 text-lg">{tr.icon}</div>
             <div className="mb-1 text-xs font-bold">{tr.title}</div>
-            <p className="text-[11px] leading-snug text-muted-foreground">{tr.desc}</p>
+            <p className="text-[11px] leading-snug text-ink-2">{tr.desc}</p>
           </div>
         ))}
       </div>

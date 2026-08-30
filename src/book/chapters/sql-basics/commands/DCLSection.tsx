@@ -182,7 +182,7 @@ export function DCLSection() {
   const t = T[lang]
   return (
     <PageContainer>
-      <ChapterTitle icon={<IconShieldLock size={36} color="#10b981" stroke={1.5} />} title={t.chapterTitle} subtitle={t.chapterSubtitle} />
+      <ChapterTitle icon={<IconShieldLock size={36} color="var(--color-green)" stroke={1.5} />} title={t.chapterTitle} subtitle={t.chapterSubtitle} />
 
       <div className="mt-6">
         {/* 권한 종류 */}

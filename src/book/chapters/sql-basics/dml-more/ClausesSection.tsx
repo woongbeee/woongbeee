@@ -76,7 +76,7 @@ export function ClausesSection() {
   return (
     <PageContainer className="max-w-6xl">
       <ChapterTitle
-        icon={<IconSortAscending size={36} color="#6366f1" stroke={1.5} />}
+        icon={<IconSortAscending size={36} color="var(--color-blue)" stroke={1.5} />}
         title={t.chapterTitle}
         subtitle={t.clausesSectionSubtitle}
       />

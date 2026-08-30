@@ -86,8 +86,8 @@ const T = {
 function ReadCommittedConflictDiagram({ lang }: { lang: 'ko' | 'en' }) {
   const isKo = lang === 'ko'
   const sessions: TxSession[] = [
-    { id: isKo ? 'Session A (READ COMMITTED)' : 'Session A (READ COMMITTED)', color: '#2563eb', bgColor: '#eff6ff', borderColor: '#bfdbfe' },
-    { id: isKo ? 'Session B (READ COMMITTED)' : 'Session B (READ COMMITTED)', color: '#7c3aed', bgColor: '#f5f3ff', borderColor: '#ddd6fe' },
+    { id: isKo ? 'Session A (READ COMMITTED)' : 'Session A (READ COMMITTED)', color: 'var(--color-blue)', bgColor: 'var(--color-rail)', borderColor: 'var(--color-blue)' },
+    { id: isKo ? 'Session B (READ COMMITTED)' : 'Session B (READ COMMITTED)', color: 'var(--color-purple)', bgColor: 'var(--color-paper-sunk)', borderColor: 'var(--color-rail)' },
   ]
   const sA = sessions[0].id
   const sB = sessions[1].id
@@ -112,8 +112,8 @@ function ReadCommittedConflictDiagram({ lang }: { lang: 'ko' | 'en' }) {
 function SerializableConflictDiagram({ lang }: { lang: 'ko' | 'en' }) {
   const isKo = lang === 'ko'
   const sessions: TxSession[] = [
-    { id: isKo ? 'Transaction 3 (READ COMMITTED)' : 'Transaction 3 (READ COMMITTED)', color: '#d97706', bgColor: '#fffbeb', borderColor: '#fde68a' },
-    { id: isKo ? 'Transaction 4 (SERIALIZABLE)' : 'Transaction 4 (SERIALIZABLE)', color: '#7c3aed', bgColor: '#f5f3ff', borderColor: '#ddd6fe' },
+    { id: isKo ? 'Transaction 3 (READ COMMITTED)' : 'Transaction 3 (READ COMMITTED)', color: 'var(--color-amber)', bgColor: 'var(--color-rail)', borderColor: 'var(--color-amber)' },
+    { id: isKo ? 'Transaction 4 (SERIALIZABLE)' : 'Transaction 4 (SERIALIZABLE)', color: 'var(--color-purple)', bgColor: 'var(--color-paper-sunk)', borderColor: 'var(--color-rail)' },
   ]
   const s3 = sessions[0].id
   const s4 = sessions[1].id
@@ -139,7 +139,7 @@ export function IsolationSection() {
   return (
     <PageContainer>
       <ChapterTitle
-        icon={<IconShieldCheck size={36} stroke={1.5} className="text-violet-500" />}
+        icon={<IconShieldCheck size={36} stroke={1.5} className="text-purple" />}
         title={t.title}
         subtitle={t.subtitle}
       />
@@ -237,7 +237,7 @@ export function IsolationSection() {
 
       <div className="space-y-4">
         {/* Read Committed */}
-        <div className="rounded-xl border bg-card p-6">
+        <div className="rounded-panel border bg-paper p-6">
           <h3 className="mb-3 text-sm font-bold">{t.readCommittedTitle}</h3>
           <Prose>{t.readCommittedDesc}</Prose>
           <div className="mt-4">
@@ -253,7 +253,7 @@ ALTER SESSION SET ISOLATION_LEVEL = READ COMMITTED;`
               }
             />
           </div>
-          <p className="mt-6 mb-2 text-sm font-semibold text-foreground/80">
+          <p className="mt-6 mb-2 text-sm font-semibold text-ink/80">
             {t.readCommittedConflictTitle}
           </p>
           <Prose>{t.readCommittedConflictDesc}</Prose>
@@ -263,7 +263,7 @@ ALTER SESSION SET ISOLATION_LEVEL = READ COMMITTED;`
         </div>
 
         {/* Serializable */}
-        <div className="rounded-xl border bg-card p-6">
+        <div className="rounded-panel border bg-paper p-6">
           <h3 className="mb-3 text-sm font-bold">{t.serializableTitle}</h3>
           <Prose>{t.serializableDesc}</Prose>
           <div className="mt-4">
@@ -288,7 +288,7 @@ SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
               }
             />
           </div>
-          <p className="mt-6 mb-2 text-sm font-semibold text-foreground/80">
+          <p className="mt-6 mb-2 text-sm font-semibold text-ink/80">
             {t.serializableExampleTitle}
           </p>
           <Prose>{t.serializableExampleDesc}</Prose>
@@ -298,7 +298,7 @@ SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
         </div>
 
         {/* Read-Only */}
-        <div className="rounded-xl border bg-card p-6">
+        <div className="rounded-panel border bg-paper p-6">
           <h3 className="mb-3 text-sm font-bold">{t.readOnlyTitle}</h3>
           <Prose>{t.readOnlyDesc}</Prose>
           <div className="mt-4">

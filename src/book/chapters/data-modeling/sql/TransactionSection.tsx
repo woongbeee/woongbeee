@@ -210,7 +210,7 @@ export function TransactionSection() {
   return (
     <PageContainer>
       <ChapterTitle
-        icon={<IconSitemap size={36} stroke={1.5} className="text-indigo-500" />}
+        icon={<IconSitemap size={36} stroke={1.5} className="text-blue" />}
         title={t.title}
         subtitle={t.subtitle}
       />

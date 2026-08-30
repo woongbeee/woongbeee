@@ -20,35 +20,35 @@ const T = {
       {
         kw: 'SELECT',
         color: 'blue',
-        icon: <IconPlayerPlay size={16} color="#2563eb" stroke={1.5} />,
+        icon: <IconPlayerPlay size={16} color="var(--color-blue)" stroke={1.5} />,
         title: '컬럼 선택',
         desc: '조회할 컬럼명을 적어요. 여러 컬럼을 적을 때는 쉼표로 연결하고, *를 쓰면 전체 컬럼을 조회해요.',
       },
       {
         kw: 'FROM',
         color: 'violet',
-        icon: <IconTable size={16} color="#7c3aed" stroke={1.5} />,
+        icon: <IconTable size={16} color="var(--color-purple)" stroke={1.5} />,
         title: '테이블 지정',
         desc: '데이터를 가져올 테이블(또는 뷰)을 지정해요.',
       },
       {
         kw: 'WHERE',
         color: 'orange',
-        icon: <IconFilter size={16} color="#d97706" stroke={1.5} />,
+        icon: <IconFilter size={16} color="var(--color-amber)" stroke={1.5} />,
         title: '데이터 필터',
         desc: 'FROM 절에 지정한 테이블에서 어떤 행을 가져올지 조건을 적어요.',
       },
       {
         kw: 'UPDATE',
         color: 'amber',
-        icon: <IconEdit size={16} color="#b45309" stroke={1.5} />,
+        icon: <IconEdit size={16} color="var(--color-amber)" stroke={1.5} />,
         title: '데이터 수정',
         desc: '테이블에 저장된 데이터를 수정하는 명령어예요.',
       },
       {
         kw: 'DELETE',
         color: 'rose',
-        icon: <IconTrash size={16} color="#e11d48" stroke={1.5} />,
+        icon: <IconTrash size={16} color="var(--color-red)" stroke={1.5} />,
         title: '데이터 삭제',
         desc: '테이블에 저장된 데이터를 삭제하는 명령어예요.',
       },
@@ -104,35 +104,35 @@ const T = {
       {
         kw: 'SELECT',
         color: 'blue',
-        icon: <IconPlayerPlay size={16} color="#2563eb" stroke={1.5} />,
+        icon: <IconPlayerPlay size={16} color="var(--color-blue)" stroke={1.5} />,
         title: 'Column Selection',
         desc: 'Write the column names to retrieve. Separate multiple columns with commas. * retrieves all columns.',
       },
       {
         kw: 'FROM',
         color: 'violet',
-        icon: <IconTable size={16} color="#7c3aed" stroke={1.5} />,
+        icon: <IconTable size={16} color="var(--color-purple)" stroke={1.5} />,
         title: 'Table Source',
         desc: 'Specifies the table or view to retrieve data from.',
       },
       {
         kw: 'WHERE',
         color: 'orange',
-        icon: <IconFilter size={16} color="#d97706" stroke={1.5} />,
+        icon: <IconFilter size={16} color="var(--color-amber)" stroke={1.5} />,
         title: 'Data Filter',
         desc: 'Write the condition that determines which rows to retrieve from the table specified in FROM.',
       },
       {
         kw: 'UPDATE',
         color: 'amber',
-        icon: <IconEdit size={16} color="#b45309" stroke={1.5} />,
+        icon: <IconEdit size={16} color="var(--color-amber)" stroke={1.5} />,
         title: 'Data Modification',
         desc: 'A command that modifies data already stored in a table.',
       },
       {
         kw: 'DELETE',
         color: 'rose',
-        icon: <IconTrash size={16} color="#e11d48" stroke={1.5} />,
+        icon: <IconTrash size={16} color="var(--color-red)" stroke={1.5} />,
         title: 'Data Deletion',
         desc: 'A command that deletes data already stored in a table.',
       },
@@ -196,7 +196,7 @@ export function DMLSection() {
 
   return (
     <PageContainer className="max-w-6xl">
-      <ChapterTitle icon={<IconEdit size={36} color="#3b82f6" stroke={1.5} />} title={t.chapterTitle} subtitle={t.chapterSubtitle} />
+      <ChapterTitle icon={<IconEdit size={36} color="var(--color-blue)" stroke={1.5} />} title={t.chapterTitle} subtitle={t.chapterSubtitle} />
 
       {/* ── Intro: clause overview ── */}
       <SyntaxRow
@@ -205,7 +205,7 @@ export function DMLSection() {
           <>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               {t.clauses.map((c) => (
-                <div key={c.kw} className={cn('rounded-lg border p-3', CLAUSE_COLOR[c.color])}>
+                <div key={c.kw} className={cn('rounded-card border p-3', CLAUSE_COLOR[c.color])}>
                   <div className="mb-1.5 flex items-center gap-2">
                     <span className="text-base">{c.icon}</span>
                     <code className="rounded bg-current/10 px-1.5 py-0.5 font-mono text-xs font-bold">{c.kw}</code>

@@ -44,7 +44,7 @@ function buildConfig(targetKey: number | null, isKo: boolean): ScanConfig {
     scanArrows: [],
     keyLabel: 'EMP_ID',
     legend: targetKey !== null ? [
-      { color: 'bg-emerald-400', label: isKo ? '찾은 행 (즉시 종료)' : 'Found (scan stops)' },
+      { color: 'bg-green', label: isKo ? '찾은 행 (즉시 종료)' : 'Found (scan stops)' },
     ] : [],
   }
 }
@@ -135,7 +135,7 @@ export function UniqueScanSection() {
   return (
     <PageContainer className="max-w-5xl">
       <ChapterTitle
-        icon={<IconTarget size={36} color="#7c3aed" stroke={1.5} />}
+        icon={<IconTarget size={36} color="var(--color-purple)" stroke={1.5} />}
         title={t.title}
         subtitle={t.subtitle}
       />
@@ -149,32 +149,32 @@ export function UniqueScanSection() {
 
       <div className="mb-4 flex items-stretch gap-3">
         <div className="flex flex-col items-center">
-          <div className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber-400 font-mono text-[11px] font-bold text-white">1</div>
-          <div className="mt-1 flex-1 border-l-2 border-dashed border-amber-300" />
+          <div className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber font-mono text-[11px] font-bold text-paper">1</div>
+          <div className="mt-1 flex-1 border-l-2 border-dashed border-amber/50" />
         </div>
         <div className="pb-2">
-          <p className="mb-0.5 font-mono text-[11px] font-bold text-amber-700">{t.step1Title}</p>
-          <p className="text-[11px] leading-relaxed text-muted-foreground">{t.step1Desc}</p>
+          <p className="mb-0.5 font-mono text-[11px] font-bold text-amber">{t.step1Title}</p>
+          <p className="text-[11px] leading-relaxed text-ink-2">{t.step1Desc}</p>
         </div>
       </div>
 
       <div className="mb-5 flex items-start gap-3">
-        <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-400 font-mono text-[11px] font-bold text-white">2</div>
+        <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-green font-mono text-[11px] font-bold text-paper">2</div>
         <div>
-          <p className="mb-0.5 font-mono text-[11px] font-bold text-emerald-700">{t.step2Title}</p>
-          <p className="text-[11px] leading-relaxed text-muted-foreground">{t.step2Desc}</p>
+          <p className="mb-0.5 font-mono text-[11px] font-bold text-green">{t.step2Title}</p>
+          <p className="text-[11px] leading-relaxed text-ink-2">{t.step2Desc}</p>
         </div>
       </div>
 
-      <p className="mb-2 font-mono text-[11px] font-bold uppercase tracking-widest text-muted-foreground">{t.keyLabel}</p>
+      <p className="mb-2 font-mono text-[11px] font-bold uppercase tracking-widest text-ink-2">{t.keyLabel}</p>
       <div className="mb-4 flex flex-wrap gap-1.5">
         {ALL_KEYS.map((key) => (
           <button key={key} onClick={() => setSelectedKey(selectedKey === key ? null : key)}
             className={[
-              'rounded-lg border px-2.5 py-1.5 font-mono text-[11px] transition-all',
+              'rounded-card border px-2.5 py-1.5 font-mono text-[11px] transition-all',
               selectedKey === key
-                ? 'border-violet-400 bg-violet-100 font-bold text-violet-800 shadow-sm'
-                : 'border-border text-muted-foreground hover:border-violet-300 hover:text-foreground',
+                ? 'border-purple/50 bg-purple/10 font-bold text-purple '
+                : 'border-line text-ink-2 hover:border-purple/50 hover:text-ink',
             ].join(' ')}>
             {key}
           </button>
@@ -187,10 +187,10 @@ export function UniqueScanSection() {
       <SectionTitle>{t.traitTitle}</SectionTitle>
       <div className="mb-4 grid gap-3 sm:grid-cols-3">
         {t.traits.map((tr, i) => (
-          <div key={i} className="rounded-xl border bg-card p-4">
+          <div key={i} className="rounded-panel border bg-paper p-4">
             <div className="mb-2 text-lg">{tr.icon}</div>
             <div className="mb-1 text-xs font-bold">{tr.title}</div>
-            <p className="text-[11px] leading-snug text-muted-foreground">{tr.desc}</p>
+            <p className="text-[11px] leading-snug text-ink-2">{tr.desc}</p>
           </div>
         ))}
       </div>

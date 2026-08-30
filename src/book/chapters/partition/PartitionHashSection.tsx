@@ -157,7 +157,7 @@ export function PartitionHashSection() {
   return (
     <PageContainer>
       <ChapterTitle
-        icon={<IconHash size={36} stroke={1.5} className="text-amber-500" />}
+        icon={<IconHash size={36} stroke={1.5} className="text-amber" />}
         title={t.title}
         subtitle={t.subtitle}
       />

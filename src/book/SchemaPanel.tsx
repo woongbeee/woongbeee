@@ -16,6 +16,14 @@ const T = {
   en: { tabLabel: 'Schema', openTitle: 'Open Schema Panel', closeTitle: 'Close Schema Panel', noTable: 'Select a table above' },
 } as const
 
+const pickBtn = (active: boolean) =>
+  cn(
+    'rounded-chip border px-2 py-0.5 font-mono text-[10px] transition-colors',
+    active
+      ? 'border-ink bg-ink text-paper'
+      : 'border-line text-ink-2 hover:border-ink-3 hover:text-ink',
+  )
+
 const SchemaTab = memo(function SchemaTab({ open, onToggle }: { open: boolean; onToggle: () => void }) {
   const lang = useSimulationStore((s) => s.lang)
   const t = T[lang]
@@ -24,10 +32,10 @@ const SchemaTab = memo(function SchemaTab({ open, onToggle }: { open: boolean; o
       onClick={onToggle}
       title={open ? t.closeTitle : t.openTitle}
       className={cn(
-        'flex w-7 shrink-0 flex-col items-center justify-center gap-1.5 border-l transition-colors duration-150',
+        'flex w-7 shrink-0 flex-col items-center justify-center gap-1.5 border-l border-line transition-colors duration-150',
         open
-          ? 'bg-muted/80 text-foreground'
-          : 'bg-card text-muted-foreground hover:bg-muted/60 hover:text-foreground',
+          ? 'bg-ink/[0.06] text-ink'
+          : 'bg-rail text-ink-3 hover:bg-ink/[0.04] hover:text-ink',
       )}
     >
       <motion.span
@@ -38,7 +46,7 @@ const SchemaTab = memo(function SchemaTab({ open, onToggle }: { open: boolean; o
         ›
       </motion.span>
       <span
-        className="select-none font-mono text-[9px] font-bold uppercase tracking-widest"
+        className="select-none font-mono text-[9px] font-semibold uppercase tracking-widest"
         style={{ writingMode: 'vertical-rl', textOrientation: 'mixed' }}
       >
         {t.tabLabel}
@@ -60,7 +68,7 @@ export function SchemaPanel({ open, onToggle }: Props) {
             animate={{ width: 340, opacity: 1 }}
             exit={{ width: 0, opacity: 0 }}
             transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-            className="overflow-hidden border-l bg-card"
+            className="overflow-hidden border-l border-line bg-rail"
           >
             <SchemaPanelBody />
           </motion.div>
@@ -84,9 +92,9 @@ function SchemaPanelBody() {
 
   return (
     <div className="flex h-full w-[340px] flex-col">
-      {/* Header: schema selector */}
-      <div className="flex shrink-0 items-center gap-2 border-b bg-muted/50 px-3 py-2">
-        <span className="font-mono text-[9px] font-bold uppercase tracking-widest text-muted-foreground">
+      {/* Header: schema selector — mono chrome */}
+      <div className="flex shrink-0 items-center gap-2 border-b border-line bg-rail px-3 py-2">
+        <span className="font-mono text-[9px] font-semibold uppercase tracking-widest text-ink-3">
           Schema
         </span>
         <div className="ml-auto flex gap-1">
@@ -94,12 +102,7 @@ function SchemaPanelBody() {
             <button
               key={s.name}
               onClick={() => { setSelectedSchemaIdx(i); setSelectedTable(null); setViewMode('schema') }}
-              className={cn(
-                'rounded border px-2 py-0.5 font-mono text-[10px] transition-colors',
-                selectedSchemaIdx === i
-                  ? 'border-foreground bg-foreground text-background'
-                  : 'border-border text-muted-foreground hover:border-foreground hover:text-foreground',
-              )}
+              className={pickBtn(selectedSchemaIdx === i)}
             >
               {s.name}
             </button>
@@ -108,16 +111,16 @@ function SchemaPanelBody() {
       </div>
 
       {/* View toggle */}
-      <div className="flex shrink-0 border-b">
+      <div className="flex shrink-0 border-b border-line">
         {(['schema', 'table'] as ViewMode[]).map((v) => (
           <button
             key={v}
             onClick={() => { setViewMode(v); if (v === 'schema') setSelectedTable(null) }}
             className={cn(
-              'flex-1 py-1.5 font-mono text-[10px] font-medium transition-colors',
+              'flex-1 border-b-2 py-1.5 font-mono text-[10px] font-medium transition-colors',
               viewMode === v
-                ? 'border-b-2 border-foreground text-foreground'
-                : 'border-b-2 border-transparent text-muted-foreground hover:text-foreground',
+                ? 'border-ink text-ink'
+                : 'border-transparent text-ink-3 hover:text-ink',
             )}
           >
             {v === 'schema' ? 'Schema' : 'Table Data'}
@@ -127,17 +130,12 @@ function SchemaPanelBody() {
 
       {/* Table picker (table mode only) */}
       {viewMode === 'table' && (
-        <div className="flex shrink-0 flex-wrap gap-1 border-b bg-muted/30 px-3 py-2">
+        <div className="flex shrink-0 flex-wrap gap-1 border-b border-line bg-ink/[0.03] px-3 py-2">
           {schema.tables.map((tbl) => (
             <button
               key={tbl.name}
               onClick={() => setSelectedTable(tbl)}
-              className={cn(
-                'rounded border px-2 py-0.5 font-mono text-[10px] transition-colors',
-                selectedTable?.name === tbl.name
-                  ? 'border-foreground bg-foreground text-background'
-                  : 'border-border text-muted-foreground hover:border-foreground hover:text-foreground',
-              )}
+              className={pickBtn(selectedTable?.name === tbl.name)}
             >
               {tbl.name}
             </button>
@@ -145,12 +143,12 @@ function SchemaPanelBody() {
         </div>
       )}
 
-      {/* Content */}
-      <div className="min-h-0 flex-1 overflow-y-auto">
+      {/* Content — pinned light until data views migrate (Phase 3) */}
+      <div data-theme="light" className="min-h-0 flex-1 overflow-y-auto bg-paper-sunk text-ink">
         {viewMode === 'schema' && <SchemaView schema={schema} />}
         {viewMode === 'table' && selectedTable && <TableView table={selectedTable} />}
         {viewMode === 'table' && !selectedTable && (
-          <div className="flex h-full items-center justify-center font-mono text-[11px] text-muted-foreground/50">
+          <div className="flex h-full items-center justify-center font-mono text-[11px] text-ink-3/60">
             {t.noTable}
           </div>
         )}

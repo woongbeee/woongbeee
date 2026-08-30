@@ -92,7 +92,7 @@ export function OptimizerAccessPathPage() {
   return (
     <PageContainer>
       <ChapterTitle
-        icon={<IconRoute size={36} stroke={1.5} className="text-emerald-500" />}
+        icon={<IconRoute size={36} stroke={1.5} className="text-green" />}
         title={t.title}
         subtitle={t.subtitle}
       />
@@ -120,8 +120,8 @@ export function OptimizerAccessPathPage() {
             <SubTitle>{t.ftsTitle}</SubTitle>
             <ul className="mt-2 flex flex-col gap-2">
               {t.ftsItems.map((item, i) => (
-                <li key={i} className="flex items-start gap-2 text-sm text-slate-600">
-                  <span className="mt-0.5 shrink-0 h-5 w-5 rounded-full bg-orange-100 text-orange-600 text-[10px] font-bold flex items-center justify-center">{i + 1}</span>
+                <li key={i} className="flex items-start gap-2 text-sm text-ink">
+                  <span className="mt-0.5 shrink-0 h-5 w-5 rounded-full bg-amber/10 text-amber text-[10px] font-bold flex items-center justify-center">{i + 1}</span>
                   {item}
                 </li>
               ))}
@@ -131,8 +131,8 @@ export function OptimizerAccessPathPage() {
             <SubTitle>{t.indexTitle}</SubTitle>
             <ul className="mt-2 flex flex-col gap-2">
               {t.indexItems.map((item, i) => (
-                <li key={i} className="flex items-start gap-2 text-sm text-slate-600">
-                  <span className="mt-0.5 shrink-0 h-5 w-5 rounded-full bg-emerald-100 text-emerald-600 text-[10px] font-bold flex items-center justify-center">{i + 1}</span>
+                <li key={i} className="flex items-start gap-2 text-sm text-ink">
+                  <span className="mt-0.5 shrink-0 h-5 w-5 rounded-full bg-green/10 text-green text-[10px] font-bold flex items-center justify-center">{i + 1}</span>
                   {item}
                 </li>
               ))}

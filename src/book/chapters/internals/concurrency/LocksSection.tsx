@@ -160,16 +160,16 @@ const DDL_LOCK_TYPES_EN = [
 const LockDiagram = ({ lang }: { lang: 'ko' | 'en' }) => (
   <svg viewBox="0 0 600 230" className="w-full max-w-2xl mx-auto" aria-label="Row lock diagram">
     {/* 테이블 박스 */}
-    <rect x="20" y="20" width="200" height="190" rx="8" fill="#f8fafc" stroke="#cbd5e1" strokeWidth="1.5" />
-    <text x="120" y="42" fontSize="11" fill="#334155" textAnchor="middle" fontWeight="bold">
+    <rect x="20" y="20" width="200" height="190" rx="8" fill="var(--color-paper-sunk)" stroke="var(--color-line)" strokeWidth="1.5" />
+    <text x="120" y="42" fontSize="11" fill="var(--color-ink)" textAnchor="middle" fontWeight="bold">
       {lang === 'ko' ? 'EMPLOYEES 테이블' : 'EMPLOYEES Table'}
     </text>
     {/* 행들 */}
     {[
-      { y: 56, id: 'EMP 100', sal: '5000', color: '#f1f5f9', border: '#e2e8f0', text: '#64748b' },
-      { y: 90, id: 'EMP 101', sal: '6000', color: '#fee2e2', border: '#fca5a5', text: '#dc2626' },
-      { y: 124, id: 'EMP 102', sal: '7000', color: '#dcfce7', border: '#86efac', text: '#16a34a' },
-      { y: 158, id: 'EMP 103', sal: '8000', color: '#f1f5f9', border: '#e2e8f0', text: '#64748b' },
+      { y: 56, id: 'EMP 100', sal: '5000', color: 'var(--color-rail)', border: 'var(--color-rail)', text: 'var(--color-ink-2)' },
+      { y: 90, id: 'EMP 101', sal: '6000', color: 'var(--color-rail)', border: 'var(--color-red)', text: 'var(--color-red)' },
+      { y: 124, id: 'EMP 102', sal: '7000', color: 'var(--color-rail)', border: 'var(--color-green)', text: 'var(--color-green)' },
+      { y: 158, id: 'EMP 103', sal: '8000', color: 'var(--color-rail)', border: 'var(--color-rail)', text: 'var(--color-ink-2)' },
     ].map((row) => (
       <g key={row.y}>
         <rect x="34" y={row.y} width="172" height="26" rx="4" fill={row.color} stroke={row.border} strokeWidth="1" />
@@ -183,59 +183,59 @@ const LockDiagram = ({ lang }: { lang: 'ko' | 'en' }) => (
     ))}
 
     {/* Session A: EMP 101 업데이트 */}
-    <rect x="260" y="15" width="155" height="70" rx="6" fill="#eff6ff" stroke="#bfdbfe" strokeWidth="1.5" />
-    <text x="337" y="34" fontSize="10" fill="#1d4ed8" textAnchor="middle" fontWeight="bold">Session A</text>
-    <text x="337" y="50" fontSize="9" fill="#3b82f6" textAnchor="middle">
+    <rect x="260" y="15" width="155" height="70" rx="6" fill="var(--color-rail)" stroke="var(--color-blue)" strokeWidth="1.5" />
+    <text x="337" y="34" fontSize="10" fill="var(--color-blue)" textAnchor="middle" fontWeight="bold">Session A</text>
+    <text x="337" y="50" fontSize="9" fill="var(--color-blue)" textAnchor="middle">
       {lang === 'ko' ? 'UPDATE EMP 101' : 'UPDATE EMP 101'}
     </text>
-    <text x="337" y="65" fontSize="9" fill="#3b82f6" textAnchor="middle">
+    <text x="337" y="65" fontSize="9" fill="var(--color-blue)" textAnchor="middle">
       {lang === 'ko' ? '→ 행 락 획득 ✓' : '→ acquires row lock ✓'}
     </text>
 
     {/* Session B: EMP 101 대기 */}
-    <rect x="260" y="100" width="155" height="70" rx="6" fill="#fef2f2" stroke="#fecaca" strokeWidth="1.5" />
-    <text x="337" y="119" fontSize="10" fill="#dc2626" textAnchor="middle" fontWeight="bold">Session B</text>
-    <text x="337" y="135" fontSize="9" fill="#ef4444" textAnchor="middle">
+    <rect x="260" y="100" width="155" height="70" rx="6" fill="var(--color-rail)" stroke="var(--color-red)" strokeWidth="1.5" />
+    <text x="337" y="119" fontSize="10" fill="var(--color-red)" textAnchor="middle" fontWeight="bold">Session B</text>
+    <text x="337" y="135" fontSize="9" fill="var(--color-red)" textAnchor="middle">
       {lang === 'ko' ? 'UPDATE EMP 101 → 대기 ⏳' : 'UPDATE EMP 101 → waits ⏳'}
     </text>
-    <text x="337" y="150" fontSize="9" fill="#9ca3af" textAnchor="middle">
+    <text x="337" y="150" fontSize="9" fill="var(--color-ink-3)" textAnchor="middle">
       {lang === 'ko' ? '(Session A 완료까지)' : '(until Session A finishes)'}
     </text>
 
     {/* Session C: EMP 102 즉시 성공 */}
-    <rect x="260" y="185" width="155" height="42" rx="6" fill="#f0fdf4" stroke="#bbf7d0" strokeWidth="1.5" />
-    <text x="337" y="203" fontSize="10" fill="#16a34a" textAnchor="middle" fontWeight="bold">Session C</text>
-    <text x="337" y="219" fontSize="9" fill="#22c55e" textAnchor="middle">
+    <rect x="260" y="185" width="155" height="42" rx="6" fill="var(--color-rail)" stroke="var(--color-green)" strokeWidth="1.5" />
+    <text x="337" y="203" fontSize="10" fill="var(--color-green)" textAnchor="middle" fontWeight="bold">Session C</text>
+    <text x="337" y="219" fontSize="9" fill="var(--color-green)" textAnchor="middle">
       {lang === 'ko' ? 'UPDATE EMP 102 → 즉시 성공 ✓' : 'UPDATE EMP 102 → immediate ✓'}
     </text>
 
     {/* 화살표: A/B → EMP 101 */}
-    <polyline points="260,50 220,103" stroke="#f87171" strokeWidth="1.5" strokeDasharray="4,3" fill="none" />
-    <polyline points="260,135 220,103" stroke="#f87171" strokeWidth="1.5" strokeDasharray="4,3" fill="none" />
+    <polyline points="260,50 220,103" stroke="var(--color-red)" strokeWidth="1.5" strokeDasharray="4,3" fill="none" />
+    <polyline points="260,135 220,103" stroke="var(--color-red)" strokeWidth="1.5" strokeDasharray="4,3" fill="none" />
     {/* 화살표: C → EMP 102 */}
-    <polyline points="260,206 220,137" stroke="#4ade80" strokeWidth="1.5" strokeDasharray="4,3" fill="none" />
+    <polyline points="260,206 220,137" stroke="var(--color-green)" strokeWidth="1.5" strokeDasharray="4,3" fill="none" />
 
     {/* ITL 설명 */}
-    <rect x="440" y="60" width="148" height="110" rx="6" fill="#fef9c3" stroke="#fde68a" strokeWidth="1.5" />
-    <text x="514" y="79" fontSize="9" fill="#92400e" textAnchor="middle" fontWeight="bold">
+    <rect x="440" y="60" width="148" height="110" rx="6" fill="var(--color-amber)" stroke="var(--color-amber)" strokeWidth="1.5" />
+    <text x="514" y="79" fontSize="9" fill="var(--color-amber)" textAnchor="middle" fontWeight="bold">
       {lang === 'ko' ? '블록 헤더 (ITL)' : 'Block Header (ITL)'}
     </text>
-    <text x="514" y="96" fontSize="8" fill="#78350f" textAnchor="middle">
+    <text x="514" y="96" fontSize="8" fill="var(--color-amber)" textAnchor="middle">
       {lang === 'ko' ? '락 정보는 별도' : 'Lock info stored in'}
     </text>
-    <text x="514" y="108" fontSize="8" fill="#78350f" textAnchor="middle">
+    <text x="514" y="108" fontSize="8" fill="var(--color-amber)" textAnchor="middle">
       {lang === 'ko' ? '락 관리자가 아닌' : 'data block header'}
     </text>
-    <text x="514" y="120" fontSize="8" fill="#78350f" textAnchor="middle">
+    <text x="514" y="120" fontSize="8" fill="var(--color-amber)" textAnchor="middle">
       {lang === 'ko' ? '데이터 블록 헤더에' : '(ITL), not in a'}
     </text>
-    <text x="514" y="132" fontSize="8" fill="#78350f" textAnchor="middle">
+    <text x="514" y="132" fontSize="8" fill="var(--color-amber)" textAnchor="middle">
       {lang === 'ko' ? '저장돼요.' : 'separate lock mgr.'}
     </text>
-    <text x="514" y="148" fontSize="8" fill="#d97706" textAnchor="middle" fontStyle="italic">
+    <text x="514" y="148" fontSize="8" fill="var(--color-amber)" textAnchor="middle" fontStyle="italic">
       {lang === 'ko' ? '→ 락 에스컬레이션 없음' : '→ No lock escalation'}
     </text>
-    <text x="514" y="162" fontSize="8" fill="#d97706" textAnchor="middle" fontStyle="italic">
+    <text x="514" y="162" fontSize="8" fill="var(--color-amber)" textAnchor="middle" fontStyle="italic">
       {lang === 'ko' ? '→ 오버헤드 최소화' : '→ Minimal overhead'}
     </text>
   </svg>
@@ -248,7 +248,7 @@ export function LocksSection() {
   return (
     <PageContainer>
       <ChapterTitle
-        icon={<IconLock size={36} stroke={1.5} className="text-amber-500" />}
+        icon={<IconLock size={36} stroke={1.5} className="text-amber" />}
         title={t.title}
         subtitle={t.subtitle}
       />
@@ -258,14 +258,14 @@ export function LocksSection() {
         {t.ruleItems.map((item) => (
           <div
             key={item.num}
-            className="flex gap-3 rounded-lg border border-border bg-muted/30 p-3"
+            className="flex gap-3 rounded-card border border-line bg-rail p-3"
           >
-            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber-500 text-xs font-bold text-white">
+            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber text-xs font-bold text-paper">
               {item.num}
             </span>
             <div>
-              <p className="text-sm font-semibold text-foreground">{item.title}</p>
-              <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{item.desc}</p>
+              <p className="text-sm font-semibold text-ink">{item.title}</p>
+              <p className="text-xs text-ink-2 mt-0.5 leading-relaxed">{item.desc}</p>
             </div>
           </div>
         ))}
@@ -280,19 +280,19 @@ export function LocksSection() {
       <SectionTitle>{t.lockTypes}</SectionTitle>
 
       {/* DML 락 */}
-      <div className="mb-4 rounded-2xl border-2 border-blue-200 bg-blue-50/40 p-5">
-        <p className="mb-1 font-mono text-sm font-bold text-blue-700">{t.dmlLocksTitle}</p>
-        <p className="mb-4 text-xs leading-relaxed text-muted-foreground">{t.dmlLocksDesc}</p>
+      <div className="mb-4 rounded-panel border-2 border-blue/30 bg-blue/5 p-5">
+        <p className="mb-1 font-mono text-sm font-bold text-blue">{t.dmlLocksTitle}</p>
+        <p className="mb-4 text-xs leading-relaxed text-ink-2">{t.dmlLocksDesc}</p>
 
-        <div className="mb-4 rounded-xl border border-blue-200 bg-white/70 p-4">
-          <p className="mb-1 font-mono text-xs font-bold text-blue-600">{t.rowLockTitle}</p>
-          <p className="text-xs leading-relaxed text-muted-foreground">{t.rowLockDesc}</p>
+        <div className="mb-4 rounded-panel border border-blue/30 bg-paper/70 p-4">
+          <p className="mb-1 font-mono text-xs font-bold text-blue">{t.rowLockTitle}</p>
+          <p className="text-xs leading-relaxed text-ink-2">{t.rowLockDesc}</p>
         </div>
 
-        <div className="rounded-xl border border-blue-200 bg-white/70 p-4">
-          <p className="mb-1 font-mono text-xs font-bold text-blue-600">{t.tableLockTitle}</p>
-          <p className="mb-3 text-xs leading-relaxed text-muted-foreground">{t.tableLockDesc}</p>
-          <p className="mb-2 text-xs font-semibold text-foreground/70">{t.tmModes}</p>
+        <div className="rounded-panel border border-blue/30 bg-paper/70 p-4">
+          <p className="mb-1 font-mono text-xs font-bold text-blue">{t.tableLockTitle}</p>
+          <p className="mb-3 text-xs leading-relaxed text-ink-2">{t.tableLockDesc}</p>
+          <p className="mb-2 text-xs font-semibold text-ink/70">{t.tmModes}</p>
           <Table
             headers={[
               lang === 'ko' ? '모드' : 'Mode',
@@ -305,10 +305,10 @@ export function LocksSection() {
       </div>
 
       {/* DDL 락 */}
-      <div className="mb-4 rounded-2xl border-2 border-violet-200 bg-violet-50/40 p-5">
-        <p className="mb-1 font-mono text-sm font-bold text-violet-700">{t.ddlLocksTitle}</p>
-        <p className="mb-4 text-xs leading-relaxed text-muted-foreground">{t.ddlLocksDesc}</p>
-        <p className="mb-2 text-xs font-semibold text-foreground/70">{t.ddlLockTypes}</p>
+      <div className="mb-4 rounded-panel border-2 border-purple/30 bg-purple/5 p-5">
+        <p className="mb-1 font-mono text-sm font-bold text-purple">{t.ddlLocksTitle}</p>
+        <p className="mb-4 text-xs leading-relaxed text-ink-2">{t.ddlLocksDesc}</p>
+        <p className="mb-2 text-xs font-semibold text-ink/70">{t.ddlLockTypes}</p>
         <Table
           headers={[
             lang === 'ko' ? '종류' : 'Type',
@@ -320,17 +320,17 @@ export function LocksSection() {
       </div>
 
       {/* 시스템 락 */}
-      <div className="mb-4 rounded-2xl border-2 border-amber-200 bg-amber-50/40 p-5">
-        <p className="mb-1 font-mono text-sm font-bold text-amber-700">{t.systemLocksTitle}</p>
-        <p className="mb-4 text-xs leading-relaxed text-muted-foreground">{t.systemLocksDesc}</p>
+      <div className="mb-4 rounded-panel border-2 border-amber/30 bg-amber/5 p-5">
+        <p className="mb-1 font-mono text-sm font-bold text-amber">{t.systemLocksTitle}</p>
+        <p className="mb-4 text-xs leading-relaxed text-ink-2">{t.systemLocksDesc}</p>
         <div className="space-y-3">
-          <div className="rounded-xl border border-amber-200 bg-white/70 p-4">
-            <p className="mb-1 font-mono text-xs font-bold text-amber-700">Latch</p>
-            <p className="text-xs leading-relaxed text-muted-foreground">{t.latchDesc}</p>
+          <div className="rounded-panel border border-amber/30 bg-paper/70 p-4">
+            <p className="mb-1 font-mono text-xs font-bold text-amber">Latch</p>
+            <p className="text-xs leading-relaxed text-ink-2">{t.latchDesc}</p>
           </div>
-          <div className="rounded-xl border border-amber-200 bg-white/70 p-4">
-            <p className="mb-1 font-mono text-xs font-bold text-amber-700">Mutex</p>
-            <p className="text-xs leading-relaxed text-muted-foreground">{t.mutexDesc}</p>
+          <div className="rounded-panel border border-amber/30 bg-paper/70 p-4">
+            <p className="mb-1 font-mono text-xs font-bold text-amber">Mutex</p>
+            <p className="text-xs leading-relaxed text-ink-2">{t.mutexDesc}</p>
           </div>
         </div>
       </div>

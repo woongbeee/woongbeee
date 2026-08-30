@@ -96,8 +96,8 @@ function DeadlockTimeline({ lang }: { lang: 'ko' | 'en' }) {
   const isKo = lang === 'ko'
 
   const sessions: TxSession[] = [
-    { id: 'Transaction 1', color: '#2563eb', bgColor: '#eff6ff', borderColor: '#bfdbfe' },
-    { id: 'Transaction 2', color: '#dc2626', bgColor: '#fef2f2', borderColor: '#fecaca' },
+    { id: 'Transaction 1', color: 'var(--color-blue)', bgColor: 'var(--color-rail)', borderColor: 'var(--color-blue)' },
+    { id: 'Transaction 2', color: 'var(--color-red)', bgColor: 'var(--color-rail)', borderColor: 'var(--color-red)' },
   ]
 
   const steps: TxStep[] = [
@@ -155,7 +155,7 @@ export function DeadlockSection() {
   return (
     <PageContainer>
       <ChapterTitle
-        icon={<IconAlertTriangle size={36} stroke={1.5} className="text-red-500" />}
+        icon={<IconAlertTriangle size={36} stroke={1.5} className="text-red" />}
         title={t.title}
         subtitle={t.subtitle}
       />

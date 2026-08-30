@@ -105,7 +105,7 @@ export function OptimizerStatsPage() {
   return (
     <PageContainer>
       <ChapterTitle
-        icon={<IconChartBar size={36} stroke={1.5} className="text-violet-500" />}
+        icon={<IconChartBar size={36} stroke={1.5} className="text-purple" />}
         title={t.title}
         subtitle={t.subtitle}
       />

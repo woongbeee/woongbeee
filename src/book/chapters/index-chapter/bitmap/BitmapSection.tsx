@@ -301,25 +301,25 @@ export function BitmapSection() {
       <Prose>{t.structureDesc}</Prose>
 
       {/* Bitmap vector 시각화 */}
-      <div className="mt-4 overflow-x-auto rounded-xl border bg-muted/20 p-5">
-        <div className="mb-3 font-mono text-xs font-bold uppercase tracking-widest text-muted-foreground">
+      <div className="mt-4 overflow-x-auto rounded-panel border bg-rail p-5">
+        <div className="mb-3 font-mono text-xs font-bold uppercase tracking-widest text-ink-2">
           EMPLOYEES — GENDER Bitmap Index ({DEMO_SIZE} rows)
         </div>
         {/* Row numbers */}
         <div className="mb-1 flex items-center gap-2">
-          <span className="w-24 shrink-0 font-mono text-[10px] text-muted-foreground/50">ROW #</span>
+          <span className="w-24 shrink-0 font-mono text-[10px] text-ink-2/50">ROW #</span>
           <div className="flex gap-1">
             {rows.map((_, i) => (
-              <span key={i} className="flex h-7 w-7 items-center justify-center font-mono text-[9px] text-muted-foreground/40">{i + 1}</span>
+              <span key={i} className="flex h-7 w-7 items-center justify-center font-mono text-[9px] text-ink-2/40">{i + 1}</span>
             ))}
           </div>
         </div>
         {/* Raw data */}
         <div className="mb-3 flex items-center gap-2 border-b pb-3">
-          <span className="w-24 shrink-0 font-mono text-[10px] text-muted-foreground">DATA</span>
+          <span className="w-24 shrink-0 font-mono text-[10px] text-ink-2">DATA</span>
           <div className="flex gap-1">
             {rows.map((r, i) => (
-              <span key={i} className="flex h-7 w-7 items-center justify-center rounded bg-muted font-mono text-[9px] font-bold text-foreground">
+              <span key={i} className="flex h-7 w-7 items-center justify-center rounded bg-rail font-mono text-[9px] font-bold text-ink">
                 {String(r['GENDER'])[0]}
               </span>
             ))}
@@ -328,7 +328,7 @@ export function BitmapSection() {
         {/* Bitmap vectors */}
         {buildVectors(table, 'GENDER').map((vec) => (
           <div key={vec.key} className="mb-1 flex items-center gap-2">
-            <span className={cn('w-24 shrink-0 font-mono text-[10px] font-bold', vec.key === 'M' ? 'text-blue-600' : 'text-rose-600')}>
+            <span className={cn('w-24 shrink-0 font-mono text-[10px] font-bold', vec.key === 'M' ? 'text-blue' : 'text-red')}>
               {vec.key}
             </span>
             <div className="flex gap-1">
@@ -341,15 +341,15 @@ export function BitmapSection() {
                   className={cn(
                     'flex h-7 w-7 items-center justify-center rounded font-mono text-[11px] font-bold',
                     bit === 1
-                      ? vec.key === 'M' ? 'bg-blue-100 text-blue-700' : 'bg-rose-100 text-rose-700'
-                      : 'bg-muted/60 text-muted-foreground'
+                      ? vec.key === 'M' ? 'bg-blue/10 text-blue' : 'bg-red/10 text-red'
+                      : 'bg-rail text-ink-2'
                   )}
                 >
                   {bit}
                 </motion.div>
               ))}
             </div>
-            <span className="font-mono text-[10px] text-muted-foreground">
+            <span className="font-mono text-[10px] text-ink-2">
               ({vec.bits.filter((b) => b === 1).length} rows)
             </span>
           </div>
@@ -370,23 +370,23 @@ export function BitmapSection() {
       <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {t.indexCombineSteps.map((step, i) => {
           const colors = [
-            { badge: 'bg-blue-500',    text: 'text-blue-700'    },
-            { badge: 'bg-orange-500',  text: 'text-orange-700'  },
-            { badge: 'bg-purple-500',  text: 'text-purple-700'  },
-            { badge: 'bg-emerald-500', text: 'text-emerald-700' },
+            { badge: 'bg-blue',    text: 'text-blue'    },
+            { badge: 'bg-amber',  text: 'text-amber'  },
+            { badge: 'bg-purple',  text: 'text-purple'  },
+            { badge: 'bg-green', text: 'text-green' },
           ]
           const c = colors[i]
           return (
-            <div key={i} className="relative rounded-xl border bg-card p-4">
+            <div key={i} className="relative rounded-panel border bg-paper p-4">
               <div className="mb-2 flex items-center gap-2">
-                <span className={cn('flex h-5 w-5 shrink-0 items-center justify-center rounded-full font-mono text-[10px] font-bold text-white', c.badge)}>
+                <span className={cn('flex h-5 w-5 shrink-0 items-center justify-center rounded-full font-mono text-[10px] font-bold text-paper', c.badge)}>
                   {i + 1}
                 </span>
                 <span className={cn('font-mono text-[10px] font-bold', c.text)}>{step.label}</span>
               </div>
-              <p className="text-[11px] leading-relaxed text-muted-foreground">{step.desc}</p>
+              <p className="text-[11px] leading-relaxed text-ink-2">{step.desc}</p>
               {i < 3 && (
-                <span className="absolute -right-2 top-1/2 z-10 hidden -translate-y-1/2 font-mono text-sm text-muted-foreground lg:block">→</span>
+                <span className="absolute -right-2 top-1/2 z-10 hidden -translate-y-1/2 font-mono text-sm text-ink-2 lg:block">→</span>
               )}
             </div>
           )
@@ -394,14 +394,14 @@ export function BitmapSection() {
       </div>
 
       {/* ── Simulator ── */}
-      <div className="mt-6 rounded-xl border bg-card p-5 space-y-5">
-        <p className="text-[11px] leading-relaxed text-muted-foreground">{t.simulLabel}</p>
+      <div className="mt-6 rounded-panel border bg-paper p-5 space-y-5">
+        <p className="text-[11px] leading-relaxed text-ink-2">{t.simulLabel}</p>
 
         {/* Controls */}
         <div className="flex flex-wrap items-end gap-4">
           <div className="flex items-end gap-2">
             <Picker label={t.col1Label} value={col1} options={[...COL_OPTIONS]} onChange={(v) => handleCol1Change(v as ColName)} />
-            <span className="mb-[9px] font-mono text-xs text-muted-foreground">=</span>
+            <span className="mb-[9px] font-mono text-xs text-ink-2">=</span>
             <Picker label={t.val1Label} value={val1} options={VAL_OPTIONS[col1]} onChange={(v) => { setVal1(v); setPhase(0) }} />
           </div>
 
@@ -411,10 +411,10 @@ export function BitmapSection() {
                 key={o}
                 onClick={() => { setOp(o); setPhase(0) }}
                 className={cn(
-                  'rounded-lg px-3 py-[7px] font-mono text-xs font-bold transition',
+                  'rounded-card px-3 py-[7px] font-mono text-xs font-bold transition',
                   op === o
-                    ? o === 'AND' ? 'bg-blue-600 text-white' : 'bg-purple-600 text-white'
-                    : 'border text-muted-foreground hover:text-foreground'
+                    ? o === 'AND' ? 'bg-blue text-paper' : 'bg-purple text-paper'
+                    : 'border text-ink-2 hover:text-ink'
                 )}
               >
                 {o}
@@ -424,20 +424,20 @@ export function BitmapSection() {
 
           <div className="flex items-end gap-2">
             <Picker label={t.col2Label} value={col2} options={[...COL_OPTIONS]} onChange={(v) => handleCol2Change(v as ColName)} />
-            <span className="mb-[9px] font-mono text-xs text-muted-foreground">=</span>
+            <span className="mb-[9px] font-mono text-xs text-ink-2">=</span>
             <Picker label={t.val2Label} value={val2} options={VAL_OPTIONS[col2]} onChange={(v) => { setVal2(v); setPhase(0) }} />
           </div>
 
           <button
             onClick={runSimulation}
             disabled={phase > 0 && phase < 4}
-            className="rounded-lg bg-slate-800 px-4 py-[9px] font-mono text-xs font-bold text-white transition hover:bg-slate-700 disabled:opacity-50"
+            className="rounded-card bg-ink px-4 py-[9px] font-mono text-xs font-bold text-paper transition hover:bg-ink disabled:opacity-50"
           >
             {t.runBtn}
           </button>
           <button
             onClick={() => setPhase(0)}
-            className="rounded-lg border px-4 py-[9px] font-mono text-xs text-muted-foreground transition hover:text-foreground"
+            className="rounded-card border px-4 py-[9px] font-mono text-xs text-ink-2 transition hover:text-ink"
           >
             {t.resetBtn}
           </button>
@@ -449,11 +449,11 @@ export function BitmapSection() {
             <div
               key={s}
               className={cn(
-                'flex items-center gap-1.5 rounded-lg border px-3 py-1.5 transition',
-                phase >= s ? 'border-blue-300 bg-blue-50' : 'opacity-35'
+                'flex items-center gap-1.5 rounded-card border px-3 py-1.5 transition',
+                phase >= s ? 'border-blue/50 bg-blue/5' : 'opacity-35'
               )}
             >
-              <span className={cn('h-1.5 w-1.5 rounded-full transition', phase >= s ? 'bg-blue-500' : 'bg-muted-foreground')} />
+              <span className={cn('h-1.5 w-1.5 rounded-full transition', phase >= s ? 'bg-blue' : 'bg-rail-foreground')} />
               <span className="font-mono text-[10px]">{t.stepLabels[s - 1]}</span>
             </div>
           ))}
@@ -464,7 +464,7 @@ export function BitmapSection() {
           {/* Row number header */}
           <BitmapRow label="">
             {Array.from({ length: DEMO_SIZE }).map((_, i) => (
-              <span key={i} className="flex h-7 w-7 items-center justify-center font-mono text-[9px] text-muted-foreground/40">
+              <span key={i} className="flex h-7 w-7 items-center justify-center font-mono text-[9px] text-ink-2/40">
                 {i + 1}
               </span>
             ))}
@@ -473,7 +473,7 @@ export function BitmapSection() {
           <AnimatePresence>
             {phase >= 1 && vec1 && (
               <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}>
-                <BitmapRow label={`${col1} = '${val1}'`} labelColor="text-blue-700">
+                <BitmapRow label={`${col1} = '${val1}'`} labelColor="text-blue">
                   <BitRow bits={vec1.bits} color="blue" />
                 </BitmapRow>
               </motion.div>
@@ -482,7 +482,7 @@ export function BitmapSection() {
 
           {phase >= 2 && (
             <BitmapRow label="">
-              <span className={cn('font-mono text-sm font-black leading-none', op === 'AND' ? 'text-blue-600' : 'text-purple-600')}>
+              <span className={cn('font-mono text-sm font-black leading-none', op === 'AND' ? 'text-blue' : 'text-purple')}>
                 {op}
               </span>
             </BitmapRow>
@@ -491,7 +491,7 @@ export function BitmapSection() {
           <AnimatePresence>
             {phase >= 2 && vec2 && (
               <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}>
-                <BitmapRow label={`${col2} = '${val2}'`} labelColor="text-orange-700">
+                <BitmapRow label={`${col2} = '${val2}'`} labelColor="text-amber">
                   <BitRow bits={vec2.bits} color="orange" />
                 </BitmapRow>
               </motion.div>
@@ -503,7 +503,7 @@ export function BitmapSection() {
           <AnimatePresence>
             {phase >= 3 && (
               <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}>
-                <BitmapRow label={t.resultLabel} labelColor="text-emerald-700">
+                <BitmapRow label={t.resultLabel} labelColor="text-green">
                   <BitRow bits={resultBits} color="emerald" highlight />
                 </BitmapRow>
               </motion.div>
@@ -515,19 +515,19 @@ export function BitmapSection() {
               <motion.div
                 initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="mt-2 rounded-xl border border-emerald-200 bg-emerald-50/60 p-4"
+                className="mt-2 rounded-panel border border-green/30 bg-green/5 p-4"
               >
-                <div className="mb-2 font-mono text-[10px] font-bold uppercase tracking-widest text-emerald-700">
+                <div className="mb-2 font-mono text-[10px] font-bold uppercase tracking-widest text-green">
                   {t.rowidLabel}
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {matchedRows.filter((r) => r.match).map((r) => (
-                    <span key={r.idx} className="rounded bg-emerald-100 px-2 py-0.5 font-mono text-[10px] text-emerald-800">
+                    <span key={r.idx} className="rounded bg-green/10 px-2 py-0.5 font-mono text-[10px] text-green">
                       Row {r.idx + 1}
                     </span>
                   ))}
                 </div>
-                <div className="mt-2 font-mono text-[11px] font-bold text-emerald-700">
+                <div className="mt-2 font-mono text-[11px] font-bold text-green">
                   {t.rowCountLabel}: {matchCount}
                 </div>
               </motion.div>
@@ -542,7 +542,7 @@ export function BitmapSection() {
           <ul className="mt-1 space-y-1">
             {t.indexCombineWhenItems.map((item, i) => (
               <li key={i} className="flex items-start gap-2">
-                <span className="mt-0.5 shrink-0 font-mono text-rose-400">▸</span>
+                <span className="mt-0.5 shrink-0 font-mono text-red">▸</span>
                 {item}
               </li>
             ))}
@@ -552,7 +552,7 @@ export function BitmapSection() {
 
       {/* Execution plan */}
       <div className="mt-5">
-        <p className="mb-2 font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+        <p className="mb-2 font-mono text-[10px] font-bold uppercase tracking-widest text-ink-2">
           {t.planLabel}
         </p>
         <ExecutionPlanViewer
@@ -577,14 +577,14 @@ export function BitmapSection() {
       <Prose>{t.bitmapJoinWhat}</Prose>
 
       {/* 작동 방식 카드 */}
-      <div className="mt-4 rounded-xl border bg-card p-5">
-        <p className="mb-3 font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+      <div className="mt-4 rounded-panel border bg-paper p-5">
+        <p className="mb-3 font-mono text-[10px] font-bold uppercase tracking-widest text-ink-2">
           {t.bitmapJoinHow.split('\n')[0]}
         </p>
         <div className="grid gap-3 sm:grid-cols-2">
           {/* Without index */}
-          <div className="rounded-lg border border-rose-200 bg-rose-50/40 p-4">
-            <div className="mb-2 font-mono text-[10px] font-bold text-rose-700">
+          <div className="rounded-card border border-red/30 bg-red/5 p-4">
+            <div className="mb-2 font-mono text-[10px] font-bold text-red">
               {lang === 'ko' ? '인덱스 없을 때' : 'Without index'}
             </div>
             <ol className="space-y-1.5">
@@ -592,16 +592,16 @@ export function BitmapSection() {
                 ? ['JOBS 테이블에서 Accountant 행 찾기', 'EMPLOYEES와 job_id로 조인', '조인된 결과에서 집계']
                 : ['Scan JOBS for Accountant rows', 'Join to EMPLOYEES via job_id', 'Aggregate the joined result']
               ).map((s, i) => (
-                <li key={i} className="flex items-start gap-2 text-[11px] text-muted-foreground">
-                  <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-rose-200 font-mono text-[9px] font-bold text-rose-700">{i + 1}</span>
+                <li key={i} className="flex items-start gap-2 text-[11px] text-ink-2">
+                  <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-red/15 font-mono text-[9px] font-bold text-red">{i + 1}</span>
                   {s}
                 </li>
               ))}
             </ol>
           </div>
           {/* With index */}
-          <div className="rounded-lg border border-emerald-200 bg-emerald-50/40 p-4">
-            <div className="mb-2 font-mono text-[10px] font-bold text-emerald-700">
+          <div className="rounded-card border border-green/30 bg-green/5 p-4">
+            <div className="mb-2 font-mono text-[10px] font-bold text-green">
               {lang === 'ko' ? 'Bitmap Join Index 있을 때' : 'With Bitmap Join Index'}
             </div>
             <ol className="space-y-1.5">
@@ -609,8 +609,8 @@ export function BitmapSection() {
                 ? ['인덱스에서 job_title = Accountant 비트맵 조회', 'ROWID(행 주소)를 바로 테이블에 적용', '조인 단계 건너뜀']
                 : ['Look up job_title = Accountant bitmap in index', 'Apply rowids directly to EMPLOYEES', 'Join step skipped entirely']
               ).map((s, i) => (
-                <li key={i} className="flex items-start gap-2 text-[11px] text-muted-foreground">
-                  <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-emerald-200 font-mono text-[9px] font-bold text-emerald-700">{i + 1}</span>
+                <li key={i} className="flex items-start gap-2 text-[11px] text-ink-2">
+                  <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-green/15 font-mono text-[9px] font-bold text-green">{i + 1}</span>
                   {s}
                 </li>
               ))}
@@ -621,27 +621,27 @@ export function BitmapSection() {
 
       {/* CREATE 문 */}
       <div className="mt-4">
-        <p className="mb-1.5 font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+        <p className="mb-1.5 font-mono text-[10px] font-bold uppercase tracking-widest text-ink-2">
           {t.bitmapJoinStructLabel}
         </p>
-        <div className="rounded-lg bg-muted/40 p-4 font-mono text-[11px] leading-relaxed text-foreground whitespace-pre">
+        <div className="rounded-card bg-rail p-4 font-mono text-[11px] leading-relaxed text-ink whitespace-pre">
           {`-- 인덱스 생성\nCREATE BITMAP INDEX employees_bm_idx\n  ON     employees (jobs.job_title)   -- 키: 다른 테이블 컬럼\n  FROM   employees, jobs              -- 조인 대상\n  WHERE  employees.job_id = jobs.job_id;  -- 조인 조건\n\n-- 이 인덱스가 도움이 되는 쿼리\nSELECT COUNT(*)\nFROM   employees, jobs\nWHERE  employees.job_id = jobs.job_id\nAND    jobs.job_title   = 'Accountant';`}
         </div>
       </div>
 
       {/* 내부 구조 */}
-      <div className="mt-4 rounded-xl border bg-muted/20 p-4">
-        <p className="mb-3 font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+      <div className="mt-4 rounded-panel border bg-rail p-4">
+        <p className="mb-3 font-mono text-[10px] font-bold uppercase tracking-widest text-ink-2">
           {t.bitmapJoinStructDesc.split('\n')[0]}
         </p>
         <div className="overflow-x-auto">
           <table className="w-full border-collapse font-mono text-[10px]">
             <thead>
               <tr className="border-b">
-                <th className="px-3 py-1.5 text-left text-muted-foreground">jobs.job_title</th>
-                <th className="px-3 py-1.5 text-left text-muted-foreground">low rowid</th>
-                <th className="px-3 py-1.5 text-left text-muted-foreground">high rowid</th>
-                <th className="px-3 py-1.5 text-left text-muted-foreground">bitmap</th>
+                <th className="px-3 py-1.5 text-left text-ink-2">jobs.job_title</th>
+                <th className="px-3 py-1.5 text-left text-ink-2">low rowid</th>
+                <th className="px-3 py-1.5 text-left text-ink-2">high rowid</th>
+                <th className="px-3 py-1.5 text-left text-ink-2">bitmap</th>
               </tr>
             </thead>
             <tbody>
@@ -652,11 +652,11 @@ export function BitmapSection() {
                 ['Administration Asst.', 'AAAQNK…ABTAAi', 'AAAQNK…ABTAAp', '00100000'],
               ].map(([key, lo, hi, bm], i) => (
                 <tr key={i} className="border-b last:border-0">
-                  <td className="px-3 py-1.5 font-bold text-blue-700">{key}</td>
-                  <td className="px-3 py-1.5 text-muted-foreground">{lo}</td>
-                  <td className="px-3 py-1.5 text-muted-foreground">{hi}</td>
+                  <td className="px-3 py-1.5 font-bold text-blue">{key}</td>
+                  <td className="px-3 py-1.5 text-ink-2">{lo}</td>
+                  <td className="px-3 py-1.5 text-ink-2">{hi}</td>
                   <td className="px-3 py-1.5">
-                    <span className="rounded bg-muted px-1.5 py-0.5">{bm}</span>
+                    <span className="rounded bg-rail px-1.5 py-0.5">{bm}</span>
                   </td>
                 </tr>
               ))}
@@ -667,17 +667,17 @@ export function BitmapSection() {
 
       {/* vs Materialized View + When to use */}
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
-        <div className="rounded-xl border bg-card p-4">
-          <p className="mb-2 font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+        <div className="rounded-panel border bg-paper p-4">
+          <p className="mb-2 font-mono text-[10px] font-bold uppercase tracking-widest text-ink-2">
             {t.bitmapJoinVsLabel}
           </p>
-          <p className="text-[11px] leading-relaxed text-muted-foreground">{t.bitmapJoinVsDesc}</p>
+          <p className="text-[11px] leading-relaxed text-ink-2">{t.bitmapJoinVsDesc}</p>
         </div>
         <InfoBox variant="tip" title={t.bitmapJoinWhen}>
           <ul className="mt-1 space-y-1">
             {t.bitmapJoinWhenItems.map((item, i) => (
               <li key={i} className="flex items-start gap-2 text-[11px]">
-                <span className="mt-0.5 shrink-0 font-mono text-rose-400">▸</span>
+                <span className="mt-0.5 shrink-0 font-mono text-red">▸</span>
                 {item}
               </li>
             ))}
@@ -696,8 +696,8 @@ export function BitmapSection() {
       <Prose>{t.compressionWhat}</Prose>
 
       {/* 압축 시각화 */}
-      <div className="mt-4 rounded-xl border bg-card p-5">
-        <p className="mb-4 font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+      <div className="mt-4 rounded-panel border bg-paper p-5">
+        <p className="mb-4 font-mono text-[10px] font-bold uppercase tracking-widest text-ink-2">
           {t.compressionExampleLabel}
         </p>
 
@@ -705,14 +705,14 @@ export function BitmapSection() {
         <div className="space-y-4">
           {/* Raw */}
           <div>
-            <div className="mb-1.5 font-mono text-[10px] text-muted-foreground">
+            <div className="mb-1.5 font-mono text-[10px] text-ink-2">
               {lang === 'ko' ? '원본 비트맵 (26비트, GENDER = \'M\')' : "Raw bitmap (26 bits, GENDER = 'M')"}
             </div>
             <div className="flex flex-wrap gap-px">
               {[0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0].map((b, i) => (
                 <div key={i} className={cn(
-                  'flex h-6 w-6 items-center justify-center rounded-sm font-mono text-[9px] font-bold',
-                  b === 1 ? 'bg-blue-100 text-blue-700' : 'bg-muted text-muted-foreground/50'
+                  'flex h-6 w-6 items-center justify-center rounded-chip font-mono text-[9px] font-bold',
+                  b === 1 ? 'bg-blue/10 text-blue' : 'bg-rail text-ink-2/50'
                 )}>{b}</div>
               ))}
             </div>
@@ -721,7 +721,7 @@ export function BitmapSection() {
           {/* Arrow */}
           <div className="flex items-center gap-3">
             <div className="h-px flex-1 border-t border-dashed border-muted-foreground/30" />
-            <div className="flex items-center gap-1.5 rounded-full border bg-muted/60 px-3 py-1 font-mono text-[10px] text-muted-foreground">
+            <div className="flex items-center gap-1.5 rounded-full border bg-rail px-3 py-1 font-mono text-[10px] text-ink-2">
               <span>RLE</span>
             </div>
             <div className="h-px flex-1 border-t border-dashed border-muted-foreground/30" />
@@ -729,16 +729,16 @@ export function BitmapSection() {
 
           {/* Compressed */}
           <div>
-            <div className="mb-1.5 font-mono text-[10px] text-muted-foreground">
+            <div className="mb-1.5 font-mono text-[10px] text-ink-2">
               {lang === 'ko' ? '압축 결과 — 26비트 → 5개 청크' : 'Compressed — 26 bits → 5 chunks'}
             </div>
             <div className="flex flex-wrap items-center gap-2">
               {[
-                { bits: '0×4', color: 'bg-muted text-muted-foreground' },
-                { bits: '1×2', color: 'bg-blue-100 text-blue-700' },
-                { bits: '0×10', color: 'bg-muted text-muted-foreground' },
-                { bits: '1×4', color: 'bg-blue-100 text-blue-700' },
-                { bits: '0×6', color: 'bg-muted text-muted-foreground' },
+                { bits: '0×4', color: 'bg-rail text-ink-2' },
+                { bits: '1×2', color: 'bg-blue/10 text-blue' },
+                { bits: '0×10', color: 'bg-rail text-ink-2' },
+                { bits: '1×4', color: 'bg-blue/10 text-blue' },
+                { bits: '0×6', color: 'bg-rail text-ink-2' },
               ].map((chunk, i) => (
                 <span key={i} className={cn('rounded px-3 py-1.5 font-mono text-[11px] font-bold', chunk.color)}>
                   {chunk.bits}
@@ -751,15 +751,15 @@ export function BitmapSection() {
 
       {/* 저장 구조 */}
       <div className="mt-4">
-        <p className="mb-1.5 font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+        <p className="mb-1.5 font-mono text-[10px] font-bold uppercase tracking-widest text-ink-2">
           {t.compressionStorageLabel}
         </p>
-        <div className="rounded-lg bg-muted/40 p-4 font-mono text-[11px] leading-relaxed text-foreground whitespace-pre">
+        <div className="rounded-card bg-rail p-4 font-mono text-[11px] leading-relaxed text-ink whitespace-pre">
           {lang === 'ko'
             ? `-- Leaf 블록 엔트리 구조\n[키 값]  [시작 ROWID]  [끝 ROWID]  [RLE 압축 비트맵]\n\n예)\nShipping Clerk, AAAPzR…ABSABQ, AAAPzR…ABSABZ, 0010000100\nShipping Clerk, AAAPzR…ABSABa, AAAPzR…ABSABh, 010010\nStock Clerk,    AAAPzR…ABSAAa, AAAPzR…ABSAAc, 1001001100\nStock Clerk,    AAAPzR…ABSAAd, AAAPzR…ABSAAt, 0101001001`
             : `-- Leaf block entry structure\n[key value]  [low rowid]  [high rowid]  [RLE-compressed bitmap]\n\ne.g.\nShipping Clerk, AAAPzR…ABSABQ, AAAPzR…ABSABZ, 0010000100\nShipping Clerk, AAAPzR…ABSABa, AAAPzR…ABSABh, 010010\nStock Clerk,    AAAPzR…ABSAAa, AAAPzR…ABSAAc, 1001001100\nStock Clerk,    AAAPzR…ABSAAd, AAAPzR…ABSAAt, 0101001001`}
         </div>
-        <p className="mt-2 text-[11px] leading-relaxed text-muted-foreground">{t.compressionStorageDesc}</p>
+        <p className="mt-2 text-[11px] leading-relaxed text-ink-2">{t.compressionStorageDesc}</p>
       </div>
 
       <div className="mt-8">
@@ -772,9 +772,9 @@ export function BitmapSection() {
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 const BIT_COLOR: Record<string, { one: string; zero: string }> = {
-  blue:    { one: 'bg-blue-100 text-blue-700',       zero: 'bg-muted/60 text-muted-foreground/50' },
-  orange:  { one: 'bg-orange-100 text-orange-700',   zero: 'bg-muted/60 text-muted-foreground/50' },
-  emerald: { one: 'bg-emerald-200 text-emerald-800', zero: 'bg-muted/60 text-muted-foreground/30' },
+  blue:    { one: 'bg-blue/10 text-blue',       zero: 'bg-rail text-ink-2/50' },
+  orange:  { one: 'bg-amber/10 text-amber',   zero: 'bg-rail text-ink-2/50' },
+  emerald: { one: 'bg-green/15 text-green', zero: 'bg-rail text-ink-2/30' },
 }
 
 // 모든 비트맵 행이 동일한 레이아웃을 공유해 세로 정렬이 맞음
@@ -785,7 +785,7 @@ function BitmapRow({ label, labelColor, children }: {
 }) {
   return (
     <div className="flex items-center">
-      <span className={cn('w-44 shrink-0 font-mono text-[10px] font-bold', labelColor ?? 'text-muted-foreground/40')}>
+      <span className={cn('w-44 shrink-0 font-mono text-[10px] font-bold', labelColor ?? 'text-ink-2/40')}>
         {label}
       </span>
       <div className="flex gap-1">{children}</div>
@@ -806,7 +806,7 @@ function BitRow({ bits, color, highlight }: { bits: (0 | 1)[]; color: string; hi
           className={cn(
             'flex h-7 w-7 items-center justify-center rounded font-mono text-[11px] font-bold',
             b === 1 ? c.one : c.zero,
-            highlight && b === 1 ? 'ring-2 ring-emerald-400' : ''
+            highlight && b === 1 ? 'ring-2 ring-green/50' : ''
           )}
         >
           {b}
@@ -821,11 +821,11 @@ function Picker({ label, value, options, onChange }: {
 }) {
   return (
     <label className="flex flex-col gap-1">
-      <span className="font-mono text-[10px] text-muted-foreground">{label}</span>
+      <span className="font-mono text-[10px] text-ink-2">{label}</span>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="rounded-lg border bg-background px-3 py-1.5 font-mono text-xs"
+        className="rounded-card border bg-paper px-3 py-1.5 font-mono text-xs"
       >
         {options.map((o) => <option key={o} value={o}>{o}</option>)}
       </select>

@@ -255,32 +255,32 @@ function HashJoinSim({ lang }: { lang: 'ko' | 'en' }) {
   }, [playing, buildDone, phase, probeDone, probeStep])
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-slate-50 p-5">
-      <p className="mb-1 font-mono text-[11px] font-bold uppercase tracking-wider text-muted-foreground">{t.simTitle}</p>
+    <div className="rounded-panel border border-line bg-paper-sunk p-5">
+      <p className="mb-1 font-mono text-[11px] font-bold uppercase tracking-wider text-ink-2">{t.simTitle}</p>
 
       {/* Phase tabs + play button */}
       <div className="mb-4 flex flex-wrap items-center gap-2">
-        {([['build', t.labelPhase1, 'border-blue-400 bg-blue-100 text-blue-700'], ['probe', t.labelPhase2, 'border-orange-400 bg-orange-100 text-orange-700']] as const).map(([key, label, activeClass]) => (
+        {([['build', t.labelPhase1, 'border-blue/50 bg-blue/10 text-blue'], ['probe', t.labelPhase2, 'border-amber/50 bg-amber/10 text-amber']] as const).map(([key, label, activeClass]) => (
           <button
             key={key}
             onClick={() => { if (!playing) { setPhase(key); if (key === 'probe' && !buildDone) setBuildStep(BUILD_ROWS.length) } }}
             disabled={playing}
             className={cn(
               'rounded-full border px-4 py-1.5 font-mono text-xs font-bold transition-all disabled:opacity-50',
-              phase === key ? activeClass : 'border-slate-200 text-muted-foreground hover:bg-muted',
+              phase === key ? activeClass : 'border-line text-ink-2 hover:bg-rail',
             )}
           >
             {label}
-            {key === 'build' && buildDone && <span className="ml-1.5 text-[9px] text-emerald-600">✓</span>}
+            {key === 'build' && buildDone && <span className="ml-1.5 text-[9px] text-green">✓</span>}
           </button>
         ))}
         <button
           onClick={togglePlay}
           className={cn(
-            'ml-auto rounded-lg border px-4 py-1.5 font-mono text-xs font-bold transition-all',
+            'ml-auto rounded-card border px-4 py-1.5 font-mono text-xs font-bold transition-all',
             playing
-              ? 'border-amber-300 bg-amber-50 text-amber-700 hover:bg-amber-100'
-              : 'border-blue-300 bg-blue-50 text-blue-700 hover:bg-blue-100',
+              ? 'border-amber/50 bg-amber/5 text-amber hover:bg-amber/10'
+              : 'border-blue/50 bg-blue/5 text-blue hover:bg-blue/10',
           )}
         >
           {playing ? t.btnPause : t.btnPlay}
@@ -290,11 +290,11 @@ function HashJoinSim({ lang }: { lang: 'ko' | 'en' }) {
       {/* ── BUILD PHASE ── */}
       {phase === 'build' && (
         <div>
-          <p className="mb-4 text-[12px] leading-relaxed text-muted-foreground">{t.simBuildDesc}</p>
+          <p className="mb-4 text-[12px] leading-relaxed text-ink-2">{t.simBuildDesc}</p>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-[1fr_auto_1fr]">
             {/* Build input */}
             <div>
-              <p className="mb-2 font-mono text-[10px] font-bold text-blue-600">{t.labelBuildInput}</p>
+              <p className="mb-2 font-mono text-[10px] font-bold text-blue">{t.labelBuildInput}</p>
               <div className="flex flex-col gap-1.5">
                 {BUILD_ROWS.map((row, i) => {
                   const isActive  = buildStep === i + 1
@@ -304,33 +304,33 @@ function HashJoinSim({ lang }: { lang: 'ko' | 'en' }) {
                     <motion.div
                       key={row.dept_id}
                       animate={
-                        isActive  ? { backgroundColor: '#bfdbfe', scale: 1.02 }
-                        : isBuilt ? { backgroundColor: '#f0fdf4', scale: 1 }
-                        :           { backgroundColor: '#ffffff', scale: 1 }
+                        isActive  ? { backgroundColor: 'var(--color-blue)', scale: 1.02 }
+                        : isBuilt ? { backgroundColor: 'var(--color-rail)', scale: 1 }
+                        :           { backgroundColor: 'var(--color-paper)', scale: 1 }
                       }
                       transition={{ duration: 0.18 }}
                       className={cn(
-                        'rounded-lg border px-3 py-2 font-mono text-xs',
-                        isActive  ? 'border-blue-400 font-bold text-blue-800'
-                        : isBuilt ? 'border-emerald-200 text-emerald-700'
-                        : isCurrent ? 'border-slate-200 text-slate-400'
-                        : 'border-border text-muted-foreground',
+                        'rounded-card border px-3 py-2 font-mono text-xs',
+                        isActive  ? 'border-blue/50 font-bold text-blue'
+                        : isBuilt ? 'border-green/30 text-green'
+                        : isCurrent ? 'border-line text-ink-2'
+                        : 'border-line text-ink-2',
                       )}
                     >
                       <span className="text-[10px] opacity-60 mr-1">dept_id=</span>
                       <span className="font-bold">{row.dept_id}</span>
                       <span className="ml-1 text-[10px] opacity-70">{row.dept_name}</span>
                       {isActive && (
-                        <span className="ml-2 text-[9px] text-blue-600">
+                        <span className="ml-2 text-[9px] text-blue">
                           h({row.dept_id})=<b>{hashFn(row.dept_id)}</b>
                         </span>
                       )}
-                      {isBuilt && <span className="ml-2 text-[9px] text-emerald-500">→ bucket {hashFn(row.dept_id)}</span>}
+                      {isBuilt && <span className="ml-2 text-[9px] text-green">→ bucket {hashFn(row.dept_id)}</span>}
                     </motion.div>
                   )
                 })}
               </div>
-              <p className="mt-2 font-mono text-[9px] text-muted-foreground">
+              <p className="mt-2 font-mono text-[9px] text-ink-2">
                 {buildDone ? t.labelBuildDone : t.labelBuildProgress(buildStep, BUILD_ROWS.length)}
               </p>
             </div>
@@ -338,14 +338,14 @@ function HashJoinSim({ lang }: { lang: 'ko' | 'en' }) {
             {/* Arrow */}
             <div className="hidden sm:flex items-center justify-center pt-6">
               <div className="flex flex-col items-center gap-0.5">
-                <span className="text-xl text-muted-foreground/30">→</span>
-                <span className="font-mono text-[9px] text-muted-foreground">{t.labelHashArrow}</span>
+                <span className="text-xl text-ink-2/30">→</span>
+                <span className="font-mono text-[9px] text-ink-2">{t.labelHashArrow}</span>
               </div>
             </div>
 
             {/* Hash table (PGA) */}
             <div>
-              <p className="mb-2 font-mono text-[10px] font-bold text-violet-600">{t.labelHashTable}</p>
+              <p className="mb-2 font-mono text-[10px] font-bold text-purple">{t.labelHashTable}</p>
               <div className="flex flex-col gap-2">
                 {Array.from({ length: BUCKET_COUNT }, (_, b) => {
                   const isHighlighted = buildStep > 0 && buildStep <= BUILD_ROWS.length && hashFn(BUILD_ROWS[buildStep - 1].dept_id) === b
@@ -353,20 +353,20 @@ function HashJoinSim({ lang }: { lang: 'ko' | 'en' }) {
                     <div
                       key={b}
                       className={cn(
-                        'rounded-lg border px-3 py-2 transition-all',
-                        isHighlighted ? 'border-violet-400 bg-violet-50' : 'border-slate-200 bg-white',
+                        'rounded-card border px-3 py-2 transition-all',
+                        isHighlighted ? 'border-purple/50 bg-purple/5' : 'border-line bg-paper',
                       )}
                     >
-                      <p className="font-mono text-[9px] font-bold text-violet-500 mb-1">{t.labelBucket(b)}</p>
+                      <p className="font-mono text-[9px] font-bold text-purple mb-1">{t.labelBucket(b)}</p>
                       <div className="flex flex-wrap gap-1">
                         {buckets[b].length === 0
-                          ? <span className="font-mono text-[9px] text-muted-foreground/40">—</span>
+                          ? <span className="font-mono text-[9px] text-ink-2/40">—</span>
                           : buckets[b].map((r) => (
                             <motion.span
                               key={r.dept_id}
                               initial={{ opacity: 0, scale: 0.8 }}
                               animate={{ opacity: 1, scale: 1 }}
-                              className="rounded bg-violet-100 px-1.5 py-0.5 font-mono text-[10px] font-bold text-violet-700"
+                              className="rounded bg-purple/10 px-1.5 py-0.5 font-mono text-[10px] font-bold text-purple"
                             >
                               {r.dept_id}·{r.dept_name.slice(0, 3)}
                             </motion.span>
@@ -382,11 +382,11 @@ function HashJoinSim({ lang }: { lang: 'ko' | 'en' }) {
 
           <div className="mt-4 flex gap-2">
             <button onClick={stepBuildBackward} disabled={playing || buildStep === 0}
-              className="rounded-lg border border-slate-200 px-3 py-1.5 font-mono text-xs text-muted-foreground hover:bg-muted disabled:opacity-30">{t.btnPrev}</button>
+              className="rounded-card border border-line px-3 py-1.5 font-mono text-xs text-ink-2 hover:bg-rail disabled:opacity-30">{t.btnPrev}</button>
             <button onClick={stepBuildForward} disabled={playing || buildDone}
-              className="rounded-lg border border-slate-200 px-3 py-1.5 font-mono text-xs text-muted-foreground hover:bg-muted disabled:opacity-30">{t.btnNext}</button>
+              className="rounded-card border border-line px-3 py-1.5 font-mono text-xs text-ink-2 hover:bg-rail disabled:opacity-30">{t.btnNext}</button>
             <button onClick={reset}
-              className="rounded-lg border border-slate-200 px-3 py-1.5 font-mono text-xs text-muted-foreground hover:bg-muted">{t.btnReset}</button>
+              className="rounded-card border border-line px-3 py-1.5 font-mono text-xs text-ink-2 hover:bg-rail">{t.btnReset}</button>
           </div>
         </div>
       )}
@@ -394,11 +394,11 @@ function HashJoinSim({ lang }: { lang: 'ko' | 'en' }) {
       {/* ── PROBE PHASE ── */}
       {phase === 'probe' && (
         <div>
-          <p className="mb-4 text-[12px] leading-relaxed text-muted-foreground">{t.simProbeDesc}</p>
+          <p className="mb-4 text-[12px] leading-relaxed text-ink-2">{t.simProbeDesc}</p>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-[1fr_auto_1fr_auto_1fr]">
             {/* Probe input */}
             <div>
-              <p className="mb-2 font-mono text-[10px] font-bold text-orange-600">{t.labelProbeInput}</p>
+              <p className="mb-2 font-mono text-[10px] font-bold text-amber">{t.labelProbeInput}</p>
               <div className="flex flex-col gap-1.5">
                 {PROBE_ROWS.map((row, i) => {
                   const isCurrent = probeStep === i + 1
@@ -408,25 +408,25 @@ function HashJoinSim({ lang }: { lang: 'ko' | 'en' }) {
                     <motion.div
                       key={row.emp_id}
                       animate={
-                        isCurrent ? { backgroundColor: '#fed7aa', scale: 1.02 }
-                        : isPassed && hasMatch  ? { backgroundColor: '#d1fae5', scale: 1 }
-                        : isPassed && !hasMatch ? { backgroundColor: '#fee2e2', scale: 1 }
-                        :                         { backgroundColor: '#ffffff', scale: 1 }
+                        isCurrent ? { backgroundColor: 'var(--color-amber)', scale: 1.02 }
+                        : isPassed && hasMatch  ? { backgroundColor: 'var(--color-line)', scale: 1 }
+                        : isPassed && !hasMatch ? { backgroundColor: 'var(--color-rail)', scale: 1 }
+                        :                         { backgroundColor: 'var(--color-paper)', scale: 1 }
                       }
                       transition={{ duration: 0.18 }}
                       className={cn(
-                        'rounded-lg border px-3 py-2 font-mono text-xs',
-                        isCurrent ? 'border-orange-400 font-bold text-orange-800'
-                        : isPassed && hasMatch ? 'border-emerald-200 text-emerald-700'
-                        : isPassed ? 'border-rose-200 text-rose-500'
-                        : 'border-border text-muted-foreground',
+                        'rounded-card border px-3 py-2 font-mono text-xs',
+                        isCurrent ? 'border-amber/50 font-bold text-amber'
+                        : isPassed && hasMatch ? 'border-green/30 text-green'
+                        : isPassed ? 'border-red/30 text-red'
+                        : 'border-line text-ink-2',
                       )}
                     >
                       <span className="font-bold">{row.first_name}</span>
                       <span className="ml-1 text-[10px] opacity-60">dept_id=</span>
                       <span className="font-bold text-[10px]">{row.dept_id}</span>
                       {isCurrent && (
-                        <span className="ml-2 text-[9px] text-orange-600">
+                        <span className="ml-2 text-[9px] text-amber">
                           h({row.dept_id})=<b>{hashFn(row.dept_id)}</b> {t.labelBucketJump}
                         </span>
                       )}
@@ -434,7 +434,7 @@ function HashJoinSim({ lang }: { lang: 'ko' | 'en' }) {
                   )
                 })}
               </div>
-              <p className="mt-2 font-mono text-[9px] text-muted-foreground">
+              <p className="mt-2 font-mono text-[9px] text-ink-2">
                 {probeDone ? t.labelProbeDone : t.labelProbeProgress(probeStep, PROBE_ROWS.length)}
               </p>
             </div>
@@ -442,14 +442,14 @@ function HashJoinSim({ lang }: { lang: 'ko' | 'en' }) {
             {/* Arrow */}
             <div className="hidden sm:flex items-center justify-center pt-6">
               <div className="flex flex-col items-center gap-0.5">
-                <span className="text-xl text-muted-foreground/30">↔</span>
-                <span className="font-mono text-[9px] text-muted-foreground">{t.labelHashArrow}</span>
+                <span className="text-xl text-ink-2/30">↔</span>
+                <span className="font-mono text-[9px] text-ink-2">{t.labelHashArrow}</span>
               </div>
             </div>
 
             {/* Hash table with highlighted bucket */}
             <div>
-              <p className="mb-2 font-mono text-[10px] font-bold text-violet-600">{t.labelHashTable}</p>
+              <p className="mb-2 font-mono text-[10px] font-bold text-purple">{t.labelHashTable}</p>
               <div className="flex flex-col gap-2">
                 {Array.from({ length: BUCKET_COUNT }, (_, b) => {
                   const isTargeted = currentBucket === b
@@ -459,16 +459,16 @@ function HashJoinSim({ lang }: { lang: 'ko' | 'en' }) {
                       animate={isTargeted ? { scale: 1.03 } : { scale: 1 }}
                       transition={{ duration: 0.18 }}
                       className={cn(
-                        'rounded-lg border px-3 py-2 transition-all',
-                        isTargeted ? 'border-orange-400 bg-orange-50 shadow-sm' : 'border-slate-200 bg-white',
+                        'rounded-card border px-3 py-2 transition-all',
+                        isTargeted ? 'border-amber/50 bg-amber/5 ' : 'border-line bg-paper',
                       )}
                     >
-                      <p className={cn('font-mono text-[9px] font-bold mb-1', isTargeted ? 'text-orange-600' : 'text-violet-500')}>
+                      <p className={cn('font-mono text-[9px] font-bold mb-1', isTargeted ? 'text-amber' : 'text-purple')}>
                         {t.labelBucket(b)} {isTargeted && '← 탐색 중'}
                       </p>
                       <div className="flex flex-wrap gap-1">
                         {buckets[b].length === 0
-                          ? <span className="font-mono text-[9px] text-muted-foreground/40">—</span>
+                          ? <span className="font-mono text-[9px] text-ink-2/40">—</span>
                           : buckets[b].map((r) => {
                             const isHit = isTargeted && matchedBuildRow?.dept_id === r.dept_id
                             return (
@@ -476,7 +476,7 @@ function HashJoinSim({ lang }: { lang: 'ko' | 'en' }) {
                                 key={r.dept_id}
                                 className={cn(
                                   'rounded px-1.5 py-0.5 font-mono text-[10px] font-bold',
-                                  isHit ? 'bg-emerald-200 text-emerald-800 ring-1 ring-emerald-400' : 'bg-violet-100 text-violet-700',
+                                  isHit ? 'bg-green/15 text-green ring-1 ring-green/50' : 'bg-purple/10 text-purple',
                                 )}
                               >
                                 {r.dept_id}·{r.dept_name.slice(0, 3)}
@@ -493,12 +493,12 @@ function HashJoinSim({ lang }: { lang: 'ko' | 'en' }) {
 
             {/* Arrow */}
             <div className="hidden sm:flex items-center justify-center pt-6">
-              <span className="text-xl text-muted-foreground/30">→</span>
+              <span className="text-xl text-ink-2/30">→</span>
             </div>
 
             {/* Result */}
             <div>
-              <p className="mb-2 font-mono text-[10px] font-bold text-emerald-600">{t.labelResult}</p>
+              <p className="mb-2 font-mono text-[10px] font-bold text-green">{t.labelResult}</p>
               <div className="flex flex-col gap-1.5 min-h-[40px]">
                 <AnimatePresence initial={false}>
                   {probeResults.map((r, i) => (
@@ -507,7 +507,7 @@ function HashJoinSim({ lang }: { lang: 'ko' | 'en' }) {
                       initial={{ opacity: 0, y: -4 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0 }}
-                      className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 font-mono text-[10px] text-emerald-800"
+                      className="rounded-card border border-green/30 bg-green/5 px-3 py-2 font-mono text-[10px] text-green"
                     >
                       <span className="font-bold">{r.empName}</span>
                       <span className="mx-1 opacity-40">↔</span>
@@ -517,8 +517,8 @@ function HashJoinSim({ lang }: { lang: 'ko' | 'en' }) {
                 </AnimatePresence>
                 {currentProbeRow && (
                   <div className={cn(
-                    'rounded-lg border px-3 py-2 font-mono text-[11px] font-bold',
-                    matchedBuildRow ? 'border-emerald-300 bg-emerald-50 text-emerald-700' : 'border-rose-200 bg-rose-50 text-rose-600',
+                    'rounded-card border px-3 py-2 font-mono text-[11px] font-bold',
+                    matchedBuildRow ? 'border-green/50 bg-green/5 text-green' : 'border-red/30 bg-red/5 text-red',
                   )}>
                     {matchedBuildRow ? t.statusMatch : t.statusNoMatch}
                   </div>
@@ -529,11 +529,11 @@ function HashJoinSim({ lang }: { lang: 'ko' | 'en' }) {
 
           <div className="mt-4 flex gap-2">
             <button onClick={stepProbeBackward} disabled={playing || probeStep === 0}
-              className="rounded-lg border border-slate-200 px-3 py-1.5 font-mono text-xs text-muted-foreground hover:bg-muted disabled:opacity-30">{t.btnPrev}</button>
+              className="rounded-card border border-line px-3 py-1.5 font-mono text-xs text-ink-2 hover:bg-rail disabled:opacity-30">{t.btnPrev}</button>
             <button onClick={stepProbeForward} disabled={playing || probeDone}
-              className="rounded-lg border border-slate-200 px-3 py-1.5 font-mono text-xs text-muted-foreground hover:bg-muted disabled:opacity-30">{t.btnNext}</button>
+              className="rounded-card border border-line px-3 py-1.5 font-mono text-xs text-ink-2 hover:bg-rail disabled:opacity-30">{t.btnNext}</button>
             <button onClick={reset}
-              className="rounded-lg border border-slate-200 px-3 py-1.5 font-mono text-xs text-muted-foreground hover:bg-muted">{t.btnReset}</button>
+              className="rounded-card border border-line px-3 py-1.5 font-mono text-xs text-ink-2 hover:bg-rail">{t.btnReset}</button>
           </div>
         </div>
       )}
@@ -549,7 +549,7 @@ export function JoinHashSection() {
   return (
     <PageContainer>
       <ChapterTitle
-        icon={<IconArrowMerge size={36} stroke={1.5} className="text-orange-500" />}
+        icon={<IconArrowMerge size={36} stroke={1.5} className="text-amber" />}
         title={t.title}
         subtitle={t.subtitle}
       />

@@ -264,38 +264,38 @@ function makeSMSteps(): Step[] {
 const METHOD_META = {
   nl: {
     label: 'Nested Loop Join',
-    headerBg: 'bg-blue-500',
-    activeBorder: 'border-blue-300',
-    empHighlight: 'border-blue-400 bg-blue-100 font-bold text-blue-800',
-    deptHighlight: 'border-orange-400 bg-orange-100 font-bold text-orange-800',
-    phaseBg: { scan: 'bg-blue-50 border-blue-200', match: 'bg-emerald-50 border-emerald-200', done: 'bg-slate-50 border-slate-200' } as Record<string, string>,
+    headerBg: 'bg-blue',
+    activeBorder: 'border-blue/50',
+    empHighlight: 'border-blue/50 bg-blue/10 font-bold text-blue',
+    deptHighlight: 'border-amber/50 bg-amber/10 font-bold text-amber',
+    phaseBg: { scan: 'bg-blue/5 border-blue/30', match: 'bg-green/5 border-green/30', done: 'bg-paper-sunk border-line' } as Record<string, string>,
   },
   hash: {
     label: 'Hash Join',
-    headerBg: 'bg-orange-500',
-    activeBorder: 'border-orange-300',
-    empHighlight: 'border-blue-400 bg-blue-100 font-bold text-blue-800',
-    deptHighlight: 'border-orange-400 bg-orange-100 font-bold text-orange-800',
-    phaseBg: { build: 'bg-blue-50 border-blue-200', probe: 'bg-orange-50 border-orange-200', done: 'bg-slate-50 border-slate-200' } as Record<string, string>,
+    headerBg: 'bg-amber',
+    activeBorder: 'border-amber/50',
+    empHighlight: 'border-blue/50 bg-blue/10 font-bold text-blue',
+    deptHighlight: 'border-amber/50 bg-amber/10 font-bold text-amber',
+    phaseBg: { build: 'bg-blue/5 border-blue/30', probe: 'bg-amber/5 border-amber/30', done: 'bg-paper-sunk border-line' } as Record<string, string>,
   },
   sm: {
     label: 'Sort Merge Join',
-    headerBg: 'bg-violet-500',
-    activeBorder: 'border-violet-300',
-    empHighlight: 'border-violet-400 bg-violet-100 font-bold text-violet-800',
-    deptHighlight: 'border-emerald-400 bg-emerald-100 font-bold text-emerald-800',
-    phaseBg: { sort: 'bg-violet-50 border-violet-200', merge: 'bg-emerald-50 border-emerald-200', done: 'bg-slate-50 border-slate-200' } as Record<string, string>,
+    headerBg: 'bg-purple',
+    activeBorder: 'border-purple/50',
+    empHighlight: 'border-purple/50 bg-purple/10 font-bold text-purple',
+    deptHighlight: 'border-green/50 bg-green/10 font-bold text-green',
+    phaseBg: { sort: 'bg-purple/5 border-purple/30', merge: 'bg-green/5 border-green/30', done: 'bg-paper-sunk border-line' } as Record<string, string>,
   },
 }
 
 const PHASE_BADGE: Record<string, string> = {
-  scan:  'bg-blue-100 text-blue-700',
-  build: 'bg-blue-100 text-blue-700',
-  probe: 'bg-orange-100 text-orange-700',
-  sort:  'bg-violet-100 text-violet-700',
-  merge: 'bg-emerald-100 text-emerald-700',
-  match: 'bg-emerald-100 text-emerald-700',
-  done:  'bg-slate-100 text-slate-500',
+  scan:  'bg-blue/10 text-blue',
+  build: 'bg-blue/10 text-blue',
+  probe: 'bg-amber/10 text-amber',
+  sort:  'bg-purple/10 text-purple',
+  merge: 'bg-green/10 text-green',
+  match: 'bg-green/10 text-green',
+  done:  'bg-paper-sunk text-ink-2',
 }
 
 // ── 조인 패널 ─────────────────────────────────────────────────────────────────
@@ -304,21 +304,21 @@ function JoinPanel({ method, steps, isKo }: { method: JoinMethod; steps: Step[];
   const [stepIdx, setStepIdx] = useState(0)
   const meta = METHOD_META[method]
   const step = steps[stepIdx]
-  const phaseBg = step.phase ? (meta.phaseBg[step.phase] ?? 'bg-slate-50 border-slate-200') : 'bg-slate-50 border-slate-200'
+  const phaseBg = step.phase ? (meta.phaseBg[step.phase] ?? 'bg-paper-sunk border-line') : 'bg-paper-sunk border-line'
   const phaseBadge = step.phase ? PHASE_BADGE[step.phase] : ''
 
   return (
-    <div className={cn('rounded-2xl border-2 overflow-hidden', meta.activeBorder)}>
+    <div className={cn('rounded-panel border-2 overflow-hidden', meta.activeBorder)}>
       {/* 헤더 바 */}
       <div className={cn('flex items-center justify-between px-5 py-3', meta.headerBg)}>
-        <span className="font-mono text-sm font-bold text-white">{meta.label}</span>
+        <span className="font-mono text-sm font-bold text-paper">{meta.label}</span>
         <div className="flex items-center gap-2">
           {step.phase && (
             <span className={cn('rounded px-2 py-0.5 font-mono text-[10px] font-bold', phaseBadge)}>
               {step.phase.toUpperCase()}
             </span>
           )}
-          <span className="font-mono text-[11px] text-white/70">
+          <span className="font-mono text-[11px] text-paper/70">
             {stepIdx + 1} / {steps.length}
           </span>
         </div>
@@ -326,8 +326,8 @@ function JoinPanel({ method, steps, isKo }: { method: JoinMethod; steps: Step[];
 
       <div className="p-5">
         {/* 현재 스텝 설명 */}
-        <div className={cn('mb-4 rounded-xl border px-4 py-3 transition-all', phaseBg)}>
-          <p className="text-sm leading-relaxed text-foreground/80">
+        <div className={cn('mb-4 rounded-panel border px-4 py-3 transition-all', phaseBg)}>
+          <p className="text-sm leading-relaxed text-ink/80">
             {isKo ? step.label.ko : step.label.en}
           </p>
         </div>
@@ -336,7 +336,7 @@ function JoinPanel({ method, steps, isKo }: { method: JoinMethod; steps: Step[];
         <div className="mb-4 grid grid-cols-3 gap-4">
           {/* EMPLOYEES */}
           <div>
-            <p className="mb-2 font-mono text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+            <p className="mb-2 font-mono text-[10px] font-bold uppercase tracking-wider text-ink-2">
               employees
             </p>
             <div className="space-y-1.5">
@@ -344,13 +344,13 @@ function JoinPanel({ method, steps, isKo }: { method: JoinMethod; steps: Step[];
                 <div
                   key={emp.id}
                   className={cn(
-                    'rounded-lg border px-3 py-2 font-mono text-xs transition-all',
+                    'rounded-card border px-3 py-2 font-mono text-xs transition-all',
                     step.highlightEmp.includes(i)
                       ? meta.empHighlight
-                      : 'border-slate-100 bg-slate-50 text-muted-foreground',
+                      : 'border-line bg-paper-sunk text-ink-2',
                   )}
                 >
-                  <span className="text-slate-400 text-[10px]">{emp.id}.</span>{' '}
+                  <span className="text-ink-2 text-[10px]">{emp.id}.</span>{' '}
                   <span className="font-semibold">{emp.name}</span>
                   <span className="ml-1.5 text-[10px] opacity-60">dept={emp.deptId}</span>
                 </div>
@@ -362,7 +362,7 @@ function JoinPanel({ method, steps, isKo }: { method: JoinMethod; steps: Step[];
           <div>
             {step.hashTable ? (
               <>
-                <p className="mb-2 font-mono text-[10px] font-bold uppercase tracking-wider text-violet-600">
+                <p className="mb-2 font-mono text-[10px] font-bold uppercase tracking-wider text-purple">
                   hash table (PGA)
                 </p>
                 <div className="space-y-1.5">
@@ -372,14 +372,14 @@ function JoinPanel({ method, steps, isKo }: { method: JoinMethod; steps: Step[];
                       <div
                         key={h.key}
                         className={cn(
-                          'rounded-lg border px-3 py-2 font-mono text-xs transition-all',
+                          'rounded-card border px-3 py-2 font-mono text-xs transition-all',
                           step.highlightDept.includes(dIdx)
                             ? meta.deptHighlight
-                            : 'border-violet-100 bg-violet-50 text-violet-700',
+                            : 'border-purple/30 bg-purple/5 text-purple',
                         )}
                       >
-                        <span className="text-violet-400">h(</span>{h.key}<span className="text-violet-400">)</span>
-                        <span className="mx-1 text-violet-300">→</span>
+                        <span className="text-purple">h(</span>{h.key}<span className="text-purple">)</span>
+                        <span className="mx-1 text-purple">→</span>
                         <span className="font-semibold">{h.val}</span>
                       </div>
                     )
@@ -388,7 +388,7 @@ function JoinPanel({ method, steps, isKo }: { method: JoinMethod; steps: Step[];
               </>
             ) : step.sortedDept ? (
               <>
-                <p className="mb-2 font-mono text-[10px] font-bold uppercase tracking-wider text-violet-600">
+                <p className="mb-2 font-mono text-[10px] font-bold uppercase tracking-wider text-purple">
                   {isKo ? 'departments (정렬됨)' : 'departments (sorted)'}
                 </p>
                 <div className="space-y-1.5">
@@ -399,19 +399,19 @@ function JoinPanel({ method, steps, isKo }: { method: JoinMethod; steps: Step[];
                       <div
                         key={dept.id}
                         className={cn(
-                          'rounded-lg border px-3 py-2 font-mono text-xs transition-all',
+                          'rounded-card border px-3 py-2 font-mono text-xs transition-all',
                           step.highlightDept.includes(origIdx)
                             ? meta.deptHighlight
                             : isFirst
-                              ? 'border-violet-300 bg-violet-50 text-violet-700 ring-1 ring-violet-300'
-                              : 'border-violet-100 bg-violet-50/50 text-violet-600',
+                              ? 'border-purple/50 bg-purple/5 text-purple ring-1 ring-purple/50'
+                              : 'border-purple/30 bg-purple/5 text-purple',
                         )}
                       >
                         <span className="text-[10px] opacity-60">{dept.id}</span>
-                        <span className="mx-1.5 text-violet-300">—</span>
+                        <span className="mx-1.5 text-purple">—</span>
                         <span className="font-semibold">{dept.name}</span>
                         {isFirst && step.phase === 'merge' && (
-                          <span className="ml-1.5 text-[9px] text-violet-400">← ptr</span>
+                          <span className="ml-1.5 text-[9px] text-purple">← ptr</span>
                         )}
                       </div>
                     )
@@ -420,7 +420,7 @@ function JoinPanel({ method, steps, isKo }: { method: JoinMethod; steps: Step[];
               </>
             ) : (
               <>
-                <p className="mb-2 font-mono text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                <p className="mb-2 font-mono text-[10px] font-bold uppercase tracking-wider text-ink-2">
                   departments
                 </p>
                 <div className="space-y-1.5">
@@ -428,13 +428,13 @@ function JoinPanel({ method, steps, isKo }: { method: JoinMethod; steps: Step[];
                     <div
                       key={dept.id}
                       className={cn(
-                        'rounded-lg border px-3 py-2 font-mono text-xs transition-all',
+                        'rounded-card border px-3 py-2 font-mono text-xs transition-all',
                         step.highlightDept.includes(i)
                           ? meta.deptHighlight
-                          : 'border-slate-100 bg-slate-50 text-muted-foreground',
+                          : 'border-line bg-paper-sunk text-ink-2',
                       )}
                     >
-                      <span className="text-slate-400 text-[10px]">{dept.id}.</span>{' '}
+                      <span className="text-ink-2 text-[10px]">{dept.id}.</span>{' '}
                       <span className="font-semibold">{dept.name}</span>
                     </div>
                   ))}
@@ -445,22 +445,22 @@ function JoinPanel({ method, steps, isKo }: { method: JoinMethod; steps: Step[];
 
           {/* 결과 */}
           <div>
-            <p className="mb-2 font-mono text-[10px] font-bold uppercase tracking-wider text-emerald-600">
+            <p className="mb-2 font-mono text-[10px] font-bold uppercase tracking-wider text-green">
               {isKo ? `결과 (${step.result.length} / 5행)` : `result (${step.result.length} / 5)`}
             </p>
             <div className="space-y-1.5 min-h-[32px]">
               {step.result.length === 0 ? (
-                <p className="rounded-lg border border-dashed border-slate-200 px-3 py-2 font-mono text-[11px] text-muted-foreground/40">
+                <p className="rounded-card border border-dashed border-line px-3 py-2 font-mono text-[11px] text-ink-2/40">
                   {isKo ? '아직 없어요' : 'none yet'}
                 </p>
               ) : (
                 step.result.map((r, i) => (
                   <div
                     key={i}
-                    className="flex items-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-1.5 font-mono text-xs text-emerald-700"
+                    className="flex items-center gap-1.5 rounded-card border border-green/30 bg-green/5 px-3 py-1.5 font-mono text-xs text-green"
                   >
                     <span className="font-bold">{r.emp.name}</span>
-                    <span className="text-emerald-300">↔</span>
+                    <span className="text-green">↔</span>
                     <span>{r.dept.name}</span>
                   </div>
                 ))
@@ -470,7 +470,7 @@ function JoinPanel({ method, steps, isKo }: { method: JoinMethod; steps: Step[];
         </div>
 
         {/* 진행 바 */}
-        <div className="mb-4 h-1.5 rounded-full bg-slate-100">
+        <div className="mb-4 h-1.5 rounded-full bg-paper-sunk">
           <div
             className={cn('h-1.5 rounded-full transition-all', meta.headerBg)}
             style={{ width: `${((stepIdx + 1) / steps.length) * 100}%` }}
@@ -488,7 +488,7 @@ function JoinPanel({ method, steps, isKo }: { method: JoinMethod; steps: Step[];
               key={btn.label}
               onClick={btn.onClick}
               disabled={btn.disabled}
-              className="rounded-lg border border-slate-200 px-4 py-1.5 font-mono text-xs text-muted-foreground transition-colors hover:bg-muted disabled:opacity-30"
+              className="rounded-card border border-line px-4 py-1.5 font-mono text-xs text-ink-2 transition-colors hover:bg-rail disabled:opacity-30"
             >
               {btn.label}
             </button>
@@ -546,7 +546,7 @@ export function JoinSimulatorSection() {
   return (
     <PageContainer>
       <ChapterTitle
-        icon={<IconArrowMerge size={36} stroke={1.5} className="text-emerald-500" />}
+        icon={<IconArrowMerge size={36} stroke={1.5} className="text-green" />}
         title={t.title}
         subtitle={t.subtitle}
       />
@@ -555,11 +555,11 @@ export function JoinSimulatorSection() {
         <SqlBlock sql={t.query} badge={t.queryLabel} badgeColor="emerald" />
       </div>
 
-      <p className="mt-4 mb-3 text-sm leading-relaxed text-muted-foreground">{t.desc}</p>
+      <p className="mt-4 mb-3 text-sm leading-relaxed text-ink-2">{t.desc}</p>
 
-      <div className="mb-6 space-y-1.5 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+      <div className="mb-6 space-y-1.5 rounded-panel border border-line bg-paper-sunk px-4 py-3">
         {t.tips.map((tip, i) => (
-          <p key={i} className="text-sm leading-relaxed text-muted-foreground">{tip}</p>
+          <p key={i} className="text-sm leading-relaxed text-ink-2">{tip}</p>
         ))}
       </div>
 

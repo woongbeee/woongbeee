@@ -31,19 +31,19 @@ function OptimizerComponentDiagram({ lang }: { lang: 'ko' | 'en' }) {
         {
           phase: 'Phase 1',
           name: 'Query Transformer',
-          color: '#3b82f6', bg: '#eff6ff', border: '#93c5fd',
+          color: 'var(--color-blue)', bg: 'var(--color-rail)', border: 'var(--color-blue)',
           desc: '"더 효율적인 형태로 쓸 수 있을까?" — 의미가 같지만 더 빠른 형태로 변환해요.',
         },
         {
           phase: 'Phase 2',
           name: 'Estimator',
-          color: '#f97316', bg: '#fff7ed', border: '#fdba74',
+          color: 'var(--color-amber)', bg: 'var(--color-rail)', border: 'var(--color-amber)',
           desc: '통계를 보고 선택도 · 카디널리티 · 비용을 숫자로 추정해요.',
         },
         {
           phase: 'Phase 3',
           name: 'Plan Generator',
-          color: '#8b5cf6', bg: '#f5f3ff', border: '#c4b5fd',
+          color: 'var(--color-purple)', bg: 'var(--color-paper-sunk)', border: 'var(--color-purple)',
           desc: '가능한 모든 조합(액세스 경로 · 조인 방법 · 조인 순서)을 탐색해 최저 비용 계획을 골라요.',
         },
       ]
@@ -51,19 +51,19 @@ function OptimizerComponentDiagram({ lang }: { lang: 'ko' | 'en' }) {
         {
           phase: 'Phase 1',
           name: 'Query Transformer',
-          color: '#3b82f6', bg: '#eff6ff', border: '#93c5fd',
+          color: 'var(--color-blue)', bg: 'var(--color-rail)', border: 'var(--color-blue)',
           desc: 'Rewrites SQL into a semantically equivalent but lower-cost form.',
         },
         {
           phase: 'Phase 2',
           name: 'Estimator',
-          color: '#f97316', bg: '#fff7ed', border: '#fdba74',
+          color: 'var(--color-amber)', bg: 'var(--color-rail)', border: 'var(--color-amber)',
           desc: 'Uses statistics to estimate selectivity, cardinality, and cost for each plan.',
         },
         {
           phase: 'Phase 3',
           name: 'Plan Generator',
-          color: '#8b5cf6', bg: '#f5f3ff', border: '#c4b5fd',
+          color: 'var(--color-purple)', bg: 'var(--color-paper-sunk)', border: 'var(--color-purple)',
           desc: 'Explores all combinations of access paths, join methods, and join orders — picks the lowest-cost plan.',
         },
       ]
@@ -72,41 +72,41 @@ function OptimizerComponentDiagram({ lang }: { lang: 'ko' | 'en' }) {
     <div className="my-4 overflow-x-auto">
       <div className="flex min-w-[520px] items-stretch gap-3">
         {/* Input */}
-        <div className="flex flex-col items-center justify-center rounded-xl border-2 border-slate-200 bg-slate-50 px-4 py-3 text-center" style={{ minWidth: 100 }}>
-          <IconDatabase size={18} className="mb-1 text-slate-400" />
-          <span className="font-mono text-[10px] font-bold text-slate-500">{input}</span>
+        <div className="flex flex-col items-center justify-center rounded-panel border-2 border-line bg-paper-sunk px-4 py-3 text-center" style={{ minWidth: 100 }}>
+          <IconDatabase size={18} className="mb-1 text-ink-2" />
+          <span className="font-mono text-[10px] font-bold text-ink-2">{input}</span>
         </div>
-        <div className="flex items-center text-lg font-bold text-muted-foreground/40">→</div>
+        <div className="flex items-center text-lg font-bold text-ink-2/40">→</div>
 
         {/* Optimizer box */}
-        <div className="flex flex-1 flex-col gap-2 rounded-xl border-2 border-orange-200 bg-orange-50/40 p-3">
-          <p className="mb-1 font-mono text-[10px] font-bold text-orange-500 uppercase tracking-wide text-center">
+        <div className="flex flex-1 flex-col gap-2 rounded-panel border-2 border-amber/30 bg-amber/5 p-3">
+          <p className="mb-1 font-mono text-[10px] font-bold text-amber uppercase tracking-wide text-center">
             {isKo ? '쿼리 옵티마이저' : 'Query Optimizer'}
           </p>
           {components.map((c, i) => (
             <div key={c.phase} className="flex items-start gap-3">
               <div
-                className="flex min-w-[170px] flex-col rounded-lg border-2 px-3 py-2"
+                className="flex min-w-[170px] flex-col rounded-card border-2 px-3 py-2"
                 style={{ borderColor: c.border, backgroundColor: c.bg }}
               >
                 <div className="flex items-center gap-1.5 mb-0.5">
                   <span className="font-mono text-[9px] font-bold" style={{ color: c.color }}>{c.phase}</span>
-                  <span className="font-mono text-xs font-bold text-foreground/80">{c.name}</span>
+                  <span className="font-mono text-xs font-bold text-ink/80">{c.name}</span>
                 </div>
-                <span className="font-mono text-[10px] leading-relaxed text-muted-foreground">{c.desc}</span>
+                <span className="font-mono text-[10px] leading-relaxed text-ink-2">{c.desc}</span>
               </div>
               {i < components.length - 1 && (
-                <div className="flex items-center self-center text-muted-foreground/30">↓</div>
+                <div className="flex items-center self-center text-ink-2/30">↓</div>
               )}
             </div>
           ))}
         </div>
 
-        <div className="flex items-center text-lg font-bold text-muted-foreground/40">→</div>
+        <div className="flex items-center text-lg font-bold text-ink-2/40">→</div>
         {/* Output */}
-        <div className="flex flex-col items-center justify-center rounded-xl border-2 border-emerald-200 bg-emerald-50 px-4 py-3 text-center" style={{ minWidth: 100 }}>
-          <IconSearch size={18} className="mb-1 text-emerald-500" />
-          <span className="font-mono text-[10px] font-bold text-emerald-600">{output}</span>
+        <div className="flex flex-col items-center justify-center rounded-panel border-2 border-green/30 bg-green/5 px-4 py-3 text-center" style={{ minWidth: 100 }}>
+          <IconSearch size={18} className="mb-1 text-green" />
+          <span className="font-mono text-[10px] font-bold text-green">{output}</span>
         </div>
       </div>
     </div>
@@ -120,14 +120,14 @@ function EstimatorDiagram({ lang }: { lang: 'ko' | 'en' }) {
 
   const items = isKo
     ? [
-        { label: '선택도\nSelectivity', desc: '조건에 맞는 행의 비율\n0.0 (없음) ~ 1.0 (전부)', color: '#3b82f6', bg: '#eff6ff', border: '#93c5fd' },
-        { label: '카디널리티\nCardinality', desc: '각 단계에서 예상되는\n반환 행 수 (Rows 컬럼)', color: '#f97316', bg: '#fff7ed', border: '#fdba74' },
-        { label: '비용\nCost', desc: 'I/O · CPU · 메모리를\n하나의 숫자로 표현', color: '#8b5cf6', bg: '#f5f3ff', border: '#c4b5fd' },
+        { label: '선택도\nSelectivity', desc: '조건에 맞는 행의 비율\n0.0 (없음) ~ 1.0 (전부)', color: 'var(--color-blue)', bg: 'var(--color-rail)', border: 'var(--color-blue)' },
+        { label: '카디널리티\nCardinality', desc: '각 단계에서 예상되는\n반환 행 수 (Rows 컬럼)', color: 'var(--color-amber)', bg: 'var(--color-rail)', border: 'var(--color-amber)' },
+        { label: '비용\nCost', desc: 'I/O · CPU · 메모리를\n하나의 숫자로 표현', color: 'var(--color-purple)', bg: 'var(--color-paper-sunk)', border: 'var(--color-purple)' },
       ]
     : [
-        { label: 'Selectivity', desc: 'Fraction of rows matching\nthe predicate (0.0 ~ 1.0)', color: '#3b82f6', bg: '#eff6ff', border: '#93c5fd' },
-        { label: 'Cardinality', desc: 'Expected number of rows\nreturned per plan step', color: '#f97316', bg: '#fff7ed', border: '#fdba74' },
-        { label: 'Cost', desc: 'I/O + CPU + memory\nas a single numeric unit', color: '#8b5cf6', bg: '#f5f3ff', border: '#c4b5fd' },
+        { label: 'Selectivity', desc: 'Fraction of rows matching\nthe predicate (0.0 ~ 1.0)', color: 'var(--color-blue)', bg: 'var(--color-rail)', border: 'var(--color-blue)' },
+        { label: 'Cardinality', desc: 'Expected number of rows\nreturned per plan step', color: 'var(--color-amber)', bg: 'var(--color-rail)', border: 'var(--color-amber)' },
+        { label: 'Cost', desc: 'I/O + CPU + memory\nas a single numeric unit', color: 'var(--color-purple)', bg: 'var(--color-paper-sunk)', border: 'var(--color-purple)' },
       ]
 
   return (
@@ -135,15 +135,15 @@ function EstimatorDiagram({ lang }: { lang: 'ko' | 'en' }) {
       {items.map((item) => (
         <div
           key={item.label}
-          className="flex-1 rounded-xl border-2 p-4 text-center"
+          className="flex-1 rounded-panel border-2 p-4 text-center"
           style={{ borderColor: item.border, backgroundColor: item.bg, minWidth: 140 }}
         >
           <p className="font-mono text-xs font-bold whitespace-pre-line leading-snug" style={{ color: item.color }}>{item.label}</p>
-          <p className="mt-2 font-mono text-[10px] leading-relaxed text-muted-foreground whitespace-pre-line">{item.desc}</p>
+          <p className="mt-2 font-mono text-[10px] leading-relaxed text-ink-2 whitespace-pre-line">{item.desc}</p>
         </div>
       ))}
-      <div className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-emerald-200 bg-emerald-50 p-3">
-        <span className="font-mono text-xs font-bold text-emerald-700">
+      <div className="flex w-full items-center justify-center gap-2 rounded-panel border-2 border-green/30 bg-green/5 p-3">
+        <span className="font-mono text-xs font-bold text-green">
           {isKo ? '→ 세 척도를 조합해 실행 계획 전체 비용을 산출해요' : '→ Combined to estimate the total cost of each execution plan'}
         </span>
       </div>
@@ -288,7 +288,7 @@ function WhatIsOptimizerLanding({ lang }: { lang: 'ko' | 'en' }) {
   return (
     <PageContainer>
       <ChapterTitle
-        icon={<IconBolt size={36} stroke={1.5} className="text-orange-500" />}
+        icon={<IconBolt size={36} stroke={1.5} className="text-amber" />}
         title={t.title}
         subtitle={t.subtitle}
       />

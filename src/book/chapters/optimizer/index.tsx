@@ -44,7 +44,7 @@ export function OptimizerChapterPage({ sectionId }: { sectionId: string }) {
   return (
     <PageContainer>
       <ChapterTitle
-        icon={<IconBolt size={36} stroke={1.5} className="text-orange-500" />}
+        icon={<IconBolt size={36} stroke={1.5} className="text-amber" />}
         title={isKo ? '옵티마이저 원리' : 'Optimizer Principles'}
         subtitle={isKo
           ? 'Oracle CBO가 어떻게 통계를 수집하고 최적의 실행 계획을 생성하는지 학습합니다. 왼쪽 목차에서 섹션을 선택하세요.'

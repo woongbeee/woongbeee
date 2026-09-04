@@ -54,6 +54,19 @@
 | `--color-accent` | = `--color-blue` | | |
 | `--color-sel` | 텍스트/행 선택 | `rgba(33,102,214,.16)` | `rgba(110,163,240,.22)` |
 
+**`--color-viz-*` — 다이어그램 전용 선명 팔레트.** 위 콘텐츠 색은 차분한 교재 톤이라 구조
+다이어그램(저장 계층·프로세스 등)에서 옅게 읽힌다. `viz-*` 는 같은 hue 를 채도·명도만 끌어올린
+버전 — **구조 다이어그램의 박스·보더·칩·라벨에만** 쓰고, 본문 콜아웃·표·용어에는 계속 `--color-*` 를 쓴다.
+Tailwind 유틸: `text-viz-green` · `bg-viz-blue` · `border-viz-amber/70` · `border-l-viz-purple`.
+
+| 토큰 | Light | Dark |
+|------|-------|------|
+| `--color-viz-blue`   | `#2563eb` | `#5b9bff` |
+| `--color-viz-green`  | `#0f9d58` | `#2fcf7f` |
+| `--color-viz-amber`  | `#ef8a00` | `#ffab3d` |
+| `--color-viz-purple` | `#7c3aed` | `#a882ff` |
+| `--color-viz-red`    | `#e5342b` | `#ff6a5e` |
+
 ### 2.3 코드 문법 강조 — 코드블록 배경은 `--color-code-bg` (라이트 웜 그레이 / 다크 rail)
 
 | 토큰 | 대상 | Light | Dark |

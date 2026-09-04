@@ -92,7 +92,7 @@
 
   --font-sans-active: var(--font-ui-ko);      /* index.css body 가 참조 — 이름 유지 */
   --font-read-active: var(--font-read-ko);
-  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --font-mono-stack: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 
 :root:lang(en) {
@@ -177,6 +177,14 @@
   --color-accent: var(--color-blue);
   --color-sel:    rgba(33, 102, 214, .16);   /* 텍스트 선택 · 행 선택 */
 
+  /* 다이어그램 전용 팔레트 — 콘텐츠 색보다 채도·명도를 올린 선명한 버전.
+     구조 다이어그램(저장 계층 등)의 박스·보더·칩·라벨에만. 본문 콜아웃/표엔 --color-* 사용. */
+  --color-viz-blue:   #2563eb;
+  --color-viz-green:  #0f9d58;
+  --color-viz-amber:  #ef8a00;
+  --color-viz-purple: #7c3aed;
+  --color-viz-red:    #e5342b;
+
   /* 코드 문법 강조 — 코드블록 배경은 웜 그레이(--color-rail) */
   --color-code-bg: #f7f6f3;
   --color-sy-kw:  #6b4cc4;   /* keyword  — purple */
@@ -193,6 +201,7 @@
   /* 타이포 유틸 매핑 — 언어별 스왑은 :root / :root:lang(en) 에서 처리 */
   --font-sans: var(--font-sans-active);   /* font-sans → 언어별 UI 폰트 */
   --font-read: var(--font-read-active);   /* font-read → 언어별 장문 폰트 (EN=세리프) */
+  --font-mono: var(--font-mono-stack);    /* font-mono → JetBrains Mono (위 :root 값 재사용) */
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -231,6 +240,11 @@
     --color-sy-str: #63b981;
     --color-sy-num: #d9a44f;
     --color-sy-com: #8f8b81;
+    --color-viz-blue:   #5b9bff;
+    --color-viz-green:  #2fcf7f;
+    --color-viz-amber:  #ffab3d;
+    --color-viz-purple: #a882ff;
+    --color-viz-red:    #ff6a5e;
   }
 }
 
@@ -257,6 +271,11 @@
   --color-sy-str: #63b981;
   --color-sy-num: #d9a44f;
   --color-sy-com: #8f8b81;
+  --color-viz-blue:   #5b9bff;
+  --color-viz-green:  #2fcf7f;
+  --color-viz-amber:  #ffab3d;
+  --color-viz-purple: #a882ff;
+  --color-viz-red:    #ff6a5e;
 }
 
 /* --- 라이트 재선언 (하위 트리 고정용) — 값은 위 :root 와 동일 --- */
@@ -283,4 +302,9 @@
   --color-sy-str: #1e7a43;
   --color-sy-num: #b26c0e;
   --color-sy-com: #83827a;
+  --color-viz-blue:   #2563eb;
+  --color-viz-green:  #0f9d58;
+  --color-viz-amber:  #ef8a00;
+  --color-viz-purple: #7c3aed;
+  --color-viz-red:    #e5342b;
 }

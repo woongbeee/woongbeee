@@ -278,26 +278,26 @@ function LargePoolDiagram({ lang }: { lang: 'ko' | 'en' }) {
         {/* SGA outer */}
         <rect x={PAD} y={PAD} width={W - PAD * 2} height={SGA_H} rx={12}
           fill="var(--color-paper-sunk)" stroke="var(--color-ink-3)" strokeWidth={1.5} strokeDasharray="7 4" />
-        <text x={PAD + 14} y={PAD + 22} fontFamily="monospace" fontSize={11}
+        <text x={PAD + 14} y={PAD + 22} fontFamily="var(--font-sans-active)" fontSize={11}
           fontWeight="bold" fill="var(--color-ink-2)" letterSpacing={1}>SGA</text>
 
         {/* ── Shared Pool ── */}
         <rect x={BOX_X} y={SP_Y} width={BOX_W} height={SP_H} rx={8}
           fill="var(--color-rail)" stroke="var(--color-purple)" strokeWidth={2} />
-        <text x={BOX_X + 16} y={SP_Y + 22} fontFamily="monospace" fontSize={13}
+        <text x={BOX_X + 16} y={SP_Y + 22} fontFamily="var(--font-sans-active)" fontSize={13}
           fontWeight="bold" fill="var(--color-purple)">Shared Pool</text>
-        <text x={BOX_X + 16} y={SP_Y + 38} fontFamily="monospace" fontSize={10}
+        <text x={BOX_X + 16} y={SP_Y + 38} fontFamily="var(--font-sans-active)" fontSize={10}
           fill="var(--color-purple)" opacity={0.85}>
           {isKo ? 'SQL 커서 · 딕셔너리 · PL/SQL' : 'SQL cursors · dictionary · PL/SQL'}
         </text>
         {/* LRU inner block */}
         <rect x={BOX_X + 16} y={SP_Y + 48} width={BOX_W - 32} height={SP_INNER_H} rx={5}
           fill="var(--color-rail)" stroke="var(--color-purple)" strokeWidth={1} />
-        <text x={BOX_X + BOX_W / 2} y={SP_Y + 48 + SP_INNER_H / 2 - 6} fontFamily="monospace"
+        <text x={BOX_X + BOX_W / 2} y={SP_Y + 48 + SP_INNER_H / 2 - 6} fontFamily="var(--font-sans-active)"
           fontSize={12} fontWeight="bold" fill="var(--color-purple)" textAnchor="middle">
           LRU list
         </text>
-        <text x={BOX_X + BOX_W / 2} y={SP_Y + 48 + SP_INNER_H / 2 + 12} fontFamily="monospace"
+        <text x={BOX_X + BOX_W / 2} y={SP_Y + 48 + SP_INNER_H / 2 + 12} fontFamily="var(--font-sans-active)"
           fontSize={10} fill="var(--color-purple)" textAnchor="middle">
           {isKo ? '오래된 항목 자동 해제' : 'old entries aged out automatically'}
         </text>
@@ -305,14 +305,14 @@ function LargePoolDiagram({ lang }: { lang: 'ko' | 'en' }) {
         {/* ── Large Pool ── */}
         <rect x={BOX_X} y={LP_Y} width={BOX_W} height={LP_H} rx={8}
           fill="var(--color-rail)" stroke="var(--color-green)" strokeWidth={2} />
-        <text x={BOX_X + 16} y={LP_Y + 22} fontFamily="monospace" fontSize={13}
+        <text x={BOX_X + 16} y={LP_Y + 22} fontFamily="var(--font-sans-active)" fontSize={13}
           fontWeight="bold" fill="var(--color-green)">Large Pool</text>
         {/* No LRU badge */}
         <rect x={BOX_X + BOX_W - 90} y={LP_Y + 8} width={74} height={22} rx={5}
           fill="var(--color-line)" stroke="var(--color-green)" strokeWidth={1.5} />
-        <text x={BOX_X + BOX_W - 53} y={LP_Y + 23} fontFamily="monospace" fontSize={10}
+        <text x={BOX_X + BOX_W - 53} y={LP_Y + 23} fontFamily="var(--font-sans-active)" fontSize={10}
           fontWeight="bold" fill="var(--color-green)" textAnchor="middle">No LRU</text>
-        <text x={BOX_X + 16} y={LP_Y + 40} fontFamily="monospace" fontSize={10}
+        <text x={BOX_X + 16} y={LP_Y + 40} fontFamily="var(--font-sans-active)" fontSize={10}
           fill="var(--color-green)" opacity={0.85}>
           {isKo ? '세션·프로세스가 해제할 때까지 유지' : 'held until session / process frees it'}
         </text>
@@ -323,7 +323,7 @@ function LargePoolDiagram({ lang }: { lang: 'ko' | 'en' }) {
             <g key={row.label}>
               <rect x={BOX_X + 16} y={ry} width={BOX_W - 32} height={LP_ROW_H} rx={5}
                 fill={row.color} stroke={row.stroke} strokeWidth={1.2} />
-              <text x={BOX_X + BOX_W / 2} y={ry + LP_ROW_H / 2 + 5} fontFamily="monospace"
+              <text x={BOX_X + BOX_W / 2} y={ry + LP_ROW_H / 2 + 5} fontFamily="var(--font-sans-active)"
                 fontSize={11} fontWeight="bold" fill="var(--color-ink)" textAnchor="middle">
                 {row.label}
               </text>
@@ -332,7 +332,7 @@ function LargePoolDiagram({ lang }: { lang: 'ko' | 'en' }) {
         })}
 
         {/* note */}
-        <text x={BOX_X} y={NOTE_Y} fontFamily="monospace" fontSize={9.5} fill="var(--color-ink-3)">
+        <text x={BOX_X} y={NOTE_Y} fontFamily="var(--font-sans-active)" fontSize={9.5} fill="var(--color-ink-3)">
           {isKo
             ? '* LARGE_POOL_SIZE 미설정 시 위 항목들이 모두 Shared Pool에서 할당됨'
             : '* Without LARGE_POOL_SIZE, all items above are allocated from the Shared Pool'}

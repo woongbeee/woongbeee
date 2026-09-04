@@ -319,10 +319,10 @@ function CircularBufferDiagram({ lang }: { lang: 'ko' | 'en' }) {
     <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-start sm:gap-8">
       <svg viewBox="0 0 200 200" className="w-52 shrink-0">
         {/* Center label */}
-        <text x={CX} y={CY - 6} textAnchor="middle" fontSize={8} fontFamily="monospace" fontWeight="bold" fill="var(--color-ink-2)">
+        <text x={CX} y={CY - 6} textAnchor="middle" fontSize={8} fontFamily="var(--font-sans-active)" fontWeight="bold" fill="var(--color-ink-2)">
           Redo Log
         </text>
-        <text x={CX} y={CY + 6} textAnchor="middle" fontSize={8} fontFamily="monospace" fontWeight="bold" fill="var(--color-ink-2)">
+        <text x={CX} y={CY + 6} textAnchor="middle" fontSize={8} fontFamily="var(--font-sans-active)" fontWeight="bold" fill="var(--color-ink-2)">
           Buffer
         </text>
 
@@ -371,7 +371,7 @@ function CircularBufferDiagram({ lang }: { lang: 'ko' | 'en' }) {
           y={headSlot.y - SLOT_H / 2 - 6}
           textAnchor="middle"
           fontSize={7}
-          fontFamily="monospace"
+          fontFamily="var(--font-sans-active)"
           fontWeight="bold"
           fill="var(--color-amber)"
         >

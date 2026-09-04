@@ -1,4 +1,5 @@
 import { OverviewSection } from './overview/OverviewSection'
+import { ConnectionSection } from './overview/connection/ConnectionSection'
 import { StorageSection } from './storage/StorageSection'
 import { SgaSection } from './overview/sga/SgaSection'
 import { SgaBufferCacheSection } from './overview/sga/buffer-cache/BufferCacheSection'
@@ -25,6 +26,7 @@ import {
 
 export function InternalsPage({ sectionId }: { sectionId: string }) {
   if (sectionId === 'internals-overview')             return <OverviewSection />
+  if (sectionId === 'internals-connection')           return <ConnectionSection />
   if (sectionId === 'internals-sga')                  return <SgaSection />
   if (sectionId === 'internals-sga-buffer-cache')     return <SgaBufferCacheSection />
   if (sectionId === 'internals-sga-shared-pool')      return <SharedPoolSection />

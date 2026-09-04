@@ -10,6 +10,7 @@ import { NullSection } from './dml-more/NullSection'
 import { DateSection } from './dml-more/DateSection'
 import { WindowFuncSection } from './dml-more/WindowFuncSection'
 import { MergeSection } from './dml-more/MergeSection'
+import { HierarchySection } from './dml-more/HierarchySection'
 import { RollupSection } from './dml-more/RollupSection'
 import { PivotSection } from './dml-more/PivotSection'
 import { ExecutionSimulator } from './dml-more/ExecutionSection'
@@ -91,6 +92,7 @@ export function SqlBasicsPage({ sectionId }: Props) {
   if (sectionId === 'sql-basics-date')       return <DateSection />
   if (sectionId === 'sql-basics-windowFunc') return <WindowFuncSection />
   if (sectionId === 'sql-basics-merge')      return <MergeSection />
+  if (sectionId === 'sql-basics-hierarchy')  return <HierarchySection />
   if (sectionId === 'sql-basics-rollup')     return <RollupSection />
   if (sectionId === 'sql-basics-pivot')      return <PivotSection />
   if (sectionId === 'sql-basics-execution')  return <ExecutionSimulator />

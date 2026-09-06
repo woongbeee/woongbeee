@@ -188,6 +188,13 @@ export const BOOK_CHAPTERS: BookChapter[] = [
             },
           },
           {
+            id: 'sql-basics-hierarchy',
+            title: {
+              ko: '계층형 질의 — CONNECT BY',
+              en: 'Hierarchical Query — CONNECT BY',
+            },
+          },
+          {
             id: 'sql-basics-rollup',
             title: {
               ko: 'ROLLUP / CUBE / GROUPING SETS / GROUPING',
@@ -230,6 +237,10 @@ export const BOOK_CHAPTERS: BookChapter[] = [
         id: 'internals-overview',
         title: { ko: '오라클의 내부 구조', en: 'Oracle Internal Structure' },
         children: [
+          {
+            id: 'internals-connection',
+            title: { ko: '오라클 접속 방식', en: 'How Clients Connect' },
+          },
           {
             id: 'internals-sga',
             title: { ko: 'SGA', en: 'SGA' },

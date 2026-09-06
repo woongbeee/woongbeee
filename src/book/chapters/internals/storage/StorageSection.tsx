@@ -1,11 +1,49 @@
 import { useState } from 'react'
+import type { ReactNode } from 'react'
 import { useSimulationStore } from '@/store/simulationStore'
 import {
   PageContainer, ChapterTitle, Prose, SubTitle,
   InfoBox, Table, ConceptGrid, AccordionSection, Divider,
 } from '../../shared'
 import { cn } from '@/lib/utils'
-import { IconCube, IconArrowDown, IconArrowUp } from '@tabler/icons-react'
+import { IconCube, IconArrowDown, IconArrowUp, IconArrowsVertical } from '@tabler/icons-react'
+
+// ── Diagram primitives ────────────────────────────────────────────────────
+// 통일된 무드: 헤어라인 1px 경계 · 채움 없는 paper 바탕 · 좌측 3px 색선으로 계층 식별.
+// 폰트 규칙: 한글·문장 = font-sans, 코드·크기·식별자만 = font-mono.
+// SVG 안에서도 동일 — 루트에 var(--font-sans-active), 식별자 text 에만 var(--font-mono).
+
+type TierKey = 'block' | 'extent' | 'segment' | 'tablespace'
+
+const TIER: Record<TierKey, { accent: string; chip: string; fg: string; tint: string; line: string }> = {
+  block:      { accent: 'border-l-viz-amber',  chip: 'bg-viz-amber',  fg: 'text-viz-amber',  tint: 'bg-viz-amber/12',  line: 'border-viz-amber/70' },
+  extent:     { accent: 'border-l-viz-green',  chip: 'bg-viz-green',  fg: 'text-viz-green',  tint: 'bg-viz-green/12',  line: 'border-viz-green/70' },
+  segment:    { accent: 'border-l-viz-purple', chip: 'bg-viz-purple', fg: 'text-viz-purple', tint: 'bg-viz-purple/12', line: 'border-viz-purple/70' },
+  tablespace: { accent: 'border-l-viz-blue',   chip: 'bg-viz-blue',   fg: 'text-viz-blue',   tint: 'bg-viz-blue/12',   line: 'border-viz-blue/70' },
+}
+
+function DiagramFrame({
+  tier, badge, note, children, className,
+}: {
+  tier: TierKey
+  badge: string
+  note: string
+  children: ReactNode
+  className?: string
+}) {
+  const c = TIER[tier]
+  return (
+    <figure className={cn('my-5 overflow-x-auto rounded-panel border border-line border-l-4 bg-paper p-4', c.accent, className)}>
+      <figcaption className="mb-3 flex flex-wrap items-center gap-x-2 gap-y-1">
+        <span className={cn('shrink-0 rounded-chip px-1.5 py-0.5 font-mono text-[10px] font-bold tracking-wide text-paper', c.chip)}>
+          {badge}
+        </span>
+        <span className="font-sans text-[12px] leading-tight text-ink-2">{note}</span>
+      </figcaption>
+      {children}
+    </figure>
+  )
+}
 
 // ── Intro paragraph ────────────────────────────────────────────────────────
 
@@ -256,50 +294,58 @@ function RowidDiagram() {
   const isKo = lang === 'ko'
 
   const parts = [
-    { chars: 'AAAPec', label: isKo ? '오브젝트 번호' : 'Object #', sublabel: 'OOOOOO', color: 'bg-purple', light: 'bg-purple/5 border-purple/50 text-purple' },
-    { chars: 'AAF',    label: isKo ? '파일 번호' : 'File #',   sublabel: 'FFF',    color: 'bg-blue',   light: 'bg-blue/5 border-blue/50 text-blue'   },
-    { chars: 'AAAABS', label: isKo ? '블록 번호' : 'Block #',  sublabel: 'BBBBBB', color: 'bg-green',light: 'bg-green/5 border-green/50 text-green'},
-    { chars: 'AAA',    label: isKo ? '슬롯 번호' : 'Slot #',   sublabel: 'RRR',    color: 'bg-amber', light: 'bg-amber/5 border-amber/50 text-amber' },
+    { chars: 'AAAPec', label: isKo ? '오브젝트 번호' : 'Object #', sublabel: 'OOOOOO', color: 'bg-viz-purple', light: 'bg-viz-purple/12 border-viz-purple text-viz-purple' },
+    { chars: 'AAF',    label: isKo ? '파일 번호' : 'File #',   sublabel: 'FFF',    color: 'bg-viz-blue',   light: 'bg-viz-blue/12 border-viz-blue text-viz-blue'   },
+    { chars: 'AAAABS', label: isKo ? '블록 번호' : 'Block #',  sublabel: 'BBBBBB', color: 'bg-viz-green',light: 'bg-viz-green/12 border-viz-green text-viz-green'},
+    { chars: 'AAA',    label: isKo ? '슬롯 번호' : 'Slot #',   sublabel: 'RRR',    color: 'bg-viz-amber', light: 'bg-viz-amber/12 border-viz-amber text-viz-amber' },
   ]
 
   return (
-    <div className="my-4 rounded-panel border border-line bg-paper-sunk p-4">
-      <div className="mb-3 flex items-center gap-2">
-        <span className="rounded bg-ink-3 px-2 py-0.5 font-mono text-[10px] font-bold text-paper">ROWID</span>
-        <span className="font-mono text-[11px] text-ink">
-          {isKo ? 'Extended ROWID — 18자리 Base64 인코딩' : 'Extended ROWID — 18-character Base64 encoding'}
+    <figure className="my-5 overflow-x-auto rounded-panel border border-line bg-paper p-4">
+      <figcaption className="mb-3 flex flex-wrap items-center gap-x-2 gap-y-1">
+        <span className="shrink-0 rounded-chip bg-ink-3 px-1.5 py-0.5 font-mono text-[10px] font-bold text-paper">ROWID</span>
+        <span className="font-sans text-[12px] leading-tight text-ink-2">
+          {isKo ? 'Extended ROWID — 18자리 Base64 문자열' : 'Extended ROWID — 18-character Base64 string'}
         </span>
-      </div>
+      </figcaption>
 
       {/* ROWID 문자열 시각화 */}
-      <div className="mb-4 flex items-stretch overflow-hidden rounded-card border border-line-2">
+      <div className="mb-4 flex min-w-[420px] items-stretch overflow-hidden rounded-card border border-line">
         {parts.map((p) => (
-          <div key={p.sublabel} className={cn('flex flex-col items-center justify-center px-2 py-2 flex-1 border-r last:border-r-0 border-line', p.light.replace('border-', 'bg-').split(' ')[0])}>
-            <span className="font-mono text-sm font-bold tracking-widest text-ink">{p.chars}</span>
-            <span className={cn('mt-0.5 font-mono text-[9px] font-bold', p.light.split(' ')[2])}>{p.sublabel}</span>
+          <div
+            key={p.sublabel}
+            className={cn(
+              'flex flex-1 flex-col items-center justify-center gap-0.5 border-r border-line px-2 py-2.5 last:border-r-0',
+              p.light.split(' ')[0], // bg tint
+            )}
+          >
+            <span className={cn('font-mono text-[13px] font-bold tracking-[0.15em]', p.light.split(' ')[2])}>{p.chars}</span>
+            <span className="font-mono text-[9px] font-medium text-ink-3">{p.sublabel}</span>
           </div>
         ))}
       </div>
 
       {/* 설명 행 */}
-      <div className="flex flex-col sm:flex-row gap-2">
+      <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
         {parts.map((p) => (
-          <div key={p.sublabel} className={cn('flex-1 rounded-card border px-3 py-2', p.light)}>
-            <div className="flex items-center gap-1.5 mb-1">
-              <span className={cn('rounded px-1.5 py-0.5 font-mono text-[9px] font-bold text-paper', p.color)}>{p.sublabel}</span>
-              <span className="font-mono text-[10px] font-bold">{p.label}</span>
+          <div key={p.sublabel} className={cn('rounded-card border border-l-4 px-3 py-2', p.light)}>
+            <div className="mb-1 flex items-center gap-1.5">
+              <span className={cn('shrink-0 rounded-chip px-1.5 py-0.5 font-mono text-[9px] font-bold text-paper', p.color)}>
+                {p.sublabel}
+              </span>
+              <span className="font-sans text-[11px] font-semibold text-ink">{p.label}</span>
             </div>
-            <span className="font-mono text-[10px] text-ink">{p.chars}</span>
+            <span className="font-mono text-[10px] text-ink-2">{p.chars}</span>
           </div>
         ))}
       </div>
 
-      <p className="mt-3 font-mono text-[10px] text-ink-2 leading-relaxed">
+      <figcaption className="mt-3 font-read text-[11.5px] leading-relaxed text-ink-3">
         {isKo
-          ? '→ Oracle은 ROWID 하나로 "어느 Segment의 어느 파일의 몇 번 블록의 몇 번 슬롯"을 즉시 계산해 해당 행으로 점프합니다.'
-          : '→ From one ROWID, Oracle instantly computes "which Segment → which file → which block → which slot" and jumps directly to the row.'}
-      </p>
-    </div>
+          ? 'Oracle 은 ROWID 하나로 "어느 Segment · 어느 파일 · 몇 번 블록 · 몇 번 슬롯"인지 즉시 계산해 그 행으로 바로 점프해요.'
+          : 'From one ROWID, Oracle instantly resolves "which Segment, which file, which block, which slot" and jumps straight to the row.'}
+      </figcaption>
+    </figure>
   )
 }
 
@@ -326,9 +372,9 @@ const BLOCK_ZONES: BlockZoneDef[] = [
     id: 'header',
     labelKo: 'Common Header',
     labelEn: 'Common Header',
-    badgeColor: 'bg-blue',
-    zoneBg: 'bg-blue/5',
-    activeRing: 'ring-2 ring-blue/50',
+    badgeColor: 'bg-viz-blue',
+    zoneBg: 'bg-viz-blue/12',
+    activeRing: 'ring-2 ring-viz-blue/50',
     titleKo: 'Common Header (캐시 계층)',
     titleEn: 'Common Header (Cache Layer)',
     descKo: '"캐시 계층"이라 불리는 이유는 이 헤더가 디스크가 아닌 Buffer Cache(메모리) 안에서만 유지되는 정보를 담기 때문이에요. 블록이 디스크에서 메모리로 올라오면 Oracle이 이 영역을 채우고, 블록이 다시 디스크로 내려갈 때는 일부 필드가 제거돼요.',
@@ -344,9 +390,9 @@ const BLOCK_ZONES: BlockZoneDef[] = [
     id: 'itl',
     labelKo: 'ITL',
     labelEn: 'ITL',
-    badgeColor: 'bg-blue',
-    zoneBg: 'bg-blue/5',
-    activeRing: 'ring-2 ring-blue/50',
+    badgeColor: 'bg-viz-blue',
+    zoneBg: 'bg-viz-blue/12',
+    activeRing: 'ring-2 ring-viz-blue/50',
     titleKo: 'ITL — Interested Transaction List',
     titleEn: 'ITL — Interested Transaction List',
     descKo: '이 블록을 동시에 수정 중인 트랜잭션 슬롯 목록이에요. INITRANS 수만큼 미리 확보하고, 부족하면 Free Space에서 동적으로 늘려요.',
@@ -379,9 +425,9 @@ const BLOCK_ZONES: BlockZoneDef[] = [
     id: 'free',
     labelKo: 'Free Space',
     labelEn: 'Free Space',
-    badgeColor: 'bg-green',
-    zoneBg: 'bg-green/5',
-    activeRing: 'ring-2 ring-green/50',
+    badgeColor: 'bg-viz-green',
+    zoneBg: 'bg-viz-green/12',
+    activeRing: 'ring-2 ring-viz-green/50',
     titleKo: 'Free Space — PCTFREE 예약 구간',
     titleEn: 'Free Space — PCTFREE Reserved Zone',
     descKo: 'INSERT 상한선(PCTFREE, 기본 10%)을 지키기 위해 비워 두는 구간이에요. UPDATE 시 가변 컬럼이 늘어나는 공간이 돼요. 위에서 내려오는 Directory와 아래에서 올라오는 Row Data 사이에 위치해요.',
@@ -397,9 +443,9 @@ const BLOCK_ZONES: BlockZoneDef[] = [
     id: 'rowdata',
     labelKo: 'Row Data',
     labelEn: 'Row Data',
-    badgeColor: 'bg-amber',
-    zoneBg: 'bg-amber/5',
-    activeRing: 'ring-2 ring-amber/50',
+    badgeColor: 'bg-viz-amber',
+    zoneBg: 'bg-viz-amber/12',
+    activeRing: 'ring-2 ring-viz-amber/50',
     titleKo: 'Row Data',
     titleEn: 'Row Data',
     descKo: '실제 행 데이터가 저장되는 영역이에요. 블록의 끝(높은 주소)에서 위쪽으로 쌓여요. 새 행이 INSERT 될수록 Free Space를 잠식하며 올라와요.',
@@ -431,128 +477,117 @@ function BlockDiagram() {
 
   const ROW_H = 48 // header, itl, directory 각각 높이(px)
 
+  const GROUPS: { labelKo: string; labelEn: string; h: number; bar: string; text: string }[] = [
+    { labelKo: '데이터 블록 헤더', labelEn: 'Block Header', h: ROW_H * 2, bar: 'bg-viz-red', text: 'text-viz-red' },
+    { labelKo: '데이터 헤더', labelEn: 'Data Header', h: ROW_H, bar: 'bg-viz-amber', text: 'text-viz-amber' },
+  ]
+
   return (
-    <div className="flex flex-col gap-6">
-      {/* ── 타이틀 — 블록 시각과 정렬 맞춤 ── */}
-      <div className="mt-6 mb-2 flex items-center gap-2">
-        <IconCube size={16} className="text-ink-2" stroke={1.5} />
-        <span className="text-sm font-bold text-ink/90">
+    <div className="flex flex-col gap-5">
+      {/* ── 타이틀 ── */}
+      <div className="mt-6 flex items-center gap-2">
+        <IconCube size={16} className="text-ink-3" stroke={1.5} />
+        <span className="font-sans text-sm font-semibold text-ink">
           {isKo ? '오라클의 블록은 이렇게 생겼어요' : 'Anatomy of an Oracle Block'}
         </span>
       </div>
 
-      <div className="flex items-stretch gap-6">
-      {/* ── Block visual (left) ── */}
-      <div className="flex shrink-0 gap-0">
-
-        {/* 좌측 브라켓 — 블록 왼편, 오른쪽으로 열리는 { 형태: [텍스트][브라켓][블록] */}
-        <div className="flex flex-col">
-          {/* 데이터 블록 헤더: header(48) + itl(48) = 96px */}
-          <div className="relative flex items-center pr-3" style={{ height: ROW_H * 2 }}>
-            <span className="font-mono text-[9px] font-bold text-red leading-tight whitespace-nowrap">
-              {isKo ? '데이터 블록 헤더' : 'Block Header'}
-            </span>
-            <div className="absolute inset-y-2 right-0 w-2 border-l-2 border-t-2 border-b-2 border-red/50 rounded-l" />
-          </div>
-          {/* 데이터 헤더: directory(48) */}
-          <div className="relative flex items-center pr-3" style={{ height: ROW_H }}>
-            <span className="font-mono text-[9px] font-bold text-amber leading-tight whitespace-nowrap">
-              {isKo ? '데이터 헤더' : 'Data Header'}
-            </span>
-            <div className="absolute inset-y-2 right-0 w-2 border-l-2 border-t-2 border-b-2 border-amber/50 rounded-l" />
-          </div>
-          {/* Free Space — 남은 높이 전부 차지 */}
-          <div className="flex-1" />
-        </div>
-
-        {/* 블록 본체 */}
-        <div className="flex w-52 flex-col overflow-hidden rounded-panel border-2 border-line-2">
-          {/* 상단 3개 행 — 클릭 가능 */}
-          {blockRows.map(({ id, labelKo, labelEn }) => {
-            const zone = BLOCK_ZONES.find((z) => z.id === id)!
-            const isActive = active === id
-            return (
-              <button
-                key={id}
-                onClick={() => setActive(id)}
-                style={{ height: ROW_H }}
-                className={cn(
-                  'flex w-full shrink-0 cursor-pointer items-center gap-3 border-b border-line px-3 text-left transition-all hover:brightness-95',
-                  zone.zoneBg,
-                  isActive && zone.activeRing,
-                )}
-              >
-                <span className={cn('shrink-0 rounded px-1.5 py-0.5 font-mono text-[9px] font-bold text-paper', zone.badgeColor)}>
-                  {id === 'header' ? 'HDR' : id === 'itl' ? 'ITL' : 'DIR'}
+      <div className="flex flex-col items-stretch gap-5 lg:flex-row">
+        {/* ── Block visual (left) ── */}
+        <div className="flex shrink-0 gap-2">
+          {/* 좌측 그룹 라벨 — 색 바 + 세로 중앙 라벨 */}
+          <div className="flex flex-col">
+            {GROUPS.map((g) => (
+              <div key={g.labelEn} className="flex items-center gap-1.5" style={{ height: g.h }}>
+                <span className={cn('font-sans text-[9px] font-semibold leading-tight', g.text)} style={{ maxWidth: 56 }}>
+                  {isKo ? g.labelKo : g.labelEn}
                 </span>
-                <span className={cn('font-mono text-[11px] leading-tight', isActive ? 'font-bold text-ink' : 'text-ink-2')}>
-                  {isKo ? labelKo : labelEn}
-                </span>
-              </button>
-            )
-          })}
+                <span className={cn('w-1 self-stretch rounded-full', g.bar)} style={{ margin: '6px 0' }} />
+              </div>
+            ))}
+            <div className="flex-1" />
+          </div>
 
-          {/* 사용 가능한 공간 — 남은 높이 전부 차지 */}
-          <button
-            onClick={() => setActive('free')}
-            className={cn(
-              'flex min-h-[112px] w-full flex-1 cursor-pointer flex-col items-center justify-center gap-2 transition-all hover:brightness-95',
-              BLOCK_ZONES.find((z) => z.id === 'free')!.zoneBg,
-              active === 'free' && BLOCK_ZONES.find((z) => z.id === 'free')!.activeRing,
-            )}
-          >
-            <span className="text-xl text-ink-2">↓</span>
-            <span className="font-mono text-[12px] font-bold text-ink-2">
-              {isKo ? '사용 가능한 공간' : 'Free Space'}
-            </span>
-            <span className="text-xl text-ink-2">↑</span>
-          </button>
-        </div>
+          {/* 블록 본체 */}
+          <div className="flex w-52 flex-col overflow-hidden rounded-card border border-line-2">
+            {blockRows.map(({ id, labelKo, labelEn }) => {
+              const zone = BLOCK_ZONES.find((z) => z.id === id)!
+              const isActive = active === id
+              return (
+                <button
+                  key={id}
+                  onClick={() => setActive(id)}
+                  style={{ height: ROW_H }}
+                  className={cn(
+                    'flex w-full shrink-0 cursor-pointer items-center gap-2.5 border-b border-line px-3 text-left transition-colors hover:bg-ink/[0.03]',
+                    isActive ? zone.zoneBg : 'bg-paper',
+                    isActive && zone.activeRing,
+                  )}
+                >
+                  <span className={cn('shrink-0 rounded-chip px-1.5 py-0.5 font-mono text-[9px] font-bold text-paper', zone.badgeColor)}>
+                    {id === 'header' ? 'HDR' : id === 'itl' ? 'ITL' : 'DIR'}
+                  </span>
+                  <span className={cn('font-sans text-[11px] leading-tight', isActive ? 'font-semibold text-ink' : 'text-ink-2')}>
+                    {isKo ? labelKo : labelEn}
+                  </span>
+                </button>
+              )
+            })}
 
-        {/* 우측 브라켓 — 블록 오른편, 왼쪽으로 열리는 } 형태: [블록][브라켓][텍스트] */}
-        <div className="flex flex-col">
-          {/* 헤더 3행은 브라켓 없음 */}
-          <div style={{ height: ROW_H * 3 }} />
-          {/* 데이터 계층 — 남은 높이 전부 */}
-          <div className="flex flex-1 items-center gap-1">
-            <div className="relative self-stretch w-3 shrink-0">
-              <div
-                className="absolute inset-y-2 right-0 w-2 border-r-2 border-t-2 border-b-2 border-blue/50 rounded-r"
-              />
+            {/* 사용 가능한 공간 */}
+            <button
+              onClick={() => setActive('free')}
+              className={cn(
+                'flex min-h-[104px] w-full flex-1 cursor-pointer flex-col items-center justify-center gap-1.5 transition-colors hover:bg-ink/[0.03]',
+                active === 'free' ? BLOCK_ZONES.find((z) => z.id === 'free')!.zoneBg : 'bg-paper',
+                active === 'free' && BLOCK_ZONES.find((z) => z.id === 'free')!.activeRing,
+              )}
+            >
+              <IconArrowsVertical size={16} className="text-ink-3" stroke={1.5} />
+              <span className="font-sans text-[11px] font-semibold text-ink-2">
+                {isKo ? '사용 가능한 공간' : 'Free Space'}
+              </span>
+            </button>
+          </div>
+
+          {/* 우측 그룹 라벨 — Data Layer */}
+          <div className="flex flex-col">
+            <div style={{ height: ROW_H * 3 }} />
+            <div className="flex flex-1 items-center gap-1.5">
+              <span className="w-1 self-stretch rounded-full bg-viz-blue" style={{ margin: '6px 0' }} />
+              <span className="font-sans text-[9px] font-semibold leading-tight text-viz-blue" style={{ maxWidth: 48 }}>
+                {isKo ? '데이터 계층' : 'Data Layer'}
+              </span>
             </div>
-            <span className="font-mono text-[9px] font-bold text-blue leading-tight whitespace-nowrap">
-              {isKo ? '데이터 계층' : 'Data Layer'}
-            </span>
           </div>
         </div>
-      </div>
 
-      {/* ── Detail card (right) ── */}
-      <div className="flex flex-1 flex-col overflow-hidden rounded-panel border border-line bg-paper">
-        <div className={cn('flex items-center gap-2.5 border-b border-line px-5 py-3', activeZone.zoneBg)}>
-          <span className={cn('rounded px-2.5 py-0.5 font-mono text-xs font-bold text-paper', activeZone.badgeColor)}>
-            {active.toUpperCase()}
-          </span>
-          <span className="text-sm font-bold text-ink/90">
-            {isKo ? activeZone.titleKo : activeZone.titleEn}
-          </span>
-        </div>
-        <p className="border-b border-line px-5 py-3.5 text-xs leading-relaxed text-ink-2">
-          {isKo ? activeZone.descKo : activeZone.descEn}
-        </p>
-        <div className="flex flex-col divide-y divide-line">
-          {activeZone.rows.map((row, i) => (
-            <div key={i} className="grid grid-cols-[160px_1fr] text-xs">
-              <div className="flex items-center border-r border-line bg-paper-sunk px-4 py-3">
-                <span className="font-mono font-bold text-ink">{isKo ? row.termKo : row.termEn}</span>
+        {/* ── Detail card (right) ── */}
+        <div className="flex min-w-0 flex-1 flex-col overflow-hidden rounded-card border border-line bg-paper">
+          <div className={cn('flex items-center gap-2.5 border-b border-line px-4 py-2.5', activeZone.zoneBg)}>
+            <span className={cn('shrink-0 rounded-chip px-2 py-0.5 font-mono text-[11px] font-bold text-paper', activeZone.badgeColor)}>
+              {active.toUpperCase()}
+            </span>
+            <span className="font-sans text-[13px] font-semibold text-ink">
+              {isKo ? activeZone.titleKo : activeZone.titleEn}
+            </span>
+          </div>
+          <p className="border-b border-line px-4 py-3 font-read text-[12px] leading-relaxed text-ink-2">
+            {isKo ? activeZone.descKo : activeZone.descEn}
+          </p>
+          <div className="flex flex-col divide-y divide-line">
+            {activeZone.rows.map((row, i) => (
+              <div key={i} className="grid grid-cols-[128px_1fr]">
+                <div className="flex items-center border-r border-line bg-paper-sunk px-3 py-2.5">
+                  <span className="font-mono text-[11px] font-bold text-ink">{isKo ? row.termKo : row.termEn}</span>
+                </div>
+                <div className="flex items-center px-3 py-2.5">
+                  <span className="font-read text-[11.5px] leading-snug text-ink-2">{isKo ? row.descKo : row.descEn}</span>
+                </div>
               </div>
-              <div className="flex items-center px-4 py-3">
-                <span className="leading-snug text-ink-2">{isKo ? row.descKo : row.descEn}</span>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
       </div>
     </div>
   )
@@ -574,17 +609,17 @@ function PctDiagram() {
       labelKo: 'PCTFREE 예약 구간',
       labelEn: 'PCTFREE reserved',
       pct: 10,
-      bg: 'bg-green/10',
-      border: 'border-green/50',
-      text: 'text-green',
+      bg: 'bg-viz-green/15',
+      border: 'border-viz-green',
+      text: 'text-viz-green',
     },
     {
       labelKo: 'Row Data (사용 중)',
       labelEn: 'Row Data (used)',
       pct: 60,
-      bg: 'bg-amber/10',
-      border: 'border-amber/50',
-      text: 'text-amber',
+      bg: 'bg-viz-amber/15',
+      border: 'border-viz-amber',
+      text: 'text-viz-amber',
     },
     {
       labelKo: '사용 가능한 공간',
@@ -599,100 +634,89 @@ function PctDiagram() {
   return (
     <div className="mt-8 flex flex-col gap-4">
       {/* ── 섹션 헤더 ── */}
-      <div className="flex items-center gap-2 border-b border-line pb-3">
-        <span className="text-sm font-bold text-ink/90">
-          {isKo ? '데이터 블록에 데이터를 어떻게 저장하는 지 더 자세히 알아보기' : 'How Oracle Stores Data Inside a Block'}
+      <div className="border-b border-line pb-2.5">
+        <span className="font-sans text-sm font-semibold text-ink">
+          {isKo ? '데이터 블록 안에 데이터가 채워지는 방식' : 'How Oracle Stores Data Inside a Block'}
         </span>
       </div>
 
-      <div className="flex items-start gap-0">
-        {/* ── 블록 본체 (고정 너비) ── */}
-        <div
-          className="relative shrink-0 flex w-48 flex-col overflow-hidden rounded-panel border-2 border-line-2"
-          style={{ height: BLOCK_H }}
-        >
-          {sections.map((s) => (
-            <div
-              key={s.labelKo}
-              className={cn('flex items-center justify-center border-b last:border-0', s.bg, s.border)}
-              style={{ height: `${s.pct}%` }}
-            >
-              <span className={cn('font-mono text-[11px] font-bold leading-tight text-center px-2', s.text)}>
-                {isKo ? s.labelKo : s.labelEn}
-              </span>
-            </div>
-          ))}
-          {/* PCTFREE 라인 — 10% 지점 (PCTFREE 구간 하단) */}
-          <div className="absolute left-0 right-0 border-t-2 border-dashed border-green" style={{ top: '10%' }} />
-          {/* PCTUSED 라인 — 50% 지점 (블록 전체의 40%가 Row Data로 채워진 지점) */}
-          <div className="absolute left-0 right-0 border-t-2 border-dashed border-blue/50" style={{ top: '50%' }} />
-        </div>
-
-        {/* ── 라인 레이블 (고정 너비 컬럼) ── */}
-        <div className="relative shrink-0 w-44" style={{ height: BLOCK_H }}>
-          {/* PCTFREE 레이블 — 10% */}
+      <div className="flex flex-col items-start gap-4 sm:flex-row">
+        {/* ── 블록 본체 + 라인 레이블 ── */}
+        <div className="flex shrink-0 items-start">
           <div
-            className="absolute left-0 flex items-center gap-1.5"
-            style={{ top: '10%', transform: 'translateY(-50%)' }}
+            className="relative flex w-44 flex-col overflow-hidden rounded-card border border-line-2"
+            style={{ height: BLOCK_H }}
           >
-            <div className="h-px w-3 bg-green" />
-            <div className="flex flex-col">
-              <span className="font-mono text-[10px] font-bold text-green whitespace-nowrap leading-tight">PCTFREE = 10%</span>
-              <span className="font-mono text-[9px] text-green whitespace-nowrap leading-tight">
-                {isKo ? '블록 전체 크기의 10%' : '10% of total block size'}
-              </span>
-            </div>
+            {sections.map((s) => (
+              <div
+                key={s.labelKo}
+                className={cn('flex items-center justify-center border-b border-line px-2 text-center last:border-0', s.bg)}
+                style={{ height: `${s.pct}%` }}
+              >
+                <span className={cn('font-sans text-[11px] font-semibold leading-tight', s.text)}>
+                  {isKo ? s.labelKo : s.labelEn}
+                </span>
+              </div>
+            ))}
+            <div className="absolute right-0 left-0 border-t border-dashed border-viz-green" style={{ top: '10%' }} />
+            <div className="absolute right-0 left-0 border-t border-dashed border-viz-blue/60" style={{ top: '50%' }} />
           </div>
-          {/* PCTUSED 레이블 — 50% */}
-          <div
-            className="absolute left-0 flex items-center gap-1.5"
-            style={{ top: '50%', transform: 'translateY(-50%)' }}
-          >
-            <div className="h-px w-3 bg-blue" />
-            <div className="flex flex-col">
-              <span className="font-mono text-[10px] font-bold text-blue whitespace-nowrap leading-tight">PCTUSED = 40%</span>
-              <span className="font-mono text-[9px] text-blue whitespace-nowrap leading-tight">
-                {isKo ? '블록 전체 크기의 40%' : '40% of total block size'}
+
+          {/* 라인 레이블 */}
+          <div className="relative w-40 shrink-0" style={{ height: BLOCK_H }}>
+            <div className="absolute left-0 flex items-center gap-1.5" style={{ top: '10%', transform: 'translateY(-50%)' }}>
+              <span className="h-px w-3 bg-viz-green" />
+              <span className="flex flex-col leading-tight">
+                <span className="font-mono text-[10px] font-bold whitespace-nowrap text-viz-green">PCTFREE = 10%</span>
+                <span className="font-sans text-[9px] whitespace-nowrap text-ink-3">
+                  {isKo ? '블록 크기의 10%' : '10% of block size'}
+                </span>
+              </span>
+            </div>
+            <div className="absolute left-0 flex items-center gap-1.5" style={{ top: '50%', transform: 'translateY(-50%)' }}>
+              <span className="h-px w-3 bg-viz-blue" />
+              <span className="flex flex-col leading-tight">
+                <span className="font-mono text-[10px] font-bold whitespace-nowrap text-viz-blue">PCTUSED = 40%</span>
+                <span className="font-sans text-[9px] whitespace-nowrap text-ink-3">
+                  {isKo ? '블록 크기의 40%' : '40% of block size'}
+                </span>
               </span>
             </div>
           </div>
         </div>
 
         {/* ── 설명 카드 ── */}
-        <div className="flex flex-1 flex-col gap-3 min-w-0">
-          {/* PCTFREE */}
-          <div className="rounded-panel border border-green/30 bg-green/5 px-4 py-3">
-            <div className="mb-1.5 flex items-center gap-2">
-              <IconArrowDown size={14} className="text-green" stroke={2} />
-              <span className="font-mono text-xs font-bold text-green">PCTFREE</span>
-              <span className="text-xs text-green">{isKo ? '= INSERT 상한선' : '= INSERT ceiling'}</span>
+        <div className="flex min-w-0 flex-1 flex-col gap-2.5">
+          <div className="rounded-card border border-line border-l-4 border-l-viz-green bg-viz-green/12 px-3.5 py-2.5">
+            <div className="mb-1 flex items-center gap-1.5">
+              <IconArrowDown size={13} className="text-viz-green" stroke={1.5} />
+              <span className="font-mono text-[11px] font-bold text-viz-green">PCTFREE</span>
+              <span className="font-sans text-[11px] text-viz-green">{isKo ? '= INSERT 상한선' : '= INSERT ceiling'}</span>
             </div>
-            <p className="text-xs leading-relaxed text-ink-2">
+            <p className="font-read text-[11.5px] leading-relaxed text-ink-2">
               {isKo
-                ? '블록 전체 크기의 10%를 상단에 예약해 둬요. 여유 공간이 이 비율 아래로 줄면 새 INSERT를 거부하고, 기존 행이 UPDATE로 길어질 때 쓸 공간으로 남겨 둬요.'
-                : 'Reserves 10% of the total block size at the top. Once free space drops below this, new INSERTs are blocked — the space is kept for in-place UPDATE growth on existing rows.'}
+                ? '블록 크기의 10%를 상단에 예약해요. 여유 공간이 이 아래로 줄면 새 INSERT 를 막고, 기존 행이 UPDATE 로 길어질 때 쓸 공간으로 남겨 둬요.'
+                : 'Reserves 10% of the block at the top. Once free space drops below this, new INSERTs are blocked — the space is kept for in-place UPDATE growth.'}
             </p>
           </div>
 
-          {/* PCTUSED */}
-          <div className="rounded-panel border border-blue/30 bg-blue/5 px-4 py-3">
-            <div className="mb-1.5 flex items-center gap-2">
-              <IconArrowUp size={14} className="text-blue" stroke={2} />
-              <span className="font-mono text-xs font-bold text-blue">PCTUSED</span>
-              <span className="text-xs text-blue">{isKo ? '= Freelist 재진입 하한선' : '= Freelist re-entry floor'}</span>
+          <div className="rounded-card border border-line border-l-4 border-l-viz-blue bg-viz-blue/12 px-3.5 py-2.5">
+            <div className="mb-1 flex items-center gap-1.5">
+              <IconArrowUp size={13} className="text-viz-blue" stroke={1.5} />
+              <span className="font-mono text-[11px] font-bold text-viz-blue">PCTUSED</span>
+              <span className="font-sans text-[11px] text-viz-blue">{isKo ? '= Freelist 재진입 하한선' : '= Freelist re-entry floor'}</span>
             </div>
-            <p className="text-xs leading-relaxed text-ink-2">
+            <p className="font-read text-[11.5px] leading-relaxed text-ink-2">
               {isKo
-                ? '블록 전체 크기의 40%예요. DELETE·UPDATE로 실제 Row Data 사용량이 이 비율 아래로 줄면, Oracle이 블록을 Freelist에 재등록해서 새 INSERT를 받을 수 있게 해요.'
-                : '40% of the total block size. When DELETE/UPDATE shrinks Row Data usage below this threshold, Oracle re-adds the block to the Freelist so it can accept new INSERTs again.'}
+                ? '블록 크기의 40%예요. DELETE·UPDATE 로 Row Data 사용량이 이 아래로 줄면 Oracle 이 블록을 Freelist 에 재등록해 다시 INSERT 를 받아요.'
+                : '40% of the block. When DELETE/UPDATE shrinks Row Data usage below this, Oracle re-adds the block to the Freelist so it can accept INSERTs again.'}
             </p>
           </div>
 
-          {/* 관계 요약 */}
-          <div className="rounded-panel border border-line bg-paper-sunk px-4 py-3">
-            <p className="text-xs leading-relaxed text-ink-2">
+          <div className="rounded-card border border-line bg-paper-sunk px-3.5 py-2.5">
+            <p className="font-read text-[11.5px] leading-relaxed text-ink-2">
               {isKo
-                ? 'INSERT → PCTFREE 도달 → INSERT 금지 → DELETE로 Row Data가 PCTUSED 이하 → Freelist 재등록 → INSERT 재개. PCTFREE + PCTUSED의 합이 100을 넘으면 안 돼요.'
+                ? 'INSERT → PCTFREE 도달 → INSERT 금지 → DELETE 로 Row Data 가 PCTUSED 이하 → Freelist 재등록 → INSERT 재개. PCTFREE + PCTUSED 합이 100 을 넘으면 안 돼요.'
                 : 'INSERT → hits PCTFREE → blocked → DELETE brings Row Data below PCTUSED → re-added to Freelist → INSERTs resume. PCTFREE + PCTUSED must not exceed 100.'}
             </p>
           </div>
@@ -709,38 +733,28 @@ function ExtentDiagram() {
   const isKo = lang === 'ko'
 
   return (
-    <div className="my-4 rounded-panel border-2 border-green/50 bg-green/5 p-4">
-      {/* Extent 레이블 */}
-      <div className="mb-3 flex items-center gap-2">
-        <span className="rounded bg-green px-2 py-0.5 font-mono text-[10px] font-bold text-paper">EXTENT</span>
-        <span className="font-mono text-[11px] text-green">
-          {isKo ? '8개의 Block이 모여 Extent 1개 = 64 KB' : '8 Blocks form 1 Extent = 64 KB'}
-        </span>
-      </div>
-
-      {/* 블록들 */}
-      <div className="flex items-stretch gap-1.5">
+    <DiagramFrame
+      tier="extent"
+      badge="EXTENT"
+      note={isKo ? 'Block 8개가 모여 Extent 1개 = 64 KB' : '8 Blocks form 1 Extent = 64 KB'}
+    >
+      <div className="flex min-w-[420px] items-stretch gap-1.5">
         {Array.from({ length: 8 }).map((_, i) => (
           <div
             key={i}
-            className="flex flex-1 flex-col items-center justify-center rounded-card border border-amber/50 bg-amber/10 py-3 gap-0.5"
+            className="flex flex-1 flex-col items-center justify-center gap-0.5 rounded-card border border-viz-amber/70 bg-viz-amber/12 py-3"
           >
-            <span className="font-mono text-[9px] font-bold text-amber">Block</span>
-            <span className="font-mono text-[8px] text-amber">8 KB</span>
+            <span className="font-sans text-[9px] font-semibold text-viz-amber">Block</span>
+            <span className="font-mono text-[8px] text-viz-amber/80">8 KB</span>
           </div>
         ))}
       </div>
 
-      {/* 하단 수식 */}
-      <div className="mt-3 flex items-center gap-1.5">
-        <div className="h-px flex-1 bg-green/25" />
-        <span className="font-mono text-[9px] text-green whitespace-nowrap">
-          {isKo ? '8 Blocks × 8 KB = 64 KB · 물리적으로 연속된 주소 공간' : '8 Blocks × 8 KB = 64 KB · physically contiguous'}
-        </span>
-        <div className="h-px flex-1 bg-green/25" />
-      </div>
-
-    </div>
+      <p className="mt-2.5 text-center font-mono text-[10px] text-ink-3">
+        8 × 8 KB = 64 KB
+        <span className="font-sans"> · {isKo ? '물리적으로 연속된 주소 공간' : 'physically contiguous'}</span>
+      </p>
+    </DiagramFrame>
   )
 }
 
@@ -769,38 +783,31 @@ function SegmentDiagram() {
   ]
 
   return (
-    <div className="my-4 rounded-panel border-2 border-purple/50 bg-purple/5 p-4">
-      {/* Segment 레이블 */}
-      <div className="mb-4 flex items-center gap-2">
-        <span className="rounded bg-purple px-2 py-0.5 font-mono text-[10px] font-bold text-paper">SEGMENT</span>
-        <span className="font-mono text-[11px] text-purple">
-          {isKo ? 'EMPLOYEES 테이블 — 오브젝트 1개 = Segment 1개' : 'EMPLOYEES table — one object = one Segment'}
-        </span>
-      </div>
-
-      <div className="flex flex-col gap-3">
+    <DiagramFrame
+      tier="segment"
+      badge="SEGMENT"
+      note={isKo ? 'EMPLOYEES 테이블 — 오브젝트 1개 = Segment 1개' : 'EMPLOYEES table — one object = one Segment'}
+    >
+      <div className="flex min-w-[440px] flex-col gap-2.5">
         {stages.map((stage, si) => (
           <div key={si} className="flex items-center gap-3">
-            {/* 단계 레이블 */}
-            <div className="w-36 shrink-0">
-              <div className="font-mono text-[10px] font-bold text-purple leading-tight">{stage.label}</div>
-              <div className="font-mono text-[9px] text-purple leading-tight mt-0.5">{stage.note}</div>
+            <div className="w-32 shrink-0">
+              <div className="font-sans text-[10px] font-semibold leading-tight text-ink">{stage.label}</div>
+              <div className="mt-0.5 font-sans text-[9px] leading-tight text-ink-3">{stage.note}</div>
             </div>
-            {/* Extent 박스들 */}
             <div className="flex flex-1 gap-1.5">
               {Array.from({ length: stage.extents }).map((_, ei) => (
                 <div
                   key={ei}
-                  className="flex flex-1 flex-col items-center justify-center rounded-card border-2 border-green/50 bg-green/5 py-3 gap-0.5"
+                  className="flex flex-1 flex-col items-center justify-center gap-0.5 rounded-card border border-viz-green/70 bg-viz-green/12 py-2.5"
                 >
-                  <span className="font-mono text-[10px] font-bold text-green">Extent {ei + 1}</span>
-                  <span className="font-mono text-[9px] text-green">64 KB · 8 blocks</span>
+                  <span className="font-mono text-[10px] font-bold text-viz-green">Extent {ei + 1}</span>
+                  <span className="font-mono text-[9px] text-viz-green/80">64 KB</span>
                 </div>
               ))}
-              {/* 마지막 단계에 +추가 암시 */}
               {si === stages.length - 1 && (
-                <div className="flex w-12 shrink-0 items-center justify-center rounded-card border border-dashed border-purple/50 bg-purple/5">
-                  <span className="font-mono text-[11px] font-bold text-purple">+</span>
+                <div className="flex w-10 shrink-0 items-center justify-center rounded-card border border-dashed border-viz-purple bg-viz-purple/12">
+                  <span className="font-mono text-[12px] font-bold text-viz-purple">+</span>
                 </div>
               )}
             </div>
@@ -808,14 +815,10 @@ function SegmentDiagram() {
         ))}
       </div>
 
-      <div className="mt-3 flex items-center gap-1.5">
-        <div className="h-px flex-1 bg-purple/15" />
-        <span className="font-mono text-[9px] text-purple whitespace-nowrap">
-          {isKo ? 'Segment = 이 Extent들의 합집합' : 'Segment = the union of all its Extents'}
-        </span>
-        <div className="h-px flex-1 bg-purple/15" />
-      </div>
-    </div>
+      <p className="mt-2.5 text-center font-sans text-[10px] text-ink-3">
+        {isKo ? 'Segment = 이 Extent 들의 합집합' : 'Segment = the union of all its Extents'}
+      </p>
+    </DiagramFrame>
   )
 }
 
@@ -838,87 +841,72 @@ function HwmDiagram() {
   }
 
   const stateStyle = {
-    data:    { bg: 'bg-amber/10 border-amber/50', label: isKo ? '데이터' : 'data', text: 'text-amber' },
-    empty:   { bg: 'bg-paper-sunk border-line-2',  label: isKo ? '빈 블록' : 'empty', text: 'text-ink-2' },
-    partial: { bg: 'bg-amber/5 border-amber/30',   label: isKo ? '미포맷' : 'partial', text: 'text-amber' },
+    data:    { bg: 'bg-viz-amber/12 border-viz-amber/70', label: isKo ? '데이터' : 'data', text: 'text-viz-amber' },
+    empty:   { bg: 'bg-paper-sunk border-line-2', label: isKo ? '빈 블록' : 'empty', text: 'text-ink-2' },
+    partial: { bg: 'bg-viz-amber/15 border-viz-amber/55', label: isKo ? '미포맷' : 'partial', text: 'text-viz-amber' },
     unused:  { bg: 'bg-paper border-dashed border-line', label: isKo ? '미사용' : 'unused', text: 'text-ink-3' },
   }
 
   return (
-    <div className="my-4 rounded-panel border-2 border-purple/30 bg-purple/5 p-4">
-      <div className="mb-3 flex items-center gap-2">
-        <span className="rounded bg-purple px-2 py-0.5 font-mono text-[10px] font-bold text-paper">HWM</span>
-        <span className="font-mono text-[11px] text-purple">
-          {isKo ? 'High Water Mark — Segment 성장 경계' : 'High Water Mark — Segment growth boundary'}
-        </span>
-      </div>
-
-      {/* 블록 행 */}
-      <div className="relative flex items-stretch gap-1">
-        {Array.from({ length: BLOCK_COUNT }).map((_, i) => {
-          const s = blockState(i)
-          const style = stateStyle[s]
-          return (
-            <div
-              key={i}
-              className={cn('relative flex flex-1 flex-col items-center justify-center rounded-card border py-3 gap-0.5', style.bg)}
-            >
-              <span className={cn('font-mono text-[8px] font-bold', style.text)}>{i + 1}</span>
-              <span className={cn('font-mono text-[7px]', style.text)}>{style.label}</span>
-            </div>
-          )
-        })}
-
-        {/* Low HWM 표시 선 */}
-        <div
-          className="absolute top-0 bottom-0 w-0.5 bg-blue"
-          style={{ left: `${(LOW_HWM / BLOCK_COUNT) * 100}%` }}
-        />
-        {/* HWM 표시 선 */}
-        <div
-          className="absolute top-0 bottom-0 w-0.5 bg-red"
-          style={{ left: `${(HWM / BLOCK_COUNT) * 100}%` }}
-        />
-      </div>
-
-      {/* 레이블 */}
-      <div className="relative mt-1" style={{ height: 32 }}>
-        <div
-          className="absolute flex flex-col items-center"
-          style={{ left: `${(LOW_HWM / BLOCK_COUNT) * 100}%`, transform: 'translateX(-50%)' }}
-        >
-          <span className="font-mono text-[9px] font-bold text-blue whitespace-nowrap">Low HWM</span>
-          <span className="font-mono text-[8px] text-blue whitespace-nowrap">
-            {isKo ? '포맷 완료 경계' : 'formatted boundary'}
-          </span>
-        </div>
-        <div
-          className="absolute flex flex-col items-center"
-          style={{ left: `${(HWM / BLOCK_COUNT) * 100}%`, transform: 'translateX(-50%)' }}
-        >
-          <span className="font-mono text-[9px] font-bold text-red whitespace-nowrap">HWM</span>
-          <span className="font-mono text-[8px] text-red whitespace-nowrap">
-            {isKo ? '할당 경계' : 'allocation boundary'}
-          </span>
-        </div>
-      </div>
-
-      {/* 범례 */}
-      <div className="mt-3 flex flex-wrap gap-3">
-        {(Object.keys(stateStyle) as (keyof typeof stateStyle)[]).map((k) => (
-          <div key={k} className="flex items-center gap-1.5">
-            <div className={cn('h-3 w-6 rounded border', stateStyle[k].bg)} />
-            <span className="font-mono text-[9px] text-ink-2">{stateStyle[k].label}</span>
+    <DiagramFrame
+      tier="segment"
+      badge="HWM"
+      note={isKo ? 'High Water Mark — Segment 성장 경계' : 'High Water Mark — Segment growth boundary'}
+    >
+      <div className="min-w-[440px]">
+        {/* 경계 레이블 — 각 선에서 바깥쪽으로만 자라 겹치지 않음 */}
+        <div className="relative mb-1 h-7">
+          <div
+            className="absolute flex flex-col items-end pr-1 text-right"
+            style={{ left: `${(LOW_HWM / BLOCK_COUNT) * 100}%`, transform: 'translateX(-100%)' }}
+          >
+            <span className="font-mono text-[9px] font-bold whitespace-nowrap text-viz-blue">Low HWM</span>
+            <span className="font-sans text-[8px] whitespace-nowrap text-ink-3">{isKo ? '포맷 완료 경계' : 'formatted'}</span>
           </div>
-        ))}
+          <div
+            className="absolute flex flex-col items-start pl-1"
+            style={{ left: `${(HWM / BLOCK_COUNT) * 100}%` }}
+          >
+            <span className="font-mono text-[9px] font-bold whitespace-nowrap text-viz-red">HWM</span>
+            <span className="font-sans text-[8px] whitespace-nowrap text-ink-3">{isKo ? '할당 경계' : 'allocation'}</span>
+          </div>
+        </div>
+
+        {/* 블록 행 */}
+        <div className="relative flex items-stretch gap-1">
+          {Array.from({ length: BLOCK_COUNT }).map((_, i) => {
+            const style = stateStyle[blockState(i)]
+            return (
+              <div
+                key={i}
+                className={cn('flex flex-1 flex-col items-center justify-center gap-0.5 rounded-card border py-3', style.bg)}
+              >
+                <span className={cn('font-mono text-[9px] font-bold', style.text)}>{i + 1}</span>
+                <span className={cn('font-sans text-[8px]', style.text)}>{style.label}</span>
+              </div>
+            )
+          })}
+          <div className="absolute top-0 bottom-0 w-[3px] bg-viz-blue" style={{ left: `${(LOW_HWM / BLOCK_COUNT) * 100}%` }} />
+          <div className="absolute top-0 bottom-0 w-[3px] bg-viz-red" style={{ left: `${(HWM / BLOCK_COUNT) * 100}%` }} />
+        </div>
+
+        {/* 범례 */}
+        <div className="mt-3 flex flex-wrap gap-x-3.5 gap-y-1.5">
+          {(Object.keys(stateStyle) as (keyof typeof stateStyle)[]).map((k) => (
+            <div key={k} className="flex items-center gap-1.5">
+              <span className={cn('h-3 w-5 shrink-0 rounded-chip border', stateStyle[k].bg)} />
+              <span className="font-sans text-[9px] text-ink-2">{stateStyle[k].label}</span>
+            </div>
+          ))}
+        </div>
       </div>
 
-      <p className="mt-3 font-mono text-[10px] text-ink-2 leading-relaxed">
+      <p className="mt-3 font-read text-[11px] leading-relaxed text-ink-3">
         {isKo
-          ? 'Full Table Scan은 Low HWM까지 연속으로, Low HWM~HWM 사이는 포맷된 블록만 선별해 읽습니다. DELETE로 모든 행을 지워도 HWM은 내려가지 않으므로 스캔 범위는 그대로입니다.'
-          : 'A Full Table Scan reads all blocks up to Low HWM contiguously, then picks only formatted blocks between Low HWM and HWM. Deleting all rows does NOT lower the HWM — scan range stays the same.'}
+          ? 'Full Table Scan 은 Low HWM 까지 연속으로, 그 위 HWM 까지는 포맷된 블록만 골라 읽어요. DELETE 로 모든 행을 지워도 HWM 은 내려가지 않아 스캔 범위는 그대로예요.'
+          : 'A Full Table Scan reads contiguously up to Low HWM, then only formatted blocks up to HWM. Deleting every row does NOT lower the HWM — scan range stays the same.'}
       </p>
-    </div>
+    </DiagramFrame>
   )
 }
 
@@ -932,56 +920,49 @@ function TablespaceDiagram() {
   const segments = [
     {
       name: 'EMPLOYEES',
-      color: 'border-purple/50 bg-purple/5',
-      badge: 'bg-purple',
+      color: 'border-viz-purple bg-viz-purple/12',
+      badge: 'bg-viz-purple',
       label: isKo ? '테이블 Segment' : 'Table Segment',
       extents: 2,
     },
     {
       name: 'EMP_IDX',
-      color: 'border-blue/50 bg-blue/5',
-      badge: 'bg-blue',
+      color: 'border-viz-blue bg-viz-blue/12',
+      badge: 'bg-viz-blue',
       label: isKo ? '인덱스 Segment' : 'Index Segment',
       extents: 1,
     },
     {
       name: 'DEPARTMENTS',
-      color: 'border-green/50 bg-green/5',
-      badge: 'bg-green',
+      color: 'border-viz-green bg-viz-green/12',
+      badge: 'bg-viz-green',
       label: isKo ? '테이블 Segment' : 'Table Segment',
       extents: 1,
     },
   ]
 
   return (
-    <div className="my-4 flex flex-col gap-3">
-      {/* Tablespace 바깥 박스 */}
-      <div className="rounded-panel border-2 border-blue/50 bg-blue/5 p-4">
-        <div className="mb-4 flex items-center gap-2">
-          <span className="rounded bg-blue px-2 py-0.5 font-mono text-[10px] font-bold text-paper">TABLESPACE</span>
-          <span className="font-mono text-[11px] font-bold text-blue">USERS</span>
-          <span className="font-mono text-[10px] text-blue">
-            {isKo ? '— 여러 Segment를 담는 논리 공간' : '— logical space containing Segments'}
-          </span>
-        </div>
-
-        {/* Segment들 */}
-        <div className="flex flex-col gap-2 ml-2">
+    <DiagramFrame
+      tier="tablespace"
+      badge="TABLESPACE"
+      note={isKo ? 'USERS — 여러 Segment 를 담는 논리 공간' : 'USERS — logical space containing Segments'}
+    >
+      <div className="min-w-[440px]">
+        <div className="flex flex-col gap-2">
           {segments.map((seg) => (
-            <div key={seg.name} className={`rounded-card border-2 ${seg.color} p-2.5`}>
-              <div className="mb-2 flex items-center gap-2">
-                <span className={`rounded px-1.5 py-0.5 font-mono text-[9px] font-bold text-paper ${seg.badge}`}>
+            <div key={seg.name} className={cn('rounded-card border border-l-4 p-2.5', seg.color)}>
+              <div className="mb-2 flex flex-wrap items-center gap-x-2 gap-y-1">
+                <span className={cn('shrink-0 rounded-chip px-1.5 py-0.5 font-mono text-[9px] font-bold text-paper', seg.badge)}>
                   SEGMENT
                 </span>
                 <span className="font-mono text-[10px] font-bold text-ink">{seg.name}</span>
-                <span className="font-mono text-[9px] text-ink-2">{seg.label}</span>
+                <span className="font-sans text-[9px] text-ink-3">{seg.label}</span>
               </div>
-              {/* Extent들 */}
-              <div className="flex gap-1.5 ml-1">
+              <div className="flex gap-1.5">
                 {Array.from({ length: seg.extents }).map((_, ei) => (
-                  <div key={ei} className="flex flex-1 flex-col items-center justify-center rounded-card border-2 border-green/50 bg-green/5 py-2.5 gap-0.5">
-                    <span className="font-mono text-[10px] font-bold text-green">Extent {ei + 1}</span>
-                    <span className="font-mono text-[9px] text-green">64 KB</span>
+                  <div key={ei} className="flex flex-1 flex-col items-center justify-center gap-0.5 rounded-card border border-viz-green/70 bg-viz-green/12 py-2">
+                    <span className="font-mono text-[10px] font-bold text-viz-green">Extent {ei + 1}</span>
+                    <span className="font-mono text-[9px] text-viz-green/80">64 KB</span>
                   </div>
                 ))}
               </div>
@@ -989,27 +970,25 @@ function TablespaceDiagram() {
           ))}
         </div>
 
-        {/* 물리 파일 표시 */}
-        <div className="mt-4 ml-2 flex items-center gap-2">
-          <div className="h-px flex-1 border-t border-dashed border-blue/50" />
-          <span className="font-mono text-[9px] text-blue whitespace-nowrap">
-            {isKo ? '실제 디스크 파일' : 'Physical disk files'}
-          </span>
-          <div className="h-px flex-1 border-t border-dashed border-blue/50" />
+        {/* 물리 파일 */}
+        <div className="mt-3.5 mb-2 flex items-center gap-2">
+          <span className="h-px flex-1 border-t border-dashed border-viz-blue/70" />
+          <span className="shrink-0 font-sans text-[9px] font-medium text-viz-blue">{isKo ? '실제 디스크 파일' : 'Physical disk files'}</span>
+          <span className="h-px flex-1 border-t border-dashed border-viz-blue/70" />
         </div>
-        <div className="mt-2 ml-2 flex gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {['users01.dbf', 'users02.dbf'].map((f) => (
-            <div key={f} className="flex items-center gap-1 rounded border border-line bg-paper px-2 py-1">
-              <span className="font-mono text-[10px]">📄</span>
+            <div key={f} className="flex items-center gap-1.5 rounded-chip border border-line bg-paper px-2 py-1">
+              <IconCube size={11} className="text-ink-3" stroke={1.5} />
               <span className="font-mono text-[9px] text-ink-2">{f}</span>
             </div>
           ))}
-          <span className="font-mono text-[9px] text-ink-2 self-center">
-            {isKo ? '← Tablespace에 묶여 하나의 논리 공간으로 관리' : '← managed as one logical space'}
+          <span className="font-sans text-[9px] text-ink-3">
+            {isKo ? '← Tablespace 로 묶여 하나의 논리 공간으로 관리' : '← managed as one logical space'}
           </span>
         </div>
       </div>
-    </div>
+    </DiagramFrame>
   )
 }
 
@@ -1026,14 +1005,16 @@ function StorageHierarchyDiagram() {
 
   // ── 색상 팔레트 ──
   const COL = {
-    db:   { fill: 'var(--color-rail)', stroke: 'var(--color-blue)', text: 'var(--color-blue)' },
-    ts:   { fill: 'var(--color-paper-sunk)', stroke: 'var(--color-purple)', text: 'var(--color-purple)' },
-    seg1: { fill: 'var(--color-rail)', stroke: 'var(--color-green)', text: 'var(--color-green)' },
-    seg2: { fill: 'var(--color-paper-sunk)', stroke: 'var(--color-purple)', text: 'var(--color-purple)' },
-    ext:  { fill: 'var(--color-rail)', stroke: 'var(--color-amber)', text: 'var(--color-red)' },
-    blk:  { fill: 'var(--color-rail)', stroke: 'var(--color-amber)', text: 'var(--color-amber)' },
-    dbf:  { fill: 'var(--color-paper-sunk)', stroke: 'var(--color-ink-2)', text: 'var(--color-ink)' },
-    arrow:'var(--color-ink-3)',
+    db:   { fill: 'var(--color-paper)',      stroke: 'var(--color-viz-blue)',   text: 'var(--color-viz-blue)' },
+    ts:   { fill: 'var(--color-paper-sunk)', stroke: 'var(--color-viz-purple)', text: 'var(--color-viz-purple)' },
+    seg1: { fill: 'var(--color-paper)',      stroke: 'var(--color-viz-green)',  text: 'var(--color-viz-green)' },
+    seg2: { fill: 'var(--color-paper)',      stroke: 'var(--color-viz-purple)', text: 'var(--color-viz-purple)' },
+    ext:  { fill: 'var(--color-paper-sunk)', stroke: 'var(--color-viz-amber)',  text: 'var(--color-viz-amber)' },
+    blk:  { fill: 'var(--color-paper)',      stroke: 'var(--color-viz-amber)',  text: 'var(--color-viz-amber)' },
+    dbf:  { fill: 'var(--color-paper-sunk)', stroke: 'var(--color-ink-2)',  text: 'var(--color-ink)' },
+    ink2: 'var(--color-ink-2)',
+    ink3: 'var(--color-ink-3)',
+    arrow: 'var(--color-ink-3)',
   }
 
   // ── 캔버스 크기 ──
@@ -1126,180 +1107,148 @@ function StorageHierarchyDiagram() {
   const DBF1 = { x: DB.x + 20, y: DBF_Y, w: (DB.w - 40 - DBF_GAP) / 2, h: DBF_H, r: 6 }
   const DBF2 = { x: DBF1.x + DBF1.w + DBF_GAP, y: DBF_Y, w: DBF1.w, h: DBF_H, r: 6 }
 
-  // ── 화살표 ──
+  // ── 화살표 ── Extent → Datafile. TS 하단 모서리에서만 출발해 박스를 가로지르지 않음.
+  const TS_BOTTOM = TS.y + TS.h
   const arrowPts = [
-    { from: { x: E1A.x + E1A.w / 2, y: E1A.y + E1A.h }, to: { x: DBF1.x + DBF1.w * 0.35, y: DBF_Y } },
-    { from: { x: E1B.x + E1B.w / 2, y: E1B.y + E1B.h }, to: { x: DBF1.x + DBF1.w * 0.65, y: DBF_Y } },
-    { from: { x: E2A.x + E2A.w / 2, y: E2A.y + E2A.h }, to: { x: DBF2.x + DBF2.w / 2,    y: DBF_Y } },
+    { from: { x: E1A.x + E1A.w / 2, y: TS_BOTTOM }, to: { x: DBF1.x + DBF1.w * 0.35, y: DBF_Y } },
+    { from: { x: E1B.x + E1B.w / 2, y: TS_BOTTOM }, to: { x: DBF1.x + DBF1.w * 0.65, y: DBF_Y } },
+    { from: { x: E2A.x + E2A.w / 2, y: TS_BOTTOM }, to: { x: DBF2.x + DBF2.w / 2,    y: DBF_Y } },
   ]
 
+  const MONO = 'var(--font-mono)'
+
   return (
-    <div className="my-6 rounded-panel border border-line bg-paper p-3 overflow-x-auto">
-      <p className="mb-3 px-1 font-mono text-[11px] font-bold text-ink-2 uppercase tracking-wide">
-        {lbl('논리적 저장 계층 구조 — Oracle Logical Storage Hierarchy', 'Oracle Logical Storage Hierarchy')}
-      </p>
-      <svg viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ minWidth: 640 }}>
+    <figure className="my-6 overflow-x-auto rounded-panel border border-line bg-paper p-4">
+      <figcaption className="mb-3 font-sans text-[12px] font-semibold text-ink-2">
+        {lbl('논리적 저장 계층 — Database → Tablespace → Segment → Extent → Block', 'Logical Storage Hierarchy — Database → Tablespace → Segment → Extent → Block')}
+      </figcaption>
+      <svg
+        viewBox={`0 0 ${W} ${H}`}
+        className="w-full"
+        style={{ minWidth: 640, fontFamily: 'var(--font-sans-active)' }}
+      >
         <defs>
           <marker id="harr" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
             <path d="M0,0 L0,7 L7,3.5 z" fill={COL.arrow} />
           </marker>
         </defs>
 
-        {/* ════ Database 박스 ════ */}
+        {/* ════ Database ════ */}
         <rect x={DB.x} y={DB.y} width={DB.w} height={DB.h} rx={DB.r}
-          fill={COL.db.fill} stroke={COL.db.stroke} strokeWidth={2} />
-        <rect x={DB.x + 12} y={DB.y + 8} width={96} height={22} rx={4} fill={COL.db.stroke} />
-        <text x={DB.x + 20} y={DB.y + 24} fontFamily="monospace" fontSize={12} fontWeight="bold" fill="white">Database</text>
-        <text x={DB.x + DB.w - 16} y={DB.y + 24} fontFamily="monospace" fontSize={11} fill={COL.db.text} textAnchor="end">
+          fill={COL.db.fill} stroke={COL.db.stroke} strokeWidth={1.5} />
+        <rect x={DB.x + 12} y={DB.y + 8} width={92} height={22} rx={4} fill={COL.db.stroke} />
+        <text x={DB.x + 21} y={DB.y + 23} fontFamily={MONO} fontSize={12} fontWeight="bold" fill="var(--color-paper)">Database</text>
+        <text x={DB.x + DB.w - 16} y={DB.y + 24} fontSize={10.5} fill={COL.db.text} textAnchor="end">
           {lbl('논리적 최상위 단위', 'Top-level logical unit')}
         </text>
 
-        {/* ════ Tablespace 박스 ════ */}
+        {/* ════ Tablespace ════ */}
         <rect x={TS.x} y={TS.y} width={TS.w} height={TS.h} rx={TS.r}
-          fill={COL.ts.fill} stroke={COL.ts.stroke} strokeWidth={2} />
-        <rect x={TS.x + 10} y={TS.y + 8} width={108} height={20} rx={4} fill={COL.ts.stroke} />
-        <text x={TS.x + 18} y={TS.y + 22} fontFamily="monospace" fontSize={11} fontWeight="bold" fill="white">TABLESPACE</text>
-        <text x={TS.x + 126} y={TS.y + 22} fontFamily="monospace" fontSize={12} fontWeight="bold" fill={COL.ts.text}>USERS</text>
-        <text x={TS.x + TS.w - 12} y={TS.y + 22} fontFamily="monospace" fontSize={11} fill={COL.ts.text} textAnchor="end">
+          fill={COL.ts.fill} stroke={COL.ts.stroke} strokeWidth={1.5} />
+        <rect x={TS.x + 10} y={TS.y + 8} width={104} height={20} rx={4} fill={COL.ts.stroke} />
+        <text x={TS.x + 18} y={TS.y + 22} fontFamily={MONO} fontSize={11} fontWeight="bold" fill="var(--color-paper)">TABLESPACE</text>
+        <text x={TS.x + 124} y={TS.y + 22} fontFamily={MONO} fontSize={12} fontWeight="bold" fill={COL.ts.text}>USERS</text>
+        <text x={TS.x + TS.w - 12} y={TS.y + 22} fontSize={10.5} fill={COL.ts.text} textAnchor="end">
           {lbl('논리적 컨테이너', 'Logical container')}
         </text>
 
         {/* ════ Segment 1 (Table) ════ */}
         <rect x={S1.x} y={S1.y} width={S1.w} height={S1.h} rx={S1.r}
           fill={COL.seg1.fill} stroke={COL.seg1.stroke} strokeWidth={1.5} />
-        <rect x={S1.x + 8} y={S1.y + 6} width={76} height={20} rx={3} fill={COL.seg1.stroke} />
-        <text x={S1.x + 14} y={S1.y + 20} fontFamily="monospace" fontSize={10} fontWeight="bold" fill="white">SEGMENT</text>
-        <text x={S1.x + 92} y={S1.y + 20} fontFamily="monospace" fontSize={11} fontWeight="bold" fill={COL.seg1.text}>EMPLOYEES</text>
-        <text x={S1.x + S1.w - 10} y={S1.y + 20} fontFamily="monospace" fontSize={10} fill={COL.seg1.text} textAnchor="end">
+        <rect x={S1.x + 8} y={S1.y + 6} width={70} height={20} rx={3} fill={COL.seg1.stroke} />
+        <text x={S1.x + 14} y={S1.y + 20} fontFamily={MONO} fontSize={10} fontWeight="bold" fill="var(--color-paper)">SEGMENT</text>
+        <text x={S1.x + 86} y={S1.y + 20} fontFamily={MONO} fontSize={11} fontWeight="bold" fill={COL.seg1.text}>EMPLOYEES</text>
+        <text x={S1.x + S1.w - 10} y={S1.y + 20} fontSize={9.5} fill={COL.seg1.text} textAnchor="end">
           {lbl('테이블 Segment', 'Table Segment')}
         </text>
-        {/* Segment 1 하단 주석 */}
-        <text x={S1.x + S1.w / 2} y={S1.y + S1.h - 10} fontFamily="monospace" fontSize={10} fill={COL.seg1.text} textAnchor="middle">
-          {lbl('Extent는 반드시 하나의 파일 안에만 존재해요', 'Each Extent lives in exactly one datafile')}
+        <text x={S1.x + S1.w / 2} y={S1.y + S1.h - 10} fontSize={9.5} fill={COL.seg1.text} textAnchor="middle">
+          {lbl('Extent 는 하나의 파일 안에만 존재', 'Each Extent stays within one datafile')}
         </text>
 
         {/* ════ Segment 2 (Index) ════ */}
         <rect x={S2.x} y={S2.y} width={S2.w} height={S2.h} rx={S2.r}
           fill={COL.seg2.fill} stroke={COL.seg2.stroke} strokeWidth={1.5} />
-        <rect x={S2.x + 8} y={S2.y + 6} width={76} height={20} rx={3} fill={COL.seg2.stroke} />
-        <text x={S2.x + 14} y={S2.y + 20} fontFamily="monospace" fontSize={10} fontWeight="bold" fill="white">SEGMENT</text>
-        <text x={S2.x + 92} y={S2.y + 20} fontFamily="monospace" fontSize={11} fontWeight="bold" fill={COL.seg2.text}>EMP_IDX</text>
-        <text x={S2.x + S2.w - 10} y={S2.y + 20} fontFamily="monospace" fontSize={10} fill={COL.seg2.text} textAnchor="end">
+        <rect x={S2.x + 8} y={S2.y + 6} width={70} height={20} rx={3} fill={COL.seg2.stroke} />
+        <text x={S2.x + 14} y={S2.y + 20} fontFamily={MONO} fontSize={10} fontWeight="bold" fill="var(--color-paper)">SEGMENT</text>
+        <text x={S2.x + 86} y={S2.y + 20} fontFamily={MONO} fontSize={11} fontWeight="bold" fill={COL.seg2.text}>EMP_IDX</text>
+        <text x={S2.x + S2.w - 10} y={S2.y + 20} fontSize={9.5} fill={COL.seg2.text} textAnchor="end">
           {lbl('인덱스 Segment', 'Index Segment')}
         </text>
-        {/* Segment 2 하단 주석 */}
-        <text x={S2.x + S2.w / 2} y={S2.y + S2.h - 10} fontFamily="monospace" fontSize={10} fill={COL.seg2.text} textAnchor="middle">
-          {lbl('Segment는 여러 파일에 걸쳐질 수 있어요', 'Segment may span multiple datafiles')}
+        <text x={S2.x + S2.w / 2} y={S2.y + S2.h - 10} fontSize={9.5} fill={COL.seg2.text} textAnchor="middle">
+          {lbl('Segment 는 여러 파일에 걸쳐질 수 있음', 'A Segment may span multiple datafiles')}
         </text>
 
         {/* ════ Extent 1A ════ */}
         <rect x={E1A.x} y={E1A.y} width={E1A.w} height={E1A.h} rx={E1A.r}
           fill={COL.ext.fill} stroke={COL.ext.stroke} strokeWidth={1.5} />
-        <text x={E1A.x + 8} y={E1A.y + 15} fontFamily="monospace" fontSize={10} fontWeight="bold" fill={COL.ext.text}>Extent 1</text>
-        <text x={E1A.x + 8} y={E1A.y + 29} fontFamily="monospace" fontSize={9} fill={COL.ext.text}>64 KB · 8 blocks</text>
-
-        {/* Extent 1A 내부 블록 4개 (2×2) */}
+        <text x={E1A.x + 8} y={E1A.y + 15} fontFamily={MONO} fontSize={10} fontWeight="bold" fill={COL.ext.text}>Extent 1</text>
+        <text x={E1A.x + 8} y={E1A.y + 29} fontFamily={MONO} fontSize={9} fill={COL.blk.text} opacity={0.85}>64 KB · 8 blocks</text>
         {blksE1A.map((b, i) => (
           <g key={i}>
             <rect x={b.x} y={b.y} width={BLK_W} height={BLK_H} rx={3}
               fill={COL.blk.fill} stroke={COL.blk.stroke} strokeWidth={1} />
-            <text x={b.x + BLK_W / 2} y={b.y + BLK_H / 2 - 4}
-              fontFamily="monospace" fontSize={9} fontWeight="bold" fill={COL.blk.text} textAnchor="middle">Block</text>
-            <text x={b.x + BLK_W / 2} y={b.y + BLK_H / 2 + 8}
-              fontFamily="monospace" fontSize={8} fill={COL.blk.text} textAnchor="middle">8 KB</text>
+            <text x={b.x + BLK_W / 2} y={b.y + BLK_H / 2 - 3}
+              fontFamily={MONO} fontSize={9} fontWeight="bold" fill={COL.blk.text} textAnchor="middle">Block</text>
+            <text x={b.x + BLK_W / 2} y={b.y + BLK_H / 2 + 9}
+              fontFamily={MONO} fontSize={8} fill={COL.blk.text} opacity={0.85} textAnchor="middle">8 KB</text>
           </g>
         ))}
 
         {/* ════ Extent 1B ════ */}
         <rect x={E1B.x} y={E1B.y} width={E1B.w} height={E1B.h} rx={E1B.r}
           fill={COL.ext.fill} stroke={COL.ext.stroke} strokeWidth={1.5} />
-        <text x={E1B.x + 8} y={E1B.y + 15} fontFamily="monospace" fontSize={10} fontWeight="bold" fill={COL.ext.text}>Extent 2</text>
-        <text x={E1B.x + 8} y={E1B.y + 29} fontFamily="monospace" fontSize={9} fill={COL.ext.text}>64 KB · 8 blocks</text>
-        {/* Extent 1B: 블록 수 표시만 */}
-        <text x={E1B.x + E1B.w / 2} y={E1B.y + E1B.h / 2 + 4}
-          fontFamily="monospace" fontSize={22} fill={COL.ext.stroke} textAnchor="middle" opacity={0.5}>···</text>
-        <text x={E1B.x + E1B.w / 2} y={E1B.y + E1B.h / 2 + 22}
-          fontFamily="monospace" fontSize={10} fill={COL.ext.text} textAnchor="middle">8 Blocks</text>
+        <text x={E1B.x + 8} y={E1B.y + 15} fontFamily={MONO} fontSize={10} fontWeight="bold" fill={COL.ext.text}>Extent 2</text>
+        <text x={E1B.x + 8} y={E1B.y + 29} fontFamily={MONO} fontSize={9} fill={COL.blk.text} opacity={0.85}>64 KB · 8 blocks</text>
+        <text x={E1B.x + E1B.w / 2} y={E1B.y + E1B.h / 2 + 8}
+          fontFamily={MONO} fontSize={10} fill={COL.blk.text} opacity={0.85} textAnchor="middle">8 blocks</text>
 
         {/* ════ Extent 2A ════ */}
         <rect x={E2A.x} y={E2A.y} width={E2A.w} height={E2A.h} rx={E2A.r}
           fill={COL.ext.fill} stroke={COL.ext.stroke} strokeWidth={1.5} />
-        <text x={E2A.x + 10} y={E2A.y + 15} fontFamily="monospace" fontSize={10} fontWeight="bold" fill={COL.ext.text}>Extent 1</text>
-        <text x={E2A.x + 10} y={E2A.y + 29} fontFamily="monospace" fontSize={9} fill={COL.ext.text}>64 KB · 8 blocks</text>
-
-        {/* Extent 2A 내부 블록 4개 (1행) */}
+        <text x={E2A.x + 10} y={E2A.y + 15} fontFamily={MONO} fontSize={10} fontWeight="bold" fill={COL.ext.text}>Extent 1</text>
+        <text x={E2A.x + 10} y={E2A.y + 29} fontFamily={MONO} fontSize={9} fill={COL.blk.text} opacity={0.85}>64 KB · 8 blocks</text>
         {blksE2A.map((b, i) => (
           <g key={i}>
             <rect x={b.x} y={b.y} width={BLK2_W} height={BLK2_H} rx={3}
               fill={COL.blk.fill} stroke={COL.blk.stroke} strokeWidth={1} />
-            <text x={b.x + BLK2_W / 2} y={b.y + BLK2_H / 2 - 4}
-              fontFamily="monospace" fontSize={9} fontWeight="bold" fill={COL.blk.text} textAnchor="middle">Block</text>
-            <text x={b.x + BLK2_W / 2} y={b.y + BLK2_H / 2 + 8}
-              fontFamily="monospace" fontSize={8} fill={COL.blk.text} textAnchor="middle">8 KB</text>
+            <text x={b.x + BLK2_W / 2} y={b.y + BLK2_H / 2 - 3}
+              fontFamily={MONO} fontSize={9} fontWeight="bold" fill={COL.blk.text} textAnchor="middle">Block</text>
+            <text x={b.x + BLK2_W / 2} y={b.y + BLK2_H / 2 + 9}
+              fontFamily={MONO} fontSize={8} fill={COL.blk.text} opacity={0.85} textAnchor="middle">8 KB</text>
           </g>
         ))}
-        {/* 블록 더 있음 표시 */}
-        <text
-          x={E2A.x + EXT_PAD + BLK2_COLS * (BLK2_W + BLK_GAP) - BLK_GAP + 14}
-          y={E2A.y + EXT_LABEL_H + BLK2_H / 2 + 4}
-          fontFamily="monospace" fontSize={14} fill={COL.ext.stroke} textAnchor="start">···</text>
 
         {/* ════ 화살표: Extent → Datafile ════ */}
         {arrowPts.map((a, i) => (
           <line key={i}
             x1={a.from.x} y1={a.from.y}
-            x2={a.to.x}   y2={a.to.y}
+            x2={a.to.x} y2={a.to.y}
             stroke={COL.arrow} strokeWidth={1.5} strokeDasharray="5 3"
             markerEnd="url(#harr)" />
         ))}
 
-        {/* ════ DataFile 1 ════ */}
-        <rect x={DBF1.x} y={DBF1.y} width={DBF1.w} height={DBF1.h} rx={DBF1.r}
-          fill={COL.dbf.fill} stroke={COL.dbf.stroke} strokeWidth={1.5} />
-        <text x={DBF1.x + 14} y={DBF1.y + 20} fontFamily="monospace" fontSize={11} fontWeight="bold" fill={COL.dbf.text}>
-          📄 users01.dbf
-        </text>
-        <text x={DBF1.x + 14} y={DBF1.y + 38} fontFamily="monospace" fontSize={10} fill={COL.dbf.text}>
-          {lbl('물리 데이터 파일', 'Physical datafile')}
-        </text>
+        {/* ════ DataFile 1 · 2 ════ */}
+        {[DBF1, DBF2].map((f, i) => (
+          <g key={i}>
+            <rect x={f.x} y={f.y} width={f.w} height={f.h} rx={f.r}
+              fill={COL.dbf.fill} stroke={COL.dbf.stroke} strokeWidth={1.5} />
+            <text x={f.x + 14} y={f.y + 20} fontFamily={MONO} fontSize={11} fontWeight="bold" fill={COL.dbf.text}>
+              users0{i + 1}.dbf
+            </text>
+            <text x={f.x + 14} y={f.y + 38} fontSize={9.5} fill={COL.ink2}>
+              {lbl('물리 데이터 파일', 'Physical datafile')}
+            </text>
+          </g>
+        ))}
 
-        {/* ════ DataFile 2 ════ */}
-        <rect x={DBF2.x} y={DBF2.y} width={DBF2.w} height={DBF2.h} rx={DBF2.r}
-          fill={COL.dbf.fill} stroke={COL.dbf.stroke} strokeWidth={1.5} />
-        <text x={DBF2.x + 14} y={DBF2.y + 20} fontFamily="monospace" fontSize={11} fontWeight="bold" fill={COL.dbf.text}>
-          📄 users02.dbf
-        </text>
-        <text x={DBF2.x + 14} y={DBF2.y + 38} fontFamily="monospace" fontSize={10} fill={COL.dbf.text}>
-          {lbl('물리 데이터 파일', 'Physical datafile')}
-        </text>
-
-        {/* ════ Tablespace ↔ Datafile 연결 브라켓 ════ */}
         <text
           x={(DBF1.x + DBF2.x + DBF2.w) / 2}
           y={DBF_Y + DBF_H + 22}
-          fontFamily="monospace" fontSize={10} fill={COL.ts.text} textAnchor="middle">
+          fontSize={10} fill={COL.ts.text} textAnchor="middle">
           {lbl('Tablespace = 하나 이상의 .dbf 파일로 구성', 'Tablespace = one or more .dbf files')}
         </text>
       </svg>
-
-      {/* ── 하단 범례 ── */}
-      <div className="mt-3 px-1 flex flex-wrap gap-x-5 gap-y-2">
-        {[
-          { color: 'bg-blue/10 border-blue/50',    label: lbl('Database', 'Database') },
-          { color: 'bg-purple/10 border-purple/50', label: lbl('Tablespace', 'Tablespace') },
-          { color: 'bg-green/10 border-green/50', label: lbl('Segment (Table)', 'Segment (Table)') },
-          { color: 'bg-purple/10 border-purple/50', label: lbl('Segment (Index)', 'Segment (Index)') },
-          { color: 'bg-amber/10 border-amber/50', label: lbl('Extent', 'Extent') },
-          { color: 'bg-amber/10 border-amber/50', label: lbl('Block', 'Block') },
-          { color: 'bg-paper-sunk border-line-2',  label: lbl('.dbf 데이터 파일', '.dbf Datafile') },
-        ].map((item) => (
-          <div key={item.label} className="flex items-center gap-1.5">
-            <div className={`h-3.5 w-6 rounded border ${item.color}`} />
-            <span className="font-mono text-[10px] text-ink-2">{item.label}</span>
-          </div>
-        ))}
-      </div>
-    </div>
+    </figure>
   )
 }
 

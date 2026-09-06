@@ -1,27 +1,46 @@
-import { motion } from 'framer-motion'
+import type { ReactNode } from 'react'
+import { IconArrowNarrowRight, IconArrowNarrowDown } from '@tabler/icons-react'
 import { cn } from '@/lib/utils'
 import { useSimulationStore } from '@/store/simulationStore'
-import { SgaPositionDiagram } from '../overview/sga/shared/SgaPositionDiagram'
-import type { SgaComponentId } from '../overview/sga/shared/SgaPositionDiagram'
-import { PgaCompactBlock } from '../overview/pga/PgaSection'
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Oracle 인스턴스 전체 구조 다이어그램 — 공용.
+//
+// Oracle 공식 "Database Instance" 그림을 그대로 옮겨 그린다:
+//   Client Process ↔ Server Process (+PGA)  →  Instance { SGA · Background
+//   Processes }  →  Database { Data / Redo / Control / Archived files }
+//
+// 다이어그램에는 이름표만 있다. 자세한 설명은 각 영역을 "클릭"하면 뜬다
+// (부모가 data-component-id 를 보고 처리 — OverviewSection 참고).
+//
+// 폰트: 이름 = font-sans, 약어(PMON·SGA…) = font-mono. 색: --color-viz-* / 토큰.
+// ─────────────────────────────────────────────────────────────────────────────
 
 export type InstanceComponentId =
+  | 'client'
   | 'server-process'
   | 'pga'
+  | 'instance'
   | 'sga'
+  | 'shared-pool'
   | 'library-cache'
   | 'dict-cache'
   | 'buffer-cache'
   | 'redo-buffer'
-  | 'undo'
   | 'large-pool'
-  | 'shared-pool'
+  | 'java-pool'
+  | 'fixed-sga'
+  | 'undo'
+  | 'bg-processes'
   | 'dbwr'
   | 'lgwr'
   | 'ckpt'
   | 'smon'
   | 'pmon'
+  | 'mmon'
+  | 'reco'
   | 'arcn'
+  | 'database'
   | 'disk'
   | 'redo-log-file'
   | 'control-file'
@@ -29,369 +48,234 @@ export type InstanceComponentId =
 
 interface Props {
   highlightIds: InstanceComponentId[]
+  /** 다이어그램 위에 뜨는 한 줄 안내 문구 */
   callout?: string
+  /** 넓은 컨테이너에서 pool/process 를 더 여러 열로 편다 */
   horizontal?: boolean
+  /** Client / Server Process 행을 숨긴다 */
   hideClient?: boolean
+  /** 영역 클릭 콜백 (부모에서 data-component-id 로 잡아도 됨) */
+  onSelect?: (id: InstanceComponentId) => void
+  className?: string
 }
 
-const COMPONENT_COLORS: Record<string, {
-  base: string
-  highlight: string
-  dim: string
-  label: string
-}> = {
-  'server-process': {
-    base:      'border-green/30 bg-green/5 text-green',
-    highlight: 'border-green bg-green/10 ring-2 ring-green/50  text-green',
-    dim:       'border-line/30 bg-rail text-ink-2/30',
-    label:     'Server Process',
-  },
-  pga: {
-    base:      'border-green/30 bg-green/5 text-green',
-    highlight: 'border-green bg-green/10 ring-2 ring-green/50  text-green',
-    dim:       'border-line/30 bg-rail text-ink-2/30',
-    label:     'PGA',
-  },
-  sga: {
-    base:      'border-blue/50 bg-blue/5',
-    highlight: 'border-blue bg-blue/10 ring-2 ring-blue/50 ',
-    dim:       'border-line/20 bg-rail',
-    label:     'SGA',
-  },
-  'shared-pool': {
-    base:      'border-blue/30 bg-blue/5',
-    highlight: 'border-blue/50 bg-blue/10 ring-2 ring-blue/50 ',
-    dim:       'border-line/20 bg-rail',
-    label:     'Shared Pool',
-  },
-  'library-cache': {
-    base:      'border-blue/30 bg-blue/5 text-blue',
-    highlight: 'border-blue bg-blue/10 ring-2 ring-blue/50  text-blue',
-    dim:       'border-line/30 bg-rail text-ink-2/30',
-    label:     'Library Cache',
-  },
-  'dict-cache': {
-    base:      'border-blue/30 bg-blue/5 text-blue',
-    highlight: 'border-blue bg-blue/10 ring-2 ring-blue/50  text-blue',
-    dim:       'border-line/30 bg-rail text-ink-2/30',
-    label:     'Dict Cache',
-  },
-  'buffer-cache': {
-    base:      'border-blue/30 bg-blue/5 text-blue',
-    highlight: 'border-blue bg-blue/10 ring-2 ring-blue/50  text-blue',
-    dim:       'border-line/30 bg-rail text-ink-2/30',
-    label:     'Buffer Cache',
-  },
-  'redo-buffer': {
-    base:      'border-amber/30 bg-amber/5 text-amber',
-    highlight: 'border-amber bg-amber/10 ring-2 ring-amber/50  text-amber',
-    dim:       'border-line/30 bg-rail text-ink-2/30',
-    label:     'Log Buffer',
-  },
-  undo: {
-    base:      'border-amber/30 bg-amber/5 text-amber',
-    highlight: 'border-amber bg-amber/10 ring-2 ring-amber/50  text-amber',
-    dim:       'border-line/30 bg-rail text-ink-2/30',
-    label:     'Undo Segment',
-  },
-  dbwr: {
-    base:      'border-amber/30 bg-amber/5 text-amber',
-    highlight: 'border-amber bg-amber/10 ring-2 ring-amber/50  text-amber',
-    dim:       'border-line/30 bg-rail text-ink-2/30',
-    label:     'DBWn',
-  },
-  lgwr: {
-    base:      'border-amber/30 bg-amber/5 text-amber',
-    highlight: 'border-amber bg-amber/10 ring-2 ring-amber/50  text-amber',
-    dim:       'border-line/30 bg-rail text-ink-2/30',
-    label:     'LGWR',
-  },
-  ckpt: {
-    base:      'border-amber/30 bg-amber/5 text-amber',
-    highlight: 'border-amber bg-amber/10 ring-2 ring-amber/50  text-amber',
-    dim:       'border-line/30 bg-rail text-ink-2/30',
-    label:     'CKPT',
-  },
-  smon: {
-    base:      'border-amber/30 bg-amber/5 text-amber',
-    highlight: 'border-amber bg-amber/10 ring-2 ring-amber/50  text-amber',
-    dim:       'border-line/30 bg-rail text-ink-2/30',
-    label:     'SMON',
-  },
-  pmon: {
-    base:      'border-amber/30 bg-amber/5 text-amber',
-    highlight: 'border-amber bg-amber/10 ring-2 ring-amber/50  text-amber',
-    dim:       'border-line/30 bg-rail text-ink-2/30',
-    label:     'PMON',
-  },
-  arcn: {
-    base:      'border-amber/30 bg-amber/5 text-amber',
-    highlight: 'border-amber bg-amber/10 ring-2 ring-amber/50  text-amber',
-    dim:       'border-line/30 bg-rail text-ink-2/30',
-    label:     'ARCn',
-  },
-  disk: {
-    base:      'border-line bg-paper-sunk text-ink',
-    highlight: 'border-line-2 bg-paper-sunk ring-2 ring-line-2  text-ink',
-    dim:       'border-line/30 bg-rail text-ink-2/30',
-    label:     'Data Files',
-  },
-  'redo-log-file': {
-    base:      'border-line bg-paper-sunk text-ink',
-    highlight: 'border-line-2 bg-paper-sunk ring-2 ring-line-2  text-ink',
-    dim:       'border-line/30 bg-rail text-ink-2/30',
-    label:     'Redo Logs',
-  },
-  'control-file': {
-    base:      'border-line bg-paper-sunk text-ink',
-    highlight: 'border-line-2 bg-paper-sunk ring-2 ring-line-2  text-ink',
-    dim:       'border-line/30 bg-rail text-ink-2/30',
-    label:     'Control File',
-  },
-  'archive-log': {
-    base:      'border-line bg-paper-sunk text-ink',
-    highlight: 'border-line-2 bg-paper-sunk ring-2 ring-line-2  text-ink',
-    dim:       'border-line/30 bg-rail text-ink-2/30',
-    label:     'Archive Logs',
-  },
+// 그룹 → 소속 id (그룹이 강조되면 소속도 함께 강조)
+const GROUP: Partial<Record<InstanceComponentId, InstanceComponentId[]>> = {
+  sga: ['shared-pool', 'library-cache', 'dict-cache', 'buffer-cache', 'redo-buffer', 'large-pool', 'java-pool', 'fixed-sga', 'undo'],
+  'shared-pool': ['library-cache', 'dict-cache'],
+  'bg-processes': ['dbwr', 'lgwr', 'ckpt', 'smon', 'pmon', 'mmon', 'reco', 'arcn'],
+  dbwr: ['dbwr', 'lgwr', 'ckpt', 'smon', 'pmon', 'mmon', 'reco', 'arcn'], // OverviewSection 투어가 'dbwr' 키를 씀
+  database: ['disk', 'redo-log-file', 'control-file', 'archive-log'],
+  disk: ['disk', 'redo-log-file', 'control-file', 'archive-log'],
 }
 
-function MapBlock({
-  id,
-  label,
-  sublabel,
-  highlightIds,
-  className,
-  pulse = true,
+type Hue = 'blue' | 'amber' | 'green' | 'purple' | 'slate'
+
+const HUE: Record<Hue, { text: string; base: string; lit: string; ring: string; hover: string; accent: string }> = {
+  blue:   { text: 'text-viz-blue',   base: 'border-viz-blue/50',   lit: 'border-viz-blue bg-viz-blue/10',     ring: 'ring-viz-blue/40',   hover: 'hover:bg-viz-blue/5',   accent: 'border-l-viz-blue' },
+  amber:  { text: 'text-viz-amber',  base: 'border-viz-amber/50',  lit: 'border-viz-amber bg-viz-amber/10',   ring: 'ring-viz-amber/40',  hover: 'hover:bg-viz-amber/5',  accent: 'border-l-viz-amber' },
+  green:  { text: 'text-viz-green',  base: 'border-viz-green/50',   lit: 'border-viz-green bg-viz-green/10',   ring: 'ring-viz-green/40',  hover: 'hover:bg-viz-green/5',  accent: 'border-l-viz-green' },
+  purple: { text: 'text-viz-purple', base: 'border-viz-purple/50',  lit: 'border-viz-purple bg-viz-purple/10', ring: 'ring-viz-purple/40', hover: 'hover:bg-viz-purple/5', accent: 'border-l-viz-purple' },
+  slate:  { text: 'text-ink-2',      base: 'border-line-2',         lit: 'border-ink-3 bg-rail',               ring: 'ring-line-2',        hover: 'hover:bg-ink/[0.03]',   accent: 'border-l-line-2' },
+}
+
+// ── 클릭 가능한 이름표 박스 ────────────────────────────────────────────────
+function Box({
+  id, label, mono, hue, state, onSelect, className,
 }: {
   id: InstanceComponentId
-  label?: string
-  sublabel?: string
-  highlightIds: InstanceComponentId[]
+  label: string
+  mono?: boolean
+  hue: Hue
+  state: 'lit' | 'base' | 'dim'
+  onSelect?: (id: InstanceComponentId) => void
   className?: string
-  pulse?: boolean
 }) {
-  const isHighlighted = highlightIds.includes(id)
-  const hasHighlights = highlightIds.length > 0
-  const isDimmed = hasHighlights && !isHighlighted
-  const c = COMPONENT_COLORS[id]
-  const displayLabel = label ?? c.label
-
+  const h = HUE[hue]
   return (
-    <motion.div
+    <button
+      type="button"
       data-component-id={id}
-      animate={
-        isHighlighted && pulse
-          ? { scale: [1, 1.04, 1], transition: { repeat: Infinity, duration: 1.2, repeatDelay: 0.3 } }
-          : { scale: 1 }
-      }
+      onClick={() => onSelect?.(id)}
       className={cn(
-        'relative cursor-pointer rounded-card border-2 px-2 py-2 transition-all duration-300',
-        isHighlighted ? c.highlight : isDimmed ? c.dim : c.base,
-        className
+        'flex min-w-0 items-center justify-center rounded-card border px-2.5 py-2 text-center transition-all',
+        state === 'dim'
+          ? 'border-line opacity-40'
+          : state === 'lit'
+            ? h.lit
+            : cn('bg-paper', h.base, h.hover),
+        className,
       )}
     >
-      {isHighlighted && (
-        <motion.div
-          className="absolute -top-2 -right-2 flex h-4 w-4 items-center justify-center rounded-full bg-blue text-paper"
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ type: 'spring', stiffness: 400 }}
-        >
-          <span className="text-[8px] font-bold">★</span>
-        </motion.div>
-      )}
-      <div className="font-mono text-[10px] font-bold leading-tight">{displayLabel}</div>
-      {sublabel && (
-        <div className="font-mono text-[9px] leading-tight opacity-60 mt-0.5">{sublabel}</div>
-      )}
-    </motion.div>
+      <span
+        className={cn(
+          'leading-tight',
+          mono ? 'font-mono text-[11px] font-bold tracking-wide' : 'font-sans text-[11.5px] font-semibold',
+          state === 'dim' ? 'text-ink-3' : h.text,
+        )}
+      >
+        {label}
+      </span>
+    </button>
   )
 }
 
-function SectionLabel({ children, dimmed }: { children: React.ReactNode; dimmed?: boolean }) {
+// ── 라벨 붙은 외곽 프레임 (SGA / Background Processes / Instance / Database) ─
+function Frame({
+  id, kicker, hue, state, onSelect, children, className,
+}: {
+  id?: InstanceComponentId
+  kicker: string
+  hue: Hue
+  state: 'lit' | 'base' | 'dim'
+  onSelect?: (id: InstanceComponentId) => void
+  children: ReactNode
+  className?: string
+}) {
+  const h = HUE[hue]
   return (
-    <div className={cn(
-      'mb-1.5 font-mono text-[9px] font-bold uppercase tracking-[0.15em] transition-opacity duration-300',
-      dimmed ? 'opacity-20' : 'opacity-60'
-    )}>
+    <div
+      data-component-id={id}
+      onClick={id && onSelect ? () => onSelect(id) : undefined}
+      className={cn(
+        'rounded-panel border border-l-[3px] bg-paper p-3 transition-all',
+        state === 'dim' ? 'border-line border-l-line opacity-40' : cn('border-line', h.accent),
+        state === 'lit' && cn('ring-1 ring-inset', h.ring),
+        id && onSelect ? 'cursor-pointer' : '',
+        className,
+      )}
+    >
+      <div className={cn('mb-2 font-mono text-[9px] font-bold uppercase tracking-[0.12em]', state === 'dim' ? 'text-ink-3/60' : 'text-ink-3')}>
+        {kicker}
+      </div>
       {children}
     </div>
   )
 }
 
-
-export function OracleInstanceMap({ highlightIds, callout, horizontal = false, hideClient = false }: Props) {
+export function OracleInstanceMap({
+  highlightIds, callout, horizontal = false, hideClient = false, onSelect, className,
+}: Props) {
   const lang = useSimulationStore((s) => s.lang)
-  const hasHighlights = highlightIds.length > 0
+  const isKo = lang === 'ko'
+  const lbl = (ko: string, en: string) => (isKo ? ko : en)
 
-  const clientHighlighted = ['server-process', 'pga'].some(id => highlightIds.includes(id as InstanceComponentId))
-  const sgaHighlighted = highlightIds.includes('sga') ||
-    ['library-cache', 'dict-cache', 'buffer-cache', 'redo-buffer', 'undo', 'shared-pool'].some(id =>
-      highlightIds.includes(id as InstanceComponentId)
-    )
-  const bgProcessHighlighted = ['dbwr', 'lgwr', 'ckpt', 'smon', 'pmon', 'arcn'].some(id =>
-    highlightIds.includes(id as InstanceComponentId)
-  )
-  const diskHighlighted = ['disk', 'redo-log-file', 'control-file', 'archive-log'].some(id =>
-    highlightIds.includes(id as InstanceComponentId)
-  )
+  // 강조 집합 = 넘어온 id + 각 id 의 그룹 소속까지 펼침
+  const hlSet = new Set<InstanceComponentId>(highlightIds)
+  for (const id of highlightIds) for (const m of GROUP[id] ?? []) hlSet.add(m)
+  const anyHl = highlightIds.length > 0
 
-  const clientDimmed = hasHighlights && !clientHighlighted
-  const sgaDimmed = hasHighlights && !sgaHighlighted
-  const bgDimmed = hasHighlights && !bgProcessHighlighted
-  const diskDimmed = hasHighlights && !diskHighlighted
+  const on = (...ids: InstanceComponentId[]) => ids.some((id) => hlSet.has(id) || (GROUP[id] ?? []).some((m) => hlSet.has(m)))
+  const st = (hit: boolean): 'lit' | 'base' | 'dim' => (!anyHl ? 'base' : hit ? 'lit' : 'dim')
 
-  const legend = callout ? (
-    <div className="flex items-center gap-2 mb-2">
-      <motion.span
-        key={callout}
-        initial={{ opacity: 0, x: -6 }}
-        animate={{ opacity: 1, x: 0 }}
-        className="font-mono text-[10px] text-ink-2"
-      >
-        {callout}
-      </motion.span>
+  const dividerCols = horizontal ? 'grid-cols-2 sm:grid-cols-3' : 'grid-cols-2'
+  const procCols = horizontal ? 'grid-cols-4 sm:grid-cols-8' : 'grid-cols-4'
+  const fileCols = horizontal ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-2'
+
+  // ── Client / Server Process 행 ──────────────────────────────────────────
+  const clientRow = !hideClient && (
+    <div className={cn('flex flex-wrap items-center gap-2', horizontal ? 'sm:flex-nowrap' : '')}>
+      <Box id="client" label={lbl('클라이언트 프로세스', 'Client Process')} hue="slate" state={st(on('client'))} onSelect={onSelect} className="flex-1 py-2.5" />
+      <IconArrowNarrowRight size={18} className="shrink-0 text-ink-3" />
+      <Box id="server-process" label="Server Process" hue="green" state={st(on('server-process'))} onSelect={onSelect} className="flex-1 py-2.5" />
+      <span className="flex shrink-0 flex-col items-center leading-none">
+        <span className="mb-0.5 font-sans text-[8px] text-ink-3">{lbl('전용', 'owns')}</span>
+        <IconArrowNarrowRight size={18} className="text-ink-3" />
+      </span>
+      <Box id="pga" label="PGA" mono hue="purple" state={st(on('pga'))} onSelect={onSelect} className="flex-1 py-2.5" />
     </div>
-  ) : null
+  )
 
-  const spHighlighted  = highlightIds.includes('server-process')
-  const pgaHighlighted = highlightIds.includes('pga')
+  // ── SGA ────────────────────────────────────────────────────────────────
+  const sga = (
+    <Frame id="sga" kicker="SGA — System Global Area" hue="blue" state={st(on('sga'))} onSelect={onSelect}>
+      <div className={cn('grid gap-2', dividerCols)}>
+        <Box id="shared-pool" label="Shared Pool" hue="blue" state={st(on('shared-pool'))} onSelect={onSelect} />
+        <Box id="buffer-cache" label={lbl('Database Buffer Cache', 'Database Buffer Cache')} hue="blue" state={st(on('buffer-cache'))} onSelect={onSelect} />
+        <Box id="redo-buffer" label="Redo Log Buffer" hue="amber" state={st(on('redo-buffer'))} onSelect={onSelect} />
+        <Box id="large-pool" label="Large Pool" hue="green" state={st(on('large-pool'))} onSelect={onSelect} />
+        <Box id="java-pool" label="Java Pool" hue="green" state={st(on('java-pool'))} onSelect={onSelect} />
+        <Box id="fixed-sga" label="Fixed SGA" hue="slate" state={st(on('fixed-sga'))} onSelect={onSelect} />
+      </div>
+    </Frame>
+  )
 
-  // Server Process = 외곽 컨테이너 박스 (teal)
-  // PGA = 그 안에 내포된 violet 박스 → "SP가 PGA를 소유한다"는 관계를 색상+중첩으로 표현
-  const layerClient = (
-    <div
-      className={cn(
-        'rounded-panel border-2 transition-all duration-300',
-        spHighlighted
-          ? 'border-green bg-green/5 ring-2 ring-green/50 '
-          : clientDimmed
-          ? 'border-line/20 bg-rail'
-          : 'border-green/50 bg-green/5'
-      )}
-    >
-      {/* ── Server Process 헤더 영역 ── */}
-      <div className="flex items-center justify-between px-3 pt-2.5 pb-1.5">
-        <div className="flex items-center gap-1.5">
-          {spHighlighted && (
-            <motion.span
-              className="inline-flex h-3.5 w-3.5 items-center justify-center rounded-full bg-blue text-paper"
-              initial={{ scale: 0 }} animate={{ scale: 1 }}
-              transition={{ type: 'spring', stiffness: 400 }}
-            >
-              <span className="text-[7px] font-bold">★</span>
-            </motion.span>
-          )}
-          <span className={cn(
-            'font-mono text-[11px] font-bold leading-tight',
-            spHighlighted ? 'text-green' : clientDimmed ? 'text-ink-2/20' : 'text-green'
-          )}>
-            Server Process
-          </span>
-        </div>
-        <span className={cn(
-          'font-mono text-[8px]',
-          clientDimmed ? 'text-ink-2/20' : 'text-green'
-        )}>
-          {lang === 'ko' ? '↔ SGA 공유 접근' : '↔ shared SGA access'}
+  // ── Background Processes ────────────────────────────────────────────────
+  const PROCS: { id: InstanceComponentId; label: string }[] = [
+    { id: 'pmon', label: 'PMON' }, { id: 'smon', label: 'SMON' }, { id: 'dbwr', label: 'DBWn' }, { id: 'lgwr', label: 'LGWR' },
+    { id: 'ckpt', label: 'CKPT' }, { id: 'mmon', label: 'MMON' }, { id: 'reco', label: 'RECO' }, { id: 'arcn', label: 'ARCn' },
+  ]
+  const bg = (
+    <Frame id="dbwr" kicker={lbl('백그라운드 프로세스', 'Background Processes')} hue="amber" state={st(on('bg-processes', 'dbwr'))} onSelect={onSelect}>
+      <div className={cn('grid gap-1.5', procCols)}>
+        {PROCS.map((p) => (
+          <Box key={p.id} id={p.id} label={p.label} mono hue="amber" state={st(on(p.id))} onSelect={onSelect} className="px-1 py-1.5" />
+        ))}
+      </div>
+    </Frame>
+  )
+
+  // ── Database (files) ───────────────────────────────────────────────────
+  const FILES: { id: InstanceComponentId; label: string }[] = [
+    { id: 'disk', label: lbl('데이터 파일', 'Data Files') },
+    { id: 'redo-log-file', label: lbl('온라인 리두 로그', 'Online Redo Log') },
+    { id: 'control-file', label: lbl('컨트롤 파일', 'Control Files') },
+    { id: 'archive-log', label: lbl('아카이브 로그', 'Archived Redo Log') },
+  ]
+  const db = (
+    <Frame id="disk" kicker="Database" hue="slate" state={st(on('database', 'disk'))} onSelect={onSelect}>
+      <div className={cn('grid gap-2', fileCols)}>
+        {FILES.map((f) => (
+          <Box key={f.id} id={f.id} label={f.label} hue="slate" state={st(on(f.id))} onSelect={onSelect} />
+        ))}
+      </div>
+    </Frame>
+  )
+
+  // ── Instance → Database 커넥터 (어느 프로세스가 어느 파일을 쓰는지) ──────
+  const connector = (
+    <div className="flex items-center justify-center gap-4 py-0.5 text-ink-3">
+      {[
+        lbl('DBWn → 데이터', 'DBWn → data'),
+        lbl('LGWR → 리두', 'LGWR → redo'),
+        lbl('CKPT → 컨트롤', 'CKPT → control'),
+        lbl('ARCn → 아카이브', 'ARCn → archive'),
+      ].map((s) => (
+        <span key={s} className="flex items-center gap-1 font-sans text-[8.5px] leading-none">
+          {s}
+          <IconArrowNarrowDown size={12} />
         </span>
-      </div>
-
-      {/* ── PGA 다이어그램 — SP 내부에 내포 ── */}
-      <div className="px-3 pb-3">
-        <motion.div
-          data-component-id="pga"
-          animate={
-            pgaHighlighted
-              ? { scale: [1, 1.02, 1], transition: { repeat: Infinity, duration: 1.4, repeatDelay: 0.3 } }
-              : { scale: 1 }
-          }
-          className={cn(
-            'relative rounded-panel transition-all duration-300',
-            pgaHighlighted ? 'ring-2 ring-purple/50 ' : '',
-            clientDimmed ? 'opacity-20 pointer-events-none' : 'opacity-100'
-          )}
-        >
-          {pgaHighlighted && (
-            <motion.div
-              className="absolute -top-2 -right-2 z-10 flex h-4 w-4 items-center justify-center rounded-full bg-blue text-paper"
-              initial={{ scale: 0 }} animate={{ scale: 1 }}
-              transition={{ type: 'spring', stiffness: 400 }}
-            >
-              <span className="text-[8px] font-bold">★</span>
-            </motion.div>
-          )}
-          <PgaCompactBlock lang={lang} />
-        </motion.div>
-      </div>
-    </div>
-  )
-
-  const sgaActiveId: SgaComponentId | null = (() => {
-    if (!hasHighlights || !sgaHighlighted) return null
-    if (highlightIds.includes('buffer-cache')) return 'buffer-cache'
-    if (highlightIds.includes('shared-pool') || highlightIds.includes('library-cache') || highlightIds.includes('dict-cache')) return 'shared-pool'
-    if (highlightIds.includes('redo-buffer')) return 'redo-log-buffer'
-    if (highlightIds.includes('large-pool')) return 'large-pool'
-    return null
-  })()
-
-  const layerSga = (
-    <div className={cn('transition-opacity duration-300', sgaDimmed ? 'opacity-20 pointer-events-none' : 'opacity-100')}>
-      <SgaPositionDiagram activeId={sgaActiveId} />
-    </div>
-  )
-
-  const layerBg = (
-    <div
-      data-component-id="dbwr"
-      className={cn(
-        'rounded-panel border-2 p-3 transition-all duration-300',
-        bgProcessHighlighted
-          ? 'border-amber/50 bg-amber/5 '
-          : bgDimmed
-          ? 'border-line/20 bg-rail'
-          : 'border-amber/30 bg-amber/5'
-      )}
-    >
-      <SectionLabel dimmed={bgDimmed}>Background Processes</SectionLabel>
-      <div className={cn('gap-1.5', horizontal ? 'flex' : 'grid grid-cols-3')}>
-        {(['dbwr', 'lgwr', 'ckpt', 'smon', 'pmon', 'arcn'] as InstanceComponentId[]).map((id) => (
-          <MapBlock key={id} id={id} highlightIds={highlightIds} pulse={false} className={horizontal ? 'flex-1' : ''} />
-        ))}
-      </div>
-    </div>
-  )
-
-  const layerDisk = (
-    <div
-      data-component-id="disk"
-      className={cn(
-        'rounded-panel border-2 p-3 transition-all duration-300',
-        diskHighlighted
-          ? 'border-line-2 bg-paper-sunk '
-          : diskDimmed
-          ? 'border-line/20 bg-rail'
-          : 'border-line-2 bg-paper-sunk'
-      )}
-    >
-      <SectionLabel dimmed={diskDimmed}>Disk Storage</SectionLabel>
-      <div className={cn('gap-1.5', horizontal ? 'flex' : 'grid grid-cols-2')}>
-        {(['disk', 'redo-log-file', 'control-file', 'archive-log'] as InstanceComponentId[]).map((id) => (
-          <MapBlock key={id} id={id} highlightIds={highlightIds} pulse={false} className={horizontal ? 'flex-1' : ''} />
-        ))}
-      </div>
+      ))}
     </div>
   )
 
   return (
-    <div className="flex flex-col gap-2">
-      {legend}
-      {!hideClient && layerClient}
-      {layerSga}
-      {layerBg}
-      {layerDisk}
-    </div>
+    <figure className={cn('flex flex-col gap-2.5 overflow-x-auto', className)}>
+      {callout && <figcaption className="font-sans text-[11px] text-ink-2">{callout}</figcaption>}
+
+      {clientRow}
+      {!hideClient && (
+        <div className="flex items-center gap-1.5 pl-1 text-ink-3">
+          <IconArrowNarrowDown size={14} className="shrink-0" />
+          <span className="font-sans text-[9px] leading-tight">
+            {lbl('Server Process 가 SGA 를 읽기·쓰기 (모든 세션 공유)', 'Server Process reads / writes the SGA — shared by all sessions')}
+          </span>
+        </div>
+      )}
+
+      {/* Instance = SGA + Background Processes */}
+      <div className="rounded-panel border border-line-2 bg-paper-sunk p-2.5">
+        <div className="mb-2 font-mono text-[9px] font-bold uppercase tracking-[0.14em] text-ink-3">
+          {lbl('Oracle Instance — 메모리 + 프로세스', 'Oracle Instance — memory + processes')}
+        </div>
+        <div className="flex flex-col gap-2">
+          {sga}
+          {bg}
+        </div>
+      </div>
+
+      {connector}
+      {db}
+    </figure>
   )
 }

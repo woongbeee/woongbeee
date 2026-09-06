@@ -316,40 +316,6 @@ export function PgaComponentDiagram({ lang }: { lang: 'ko' | 'en' }) {
   )
 }
 
-// ── compact PGA 요약 블록 (OracleInstanceMap 전용) ──
-// SVG는 너무 작으면 안 읽히므로 텍스트 기반 박스로 대체
-export function PgaCompactBlock({ lang }: { lang: 'ko' | 'en' }) {
-  const isKo = lang === 'ko'
-  const rows = isKo
-    ? [
-        { label: 'Private SQL Area', sub: 'Persistent · Runtime', color: 'bg-purple/10 border-purple/50 text-purple' },
-        { label: 'SQL Work Area',    sub: 'Sort · Hash · Bitmap', color: 'bg-blue/10 border-blue/50 text-blue' },
-        { label: 'UGA',              sub: '세션 변수 · 로그인',     color: 'bg-green/10 border-green/50 text-green' },
-      ]
-    : [
-        { label: 'Private SQL Area', sub: 'Persistent · Runtime', color: 'bg-purple/10 border-purple/50 text-purple' },
-        { label: 'SQL Work Area',    sub: 'Sort · Hash · Bitmap', color: 'bg-blue/10 border-blue/50 text-blue' },
-        { label: 'UGA',              sub: 'session vars · logon',  color: 'bg-green/10 border-green/50 text-green' },
-      ]
-  return (
-    <div className="rounded-card border-2 border-purple/50 bg-purple/5 p-2">
-      <div className="mb-1.5 flex items-center gap-1.5">
-        <span className="rounded bg-purple px-1.5 py-0.5 font-mono text-[9px] font-bold text-paper">PGA</span>
-        <span className="font-mono text-[9px] text-purple">
-          {isKo ? '전용 메모리' : 'Private Memory'}
-        </span>
-      </div>
-      <div className="flex flex-col gap-1">
-        {rows.map((r) => (
-          <div key={r.label} className={cn('rounded border px-2 py-1', r.color)}>
-            <div className="font-mono text-[9px] font-bold leading-tight">{r.label}</div>
-            <div className="font-mono text-[8px] leading-tight opacity-70">{r.sub}</div>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
 
 // ── SVG: Dedicated vs Shared Server ───────────────────────────────────────
 
@@ -383,11 +349,11 @@ function DedicatedSharedDiagram({ lang }: { lang: 'ko' | 'en' }) {
       <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ maxWidth: W, display: 'block', margin: '0 auto' }}>
 
         {/* column headers */}
-        <text x={DED_X + HALF_W / 2} y={PAD + 16} fontFamily="monospace" fontSize={11}
+        <text x={DED_X + HALF_W / 2} y={PAD + 16} fontFamily="var(--font-sans-active)" fontSize={11}
           fontWeight="bold" fill="var(--color-blue)" textAnchor="middle">
           {isKo ? 'Dedicated Server' : 'Dedicated Server'}
         </text>
-        <text x={SHR_X + HALF_W / 2} y={PAD + 16} fontFamily="monospace" fontSize={11}
+        <text x={SHR_X + HALF_W / 2} y={PAD + 16} fontFamily="var(--font-sans-active)" fontSize={11}
           fontWeight="bold" fill="var(--color-green)" textAnchor="middle">
           {isKo ? 'Shared Server' : 'Shared Server'}
         </text>
@@ -405,18 +371,18 @@ function DedicatedSharedDiagram({ lang }: { lang: 'ko' | 'en' }) {
               {/* PGA box */}
               <rect x={DED_X + 8} y={py} width={HALF_W - 16} height={PGA_H} rx={7}
                 fill="var(--color-paper-sunk)" stroke="var(--color-purple)" strokeWidth={1.5} strokeDasharray="5 3" />
-              <text x={DED_X + 18} y={py + 16} fontFamily="monospace" fontSize={9.5}
+              <text x={DED_X + 18} y={py + 16} fontFamily="var(--font-sans-active)" fontSize={9.5}
                 fontWeight="bold" fill="var(--color-purple)">PGA — {sessionLabel}</text>
               {/* UGA inside PGA */}
               <rect x={DED_X + 18} y={py + 24} width={(HALF_W - 36) * 0.52} height={28} rx={4}
                 fill="var(--color-line)" stroke="var(--color-green)" strokeWidth={1} />
               <text x={DED_X + 18 + ((HALF_W - 36) * 0.52) / 2} y={py + 42}
-                fontFamily="monospace" fontSize={9} fontWeight="bold" fill="var(--color-green)" textAnchor="middle">UGA</text>
+                fontFamily="var(--font-sans-active)" fontSize={9} fontWeight="bold" fill="var(--color-green)" textAnchor="middle">UGA</text>
               {/* Work Area */}
               <rect x={DED_X + 18 + (HALF_W - 36) * 0.52 + 6} y={py + 24} width={(HALF_W - 36) * 0.44} height={28} rx={4}
                 fill="var(--color-rail)" stroke="var(--color-blue)" strokeWidth={1} />
               <text x={DED_X + 18 + (HALF_W - 36) * 0.52 + 6 + ((HALF_W - 36) * 0.44) / 2} y={py + 42}
-                fontFamily="monospace" fontSize={9} fontWeight="bold" fill="var(--color-blue)" textAnchor="middle">Work Area</text>
+                fontFamily="var(--font-sans-active)" fontSize={9} fontWeight="bold" fill="var(--color-blue)" textAnchor="middle">Work Area</text>
             </g>
           )
         })}
@@ -425,17 +391,17 @@ function DedicatedSharedDiagram({ lang }: { lang: 'ko' | 'en' }) {
         {/* Server processes (shared, small) */}
         <rect x={SHR_X + 8} y={SHR_Y} width={HALF_W - 16} height={44} rx={7}
           fill="var(--color-rail)" stroke="var(--color-ink-3)" strokeWidth={1.5} />
-        <text x={SHR_X + HALF_W / 2} y={SHR_Y + 16} fontFamily="monospace" fontSize={9.5}
+        <text x={SHR_X + HALF_W / 2} y={SHR_Y + 16} fontFamily="var(--font-sans-active)" fontSize={9.5}
           fontWeight="bold" fill="var(--color-ink-2)" textAnchor="middle">
           {isKo ? '공유 서버 프로세스 (여러 세션 처리)' : 'Shared Server Processes (multi-session)'}
         </text>
-        <text x={SHR_X + HALF_W / 2} y={SHR_Y + 30} fontFamily="monospace" fontSize={8.5}
+        <text x={SHR_X + HALF_W / 2} y={SHR_Y + 30} fontFamily="var(--font-sans-active)" fontSize={8.5}
           fill="var(--color-ink-3)" textAnchor="middle">PGA → {isKo ? 'Work Area만 포함' : 'Work Area only'}</text>
 
         {/* SGA box on shared side */}
         <rect x={SHR_X + 8} y={SGA_Y_SHR} width={HALF_W - 16} height={SGA_H_SHR} rx={7}
           fill="var(--color-paper-sunk)" stroke="var(--color-ink-3)" strokeWidth={1.5} strokeDasharray="6 3" />
-        <text x={SHR_X + 18} y={SGA_Y_SHR + 18} fontFamily="monospace" fontSize={10}
+        <text x={SHR_X + 18} y={SGA_Y_SHR + 18} fontFamily="var(--font-sans-active)" fontSize={10}
           fontWeight="bold" fill="var(--color-ink-2)">SGA — Large Pool</text>
 
         {/* UGA blocks inside SGA */}
@@ -445,7 +411,7 @@ function DedicatedSharedDiagram({ lang }: { lang: 'ko' | 'en' }) {
             <g key={i}>
               <rect x={SHR_X + 18} y={uy} width={HALF_W - 36} height={26} rx={4}
                 fill="var(--color-line)" stroke="var(--color-green)" strokeWidth={1} />
-              <text x={SHR_X + 18 + (HALF_W - 36) / 2} y={uy + 17} fontFamily="monospace"
+              <text x={SHR_X + 18 + (HALF_W - 36) / 2} y={uy + 17} fontFamily="var(--font-sans-active)"
                 fontSize={9} fontWeight="bold" fill="var(--color-green)" textAnchor="middle">
                 UGA — {isKo ? `세션 ${i + 1}` : `Session ${i + 1}`}
               </text>
@@ -455,9 +421,9 @@ function DedicatedSharedDiagram({ lang }: { lang: 'ko' | 'en' }) {
 
         {/* legend */}
         <rect x={DED_X + 8} y={H - 18} width={10} height={8} rx={2} fill="var(--color-line)" stroke="var(--color-green)" strokeWidth={1} />
-        <text x={DED_X + 22} y={H - 11} fontFamily="monospace" fontSize={8.5} fill="var(--color-ink-2)">UGA</text>
+        <text x={DED_X + 22} y={H - 11} fontFamily="var(--font-sans-active)" fontSize={8.5} fill="var(--color-ink-2)">UGA</text>
         <rect x={DED_X + 60} y={H - 18} width={10} height={8} rx={2} fill="var(--color-rail)" stroke="var(--color-blue)" strokeWidth={1} />
-        <text x={DED_X + 74} y={H - 11} fontFamily="monospace" fontSize={8.5} fill="var(--color-ink-2)">Work Area</text>
+        <text x={DED_X + 74} y={H - 11} fontFamily="var(--font-sans-active)" fontSize={8.5} fill="var(--color-ink-2)">Work Area</text>
       </svg>
     </div>
   )

@@ -206,6 +206,10 @@ const T = {
 
 **Sort·Parallel 챕터:** 단일 `index.tsx` 파일에 모든 섹션 포함. `sql-tuning` 챕터의 하위 섹션으로 TOC에 배치됨.
 
+**SQL Basics 챕터 특이사항:**
+- `dml-more/JoinSection.tsx` (`sql-basics-join`) — JOIN 종류 선택 UI + `SqlHighlight` SQL 블록 + 벤/격자 다이어그램(`JoinDiagram`, 이 파일 전용 구현)을 조합. 실제 조인 애니메이션은 공용 `@/components/join-sim`의 `JoinSimulator` 사용.
+- `dml-more/HierarchySection.tsx` (`sql-basics-hierarchy`, MERGE INTO 다음 섹션) — CONNECT BY 계층형 질의 전용 페이지. 이전엔 `JoinSection.tsx`에 탭으로 통합돼 있었으나 별도 섹션으로 분리됨.
+
 ### 챕터 공통 UI (`src/book/chapters/shared.tsx`)
 
 > **새 UI를 만들기 전에 반드시 이 목록을 먼저 확인하라.** SQL 코드 블록, 단계 목록, 아코디언, 표, 정보 박스 등은 모두 이미 정의되어 있다. 직접 `div`/`ul`을 만들지 말고 공통 컴포넌트를 쓴다.
@@ -254,6 +258,8 @@ const T = {
 ```
 
 `SqlHighlight` (`sql-basics/dml-more/SqlHighlight.tsx`) — `--` 이후를 회색 이탤릭 주석으로 처리. `shared.tsx`가 이 파일을 직접 import함.
+
+**`src/components/join-sim/`** — 챕터 경계를 넘어 재사용되는 조인 시뮬레이션 컴포넌트. `<JoinSimulator type="left" queryDesc="..." />` 형태로 사용하며 employees ⋈ departments 결합 과정을 단계별 애니메이션(재생/이전/다음/초기화)으로 보여준다. **SQL 코드 블록과 벤/격자 다이어그램은 포함하지 않는다** — 각 사용처(`sql-basics/dml-more/JoinSection.tsx`, `join/overview/OverviewSection.tsx`)가 `JOIN_SQL`(barrel에서 export)과 자체 다이어그램 구현을 옆에 직접 배치한다. 조인 결과 테이블은 `shared.tsx`의 `ResultTable`을 사용하고, 소스 테이블(EMPLOYEES/DEPARTMENTS)은 행 하이라이트 애니메이션이 핵심이라 raw `<table>` + framer-motion 유지 (단, `ResultTable`과 시각적으로 통일된 스타일).
 
 #### StepList 사용 예시
 
@@ -354,7 +360,8 @@ SVG 레이아웃 상수는 **의존 관계 순서대로** 선언한다 — 버�
   - **§3** — `:root[data-theme="light"]`가 §2c 서피스 토큰을 라이트로 override.
 - **`src/lib/theme.tsx`** (구 `theme.ts` — JSX 아이콘 때문에 `.tsx`) — 색을 다루는 **유일한 TS 매핑 모듈**: `ACCENT_COLORS`(챕터 액센트 클래스 세트), `INFOBOX_VARIANT`+`INFOBOX_LEGACY_COLOR`, `CONCEPT_TINT`, `SIMULATOR_TINT`, `STEP_COLORS`, `DIAGRAM`/`DATA_PALETTE`/`CODE`(SVG용 `var(--color-*)` 문자열). importer: `shared.tsx`, `BookContent.tsx`, `IntroductionPage.tsx`, `bookStructure.tsx`.
 - **`src/index.css`** — `@import` 3줄(tailwindcss, `./styles/tokens.css`, tw-animate-css) + 구조 규칙(`body`, `#root`, `.react-flow__*` 오버라이드)만. React Flow 커스텀은 여기 `.react-flow__*` 셀렉터에만.
-- **폰트** — `IBM Plex Sans KR`(본문·제목·라벨) + `IBM Plex Mono`(코드·수치·표·뱃지·브레드크럼). `index.html`의 Google Fonts `<link>`로 로드. 스택은 `tokens.css`의 `--font-sans-ko`/`--font-sans-en`/`--font-mono`에만 정의. `App.tsx`가 `<html lang>`을 `useLangStore`와 동기화 → `:root:lang(en)`이 `--font-sans-active` 스왑.
+- **폰트** — UI/제목/라벨: KO=`Noto Sans KR`, EN=`Inter`. 장문 본문: KO=`Noto Sans KR`, EN=`Newsreader`(세리프). 코드·수치·표·뱃지: `JetBrains Mono`. `index.html`의 Google Fonts `<link>`로 로드. 원본 스택은 `tokens.css`의 `--font-ui-ko`/`--font-ui-en`/`--font-read-ko`/`--font-read-en`/`--font-mono-stack`(`:root`, `@theme` 밖)에 정의되고, `@theme` 블록 안의 `--font-sans`/`--font-read`/`--font-mono`가 그 값을 재참조해서 Tailwind `font-sans`/`font-read`/`font-mono` 유틸을 생성한다. `App.tsx`가 `<html lang>`을 `useLangStore`와 동기화 → `:root:lang(en)`이 `--font-sans-active`/`--font-read-active` 스왑.
+  - ⚠ **`@theme` 안에서 변수를 자기 자신으로 참조하지 말 것** (`--font-mono: var(--font-mono);` 같은 패턴) — CSS 커스텀 프로퍼티 순환으로 간주되어 guaranteed-invalid 처리되고, 해당 Tailwind 유틸 전체가 조용히 브라우저 기본값으로 폴백된다. 실제 값은 항상 다른 이름의 변수(`-active`/`-stack` 접미사 등)에 두고 `@theme`에서는 그 이름을 참조한다.
 - shadcn 스타일 프리셋: `base-nova` (`components.json`).
 
 **진행 상태:** 디자인 리팩터링 Phase 0/1 완료(토큰 구조·`shared.tsx` 배선·폰트 교체). **앱 화면은 아직 라이트로 렌더**되고(`body`가 shadcn HSL 참조), 다크 우선 전환·`body`↔`--color-*` 연결·2,500여 클래스 이관·테마 토글은 **Phase 2+** (`DESIGN.md §7·§9`).

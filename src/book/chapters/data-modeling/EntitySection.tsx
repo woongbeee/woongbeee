@@ -236,7 +236,7 @@ export function EntitySection() {
       <SectionTitle>{t.whatTitle}</SectionTitle>
       <Prose>{t.whatDesc}</Prose>
 
-      <div>
+      <div>c
         <SectionTitle>{t.instanceTitle}</SectionTitle>
         <Prose>{t.instanceDesc}</Prose>
       </div>

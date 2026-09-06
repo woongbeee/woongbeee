@@ -392,21 +392,21 @@ function SharedPrivateSection({ lang }: { lang: 'ko' | 'en' }) {
           {/* ── SGA box ── */}
           <rect x={SGA_X} y={SGA_Y} width={SGA_W} height={SGA_H} rx={10}
             fill="var(--color-paper-sunk)" stroke="var(--color-purple)" strokeWidth={1.5} strokeDasharray="6 3" />
-          <text x={SGA_X + 12} y={SGA_Y + 22} fontFamily="monospace" fontSize={9}
+          <text x={SGA_X + 12} y={SGA_Y + 22} fontFamily="var(--font-sans-active)" fontSize={9}
             fontWeight="bold" fill="var(--color-purple)" letterSpacing={1}>SGA — Library Cache</text>
 
           {/* ── Shared SQL Area box ── */}
           <rect x={SHARED_X} y={SHARED_Y} width={SHARED_W} height={SHARED_H} rx={7}
             fill="var(--color-rail)" stroke="var(--color-purple)" strokeWidth={1.5} />
-          <text x={SHARED_X + 10} y={SHARED_Y + 18} fontFamily="monospace" fontSize={8.5}
+          <text x={SHARED_X + 10} y={SHARED_Y + 18} fontFamily="var(--font-sans-active)" fontSize={8.5}
             fontWeight="bold" fill="var(--color-purple)">{t.sharedAreaLabel}</text>
-          <text x={SHARED_X + 10} y={SHARED_Y + 30} fontFamily="monospace" fontSize={7.5}
+          <text x={SHARED_X + 10} y={SHARED_Y + 30} fontFamily="var(--font-sans-active)" fontSize={7.5}
             fill="var(--color-purple)" opacity={0.7}>{isKo ? '(모든 세션 공유 · 읽기 전용)' : '(shared · read-only)'}</text>
 
           {/* Parse tree block */}
           <rect x={BLOCK_X} y={BLOCK_Y1} width={BLOCK_W} height={BLOCK_H} rx={4}
             fill="var(--color-rail)" stroke="var(--color-purple)" strokeWidth={1} />
-          <text x={BLOCK_X + BLOCK_W / 2} y={BLOCK_Y1 + 17} fontFamily="monospace" fontSize={8}
+          <text x={BLOCK_X + BLOCK_W / 2} y={BLOCK_Y1 + 17} fontFamily="var(--font-sans-active)" fontSize={8}
             fontWeight="bold" fill="var(--color-purple)" textAnchor="middle">
             {isKo ? 'Parse Tree (파싱 트리)' : 'Parse Tree'}
           </text>
@@ -414,7 +414,7 @@ function SharedPrivateSection({ lang }: { lang: 'ko' | 'en' }) {
           {/* Execution plan block */}
           <rect x={BLOCK_X} y={BLOCK_Y2} width={BLOCK_W} height={BLOCK_H} rx={4}
             fill="var(--color-rail)" stroke="var(--color-purple)" strokeWidth={1} />
-          <text x={BLOCK_X + BLOCK_W / 2} y={BLOCK_Y2 + 17} fontFamily="monospace" fontSize={8}
+          <text x={BLOCK_X + BLOCK_W / 2} y={BLOCK_Y2 + 17} fontFamily="var(--font-sans-active)" fontSize={8}
             fontWeight="bold" fill="var(--color-purple)" textAnchor="middle">
             {isKo ? 'Execution Plan (실행 계획)' : 'Execution Plan'}
           </text>
@@ -422,7 +422,7 @@ function SharedPrivateSection({ lang }: { lang: 'ko' | 'en' }) {
           {/* Optimization metadata block */}
           <rect x={BLOCK_X} y={BLOCK_Y3} width={BLOCK_W} height={BLOCK_H} rx={4}
             fill="var(--color-rail)" stroke="var(--color-purple)" strokeWidth={1} />
-          <text x={BLOCK_X + BLOCK_W / 2} y={BLOCK_Y3 + 17} fontFamily="monospace" fontSize={8}
+          <text x={BLOCK_X + BLOCK_W / 2} y={BLOCK_Y3 + 17} fontFamily="var(--font-sans-active)" fontSize={8}
             fontWeight="bold" fill="var(--color-purple)" textAnchor="middle">
             {isKo ? 'Optimization Info' : 'Optimization Info'}
           </text>
@@ -450,15 +450,15 @@ function SharedPrivateSection({ lang }: { lang: 'ko' | 'en' }) {
                 {/* PGA outer box */}
                 <rect x={PGA_X} y={sess.y} width={PGA_W} height={PGA_H} rx={8}
                   fill="var(--color-rail)" stroke="var(--color-blue)" strokeWidth={1.5} strokeDasharray="5 3" />
-                <text x={PGA_X + 12} y={sess.y + 18} fontFamily="monospace" fontSize={8.5}
+                <text x={PGA_X + 12} y={sess.y + 18} fontFamily="var(--font-sans-active)" fontSize={8.5}
                   fontWeight="bold" fill="var(--color-blue)">PGA — {sess.label}</text>
 
                 {/* Private SQL Area inner box */}
                 <rect x={PRIV_X} y={privY} width={PRIV_W} height={privH} rx={5}
                   fill="var(--color-rail)" stroke="var(--color-blue)" strokeWidth={1} />
-                <text x={PRIV_X + PRIV_W / 2} y={privY + 13} fontFamily="monospace" fontSize={7.5}
+                <text x={PRIV_X + PRIV_W / 2} y={privY + 13} fontFamily="var(--font-sans-active)" fontSize={7.5}
                   fontWeight="bold" fill="var(--color-blue)" textAnchor="middle">{t.privateAreaLabel}</text>
-                <text x={PRIV_X + PRIV_W / 2} y={privY + 25} fontFamily="monospace" fontSize={7}
+                <text x={PRIV_X + PRIV_W / 2} y={privY + 25} fontFamily="var(--font-sans-active)" fontSize={7}
                   fill="var(--color-blue)" textAnchor="middle">
                   {isKo ? 'bind vars · exec state' : 'bind vars · exec state'}
                 </text>
@@ -477,7 +477,7 @@ function SharedPrivateSection({ lang }: { lang: 'ko' | 'en' }) {
                 <text
                   x={(arrowStartX + arrowEndX) / 2}
                   y={(arrowStartY + arrowEndY) / 2 - 5}
-                  fontFamily="monospace"
+                  fontFamily="var(--font-sans-active)"
                   fontSize={7}
                   fill="var(--color-purple)"
                   textAnchor="middle"
@@ -491,12 +491,12 @@ function SharedPrivateSection({ lang }: { lang: 'ko' | 'en' }) {
           {/* ── Legend ── */}
           <rect x={SGA_X} y={376} width={14} height={8} rx={2}
             fill="var(--color-rail)" stroke="var(--color-purple)" strokeWidth={1} />
-          <text x={SGA_X + 18} y={384} fontFamily="monospace" fontSize={8}
+          <text x={SGA_X + 18} y={384} fontFamily="var(--font-sans-active)" fontSize={8}
             fill="var(--color-ink-2)">{isKo ? 'Shared SQL Area (1개)' : 'Shared SQL Area (×1)'}</text>
 
           <rect x={PGA_X} y={376} width={14} height={8} rx={2}
             fill="var(--color-rail)" stroke="var(--color-blue)" strokeWidth={1} />
-          <text x={PGA_X + 18} y={384} fontFamily="monospace" fontSize={8}
+          <text x={PGA_X + 18} y={384} fontFamily="var(--font-sans-active)" fontSize={8}
             fill="var(--color-ink-2)">{isKo ? 'Private SQL Area (세션마다 1개)' : 'Private SQL Area (×1 per session)'}</text>
         </svg>
       </div>
@@ -561,16 +561,16 @@ function ChildCursorSection({ lang }: { lang: 'ko' | 'en' }) {
           </defs>
 
           {/* SQL text hash label */}
-          <text x={PAR_X} y={PAR_Y - 10} fontFamily="monospace" fontSize={8} fill="var(--color-ink-3)">
+          <text x={PAR_X} y={PAR_Y - 10} fontFamily="var(--font-sans-active)" fontSize={8} fill="var(--color-ink-3)">
             hash({isKo ? 'SQL 텍스트' : 'SQL text'})
           </text>
 
           {/* Parent cursor box */}
           <rect x={PAR_X} y={PAR_Y} width={PAR_W} height={PAR_H} rx={7}
             fill="var(--color-rail)" stroke="var(--color-purple)" strokeWidth={2} />
-          <text x={PAR_X + PAR_W / 2} y={PAR_Y + 18} fontFamily="monospace" fontSize={9}
+          <text x={PAR_X + PAR_W / 2} y={PAR_Y + 18} fontFamily="var(--font-sans-active)" fontSize={9}
             fontWeight="bold" fill="var(--color-purple)" textAnchor="middle">Parent Cursor</text>
-          <text x={PAR_X + PAR_W / 2} y={PAR_Y + 32} fontFamily="monospace" fontSize={7.5}
+          <text x={PAR_X + PAR_W / 2} y={PAR_Y + 32} fontFamily="var(--font-sans-active)" fontSize={7.5}
             fill="var(--color-purple)" textAnchor="middle">
             {isKo ? '"SELECT * FROM emp WHERE …"' : '"SELECT * FROM emp WHERE …"'}
           </text>
@@ -591,7 +591,7 @@ function ChildCursorSection({ lang }: { lang: 'ko' | 'en' }) {
           })}
 
           {/* "Child Cursors" label */}
-          <text x={PAR_X + PAR_W + 16} y={CHILD_Y + CHILD_H / 2 + 4} fontFamily="monospace"
+          <text x={PAR_X + PAR_W + 16} y={CHILD_Y + CHILD_H / 2 + 4} fontFamily="var(--font-sans-active)"
             fontSize={8} fill="var(--color-ink-3)" transform={`rotate(-90, ${PAR_X + PAR_W + 16}, ${CHILD_Y + CHILD_H / 2 + 4})`}>
           </text>
 
@@ -600,15 +600,15 @@ function ChildCursorSection({ lang }: { lang: 'ko' | 'en' }) {
             <g key={c.label}>
               <rect x={c.x} y={CHILD_Y} width={CHILD_W} height={CHILD_H} rx={6}
                 fill={c.bg} stroke={c.border} strokeWidth={1.5} />
-              <text x={c.x + CHILD_W / 2} y={CHILD_Y + 18} fontFamily="monospace" fontSize={8.5}
+              <text x={c.x + CHILD_W / 2} y={CHILD_Y + 18} fontFamily="var(--font-sans-active)" fontSize={8.5}
                 fontWeight="bold" fill={c.color} textAnchor="middle">{c.label}</text>
-              <text x={c.x + CHILD_W / 2} y={CHILD_Y + 32} fontFamily="monospace" fontSize={7.5}
+              <text x={c.x + CHILD_W / 2} y={CHILD_Y + 32} fontFamily="var(--font-sans-active)" fontSize={7.5}
                 fill={c.color} textAnchor="middle" opacity={0.8}>{c.desc}</text>
             </g>
           ))}
 
           {/* VERSION_COUNT label */}
-          <text x={W - 12} y={CHILD_Y + CHILD_H / 2 + 4} fontFamily="monospace" fontSize={7.5}
+          <text x={W - 12} y={CHILD_Y + CHILD_H / 2 + 4} fontFamily="var(--font-sans-active)" fontSize={7.5}
             fill="var(--color-ink-2)" textAnchor="end">
             {isKo ? '→ VERSION_COUNT (V$SQL)' : '→ VERSION_COUNT (V$SQL)'}
           </text>

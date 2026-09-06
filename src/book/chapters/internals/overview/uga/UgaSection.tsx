@@ -163,11 +163,11 @@ function UgaLocationDiagram({ lang }: { lang: 'ko' | 'en' }) {
       <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ maxWidth: W, display: 'block', margin: '0 auto' }}>
 
         {/* column headers */}
-        <text x={DED_X + HALF_W / 2} y={HEADER_Y} fontFamily="monospace" fontSize={11}
+        <text x={DED_X + HALF_W / 2} y={HEADER_Y} fontFamily="var(--font-sans-active)" fontSize={11}
           fontWeight="bold" fill="var(--color-blue)" textAnchor="middle">
           {isKo ? 'Dedicated Server' : 'Dedicated Server'}
         </text>
-        <text x={SHR_X + HALF_W / 2} y={HEADER_Y} fontFamily="monospace" fontSize={11}
+        <text x={SHR_X + HALF_W / 2} y={HEADER_Y} fontFamily="var(--font-sans-active)" fontSize={11}
           fontWeight="bold" fill="var(--color-green)" textAnchor="middle">
           {isKo ? 'Shared Server' : 'Shared Server'}
         </text>
@@ -179,38 +179,38 @@ function UgaLocationDiagram({ lang }: { lang: 'ko' | 'en' }) {
         {/* ── Dedicated: session → PGA → UGA ── */}
         <rect x={DED_X + 8} y={DED_Y} width={HALF_W - 16} height={DED_BOX_H} rx={8}
           fill="var(--color-rail)" stroke="var(--color-blue)" strokeWidth={1.5} strokeDasharray="5 3" />
-        <text x={DED_X + 20} y={DED_Y + 18} fontFamily="monospace" fontSize={10}
+        <text x={DED_X + 20} y={DED_Y + 18} fontFamily="var(--font-sans-active)" fontSize={10}
           fontWeight="bold" fill="var(--color-blue)">{isKo ? '세션 (Session)' : 'Session'}</text>
         {/* PGA */}
         <rect x={DED_X + 18} y={PGA_INNER_Y} width={HALF_W - 36} height={PGA_INNER_H} rx={6}
           fill="var(--color-paper-sunk)" stroke="var(--color-purple)" strokeWidth={1.5} strokeDasharray="5 3" />
-        <text x={DED_X + 30} y={PGA_INNER_Y + 18} fontFamily="monospace" fontSize={10}
+        <text x={DED_X + 30} y={PGA_INNER_Y + 18} fontFamily="var(--font-sans-active)" fontSize={10}
           fontWeight="bold" fill="var(--color-purple)">PGA</text>
         {/* UGA inside PGA */}
         <rect x={DED_X + 28} y={UGA_D_Y} width={HALF_W - 56} height={UGA_D_H} rx={5}
           fill="var(--color-line)" stroke="var(--color-green)" strokeWidth={2} />
         <text x={DED_X + 28 + (HALF_W - 56) / 2} y={UGA_D_Y + UGA_D_H / 2 - 8}
-          fontFamily="monospace" fontSize={13} fontWeight="bold" fill="var(--color-green)" textAnchor="middle">UGA</text>
+          fontFamily="var(--font-sans-active)" fontSize={13} fontWeight="bold" fill="var(--color-green)" textAnchor="middle">UGA</text>
         <text x={DED_X + 28 + (HALF_W - 56) / 2} y={UGA_D_Y + UGA_D_H / 2 + 10}
-          fontFamily="monospace" fontSize={9} fill="var(--color-green)" textAnchor="middle" opacity={0.8}>
+          fontFamily="var(--font-sans-active)" fontSize={9} fill="var(--color-green)" textAnchor="middle" opacity={0.8}>
           {isKo ? '세션 변수 · 커서 상태' : 'session vars · cursor state'}
         </text>
 
         {/* ── Shared: server process pool + SGA ── */}
         <rect x={SHR_X + 8} y={SHR_PROC_Y} width={HALF_W - 16} height={SHR_PROC_H} rx={7}
           fill="var(--color-rail)" stroke="var(--color-ink-3)" strokeWidth={1.5} />
-        <text x={SHR_X + HALF_W / 2} y={SHR_PROC_Y + 18} fontFamily="monospace" fontSize={9.5}
+        <text x={SHR_X + HALF_W / 2} y={SHR_PROC_Y + 18} fontFamily="var(--font-sans-active)" fontSize={9.5}
           fontWeight="bold" fill="var(--color-ink-2)" textAnchor="middle">
           {isKo ? '공유 서버 프로세스' : 'Shared Server Processes'}
         </text>
-        <text x={SHR_X + HALF_W / 2} y={SHR_PROC_Y + 32} fontFamily="monospace" fontSize={8.5}
+        <text x={SHR_X + HALF_W / 2} y={SHR_PROC_Y + 32} fontFamily="var(--font-sans-active)" fontSize={8.5}
           fill="var(--color-ink-3)" textAnchor="middle">
           PGA: {isKo ? 'Work Area만' : 'Work Area only'}
         </text>
         {/* SGA */}
         <rect x={SHR_X + 8} y={SGA_Y} width={HALF_W - 16} height={SGA_H} rx={7}
           fill="var(--color-paper-sunk)" stroke="var(--color-ink-3)" strokeWidth={1.5} strokeDasharray="6 3" />
-        <text x={SHR_X + 20} y={SGA_Y + 18} fontFamily="monospace" fontSize={10}
+        <text x={SHR_X + 20} y={SGA_Y + 18} fontFamily="var(--font-sans-active)" fontSize={10}
           fontWeight="bold" fill="var(--color-ink-2)">SGA — Large Pool</text>
         {/* 3 UGA blocks */}
         {[0, 1, 2].map((i) => {
@@ -220,7 +220,7 @@ function UgaLocationDiagram({ lang }: { lang: 'ko' | 'en' }) {
               <rect x={SHR_X + 18} y={uy} width={HALF_W - 36} height={30} rx={5}
                 fill="var(--color-line)" stroke="var(--color-green)" strokeWidth={1.5} />
               <text x={SHR_X + 18 + (HALF_W - 36) / 2} y={uy + 19}
-                fontFamily="monospace" fontSize={10} fontWeight="bold" fill="var(--color-green)" textAnchor="middle">
+                fontFamily="var(--font-sans-active)" fontSize={10} fontWeight="bold" fill="var(--color-green)" textAnchor="middle">
                 UGA — {isKo ? `세션 ${i + 1}` : `Session ${i + 1}`}
               </text>
             </g>
@@ -229,11 +229,11 @@ function UgaLocationDiagram({ lang }: { lang: 'ko' | 'en' }) {
 
         {/* legends */}
         <rect x={PAD + 8} y={LEGEND_Y} width={10} height={8} rx={2} fill="var(--color-line)" stroke="var(--color-green)" strokeWidth={1} />
-        <text x={PAD + 22} y={LEGEND_Y + 8} fontFamily="monospace" fontSize={8.5} fill="var(--color-ink-2)">UGA</text>
+        <text x={PAD + 22} y={LEGEND_Y + 8} fontFamily="var(--font-sans-active)" fontSize={8.5} fill="var(--color-ink-2)">UGA</text>
         <rect x={PAD + 58} y={LEGEND_Y} width={10} height={8} rx={2} fill="var(--color-paper-sunk)" stroke="var(--color-purple)" strokeWidth={1} />
-        <text x={PAD + 72} y={LEGEND_Y + 8} fontFamily="monospace" fontSize={8.5} fill="var(--color-ink-2)">PGA</text>
+        <text x={PAD + 72} y={LEGEND_Y + 8} fontFamily="var(--font-sans-active)" fontSize={8.5} fill="var(--color-ink-2)">PGA</text>
         <rect x={PAD + 108} y={LEGEND_Y} width={10} height={8} rx={2} fill="var(--color-paper-sunk)" stroke="var(--color-ink-3)" strokeWidth={1} />
-        <text x={PAD + 122} y={LEGEND_Y + 8} fontFamily="monospace" fontSize={8.5} fill="var(--color-ink-2)">SGA</text>
+        <text x={PAD + 122} y={LEGEND_Y + 8} fontFamily="var(--font-sans-active)" fontSize={8.5} fill="var(--color-ink-2)">SGA</text>
       </svg>
     </div>
   )

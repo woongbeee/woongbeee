@@ -1,7 +1,16 @@
 // Shared UI primitives for book chapter pages — Notion style, token-driven.
 // 색은 src/styles/tokens.css (§2c) 토큰만. 매핑은 src/lib/theme.tsx.
-import { type ReactNode, useEffect, useRef, useState } from 'react'
+import {
+  type ReactNode,
+  type CSSProperties,
+  useEffect,
+  useRef,
+  useState,
+} from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
+
+type CSSPropertiesWithVars = CSSProperties & { '--idx-w'?: string }
 import {
   INFOBOX_VARIANT,
   INFOBOX_LEGACY_COLOR,
@@ -581,6 +590,91 @@ export function AccordionSection({
           <div className="px-5 py-5">{children}</div>
         </>
       )}
+    </div>
+  )
+}
+
+// ── IndexedContent ───────────────────────────────────────────────────────────
+// 좌측 인덱스(버튼 목록) + 우측 상세 콘텐츠 레이아웃. 선택된 아이템만 오른쪽에
+// 페이드 전환으로 표시된다. 인덱스 항목/상세 콘텐츠 렌더링은 각 페이지가
+// renderIndexItem / renderContent로 정의한다 (텍스트 버튼, 아이콘+설명 카드 등 자유).
+export function IndexedContent<T>({
+  items,
+  activeId,
+  onSelect,
+  getId,
+  renderIndexItem,
+  renderContent,
+  indexWidth = '160px',
+  responsive = false,
+  indexClassName,
+  itemButtonClassName = 'rounded-card text-left transition-all',
+  className,
+}: {
+  items: T[]
+  activeId: string
+  onSelect: (id: string) => void
+  getId: (item: T) => string
+  renderIndexItem: (item: T, isActive: boolean) => ReactNode
+  renderContent: (item: T) => ReactNode
+  indexWidth?: string
+  /** true면 모바일은 1열(세로), lg 이상에서 {indexWidth}_1fr 그리드로 전환 */
+  responsive?: boolean
+  /** 좌측 인덱스 컨테이너에 추가할 클래스 (기본은 세로 버튼 목록 박스) */
+  indexClassName?: string
+  /** 각 인덱스 항목의 <button> 클래스 (renderIndexItem 스타일에 맞춰 조정) */
+  itemButtonClassName?: string
+  className?: string
+}) {
+  const activeItem = items.find((item) => getId(item) === activeId) ?? items[0]
+
+  return (
+    <div
+      className={cn(
+        'grid items-stretch gap-4',
+        responsive && 'grid-cols-1 lg:grid-cols-[var(--idx-w)_1fr]',
+        className
+      )}
+      style={
+        responsive
+          ? ({ '--idx-w': indexWidth } as CSSPropertiesWithVars)
+          : { gridTemplateColumns: `${indexWidth} 1fr` }
+      }
+    >
+      {/* LEFT: 인덱스 */}
+      <div
+        className={
+          indexClassName ??
+          'rounded-panel bg-rail flex h-full flex-col gap-1 border p-2'
+        }
+      >
+        {items.map((item) => {
+          const id = getId(item)
+          return (
+            <button
+              key={id}
+              onClick={() => onSelect(id)}
+              className={itemButtonClassName}
+            >
+              {renderIndexItem(item, id === activeId)}
+            </button>
+          )
+        })}
+      </div>
+
+      {/* RIGHT: 상세 */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={activeId}
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -6 }}
+          transition={{ duration: 0.18 }}
+          className="flex min-w-0 flex-col gap-4"
+        >
+          {renderContent(activeItem)}
+        </motion.div>
+      </AnimatePresence>
     </div>
   )
 }

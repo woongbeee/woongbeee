@@ -1,7 +1,13 @@
 import { useState, type ReactNode } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
-import { PageContainer, ChapterTitle, Prose, InfoBox } from '../../shared'
+import {
+  PageContainer,
+  ChapterTitle,
+  Prose,
+  InfoBox,
+  IndexedContent,
+} from '../../shared'
 import {
   IconArrowMerge,
   IconArrowsJoin,
@@ -436,108 +442,104 @@ export function JoinSection() {
       >
         <Prose className="pt-2.5">{t.joinIntro}</Prose>
 
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[280px_1fr] lg:items-start">
-          {/* LEFT: JOIN type selector */}
-          <div className="flex flex-col gap-2">
-            {(
-              t.joinTypes as Array<{
-                key: string
-                icon: ReactNode
-                title: string
-                desc: string
-              }>
-            ).map((jt) => {
-              const jk = jt.key as JoinType
-              const isActive = activeJoin === jk
-              return (
-                <button
-                  key={jk}
-                  onClick={() => setActiveJoin(jk)}
+        <IndexedContent
+          items={
+            t.joinTypes as Array<{
+              key: string
+              icon: ReactNode
+              title: string
+              desc: string
+            }>
+          }
+          activeId={activeJoin}
+          onSelect={(id) => setActiveJoin(id as JoinType)}
+          getId={(jt) => jt.key}
+          indexWidth="280px"
+          responsive
+          indexClassName="flex flex-col gap-2"
+          itemButtonClassName="w-full text-left transition-all"
+          renderIndexItem={(jt, isActive) => {
+            const jk = jt.key as JoinType
+            return (
+              <div
+                className={cn(
+                  'rounded-panel flex items-start gap-3 border-2 p-3',
+                  isActive
+                    ? `${JOIN_COLOR[jk].bg} ${JOIN_COLOR[jk].border} `
+                    : 'border-line bg-paper hover:bg-rail'
+                )}
+              >
+                <div
                   className={cn(
-                    'rounded-panel flex items-start gap-3 border-2 p-3 text-left transition-all',
-                    isActive
-                      ? `${JOIN_COLOR[jk].bg} ${JOIN_COLOR[jk].border} `
-                      : 'border-line bg-paper hover:bg-rail'
+                    'rounded-card mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center text-sm font-bold',
+                    isActive ? JOIN_COLOR[jk].badge : 'bg-rail text-ink-2'
                   )}
                 >
+                  {jt.icon}
+                </div>
+                <div className="min-w-0">
                   <div
                     className={cn(
-                      'rounded-card mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center text-sm font-bold',
-                      isActive ? JOIN_COLOR[jk].badge : 'bg-rail text-ink-2'
+                      'font-mono text-xs font-bold',
+                      isActive ? JOIN_COLOR[jk].text : 'text-ink/70'
                     )}
                   >
-                    {jt.icon}
+                    {jt.title}
                   </div>
-                  <div className="min-w-0">
-                    <div
-                      className={cn(
-                        'font-mono text-xs font-bold',
-                        isActive ? JOIN_COLOR[jk].text : 'text-ink/70'
-                      )}
-                    >
-                      {jt.title}
-                    </div>
-                    <div
-                      className={cn(
-                        'mt-0.5 text-[11px] leading-snug',
-                        isActive ? 'text-ink/70' : 'text-ink-2'
-                      )}
-                    >
-                      {jt.desc}
-                    </div>
-                  </div>
-                  {isActive && (
-                    <span
-                      className={cn(
-                        'mt-0.5 ml-auto shrink-0 text-xs',
-                        JOIN_COLOR[jk].text
-                      )}
-                    >
-                      ◀
-                    </span>
-                  )}
-                </button>
-              )
-            })}
-          </div>
-
-          {/* RIGHT: SQL + diagram + animation simulator */}
-          <div
-            className={cn(
-              'rounded-panel border p-4 transition-colors',
-              C.bg,
-              C.border
-            )}
-          >
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={activeJoin}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -6 }}
-                transition={{ duration: 0.2 }}
-                className="flex flex-col gap-3"
-              >
-                {/* SQL 블록(왼쪽) + 벤 다이어그램(오른쪽, 크게) */}
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-stretch">
-                  <SqlHighlight
-                    sql={JOIN_SQL[activeJoin]}
-                    className="min-w-0 flex-1"
-                  />
-                  <div className="shrink-0 sm:w-44">
-                    <JoinDiagram type={activeJoin} />
+                  <div
+                    className={cn(
+                      'mt-0.5 text-[11px] leading-snug',
+                      isActive ? 'text-ink/70' : 'text-ink-2'
+                    )}
+                  >
+                    {jt.desc}
                   </div>
                 </div>
+                {isActive && (
+                  <span
+                    className={cn(
+                      'mt-0.5 ml-auto shrink-0 text-xs',
+                      JOIN_COLOR[jk].text
+                    )}
+                  >
+                    ◀
+                  </span>
+                )}
+              </div>
+            )
+          }}
+          renderContent={(jt) => {
+            const jk = jt.key as JoinType
+            return (
+              <div
+                className={cn(
+                  'rounded-panel border p-4 transition-colors',
+                  C.bg,
+                  C.border
+                )}
+              >
+                <div className="flex flex-col gap-3">
+                  {/* SQL 블록(왼쪽) + 벤 다이어그램(오른쪽, 크게) */}
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-stretch">
+                    <SqlHighlight
+                      sql={JOIN_SQL[jk]}
+                      className="min-w-0 flex-1"
+                    />
+                    <div className="shrink-0 sm:w-44">
+                      <JoinDiagram type={jk} />
+                    </div>
+                  </div>
 
-                <JoinSimulator
-                  type={activeJoin}
-                  rowCountLabel={t.joinRowCount}
-                  queryDesc={t.joinQueryDesc[activeJoin]}
-                />
-              </motion.div>
-            </AnimatePresence>
-          </div>
-        </div>
+                  <JoinSimulator
+                    type={jk}
+                    rowCountLabel={t.joinRowCount}
+                    queryDesc={t.joinQueryDesc[jk]}
+                  />
+                </div>
+              </div>
+            )
+          }}
+        />
 
         <div className="flex flex-col gap-3">
           <InfoBox variant="note">{t.ansiDesc}</InfoBox>

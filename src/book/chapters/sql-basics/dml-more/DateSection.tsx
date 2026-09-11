@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { cn } from '@/lib/utils'
 import {
   PageContainer,
   ChapterTitle,
@@ -6,7 +7,7 @@ import {
   Divider,
   InfoBox,
   TermPopup,
-  AccordionSection,
+  IndexedContent,
 } from '../../shared'
 import { IconCalendarEvent } from '@tabler/icons-react'
 import { SqlHighlight } from './SqlHighlight'
@@ -716,7 +717,7 @@ function FormatMaskTable({
       <p className="text-ink-2 mb-1.5 font-mono text-[11px] font-bold tracking-wider uppercase">
         {title[lang]}
       </p>
-      <div className="rounded-card inline-block border text-xs">
+      <div className="rounded-card overflow-x-auto border text-xs">
         <table className="w-auto">
           <thead>
             <tr className="bg-rail border-b">
@@ -768,7 +769,7 @@ function ArithTable({
       <p className="text-ink-2 mb-1.5 font-mono text-[11px] font-bold tracking-wider uppercase">
         {title[lang]}
       </p>
-      <div className="rounded-card inline-block border text-xs">
+      <div className="rounded-card overflow-x-auto border text-xs">
         <table className="w-auto">
           <thead>
             <tr className="bg-rail border-b">
@@ -834,6 +835,13 @@ const T = {
 
 // ── FuncContent ──────────────────────────────────────────────────────────────
 
+const C = {
+  bg: 'bg-rail',
+  border: 'border-line',
+  text: 'text-ink/80',
+  active: 'bg-blue/10 text-blue',
+}
+
 function FuncContent({
   item,
   lang,
@@ -847,11 +855,22 @@ function FuncContent({
 
   return (
     <div className="flex flex-col gap-4">
-      {/* 시그니처 */}
-      <div>
-        <span className="bg-blue/10 text-blue inline-block rounded border px-2 py-0.5 font-mono text-[11px]">
+      {/* 헤더 */}
+      <div
+        className={cn('rounded-panel border px-4 py-3', C.bg, C.border, C.text)}
+      >
+        <div className="mb-1 font-mono text-[10px] font-bold tracking-wider uppercase opacity-60">
+          {t.categoryLabel}
+        </div>
+        <div className="font-mono text-xl font-black">{item.name}</div>
+        <div
+          className={cn(
+            'mt-1.5 inline-block rounded border px-2 py-0.5 font-mono text-[11px]',
+            C.active
+          )}
+        >
           {item.signature}
-        </span>
+        </div>
       </div>
 
       {/* 설명 */}
@@ -1007,7 +1026,7 @@ function FuncContent({
 
       {/* 참고 */}
       {item.note && (
-        <div className="rounded-panel bg-rail text-ink/80 border px-4 py-3 text-xs leading-relaxed">
+        <div className="rounded-panel bg-rail text-ink/80 font-read border px-4 py-3 text-xs leading-relaxed">
           <span className="mr-1.5 font-bold">💡</span>
           {item.note[lang]}
         </div>
@@ -1021,6 +1040,7 @@ function FuncContent({
 export function DateSection() {
   const lang = useSimulationStore((s) => s.lang)
   const t = T[lang]
+  const [openItem, setOpenItem] = useState<string>(FUNC_ITEMS[0].name)
 
   return (
     <PageContainer className="max-w-5xl">
@@ -1032,17 +1052,24 @@ export function DateSection() {
         subtitle={t.chapterSubtitle}
       />
 
-      <div className="flex flex-col gap-2">
-        {FUNC_ITEMS.map((item, idx) => (
-          <AccordionSection
-            key={item.name}
-            title={`${item.name}  —  ${item.signature}`}
-            defaultOpen={idx === 0}
+      <IndexedContent
+        items={FUNC_ITEMS}
+        activeId={openItem}
+        onSelect={setOpenItem}
+        getId={(item) => item.name}
+        indexWidth="220px"
+        renderIndexItem={(item, isActive) => (
+          <span
+            className={cn(
+              'block px-3 py-2 font-mono text-xs font-bold',
+              isActive ? C.active : 'text-ink-2 hover:bg-rail'
+            )}
           >
-            <FuncContent item={item} lang={lang} t={t} />
-          </AccordionSection>
-        ))}
-      </div>
+            {item.name}
+          </span>
+        )}
+        renderContent={(item) => <FuncContent item={item} lang={lang} t={t} />}
+      />
     </PageContainer>
   )
 }

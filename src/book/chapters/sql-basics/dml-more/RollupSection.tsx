@@ -10,6 +10,7 @@ import {
   InfoBox,
   Divider,
   SqlBlock,
+  IndexedContent,
 } from '../../shared'
 import { IconChartTreemap } from '@tabler/icons-react'
 import { useSimulationStore } from '@/store/simulationStore'
@@ -1773,50 +1774,18 @@ function NullCell() {
 
 // ── Main component ─────────────────────────────────────────────────────────
 
-export function RollupSection() {
-  const lang = useSimulationStore((s) => s.lang)
-  const t = T[lang] as TShape
-  const [tab, setTab] = useState<Tab>('rollup')
-
-  const tabs: { id: Tab; label: string }[] = [
-    { id: 'rollup', label: t.tabRollup },
-    { id: 'cube', label: t.tabCube },
-    { id: 'groupingsets', label: t.tabGroupingSets },
-    { id: 'grouping', label: t.tabGrouping },
-  ]
-
-  const tabActiveClass = 'border-amber/30 bg-amber/10 text-amber'
-
-  return (
-    <PageContainer className="max-w-5xl">
-      <ChapterTitle
-        icon={
-          <IconChartTreemap size={36} color="var(--color-amber)" stroke={1.5} />
-        }
-        title={t.chapterTitle}
-        subtitle={t.chapterSubtitle}
-      />
-
-      {/* Tab bar */}
-      <div className="mb-6 flex gap-2">
-        {tabs.map((tb) => (
-          <button
-            key={tb.id}
-            onClick={() => setTab(tb.id)}
-            className={cn(
-              'rounded-card border px-4 py-1.5 font-mono text-[11px] font-bold transition-all',
-              tab === tb.id
-                ? tabActiveClass + ' '
-                : 'border-line bg-rail text-ink-2 hover:bg-rail'
-            )}
-          >
-            {tb.label}
-          </button>
-        ))}
-      </div>
-
-      {/* ROLLUP */}
-      {tab === 'rollup' && (
+function RollupTabContent({
+  tab,
+  lang,
+  t,
+}: {
+  tab: Tab
+  lang: 'ko' | 'en'
+  t: TShape
+}) {
+  switch (tab) {
+    case 'rollup':
+      return (
         <>
           <SectionTitle>{t.rollupTitle}</SectionTitle>
           <Prose>{t.rollupDesc}</Prose>
@@ -1851,10 +1820,10 @@ export function RollupSection() {
             ))}
           </div>
         </>
-      )}
+      )
 
-      {/* CUBE */}
-      {tab === 'cube' && (
+    case 'cube':
+      return (
         <>
           <SectionTitle>{t.cubeTitle}</SectionTitle>
           <Prose>{t.cubeDesc}</Prose>
@@ -1927,10 +1896,10 @@ export function RollupSection() {
           <CubeAnimator lang={lang} />
           <InfoBox variant="note">{t.nullMeaning}</InfoBox>
         </>
-      )}
+      )
 
-      {/* GROUPING SETS */}
-      {tab === 'groupingsets' && (
+    case 'groupingsets':
+      return (
         <>
           <SectionTitle>{t.groupingSetsTitle}</SectionTitle>
           <Prose>{t.groupingSetsDesc}</Prose>
@@ -1946,10 +1915,10 @@ export function RollupSection() {
 
           <InfoBox variant="note">{t.nullMeaning}</InfoBox>
         </>
-      )}
+      )
 
-      {/* GROUPING() */}
-      {tab === 'grouping' && (
+    case 'grouping':
+      return (
         <>
           <SectionTitle>{t.groupingTitle}</SectionTitle>
           <Prose>{t.groupingDesc}</Prose>
@@ -1963,7 +1932,52 @@ export function RollupSection() {
           <Prose>{t.groupingCaseDesc}</Prose>
           <SqlBlock sql={GROUPING_CASE_SQL} className="mb-5" />
         </>
-      )}
+      )
+  }
+}
+
+export function RollupSection() {
+  const lang = useSimulationStore((s) => s.lang)
+  const t = T[lang] as TShape
+  const [tab, setTab] = useState<Tab>('rollup')
+
+  const tabs: { id: Tab; label: string }[] = [
+    { id: 'rollup', label: t.tabRollup },
+    { id: 'cube', label: t.tabCube },
+    { id: 'groupingsets', label: t.tabGroupingSets },
+    { id: 'grouping', label: t.tabGrouping },
+  ]
+
+  return (
+    <PageContainer className="max-w-5xl">
+      <ChapterTitle
+        icon={
+          <IconChartTreemap size={36} color="var(--color-amber)" stroke={1.5} />
+        }
+        title={t.chapterTitle}
+        subtitle={t.chapterSubtitle}
+      />
+
+      <IndexedContent
+        items={tabs}
+        activeId={tab}
+        onSelect={(id) => setTab(id as Tab)}
+        getId={(tb) => tb.id}
+        indexWidth="220px"
+        renderIndexItem={(tb, isActive) => (
+          <span
+            className={cn(
+              'block px-3 py-2 font-mono text-xs font-bold',
+              isActive ? 'bg-amber/10 text-amber' : 'text-ink-2 hover:bg-rail'
+            )}
+          >
+            {tb.label}
+          </span>
+        )}
+        renderContent={(tb) => (
+          <RollupTabContent tab={tb.id} lang={lang} t={t} />
+        )}
+      />
     </PageContainer>
   )
 }

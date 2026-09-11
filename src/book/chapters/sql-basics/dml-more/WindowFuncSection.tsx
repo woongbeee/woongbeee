@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import {
   PageContainer,
@@ -7,6 +6,7 @@ import {
   SectionTitle,
   Prose,
   Divider,
+  IndexedContent,
 } from '../../shared'
 import { IconChartBar } from '@tabler/icons-react'
 import { SqlHighlight } from './SqlHighlight'
@@ -737,7 +737,7 @@ function FrameSummaryDesc({ lang }: { lang: 'ko' | 'en' }) {
         </table>
       </div>
 
-      <p className="text-ink-2 text-xs leading-relaxed">{d.note}</p>
+      <p className="text-ink-2 font-read text-xs leading-relaxed">{d.note}</p>
     </div>
   )
 }
@@ -754,80 +754,66 @@ function DetailPanel({
   labels: { categoryLabel: string; exampleQuery: string; result: string }
 }) {
   return (
-    <AnimatePresence mode="wait">
-      <motion.div
-        key={item.name}
-        initial={{ opacity: 0, y: 6 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -6 }}
-        transition={{ duration: 0.18 }}
-        className="flex flex-col gap-4"
+    <>
+      <div
+        className={cn('rounded-panel border px-4 py-3', C.bg, C.border, C.text)}
       >
+        <div className="mb-1 font-mono text-[10px] font-bold tracking-wider uppercase opacity-60">
+          {labels.categoryLabel}
+        </div>
+        <div className="font-mono text-xl font-black">{item.name}</div>
         <div
           className={cn(
-            'rounded-panel border px-4 py-3',
-            C.bg,
-            C.border,
-            C.text
+            'mt-1.5 inline-block rounded border px-2 py-0.5 font-mono text-[11px]',
+            C.active
           )}
         >
-          <div className="mb-1 font-mono text-[10px] font-bold tracking-wider uppercase opacity-60">
-            {labels.categoryLabel}
-          </div>
-          <div className="font-mono text-xl font-black">{item.name}</div>
+          {item.signature}
+        </div>
+      </div>
+
+      <div className="rounded-panel bg-paper border px-4 py-3">
+        {item.name === 'Frame 적용 함수 정리' ? (
+          <FrameSummaryDesc lang={lang} />
+        ) : (
+          <Prose>{item.desc[lang]}</Prose>
+        )}
+      </div>
+
+      <div>
+        <p className="text-ink-2 mb-1.5 font-mono text-[11px] font-bold tracking-wider uppercase">
+          {labels.exampleQuery}
+        </p>
+        <p className="text-ink/70 font-read mb-2 text-xs leading-relaxed">
+          {item.queryDesc[lang]}
+        </p>
+        <SqlHighlight sql={item.example} />
+      </div>
+
+      <div>
+        <p className="text-ink-2 mb-2 font-mono text-[11px] font-bold tracking-wider uppercase">
+          {labels.result}
+        </p>
+        <ResultTable headers={item.resultHeaders} rows={item.resultRows} />
+      </div>
+
+      {item.note && (
+        <>
+          <Divider />
           <div
             className={cn(
-              'mt-1.5 inline-block rounded border px-2 py-0.5 font-mono text-[11px]',
-              C.active
+              'rounded-panel border px-4 py-3 text-xs leading-relaxed',
+              C.bg,
+              C.border,
+              C.text
             )}
           >
-            {item.signature}
+            <span className="mr-1.5 font-bold">💡</span>
+            {item.note[lang]}
           </div>
-        </div>
-
-        <div className="rounded-panel bg-paper border px-4 py-3">
-          {item.name === 'Frame 적용 함수 정리' ? (
-            <FrameSummaryDesc lang={lang} />
-          ) : (
-            <Prose>{item.desc[lang]}</Prose>
-          )}
-        </div>
-
-        <div>
-          <p className="text-ink-2 mb-1.5 font-mono text-[11px] font-bold tracking-wider uppercase">
-            {labels.exampleQuery}
-          </p>
-          <p className="text-ink/70 mb-2 text-xs leading-relaxed">
-            {item.queryDesc[lang]}
-          </p>
-          <SqlHighlight sql={item.example} />
-        </div>
-
-        <div>
-          <p className="text-ink-2 mb-2 font-mono text-[11px] font-bold tracking-wider uppercase">
-            {labels.result}
-          </p>
-          <ResultTable headers={item.resultHeaders} rows={item.resultRows} />
-        </div>
-
-        {item.note && (
-          <>
-            <Divider />
-            <div
-              className={cn(
-                'rounded-panel border px-4 py-3 text-xs leading-relaxed',
-                C.bg,
-                C.border,
-                C.text
-              )}
-            >
-              <span className="mr-1.5 font-bold">💡</span>
-              {item.note[lang]}
-            </div>
-          </>
-        )}
-      </motion.div>
-    </AnimatePresence>
+        </>
+      )}
+    </>
   )
 }
 
@@ -950,9 +936,6 @@ export function WindowFuncSection() {
   const [openFunc, setOpenFunc] = useState<string>(FUNC_ITEMS[0].name)
   const [openFrame, setOpenFrame] = useState<string>(FRAME_ITEMS[0].name)
 
-  const activeFunc = FUNC_ITEMS.find((f) => f.name === openFunc)!
-  const activeFrame = FRAME_ITEMS.find((f) => f.name === openFrame)!
-
   return (
     <PageContainer className="max-w-5xl">
       <ChapterTitle
@@ -976,35 +959,33 @@ export function WindowFuncSection() {
         </div>
       </div>
 
-      <div className="grid grid-cols-[160px_1fr] items-start gap-4">
-        <div className="rounded-panel bg-rail flex flex-col gap-1 border p-2">
-          {FUNC_ITEMS.map((f) => {
-            const isActive = f.name === openFunc
-            return (
-              <button
-                key={f.name}
-                onClick={() => setOpenFunc(f.name)}
-                className={cn(
-                  'rounded-card px-3 py-2 text-left font-mono text-xs font-bold transition-all',
-                  isActive ? C.active : 'text-ink-2 hover:bg-rail'
-                )}
-              >
-                {f.name}
-              </button>
-            )
-          })}
-        </div>
-
-        <DetailPanel
-          item={activeFunc}
-          lang={lang}
-          labels={{
-            categoryLabel: t.categoryLabel,
-            exampleQuery: t.exampleQuery,
-            result: t.result,
-          }}
-        />
-      </div>
+      <IndexedContent
+        items={FUNC_ITEMS}
+        activeId={openFunc}
+        onSelect={setOpenFunc}
+        getId={(f) => f.name}
+        renderIndexItem={(f, isActive) => (
+          <span
+            className={cn(
+              'block px-3 py-2 font-mono text-xs font-bold',
+              isActive ? C.active : 'text-ink-2 hover:bg-rail'
+            )}
+          >
+            {f.name}
+          </span>
+        )}
+        renderContent={(item) => (
+          <DetailPanel
+            item={item}
+            lang={lang}
+            labels={{
+              categoryLabel: t.categoryLabel,
+              exampleQuery: t.exampleQuery,
+              result: t.result,
+            }}
+          />
+        )}
+      />
 
       <Divider />
 
@@ -1035,9 +1016,13 @@ export function WindowFuncSection() {
               <span className="text-ink font-mono text-sm font-black">
                 {w.word}
               </span>
-              <span className="text-ink-2 text-xs italic">{w.literal}</span>
+              <span className="text-ink-2 font-sans text-xs italic">
+                {w.literal}
+              </span>
             </div>
-            <p className="text-ink/80 text-xs leading-relaxed">{w.meaning}</p>
+            <p className="text-ink/80 font-read text-xs leading-relaxed">
+              {w.meaning}
+            </p>
             <div className="rounded-card bg-rail text-ink-2 mt-0.5 border px-2.5 py-1.5 font-mono text-[11px]">
               {w.example}
             </div>
@@ -1045,35 +1030,34 @@ export function WindowFuncSection() {
         ))}
       </div>
 
-      <div className="grid grid-cols-[220px_1fr] items-start gap-4">
-        <div className="rounded-panel bg-rail flex flex-col gap-1 border p-2">
-          {FRAME_ITEMS.map((f) => {
-            const isActive = f.name === openFrame
-            return (
-              <button
-                key={f.name}
-                onClick={() => setOpenFrame(f.name)}
-                className={cn(
-                  'rounded-card px-3 py-2 text-left font-mono text-xs font-bold transition-all',
-                  isActive ? C.active : 'text-ink-2 hover:bg-rail'
-                )}
-              >
-                {f.name}
-              </button>
-            )
-          })}
-        </div>
-
-        <DetailPanel
-          item={activeFrame}
-          lang={lang}
-          labels={{
-            categoryLabel: t.frameCategoryLabel,
-            exampleQuery: t.exampleQuery,
-            result: t.result,
-          }}
-        />
-      </div>
+      <IndexedContent
+        items={FRAME_ITEMS}
+        activeId={openFrame}
+        onSelect={setOpenFrame}
+        getId={(f) => f.name}
+        indexWidth="220px"
+        renderIndexItem={(f, isActive) => (
+          <span
+            className={cn(
+              'block px-3 py-2 font-mono text-xs font-bold',
+              isActive ? C.active : 'text-ink-2 hover:bg-rail'
+            )}
+          >
+            {f.name}
+          </span>
+        )}
+        renderContent={(item) => (
+          <DetailPanel
+            item={item}
+            lang={lang}
+            labels={{
+              categoryLabel: t.frameCategoryLabel,
+              exampleQuery: t.exampleQuery,
+              result: t.result,
+            }}
+          />
+        )}
+      />
     </PageContainer>
   )
 }

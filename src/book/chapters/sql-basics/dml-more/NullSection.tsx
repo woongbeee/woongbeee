@@ -1,7 +1,12 @@
 import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
-import { PageContainer, ChapterTitle, Prose, Divider } from '../../shared'
+import {
+  PageContainer,
+  ChapterTitle,
+  Prose,
+  Divider,
+  IndexedContent,
+} from '../../shared'
 import { IconMathOff } from '@tabler/icons-react'
 import { SqlHighlight } from './SqlHighlight'
 import { useSimulationStore } from '@/store/simulationStore'
@@ -248,7 +253,6 @@ export function NullSection() {
   const lang = useSimulationStore((s) => s.lang)
   const t = T[lang]
   const [openItem, setOpenItem] = useState<string>(FUNC_ITEMS[0].name)
-  const item = FUNC_ITEMS.find((f) => f.name === openItem)!
 
   return (
     <PageContainer className="max-w-5xl">
@@ -260,36 +264,23 @@ export function NullSection() {
         subtitle={t.chapterSubtitle}
       />
 
-      <div className="grid grid-cols-[160px_1fr] items-start gap-4">
-        {/* LEFT: 함수 목록 */}
-        <div className="rounded-panel bg-rail flex flex-col gap-1 border p-2">
-          {FUNC_ITEMS.map((f) => {
-            const isActive = f.name === openItem
-            return (
-              <button
-                key={f.name}
-                onClick={() => setOpenItem(f.name)}
-                className={cn(
-                  'rounded-card px-3 py-2 text-left font-mono text-xs font-bold transition-all',
-                  isActive ? C.active : 'text-ink-2 hover:bg-rail'
-                )}
-              >
-                {f.name}
-              </button>
-            )
-          })}
-        </div>
-
-        {/* RIGHT: 상세 */}
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={item.name}
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -6 }}
-            transition={{ duration: 0.18 }}
-            className="flex flex-col gap-4"
+      <IndexedContent
+        items={FUNC_ITEMS}
+        activeId={openItem}
+        onSelect={setOpenItem}
+        getId={(f) => f.name}
+        renderIndexItem={(f, isActive) => (
+          <span
+            className={cn(
+              'block px-3 py-2 font-mono text-xs font-bold',
+              isActive ? C.active : 'text-ink-2 hover:bg-rail'
+            )}
           >
+            {f.name}
+          </span>
+        )}
+        renderContent={(item) => (
+          <>
             {/* 헤더 */}
             <div
               className={cn(
@@ -344,7 +335,7 @@ export function NullSection() {
                 <Divider />
                 <div
                   className={cn(
-                    'rounded-panel border px-4 py-3 text-xs leading-relaxed',
+                    'rounded-panel font-read border px-4 py-3 text-xs leading-relaxed',
                     C.bg,
                     C.border,
                     C.text
@@ -355,9 +346,9 @@ export function NullSection() {
                 </div>
               </>
             )}
-          </motion.div>
-        </AnimatePresence>
-      </div>
+          </>
+        )}
+      />
     </PageContainer>
   )
 }

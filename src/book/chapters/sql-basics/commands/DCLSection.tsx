@@ -1,6 +1,8 @@
 import {
   PageContainer,
   ChapterTitle,
+  SectionTitle,
+  SubTitle,
   Prose,
   InfoBox,
   SqlBlock,
@@ -38,7 +40,10 @@ const T = {
       ['INSERT', '테이블에 새 행을 삽입할 수 있는 권한이에요'],
       ['UPDATE', '테이블의 기존 행을 수정할 수 있는 권한이에요'],
       ['DELETE', '테이블의 행을 삭제할 수 있는 권한이에요'],
-      ['EXECUTE', '저장 프로시저(Stored Procedure)나 함수를 실행할 수 있는 권한이에요'],
+      [
+        'EXECUTE',
+        '저장 프로시저(Stored Procedure)나 함수를 실행할 수 있는 권한이에요',
+      ],
       ['ALL', 'SELECT·INSERT·UPDATE·DELETE 등 해당 객체의 모든 권한이에요'],
     ],
 
@@ -121,7 +126,10 @@ REVOKE hr_readonly FROM alice;`,
       ['UPDATE', 'Modify existing rows in a table'],
       ['DELETE', 'Delete rows from a table'],
       ['EXECUTE', 'Run a stored procedure or function'],
-      ['ALL', 'All applicable privileges (SELECT, INSERT, UPDATE, DELETE, etc.)'],
+      [
+        'ALL',
+        'All applicable privileges (SELECT, INSERT, UPDATE, DELETE, etc.)',
+      ],
     ],
 
     grantTitle: 'GRANT — Granting Privileges',
@@ -173,7 +181,7 @@ GRANT hr_readonly TO bob;
 -- Revoke the role from a user
 REVOKE hr_readonly FROM alice;`,
     roleTip:
-      "Oracle ships with built-in roles: CONNECT (login access), RESOURCE (create tables, sequences, etc.), and DBA (full admin rights). Prefer built-in roles over custom ones when they cover your needs.",
+      'Oracle ships with built-in roles: CONNECT (login access), RESOURCE (create tables, sequences, etc.), and DBA (full admin rights). Prefer built-in roles over custom ones when they cover your needs.',
   },
 }
 
@@ -182,43 +190,44 @@ export function DCLSection() {
   const t = T[lang]
   return (
     <PageContainer>
-      <ChapterTitle icon={<IconShieldLock size={36} color="var(--color-green)" stroke={1.5} />} title={t.chapterTitle} subtitle={t.chapterSubtitle} />
+      <ChapterTitle
+        icon={
+          <IconShieldLock size={36} color="var(--color-green)" stroke={1.5} />
+        }
+        title={t.chapterTitle}
+        subtitle={t.chapterSubtitle}
+      />
 
-      <div className="mt-6">
-        {/* 권한 종류 */}
-        <AccordionSection title={t.privilegeTitle}>
-          <Prose>{t.privilegeDesc}</Prose>
-          <Table headers={t.privilegeHeaders} rows={t.privilegeRows} />
-          <p className="mb-2 mt-4 text-sm font-bold">
-            {lang === 'ko' ? '주요 객체 권한' : 'Common Object Privileges'}
-          </p>
-          <Table headers={t.objectPrivHeaders} rows={t.objectPrivRows} />
-        </AccordionSection>
-
-        {/* GRANT */}
-        <AccordionSection title={t.grantTitle}>
-          <Prose>{t.grantDesc}</Prose>
-          <SqlBlock sql={t.grantExample} />
-          <InfoBox variant="warning">
-            {t.grantTip}
-          </InfoBox>
-        </AccordionSection>
-
-        {/* REVOKE */}
-        <AccordionSection title={t.revokeTitle}>
-          <Prose>{t.revokeDesc}</Prose>
-          <SqlBlock sql={t.revokeExample} />
-        </AccordionSection>
-
-        {/* Role */}
-        <AccordionSection title={t.roleTitle}>
-          <Prose>{t.roleDesc}</Prose>
-          <SqlBlock sql={t.roleExample} />
-          <InfoBox variant="note">
-            {t.roleTip}
-          </InfoBox>
-        </AccordionSection>
+      {/* 먼저 알아두기 — 권한 종류 */}
+      <SectionTitle>{t.privilegeTitle}</SectionTitle>
+      <Prose>{t.privilegeDesc}</Prose>
+      <Table headers={t.privilegeHeaders} rows={t.privilegeRows} />
+      <div className="mt-4">
+        <SubTitle>
+          {lang === 'ko' ? '주요 객체 권한' : 'Common Object Privileges'}
+        </SubTitle>
       </div>
+      <Table headers={t.objectPrivHeaders} rows={t.objectPrivRows} />
+
+      {/* GRANT */}
+      <AccordionSection title={t.grantTitle}>
+        <Prose>{t.grantDesc}</Prose>
+        <SqlBlock sql={t.grantExample} />
+        <InfoBox variant="warning">{t.grantTip}</InfoBox>
+      </AccordionSection>
+
+      {/* REVOKE */}
+      <AccordionSection title={t.revokeTitle}>
+        <Prose>{t.revokeDesc}</Prose>
+        <SqlBlock sql={t.revokeExample} />
+      </AccordionSection>
+
+      {/* Role */}
+      <AccordionSection title={t.roleTitle}>
+        <Prose>{t.roleDesc}</Prose>
+        <SqlBlock sql={t.roleExample} />
+        <InfoBox variant="note">{t.roleTip}</InfoBox>
+      </AccordionSection>
     </PageContainer>
   )
 }

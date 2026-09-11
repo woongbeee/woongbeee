@@ -1,6 +1,8 @@
 import {
   PageContainer,
   ChapterTitle,
+  SectionTitle,
+  SubTitle,
   Prose,
   InfoBox,
   SqlBlock,
@@ -101,15 +103,18 @@ ALTER TABLE employees DROP CONSTRAINT chk_salary;`,
       'NOT NULL 제약 조건을 추가할 때, 기존 행에 이미 NULL 값이 있으면 에러가 발생해요. 먼저 UPDATE로 NULL을 채운 뒤 제약 조건을 추가하세요.',
 
     dropTruncateTitle: 'DROP vs TRUNCATE — 무엇이 다를까요?',
-    dropTruncateDesc:
-      '둘 다 DDL이라 자동 COMMIT되지만, 지우는 대상이 달라요.',
+    dropTruncateDesc: '둘 다 DDL이라 자동 COMMIT되지만, 지우는 대상이 달라요.',
     dropTruncateHeaders: ['구분', 'DROP TABLE', 'TRUNCATE TABLE'],
     dropTruncateRows: [
       ['지우는 대상', '테이블 구조 + 데이터 모두', '데이터만 (구조는 유지)'],
       ['ROLLBACK', '불가능', '불가능'],
       ['속도', '빠름', '매우 빠름 (Undo 로그 없음)'],
       ['WHERE 조건', '없음', '없음 (전체 삭제만 가능)'],
-      ['실행 후', '테이블이 사라짐 (다시 CREATE 필요)', '빈 테이블이 그대로 남음'],
+      [
+        '실행 후',
+        '테이블이 사라짐 (다시 CREATE 필요)',
+        '빈 테이블이 그대로 남음',
+      ],
     ],
     dropExample: `-- employees 테이블 완전 삭제 (데이터와 구조 모두 사라짐, 복구 불가)
 DROP TABLE employees;
@@ -346,66 +351,75 @@ export function DDLSection() {
   const t = T[lang]
   return (
     <PageContainer>
-      <ChapterTitle icon={<IconTable size={36} color="var(--color-amber)" stroke={1.5} />} title={t.chapterTitle} subtitle={t.chapterSubtitle} />
+      <ChapterTitle
+        icon={<IconTable size={36} color="var(--color-amber)" stroke={1.5} />}
+        title={t.chapterTitle}
+        subtitle={t.chapterSubtitle}
+      />
 
-      <div className="mt-6">
-        {/* 데이터 타입 & 제약 조건 */}
-        <AccordionSection title={t.prerequisiteTitle}>
-          <Prose>{t.prerequisiteDesc}</Prose>
-          <p className="mb-2 text-sm font-bold">{t.dataTypeTitle}</p>
-          <Table headers={t.dataTypeHeaders} rows={t.dataTypeRows} />
-          <InfoBox variant="tip">
-            <span style={{ whiteSpace: 'pre-line' }}>{t.varcharVsChar}</span>
-          </InfoBox>
-          <p className="mb-2 mt-4 text-sm font-bold">{t.constraintTitle}</p>
-          <Prose>{t.constraintDesc}</Prose>
-          <Table headers={t.constraintHeaders} rows={t.constraintRows} />
-        </AccordionSection>
-
-        {/* CREATE TABLE */}
-        <AccordionSection title={t.createTitle}>
-          <Prose>{t.createDesc}</Prose>
-          <SqlBlock sql={t.createExample} />
-        </AccordionSection>
-
-        {/* ALTER TABLE */}
-        <AccordionSection title={t.alterTitle}>
-          <Prose>{t.alterDesc}</Prose>
-          <SqlBlock sql={t.alterExample} />
-          <InfoBox variant="tip">
-            {t.alterTip}
-          </InfoBox>
-        </AccordionSection>
-
-        {/* DROP vs TRUNCATE */}
-        <AccordionSection title={t.dropTruncateTitle}>
-          <Prose>{t.dropTruncateDesc}</Prose>
-          <Table headers={t.dropTruncateHeaders} rows={t.dropTruncateRows} />
-          <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <SqlBlock badge="DROP TABLE" badgeColor="violet" sql={t.dropExample} />
-            <SqlBlock badge="TRUNCATE TABLE" badgeColor="violet" sql={t.truncateExample} />
-          </div>
-        </AccordionSection>
-
-        {/* Other DDL */}
-        <AccordionSection title={t.otherTitle}>
-          <Prose>{t.otherDesc}</Prose>
-          <InfoBox variant="note">/
-            <span style={{ whiteSpace: 'pre-line' }}>{t.otherPreview}</span>
-          </InfoBox>
-          <div className="space-y-5">
-            {t.otherExamples.map((item) => (
-              <SqlBlock
-                key={item.cmd}
-                badge={item.cmd}
-                badgeColor="violet"
-                desc={item.desc}
-                sql={item.example}
-              />
-            ))}
-          </div>
-        </AccordionSection>
+      {/* 먼저 알아두기 — 데이터 타입 & 제약 조건 */}
+      <SectionTitle>{t.prerequisiteTitle}</SectionTitle>
+      <Prose>{t.prerequisiteDesc}</Prose>
+      <SubTitle>{t.dataTypeTitle}</SubTitle>
+      <Table headers={t.dataTypeHeaders} rows={t.dataTypeRows} />
+      <InfoBox variant="tip">
+        <span style={{ whiteSpace: 'pre-line' }}>{t.varcharVsChar}</span>
+      </InfoBox>
+      <div className="mt-4">
+        <SubTitle>{t.constraintTitle}</SubTitle>
       </div>
+      <Prose>{t.constraintDesc}</Prose>
+      <Table headers={t.constraintHeaders} rows={t.constraintRows} />
+
+      {/* CREATE TABLE */}
+      <AccordionSection title={t.createTitle}>
+        <Prose>{t.createDesc}</Prose>
+        <SqlBlock sql={t.createExample} />
+      </AccordionSection>
+
+      {/* ALTER TABLE */}
+      <AccordionSection title={t.alterTitle}>
+        <Prose>{t.alterDesc}</Prose>
+        <SqlBlock sql={t.alterExample} />
+        <InfoBox variant="tip">{t.alterTip}</InfoBox>
+      </AccordionSection>
+
+      {/* DROP vs TRUNCATE */}
+      <AccordionSection title={t.dropTruncateTitle}>
+        <Prose>{t.dropTruncateDesc}</Prose>
+        <Table headers={t.dropTruncateHeaders} rows={t.dropTruncateRows} />
+        <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <SqlBlock
+            badge="DROP TABLE"
+            badgeColor="violet"
+            sql={t.dropExample}
+          />
+          <SqlBlock
+            badge="TRUNCATE TABLE"
+            badgeColor="violet"
+            sql={t.truncateExample}
+          />
+        </div>
+      </AccordionSection>
+
+      {/* Other DDL */}
+      <AccordionSection title={t.otherTitle}>
+        <Prose>{t.otherDesc}</Prose>
+        <InfoBox variant="note">
+          <span style={{ whiteSpace: 'pre-line' }}>{t.otherPreview}</span>
+        </InfoBox>
+        <div className="space-y-5">
+          {t.otherExamples.map((item) => (
+            <SqlBlock
+              key={item.cmd}
+              badge={item.cmd}
+              badgeColor="violet"
+              desc={item.desc}
+              sql={item.example}
+            />
+          ))}
+        </div>
+      </AccordionSection>
     </PageContainer>
   )
 }

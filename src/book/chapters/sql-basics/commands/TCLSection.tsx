@@ -1,6 +1,8 @@
 import {
   PageContainer,
   ChapterTitle,
+  SectionTitle,
+  SubTitle,
   Prose,
   InfoBox,
   SqlBlock,
@@ -21,10 +23,22 @@ const T = {
       '트랜잭션은 "하나의 작업 단위"예요. 은행 이체를 예로 들면, A 계좌에서 출금하고 B 계좌에 입금하는 두 작업은 반드시 함께 성공하거나 함께 실패해야 해요. 어느 하나만 성공하면 데이터가 망가지거든요.\n\n트랜잭션은 이런 상황에서 데이터 무결성(Integrity)을 지키기 위해 존재해요.',
     txPropHeaders: ['특성', '설명'],
     txPropRows: [
-      ['Atomicity (원자성)', '트랜잭션 안의 모든 작업이 전부 성공하거나 전부 실패해야 해요.'],
-      ['Consistency (일관성)', '트랜잭션 전후로 데이터베이스는 항상 일관된 상태를 유지해야 해요.'],
-      ['Isolation (격리성)', '동시에 실행 중인 트랜잭션은 서로의 중간 상태를 볼 수 없어요.'],
-      ['Durability (지속성)', 'COMMIT된 데이터는 장애가 발생해도 영구적으로 보존돼요.'],
+      [
+        'Atomicity (원자성)',
+        '트랜잭션 안의 모든 작업이 전부 성공하거나 전부 실패해야 해요.',
+      ],
+      [
+        'Consistency (일관성)',
+        '트랜잭션 전후로 데이터베이스는 항상 일관된 상태를 유지해야 해요.',
+      ],
+      [
+        'Isolation (격리성)',
+        '동시에 실행 중인 트랜잭션은 서로의 중간 상태를 볼 수 없어요.',
+      ],
+      [
+        'Durability (지속성)',
+        'COMMIT된 데이터는 장애가 발생해도 영구적으로 보존돼요.',
+      ],
     ],
     txNote:
       'Oracle에서 트랜잭션은 첫 번째 DML이 실행되는 순간 자동으로 시작돼요. COMMIT 또는 ROLLBACK이 실행되면 트랜잭션이 종료되고, 다음 DML에서 새 트랜잭션이 시작돼요.\n\nDDL(CREATE·ALTER·DROP 등)은 실행 시 자동 COMMIT되는데, 이때 진행 중이던 트랜잭션도 함께 COMMIT돼요.',
@@ -93,7 +107,11 @@ COMMIT;`,
       ['이후 복구', '불가능 (영구 확정)', '가능 (이전 COMMIT 상태로)'],
       ['트랜잭션', '종료 후 새 트랜잭션 시작', '종료 후 새 트랜잭션 시작'],
       ['DDL 실행 시', '자동으로 COMMIT 발생', '—'],
-      ['접속 종료 시', '정상 종료 → 자동 COMMIT', '비정상 종료 → 자동 ROLLBACK'],
+      [
+        '접속 종료 시',
+        '정상 종료 → 자동 COMMIT',
+        '비정상 종료 → 자동 ROLLBACK',
+      ],
     ],
   },
   en: {
@@ -106,9 +124,18 @@ COMMIT;`,
       'A transaction is a single unit of work. Take a bank transfer: withdrawing from account A and depositing into account B must either both succeed or both fail — if only one side completes, the data is corrupted.\n\nTransactions exist to protect data integrity in exactly these situations.',
     txPropHeaders: ['Property', 'Description'],
     txPropRows: [
-      ['Atomicity', 'All operations in a transaction must fully succeed or fully fail together.'],
-      ['Consistency', 'The database must remain in a consistent state before and after the transaction.'],
-      ['Isolation', 'Concurrent transactions cannot see each other\'s intermediate state.'],
+      [
+        'Atomicity',
+        'All operations in a transaction must fully succeed or fully fail together.',
+      ],
+      [
+        'Consistency',
+        'The database must remain in a consistent state before and after the transaction.',
+      ],
+      [
+        'Isolation',
+        "Concurrent transactions cannot see each other's intermediate state.",
+      ],
       ['Durability', 'Once committed, data survives even system failures.'],
     ],
     txNote:
@@ -174,11 +201,27 @@ COMMIT;`,
     compareTitle: 'COMMIT vs ROLLBACK',
     compareHeaders: ['', 'COMMIT', 'ROLLBACK'],
     compareRows: [
-      ['Effect', 'Permanently saves changes', 'Discards all uncommitted changes'],
-      ['Recovery after', 'Not possible — permanently committed', 'Possible — restores to last COMMIT'],
-      ['Transaction', 'Ends; new transaction starts next DML', 'Ends; new transaction starts next DML'],
+      [
+        'Effect',
+        'Permanently saves changes',
+        'Discards all uncommitted changes',
+      ],
+      [
+        'Recovery after',
+        'Not possible — permanently committed',
+        'Possible — restores to last COMMIT',
+      ],
+      [
+        'Transaction',
+        'Ends; new transaction starts next DML',
+        'Ends; new transaction starts next DML',
+      ],
       ['On DDL execution', 'Auto-COMMIT triggered', '—'],
-      ['On session end', 'Normal exit → auto COMMIT', 'Abnormal exit → auto ROLLBACK'],
+      [
+        'On session end',
+        'Normal exit → auto COMMIT',
+        'Abnormal exit → auto ROLLBACK',
+      ],
     ],
   },
 }
@@ -188,50 +231,47 @@ export function TCLSection() {
   const t = T[lang]
   return (
     <PageContainer>
-      <ChapterTitle icon={<IconGitCommit size={36} color="var(--color-amber)" stroke={1.5} />} title={t.chapterTitle} subtitle={t.chapterSubtitle} />
+      <ChapterTitle
+        icon={
+          <IconGitCommit size={36} color="var(--color-amber)" stroke={1.5} />
+        }
+        title={t.chapterTitle}
+        subtitle={t.chapterSubtitle}
+      />
 
-      <div className="mt-6">
-        {/* 트랜잭션 개념 */}
-        <AccordionSection title={t.txTitle}>
-          <Prose>{t.txDesc}</Prose>
-          <p className="mb-2 text-sm font-bold">
-            {lang === 'ko' ? 'ACID 특성' : 'ACID Properties'}
-          </p>
-          <Table headers={t.txPropHeaders} rows={t.txPropRows} />
-          <InfoBox variant="note">
-            <span style={{ whiteSpace: 'pre-line' }}>{t.txNote}</span>
-          </InfoBox>
-        </AccordionSection>
+      {/* 먼저 알아두기 — 트랜잭션 개념 */}
+      <SectionTitle>{t.txTitle}</SectionTitle>
+      <Prose>{t.txDesc}</Prose>
+      <SubTitle>{lang === 'ko' ? 'ACID 특성' : 'ACID Properties'}</SubTitle>
+      <Table headers={t.txPropHeaders} rows={t.txPropRows} />
+      <InfoBox variant="note">
+        <span style={{ whiteSpace: 'pre-line' }}>{t.txNote}</span>
+      </InfoBox>
 
-        {/* COMMIT */}
-        <AccordionSection title={t.commitTitle}>
-          <Prose>{t.commitDesc}</Prose>
-          <SqlBlock sql={t.commitExample} />
-          <InfoBox variant="warning">
-            {t.commitTip}
-          </InfoBox>
-        </AccordionSection>
+      {/* COMMIT */}
+      <AccordionSection title={t.commitTitle}>
+        <Prose>{t.commitDesc}</Prose>
+        <SqlBlock sql={t.commitExample} />
+        <InfoBox variant="warning">{t.commitTip}</InfoBox>
+      </AccordionSection>
 
-        {/* ROLLBACK */}
-        <AccordionSection title={t.rollbackTitle}>
-          <Prose>{t.rollbackDesc}</Prose>
-          <SqlBlock sql={t.rollbackExample} />
-        </AccordionSection>
+      {/* ROLLBACK */}
+      <AccordionSection title={t.rollbackTitle}>
+        <Prose>{t.rollbackDesc}</Prose>
+        <SqlBlock sql={t.rollbackExample} />
+      </AccordionSection>
 
-        {/* SAVEPOINT */}
-        <AccordionSection title={t.savepointTitle}>
-          <Prose>{t.savepointDesc}</Prose>
-          <SqlBlock sql={t.savepointExample} />
-          <InfoBox variant="tip">
-            {t.savepointTip}
-          </InfoBox>
-        </AccordionSection>
+      {/* SAVEPOINT */}
+      <AccordionSection title={t.savepointTitle}>
+        <Prose>{t.savepointDesc}</Prose>
+        <SqlBlock sql={t.savepointExample} />
+        <InfoBox variant="tip">{t.savepointTip}</InfoBox>
+      </AccordionSection>
 
-        {/* 비교 표 */}
-        <AccordionSection title={t.compareTitle}>
-          <Table headers={t.compareHeaders} rows={t.compareRows} />
-        </AccordionSection>
-      </div>
+      {/* 비교 표 */}
+      <AccordionSection title={t.compareTitle}>
+        <Table headers={t.compareHeaders} rows={t.compareRows} />
+      </AccordionSection>
     </PageContainer>
   )
 }

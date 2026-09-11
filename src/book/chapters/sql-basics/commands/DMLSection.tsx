@@ -3,6 +3,7 @@ import {
   ChapterTitle,
   Prose,
   InfoBox,
+  SqlBlock,
   AccordionSection,
 } from '../../shared'
 import { useSimulationStore } from '@/store/simulationStore'
@@ -21,7 +22,7 @@ const T = {
   ko: {
     chapterTitle: 'DML — Data Manipulation Language',
     chapterSubtitle:
-      '데이터를 조회·수정·삭제하는 가장 기본적인 명령어인 SELECT, FROM, WHERE, UPDATE, DELETE를 알아봐요.',
+      '데이터를 조회·삽입·수정·삭제하는 가장 기본적인 명령어인 SELECT, FROM, WHERE, INSERT, UPDATE, DELETE를 알아봐요.',
     clauseTitle: '핵심 절(Clause) 정리',
     clauses: [
       {
@@ -104,6 +105,15 @@ const T = {
     ],
     whereNullTip:
       "NULL은 값이 없음을 나타내는 특수한 상태예요. 0이나 빈 문자열('')과는 달라요. NULL과의 비교는 항상 UNKNOWN이 되기 때문에 = NULL이나 != NULL은 동작하지 않아요. NULL 여부를 확인할 때는 반드시 IS NULL / IS NOT NULL을 사용하세요.",
+    insertTitle: 'INSERT — 데이터 삽입',
+    insertDesc:
+      'INSERT는 테이블에 새 행을 추가해요. 모든 컬럼에 값을 채울 수도 있고, 컬럼명을 지정해서 일부만 채울 수도 있어요.',
+    insertExample: `-- 전체 컬럼에 값 삽입 (컬럼 순서대로)
+INSERT INTO employees VALUES (1, 'Alice', 10, 6000);
+
+-- 특정 컬럼만 지정 — 나머지는 NULL 또는 DEFAULT 값
+INSERT INTO employees (emp_id, name, dept_id)
+VALUES (2, 'Bob', 20);`,
     updateTitle: 'UPDATE — 데이터 수정',
     updateDesc:
       'UPDATE는 기존 행의 값을 바꿔요. SET 절에 수정할 컬럼명과 새 값을 적고, WHERE 절에 수정하려는 행의 조건을 기술해요.',
@@ -114,6 +124,19 @@ const T = {
       'WHERE 절에 조건을 기술해서 해당하는 행을 삭제해요. WHERE 절을 쓰지 않으면 테이블의 전체 행이 삭제되니 주의하세요.',
     deleteTip:
       'DELETE는 행 단위로 Undo 로그를 남기기 때문에 느릴 수 있어요. (대신 ROLLBACK이 가능해요.) 전체 행을 지워야 한다면 TRUNCATE TABLE이 훨씬 빨라요.\n\nTRUNCATE는 "잘라내다"는 뜻이에요. TRUNCATE TABLE은 테이블의 모든 행을 한 번에 제거하는 DDL 명령이에요. DELETE와 달리 행별 Undo 로그를 남기지 않아서 매우 빠르지만, ROLLBACK은 불가능해요.',
+    deleteCompareTitle: 'DELETE vs TRUNCATE vs DROP — 무엇이 다를까요?',
+    deleteCompareBody:
+      '세 명령어 모두 데이터를 "지운다"는 점은 같지만, 무엇을 지우고 되돌릴 수 있는지가 달라요.\n\n' +
+      '• DELETE (DML) — 조건에 맞는 행만 골라서 삭제해요. 삭제하는 행마다 Undo 로그를 기록하기 때문에 ROLLBACK으로 되돌릴 수 있어요. 하지만 그만큼 느릴 수 있어요.\n\n' +
+      '• TRUNCATE (DDL) — 테이블의 모든 행을 한 번에 제거해요. 행별 Undo 로그를 남기지 않아서 DELETE보다 훨씬 빠르지만, 자동 COMMIT되기 때문에 ROLLBACK이 불가능해요. 테이블 구조(컬럼 정의, 제약 조건)는 그대로 남아요.\n\n' +
+      '• DROP (DDL) — 테이블 자체를 데이터베이스에서 완전히 제거해요. 데이터와 테이블 구조 모두 사라져요. 마찬가지로 ROLLBACK 불가능해요.',
+    undoLogTitle: 'Undo 로그란?',
+    undoLogBody:
+      'Oracle이 DML(INSERT, UPDATE, DELETE)을 실행할 때, 변경하기 이전의 데이터를 Undo 세그먼트(Undo Segment)라는 별도 공간에 저장해 둬요. 이게 바로 Undo 로그예요.\n\n' +
+      'Undo 로그 덕분에 두 가지가 가능해요.\n' +
+      '① ROLLBACK — "아, 실수했다" 싶을 때 변경 전 상태로 되돌릴 수 있어요.\n' +
+      '② 읽기 일관성 — 내가 수정 중인 데이터를 다른 사용자가 조회하면 수정 전 값을 보여줄 수 있어요.\n\n' +
+      'TRUNCATE나 DROP은 Undo 로그를 남기지 않기 때문에 실행 즉시 되돌릴 방법이 없어요. 항상 신중하게 사용하세요.',
   },
   en: {
     chapterTitle: 'Core Syntax — SELECT / FROM / WHERE',
@@ -212,6 +235,15 @@ const T = {
     ],
     whereNullTip:
       "What is NULL? — NULL represents the absence of a value. It is not the same as 0 or an empty string (''). Any comparison with NULL evaluates to UNKNOWN, so = NULL and != NULL do not work. Always use IS NULL / IS NOT NULL to check for NULL.",
+    insertTitle: 'INSERT — Adding Data',
+    insertDesc:
+      'INSERT adds a new row to a table. You can supply values for every column, or specify column names to fill in only some of them.',
+    insertExample: `-- Insert into every column, in order
+INSERT INTO employees VALUES (1, 'Alice', 10, 6000);
+
+-- Insert into specific columns — the rest get NULL or their DEFAULT value
+INSERT INTO employees (emp_id, name, dept_id)
+VALUES (2, 'Bob', 20);`,
     updateTitle: 'UPDATE — Modifying Data',
     updateDesc:
       'UPDATE changes existing row values. Write the column name and new value in the SET clause, and specify the condition for the rows to modify in the WHERE clause. Omitting WHERE updates every row in the table.',
@@ -222,6 +254,19 @@ const T = {
       'Write a condition in the WHERE clause to delete the matching rows. Omitting WHERE deletes all rows.',
     deleteTip:
       'DELETE writes per-row undo logs and can be slow. (However, ROLLBACK is possible.) For full-table removal, TRUNCATE TABLE is much faster.\n\nTRUNCATE means "to cut off". TRUNCATE TABLE is a DDL command that removes all rows from a table at once. Unlike DELETE, it does not write per-row undo logs — making it extremely fast — but ROLLBACK is not possible.',
+    deleteCompareTitle: "DELETE vs TRUNCATE vs DROP — What's the difference?",
+    deleteCompareBody:
+      'All three commands "delete" data, but they differ in what they remove and whether it can be undone.\n\n' +
+      '• DELETE (DML) — Removes only the rows that match a condition. Each deleted row is recorded in the Undo log, so ROLLBACK is possible. This per-row logging can make it slower on large datasets.\n\n' +
+      '• TRUNCATE (DDL) — Removes all rows from a table in one shot. It skips per-row Undo logging, making it much faster than DELETE — but it auto-commits, so ROLLBACK is not possible. The table structure (columns, constraints) remains intact.\n\n' +
+      '• DROP (DDL) — Completely removes the table itself from the database. Both the data and the table structure are gone. Like TRUNCATE, it cannot be rolled back.',
+    undoLogTitle: 'What is an Undo Log?',
+    undoLogBody:
+      'When Oracle executes a DML statement (INSERT, UPDATE, DELETE), it saves a copy of the data as it was before the change in a special area called the Undo Segment. This saved copy is the Undo log.\n\n' +
+      'The Undo log enables two key features:\n' +
+      '① ROLLBACK — if you made a mistake, Oracle can restore the data to its state before the change.\n' +
+      '② Read consistency — while you are modifying data, other users who query it will see the pre-change version, not your uncommitted work.\n\n' +
+      'TRUNCATE and DROP do not write Undo logs, so there is no way to recover once they execute. Always double-check before running them.',
   },
 }
 
@@ -263,8 +308,10 @@ export function DMLSection() {
                       {c.kw}
                     </code>
                   </div>
-                  <div className="mb-0.5 text-xs font-bold">{c.title}</div>
-                  <div className="text-xs leading-relaxed opacity-80">
+                  <div className="mb-0.5 font-sans text-xs font-bold">
+                    {c.title}
+                  </div>
+                  <div className="font-read text-xs leading-relaxed opacity-80">
                     {c.desc}
                   </div>
                 </div>
@@ -275,7 +322,7 @@ export function DMLSection() {
       />
 
       {/* ── SELECT ── */}
-      <AccordionSection title={t.selectTitle} defaultOpen>
+      <AccordionSection title={t.selectTitle}>
         <SyntaxRow demo={selectDemo} left={<Prose>{t.selectDesc}</Prose>} />
       </AccordionSection>
 
@@ -299,6 +346,12 @@ export function DMLSection() {
           topContent={<Prose>{t.whereDesc}</Prose>}
           bottomContent={<InfoBox variant="note">{t.whereNullTip}</InfoBox>}
         />
+      </AccordionSection>
+
+      {/* ── INSERT ── */}
+      <AccordionSection title={t.insertTitle}>
+        <Prose>{t.insertDesc}</Prose>
+        <SqlBlock sql={t.insertExample} />
       </AccordionSection>
 
       {/* ── UPDATE ── */}
@@ -327,6 +380,20 @@ export function DMLSection() {
             </>
           }
         />
+        <div className="mt-6 space-y-4">
+          <InfoBox variant="tip">
+            <span className="font-bold">{t.deleteCompareTitle}</span>
+            <span style={{ whiteSpace: 'pre-line' }}>
+              {'\n\n' + t.deleteCompareBody}
+            </span>
+          </InfoBox>
+          <InfoBox variant="note">
+            <span className="font-bold">{t.undoLogTitle}</span>
+            <span style={{ whiteSpace: 'pre-line' }}>
+              {'\n\n' + t.undoLogBody}
+            </span>
+          </InfoBox>
+        </div>
       </AccordionSection>
     </PageContainer>
   )

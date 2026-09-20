@@ -4,6 +4,20 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Oracle DB — Interactive Learning Book</title>
+    <!-- 포트폴리오 진입점: 사이트 루트(해시/쿼리 없는 순수 진입)는 이력서(resume.html)로 리다이렉트.
+         #book 으로 오면 리다이렉트하지 않고 아래에서 React 학습서(BookLayout)를 그대로 렌더.
+         #simulator · ?print= 등 기존 특수 진입점도 리다이렉트 대상에서 제외. -->
+    <script>
+      (function () {
+        if (
+          window.location.hash === '' &&
+          !window.location.search &&
+          !/\/resume\.html$/.test(window.location.pathname)
+        ) {
+          window.location.replace('resume.html')
+        }
+      })()
+    </script>
     <!-- 테마 FOUC 방지: React 마운트 전에 <html data-theme> 를 먼저 세팅.
          로직은 src/store/simulationStore.ts 의 initialTheme() 와 일치해야 함. -->
     <script>

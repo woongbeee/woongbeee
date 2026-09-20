@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>박웅비 | 포트폴리오</title>
+  <style>
+    :root {
+      --accent: #F37321;
+      --accent-ink: #000000;
+      --accent-tint: #FFF1E8;
+      --accent-tint-border: #F8C4A0;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+      background: #f0f2f5;
+      color: #333;
+      line-height: 1.6;
+      font-size: 14px;
+    }
+
+    a { color: var(--accent-ink); text-decoration: underline; text-decoration-color: var(--accent); text-decoration-thickness: 2px; text-underline-offset: 2px; }
+    a:hover { text-decoration-color: var(--accent-ink); }
+
+    .page {
+      max-width: 980px;
+      margin: 40px auto;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 32px rgba(0,0,0,0.10);
+      overflow: hidden;
+    }
+
+    /* ── Header ── */
+    .r-header {
+      padding: 36px 40px 28px;
+      border-bottom: 1px solid #e8edf2;
+      display: flex;
+      align-items: center;
+      gap: 32px;
+    }
+
+    .header-avatar {
+      width: 110px;
+      height: 110px;
+      border-radius: 12px;
+      background: #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .header-info { flex: 1; }
+
+    .header-info h1 {
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: #1a202c;
+      margin-bottom: 4px;
+    }
+
+    .header-info h1 span { font-weight: 300; color: #4a5568; }
+
+    .header-info .position {
+      font-size: 14px;
+      color: #718096;
+      font-weight: 500;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+
+    .contacts {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 20px;
+      font-size: 13px;
+      color: #555;
+    }
+
+    .contacts a, .contacts span {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      color: #555;
+    }
+
+    .contact-icon {
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      background: #edf2f7;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      flex-shrink: 0;
+    }
+
+    /* ── Body ── */
+    .r-body {
+      padding: 36px 40px 48px;
+    }
+
+    /* ── Section ── */
+    .r-section { margin-bottom: 40px; }
+    .r-section:last-child { margin-bottom: 0; }
+
+    .r-section > h2 {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #a0aec0;
+      margin-bottom: 20px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #e8edf2;
+    }
+
+    /* ── Sub-section divider (같은 r-section 안에서 별개 프로젝트를 구분, r-section > h2와 동일한 디자인) ── */
+    .subsection-divider {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #a0aec0;
+      margin: 32px 0 20px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #e8edf2;
+    }
+
+    /* ── About ── */
+    .about-text {
+      font-size: 14px;
+      color: #4a5568;
+      line-height: 1.9;
+    }
+
+    /* ── Architecture diagram ── */
+    .arch-intro {
+      font-size: 13px;
+      color: #718096;
+      line-height: 1.8;
+      margin-bottom: 18px;
+    }
+
+    .arch-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 16px;
+      font-size: 12px;
+      color: #718096;
+    }
+
+    .arch-legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .arch-legend-swatch {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+
+    .arch-diagram-wrap {
+      background: #f8fafc;
+      border: 1px solid #e8edf2;
+      border-radius: 12px;
+      padding: 20px;
+      overflow-x: auto;
+      margin-bottom: 24px;
+    }
+
+    .arch-diagram-wrap svg {
+      display: block;
+      min-width: 900px;
+    }
+
+    /* ── Flow steps (사용자가 정리한 1~6단계 요약) ── */
+    .flow-list {
+      list-style: none;
+      counter-reset: flow;
+      margin-bottom: 24px;
+    }
+
+    .flow-list li {
+      counter-increment: flow;
+      position: relative;
+      padding: 12px 16px 12px 44px;
+      background: #f8fafc;
+      border: 1px solid #e8edf2;
+      border-radius: 10px;
+      margin-bottom: 8px;
+      font-size: 12.5px;
+      color: #4a5568;
+      line-height: 1.7;
+    }
+
+    .flow-list li.out-of-scope {
+      opacity: 0.65;
+    }
+
+    .flow-list li::before {
+      content: counter(flow);
+      position: absolute;
+      left: 14px;
+      top: 12px;
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      background: var(--accent);
+      color: #000;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .flow-list li.out-of-scope::before {
+      background: #cbd5e0;
+      color: #4a5568;
+    }
+
+    .flow-list li b { color: var(--accent-ink); font-weight: 700; }
+
+    .flow-list .flow-tech {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 8px;
+    }
+
+    .flow-list .flow-tech-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--accent-tint);
+      color: var(--accent-ink);
+      border: 1px solid var(--accent-tint-border);
+      font-size: 10.5px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 5px;
+    }
+
+    .flow-list .flow-tech-tag .tech-icon {
+      width: 12px;
+      height: 12px;
+      flex-shrink: 0;
+      display: inline-block;
+    }
+
+    /* ── Company block ── */
+    .company-block { margin-bottom: 36px; }
+    .company-block:last-child { margin-bottom: 0; }
+
+    .company-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .company-logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: #edf2f7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: #4a5568;
+      flex-shrink: 0;
+    }
+
+    .company-info { flex: 1; }
+
+    .company-name-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .company-name {
+      font-size: 15px;
+      font-weight: 700;
+      color: #1a202c;
+    }
+
+    .company-period {
+      font-size: 12px;
+      color: #a0aec0;
+      white-space: nowrap;
+    }
+
+    .company-role {
+      font-size: 13px;
+      color: #718096;
+      margin-top: 2px;
+    }
+
+    /* ── Project block ── */
+    .project-block {
+      margin-left: 54px;
+      margin-bottom: 16px;
+      padding: 16px 18px;
+      background: #f8fafc;
+      border-radius: 10px;
+      border: 1px solid #e8edf2;
+    }
+
+    .project-block:last-child { margin-bottom: 0; }
+
+    .project-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 4px;
+    }
+
+    .project-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: #2d3748;
+    }
+
+    .project-name a {
+      font-size: 12px;
+      font-weight: 400;
+      margin-left: 6px;
+    }
+
+    .project-period {
+      font-size: 11px;
+      color: #a0aec0;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .project-summary {
+      font-size: 13px;
+      color: #718096;
+      line-height: 1.75;
+      margin-bottom: 12px;
+    }
+
+    .project-block h5 {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #a0aec0;
+      margin: 12px 0 6px;
+    }
+
+    .project-block h5:first-of-type { margin-top: 0; }
+
+    .project-block ul {
+      list-style: none;
+      margin-bottom: 4px;
+    }
+
+    .project-block ul li {
+      font-size: 13px;
+      color: #4a5568;
+      padding-left: 12px;
+      position: relative;
+      margin-bottom: 4px;
+      line-height: 1.7;
+    }
+
+    .project-block ul li::before {
+      content: '·';
+      position: absolute;
+      left: 0;
+      color: #a0aec0;
+      font-weight: 700;
+    }
+
+    .project-block ul li b {
+      color: var(--accent-ink);
+      font-weight: 600;
+    }
+
+    .achievement-list li {
+      color: #2d3748;
+    }
+
+    .tech-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 10px;
+    }
+
+    .tech-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--accent-tint);
+      color: var(--accent-ink);
+      border: 1px solid var(--accent-tint-border);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 5px;
+    }
+
+    .tech-icon {
+      width: 12px;
+      height: 12px;
+      flex-shrink: 0;
+      display: inline-block;
+    }
+
+    /* ── Print ── */
+    @media print {
+      body { background: #fff; }
+      .page { margin: 0; box-shadow: none; border-radius: 0; }
+      .arch-diagram-wrap { overflow-x: visible; }
+    }
+
+    @media (max-width: 640px) {
+      .r-header { flex-direction: column; align-items: flex-start; gap: 16px; }
+      .project-block { margin-left: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Tech icon sprite (재사용을 위한 숨김 SVG symbol 세트) -->
+  <svg width="0" height="0" style="position:absolute; overflow:hidden;" aria-hidden="true">
+    <defs>
+      <!-- C# -->
+      <symbol id="icon-csharp" viewBox="0 0 24 24">
+        <path fill="#68217A" d="M12 2 3 7v10l9 5 9-5V7l-9-5Z"/>
+        <text x="12" y="16.5" font-family="Georgia, serif" font-size="10" font-weight="700" fill="#fff" text-anchor="middle">C#</text>
+      </symbol>
+      <!-- DevExpress (제네릭 UI/컴포넌트 아이콘) -->
+      <symbol id="icon-devexpress" viewBox="0 0 24 24">
+        <rect x="2" y="2" width="20" height="20" rx="4" fill="#FF7200"/>
+        <rect x="6" y="6" width="5.5" height="5.5" rx="1" fill="#fff"/>
+        <rect x="12.5" y="6" width="5.5" height="5.5" rx="1" fill="#fff" opacity="0.6"/>
+        <rect x="6" y="12.5" width="5.5" height="5.5" rx="1" fill="#fff" opacity="0.6"/>
+        <rect x="12.5" y="12.5" width="5.5" height="5.5" rx="1" fill="#fff"/>
+      </symbol>
+      <!-- Oracle -->
+      <symbol id="icon-oracle" viewBox="0 0 24 24">
+        <rect x="1" y="8" width="22" height="8" rx="4" fill="#F80000"/>
+        <ellipse cx="12" cy="12" rx="5.5" ry="2.7" fill="#F80000" stroke="#fff" stroke-width="1"/>
+      </symbol>
+      <!-- SQL / Database (제네릭) -->
+      <symbol id="icon-sql" viewBox="0 0 24 24">
+        <ellipse cx="12" cy="5.5" rx="8" ry="3" fill="#4A5568"/>
+        <path d="M4 5.5V18.5C4 20.16 7.58 21.5 12 21.5C16.42 21.5 20 20.16 20 18.5V5.5" fill="none" stroke="#4A5568" stroke-width="2"/>
+        <path d="M4 12C4 13.66 7.58 15 12 15C16.42 15 20 13.66 20 12" fill="none" stroke="#4A5568" stroke-width="2"/>
+      </symbol>
+      <!-- Java -->
+      <symbol id="icon-java" viewBox="0 0 24 24">
+        <path fill="#f89820" d="M8.5 17.3c0 0-1.2.7.9.9c2.5.3 3.8.3 6.6-.2c0 0 .7.4 1.7.8c-6.1 2.6-13.8-.2-9.2-1.5Z"/>
+        <path fill="#f89820" d="M7.7 14.4c0 0-1.3.9.8 1.2c2.7.3 4.9.3 8.6-.4c0 0 .5.5 1.2.8c-7.4 2.2-15.6.2-10.6-1.6Z"/>
+        <path fill="#f89820" d="M13.9 9.6c1.5 1.8-.4 3.3-.4 3.3s3.9-2 2.1-4.5c-1.7-2.4-3-3.5 4-7.5c0 0-10.9 2.7-5.7 8.7Z"/>
+        <path fill="#f89820" d="M18.6 19.6c0 0 .9.7-1 1.3c-3.5 1.1-14.6 1.4-17.7 0c-1.1-.5.9-1.1 1.6-1.3c.7-.1 1.1-.1 1.1-.1c-1.2-.9-8 1.7-3.4 2.5c12.5 2 22.8-.9 19.4-2.4Z"/>
+      </symbol>
+      <!-- Spring Boot -->
+      <symbol id="icon-spring" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10.5" fill="#6DB33F"/>
+        <path fill="#fff" d="M17.6 8.6c-2.6-3.4-7.6-3.5-10.4-.5c-2.5 2.7-2.5 6.6-.3 9.2c-.2-.6-.2-1.3 0-2c-3.7-3.5-1.2-9.8 4.2-9.9c2 0 3.7.9 4.8 2.3c.3-.3.7-.7 1.7 1Z"/>
+        <path fill="#fff" d="M17.9 8.9c1 3-.9 6.2-3.9 7.3c-3.4 1.3-6.7-.4-7.9-2.8c1.9 1.3 4.6 1.6 6.9.7c2.6-1 4.4-3.1 4.4-5.7c0-.3 0-.6-.1-.9c.2.4.4.9.6 1.4Z"/>
+      </symbol>
+      <!-- Vue -->
+      <symbol id="icon-vue" viewBox="0 0 24 24">
+        <path fill="#41B883" d="M2 3h4l6 10.5L18 3h4L12 21 2 3Z"/>
+        <path fill="#35495E" d="M6 3h3.2L12 7.8 14.8 3H18l-6 10.5L6 3Z"/>
+      </symbol>
+      <!-- TypeScript -->
+      <symbol id="icon-typescript" viewBox="0 0 24 24">
+        <rect x="2" y="2" width="20" height="20" rx="3" fill="#3178C6"/>
+        <text x="12" y="16.5" font-family="Arial, sans-serif" font-size="11" font-weight="700" fill="#fff" text-anchor="middle">TS</text>
+      </symbol>
+      <!-- Monorepo (제네릭 폴더 트리) -->
+      <symbol id="icon-monorepo" viewBox="0 0 24 24">
+        <rect x="2" y="4" width="8" height="6" rx="1.2" fill="#000"/>
+        <rect x="13" y="4" width="9" height="6" rx="1.2" fill="#000" opacity="0.55"/>
+        <rect x="7" y="14" width="9" height="6" rx="1.2" fill="#000" opacity="0.8"/>
+        <path d="M6 10v2h11.5v2" fill="none" stroke="#000" stroke-width="1.3" opacity="0.5"/>
+      </symbol>
+      <!-- GoJS (다이어그램/그래프 UI) -->
+      <symbol id="icon-gojs" viewBox="0 0 24 24">
+        <circle cx="6" cy="6" r="3.2" fill="#E4572E"/>
+        <circle cx="18" cy="6" r="3.2" fill="#E4572E"/>
+        <circle cx="12" cy="18" r="3.2" fill="#E4572E"/>
+        <path d="M8.6 7.4 15.4 7.4M7.4 8.8 11 15.5M16.6 8.8 13 15.5" stroke="#E4572E" stroke-width="1.4"/>
+      </symbol>
+      <!-- Chart (Realgrid/Lightning Chart 등 제네릭) -->
+      <symbol id="icon-chart" viewBox="0 0 24 24">
+        <path d="M4 20V10M11 20V4M18 20V13" stroke="#2563EB" stroke-width="3" stroke-linecap="round"/>
+      </symbol>
+      <!-- JWT / 인증 (제네릭 열쇠) -->
+      <symbol id="icon-jwt" viewBox="0 0 24 24">
+        <circle cx="8" cy="12" r="4.5" fill="none" stroke="#000" stroke-width="1.8"/>
+        <path d="M11.5 12h9.5M17.5 12v4M20.5 12v3" stroke="#000" stroke-width="1.8" stroke-linecap="round"/>
+      </symbol>
+      <!-- Linux 서버 배포 (제네릭 서버 랙) -->
+      <symbol id="icon-linux" viewBox="0 0 24 24">
+        <rect x="2" y="4" width="20" height="6.5" rx="1.4" fill="#000"/>
+        <rect x="2" y="13.5" width="20" height="6.5" rx="1.4" fill="#000" opacity="0.7"/>
+        <circle cx="6" cy="7.25" r="1.1" fill="#fff"/>
+        <circle cx="6" cy="16.75" r="1.1" fill="#fff"/>
+      </symbol>
+    </defs>
+  </svg>
+
+<div class="page">
+
+  <!-- Header -->
+  <header class="r-header">
+    <div class="header-avatar" style="background:none; padding:0; overflow:hidden;">
+      <img src="resume-profile.png" alt="박웅비" width="110" height="110" style="width:110px;height:110px;object-fit:cover;border-radius:12px;display:block;"/>
+    </div>
+    <div class="header-info">
+      <h1>박웅비 <span>PARK WOONGBEE</span></h1>
+      <div class="position">Software Engineer · 포트폴리오</div>
+      <div class="contacts">
+        <a href="mailto:woongbeee@gmail.com">
+          <span class="contact-icon">✉</span>
+          woongbeee@gmail.com
+        </a>
+        <span>
+          <span class="contact-icon">☎</span>
+          010-9014-7222
+        </span>
+        <a href="https://github.com/woongbeee" target="_blank">
+          <span class="contact-icon">GH</span>
+          github.com/woongbeee
+        </a>
+        <span>
+          <span class="contact-icon">⏱</span>
+          총 경력 약 3년
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <div class="r-body">
+
+    <!-- About Me -->
+    <section class="r-section">
+      <h2>About Me</h2>
+      <p class="about-text">
+        사용자 경험과 코드 품질을 함께 고민하는 소프트웨어 엔지니어입니다.<br>
+        React / TypeScript 프론트엔드 개발자로 경력을 시작해,
+        현재는 반도체 공정 모니터링 프로그램(EES) 운영팀에서 설비 데이터가 DB에 적재된 이후의 전 구간 — Job/Stored Procedure 개발, Gateway 하위 서비스, BFF, Window/Web Application — 을
+        기획·개발·배포까지 담당하고 있습니다.<br>
+        이 문서에 현재 제가 종사중인 프로젝트의 구조와 제가 하는 역할, 이전에 수행한 프로젝트를 정리한 글, 개인 프로젝트 링크까지 정리했습니다.
+      </p>
+    </section>
+
+    <!-- Experience -->
+    <section class="r-section">
+      <h2>Experience</h2>
+
+      <div class="company-block">
+        <div class="company-row">
+          <div class="company-logo">BR</div>
+          <div class="company-info">
+            <div class="company-name-row">
+              <span class="company-name">(주)BRIQUE</span>
+              <span class="company-period">2023.01 – 현재</span>
+            </div>
+            <div class="company-role">Software Engineer &nbsp;·&nbsp; 경기도 화성 &nbsp;·&nbsp; 정규직</div>
+          </div>
+        </div>
+
+        <div class="project-block">
+          <div class="project-header">
+            <span class="project-name">EES 프로그램 — Window → Web Application 전환 및 전체 백엔드 구조 개발</span>
+            <span class="project-period">2023.11 – 현재</span>
+          </div>
+          <p class="project-summary">
+            반도체 생산 공정을 모니터링하는 EES(Equipment Engineering System) 프로그램 운영팀.
+            설비에서 원천 데이터가 데이터베이스에 적재되는 과정을 제외한 전 구간(Job/DB 가공 → Gateway 하위 서비스 → BFF → Client)의
+            설계·개발·배포에 참여하고 있으며, 현재 Window Application(C#) 을 Web Application(Vue/TypeScript) 으로 전환하는 프로젝트를 진행 중입니다.
+          </p>
+
+          <h5>담당 업무</h5>
+          <ul>
+            <li>원천 데이터베이스 → 프로그램 데이터베이스 간 <b>Job Procedure(Stored Procedure) 개발 및 튜닝</b></li>
+            <li>대량 데이터 조회 응답 속도 개선을 위한 <b>Oracle SQL/SP 튜닝</b></li>
+            <li>Window Application(C#, DevExpress) <b>유지보수</b></li>
+            <li>Web Application(Vue/TypeScript, GoJS, Realgrid, Lightning Chart) <b>화면 설계 · 디렉토리 구조 설계 · 공통 컴포넌트 설계 및 개발</b></li>
+            <li>Java/Spring Boot 기반 <b>BFF</b> 설계 및 개발 — Client와 SSH·JWT 토큰 기반으로 연결, Frontend/Backend monorepo 구조로 전환 중</li>
+            <li>Gateway 하위 <b>Data Provider / Real Time / Simulator</b> 서비스 개발 및 배포 (Java, Spring Boot)</li>
+          </ul>
+
+          <h5>주요 성과</h5>
+          <ul class="achievement-list">
+            <li>Window Application → Web Application 전환 프로젝트에서 <b>화면·디렉토리·공통 컴포넌트 설계 및 개발</b></li>
+            <li>Frontend/Backend 분리 구조를 <b>monorepo 구조로 전환</b>하며 BFF 개발 병행</li>
+            <li>대량 데이터 조회 Stored Procedure <b>튜닝으로 응답 속도 개선</b></li>
+            <li>설비 데이터 적재 이후 전 구간(Job → Gateway → BFF → Client)을 <b>담당</b></li>
+          </ul>
+
+          <div class="tech-tags">
+            <span class="tech-tag"><svg class="tech-icon"><use href="#icon-csharp"/></svg>C#</span>
+            <span class="tech-tag"><svg class="tech-icon"><use href="#icon-devexpress"/></svg>DevExpress</span>
+            <span class="tech-tag"><svg class="tech-icon"><use href="#icon-oracle"/></svg>Oracle</span>
+            <span class="tech-tag"><svg class="tech-icon"><use href="#icon-sql"/></svg>SQL</span>
+            <span class="tech-tag"><svg class="tech-icon"><use href="#icon-java"/></svg>Java</span>
+            <span class="tech-tag"><svg class="tech-icon"><use href="#icon-spring"/></svg>Spring Boot</span>
+            <span class="tech-tag"><svg class="tech-icon"><use href="#icon-vue"/></svg>Vue</span>
+            <span class="tech-tag"><svg class="tech-icon"><use href="#icon-typescript"/></svg>TypeScript</span>
+            <span class="tech-tag"><svg class="tech-icon"><use href="#icon-gojs"/></svg>GoJS</span>
+            <span class="tech-tag"><svg class="tech-icon"><use href="#icon-chart"/></svg>Realgrid / Lightning Chart</span>
+            <span class="tech-tag"><svg class="tech-icon"><use href="#icon-jwt"/></svg>SSH / JWT</span>
+            <span class="tech-tag"><svg class="tech-icon"><use href="#icon-monorepo"/></svg>Monorepo</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- System Architecture -->
+    <section class="r-section">
+      <h2>System Architecture &amp; My Role</h2>
+      <p class="arch-intro">
+        EES(Equipment Engineering System)는 반도체 생산 설비의 데이터를 수집해 실시간 모니터링과 이력 조회를 제공하는 사내 프로그램입니다.
+        설비에서 원천 데이터베이스로 데이터를 적재하는 프로토콜·프로그램(맨 앞 단계)에는 관여하지 않으며,
+        <b style="color:#2d3748;">그 이후 Job/Stored Procedure 개발 및 튜닝부터, Gateway 하위 서비스, BFF, Window/Web Application 까지 전 구간</b>에 참여하고 있습니다.
+        Window Application(C#)은 유지보수를, Web Application(Vue/TypeScript)은 화면 설계부터 배포까지 전담하며 전환 프로젝트를 진행 중입니다.
+        아래 다이어그램에서 굵은 테두리, 설명에서 노란색으로 강조된 부분이 제가 직접 설계·개발·운영하는 영역입니다.
+      </p>
+
+      <ol class="flow-list">
+        <li class="out-of-scope">원천 데이터: 설비에서 실시간 데이터를 <b>원천 데이터베이스</b>에 적재.</li>
+        <li>
+          원천 DB에 적재된 데이터를 <b>Job & Stored Procedure</b>로 분류·재조합해 EES <b>프로그램 데이터베이스(Oracle)</b>로 이관 — Job 개발 및 튜닝 담당
+          <div class="flow-tech">
+            <span class="flow-tech-tag"><svg class="tech-icon"><use href="#icon-oracle"/></svg>ORACLE</span>
+          </div>
+        </li>
+        <li>
+          <b>Web Application</b>(Vue/TypeScript, GoJS, Realgrid, Lightning Chart)과 <b>Window Application</b>(C#, DevExpress) 설계·개발 <br/>— Window → Web 전환 프로젝트 수행 중이며, Web은 화면·디렉토리·공통 컴포넌트 설계까지 전담
+          <div class="flow-tech">
+            <span class="flow-tech-tag"><svg class="tech-icon"><use href="#icon-vue"/></svg>VUE</span>
+            <span class="flow-tech-tag"><svg class="tech-icon"><use href="#icon-typescript"/></svg>TYPESCRIPT</span>
+            <span class="flow-tech-tag"><svg class="tech-icon"><use href="#icon-gojs"/></svg>GOJS</span>
+            <span class="flow-tech-tag"><svg class="tech-icon"><use href="#icon-chart"/></svg>REALGRID/LIGHTNING CHART1</span>
+            <span class="flow-tech-tag"><svg class="tech-icon"><use href="#icon-csharp"/></svg>C#</span>
+          </div>
+        </li>
+        <li>
+          <b>BFF</b>(Backend for Frontend): Client와 SSH·JWT 토큰으로 연결하고 요청을 Gateway로 전달. Java/Spring Boot로 빌드되어 Linux 서버에 배포. Frontend/Backend 분리 구조를 <b>monorepo</b>로 전환 중이라 Frontend·Backend를 함께 개발
+          <div class="flow-tech">
+            <span class="flow-tech-tag"><svg class="tech-icon"><use href="#icon-java"/></svg>JAVA</span>
+            <span class="flow-tech-tag"><svg class="tech-icon"><use href="#icon-spring"/></svg>SPRING BOOT</span>
+            <span class="flow-tech-tag"><svg class="tech-icon"><use href="#icon-linux"/></svg>LINUX</span>
+            <span class="flow-tech-tag"><svg class="tech-icon"><use href="#icon-jwt"/></svg>SSH/JWT</span>
+          </div>
+        </li>
+        <li>
+          <b>Gateway</b>: Data Provider(단순 데이터 처리) · Real Time(실시간 데이터 처리) · Simulator(사용자 계산 요청 처리) 서비스가 각각 배포되어, BFF 요청 URL에 맞춰 라우팅 — 세 서비스 모두 Java/Spring Boot로 개발·배포
+          <div class="flow-tech">
+            <span class="flow-tech-tag"><svg class="tech-icon"><use href="#icon-java"/></svg>JAVA</span>
+            <span class="flow-tech-tag"><svg class="tech-icon"><use href="#icon-spring"/></svg>SPRING BOOT</span>
+            <span class="flow-tech-tag"><svg class="tech-icon"><use href="#icon-linux"/></svg>LINUX</span>
+          </div>
+        </li>
+        <li>
+          <b>Database (Oracle)</b>: 설비 데이터를 받아 적재하는 SP, 대량 데이터를 빠르게 리턴하기 위한 SP 개발 및 튜닝
+          <div class="flow-tech">
+            <span class="flow-tech-tag"><svg class="tech-icon"><use href="#icon-sql"/></svg>SQL</span>
+          </div>
+        </li>
+      </ol>
+
+      <div class="arch-legend">
+        <div class="arch-legend-item"><span class="arch-legend-swatch" style="background:#F37321; border:1px solid #000;"></span>직접 개발·운영</div>
+        <div class="arch-legend-item"><span class="arch-legend-swatch" style="background:#cbd5e0;"></span>개발 미관여 (설비 → DB 적재)</div>
+        <div class="arch-legend-item"><span class="arch-legend-swatch" style="background:#f8fafc; border:1px dashed #cbd5e0;"></span>Window Application (유지보수)</div>
+      </div>
+
+      <div class="arch-diagram-wrap">
+        <svg viewBox="0 0 900 1040" xmlns="http://www.w3.org/2000/svg" font-family="'Apple SD Gothic Neo','Noto Sans KR','Malgun Gothic',sans-serif">
+
+          <!-- ══ 0. 설비 (범위 외) ══ -->
+          <text x="20" y="26" font-size="11" font-weight="700" fill="#a0aec0" letter-spacing="1">0 · 설비 &amp; 원천 데이터 적재</text>
+          <rect x="20" y="36" width="860" height="54" rx="10" fill="#f1f5f9" stroke="#cbd5e0" stroke-width="1.5"/>
+          <text x="450" y="59" font-size="13" font-weight="700" fill="#718096" text-anchor="middle">반도체 생산 설비 데이터 → 원천 데이터베이스 적재</text>
+          <text x="450" y="77" font-size="10.5" fill="#a0aec0" text-anchor="middle">설비의 실시간 데이터를 DB에 적재</text>
+
+          <!-- 0 -> 1 : 적재 흐름 (아래) -->
+          <line x1="450" y1="90" x2="450" y2="136" stroke="#cbd5e0" stroke-width="2" marker-end="url(#arrowGray)"/>
+          <text x="466" y="112" font-size="9.5" fill="#a0aec0">적재</text>
+
+          <!-- ══ 1. 원천 DB ══ -->
+          <text x="20" y="146" font-size="11" font-weight="700" fill="#a0aec0" letter-spacing="1">1 · 원천 데이터베이스</text>
+          <rect x="300" y="156" width="300" height="52" rx="10" fill="#f8fafc" stroke="#cbd5e0" stroke-width="1.5"/>
+          <text x="450" y="180" font-size="12.5" font-weight="700" fill="#718096" text-anchor="middle">Source Database</text>
+          <text x="450" y="197" font-size="10.5" fill="#a0aec0" text-anchor="middle">설비 데이터가 원본 형태로 적재되는 DB</text>
+
+          <!-- 1 -> 2 : 적재 흐름 (아래) -->
+          <line x1="450" y1="208" x2="450" y2="260" stroke="#000000" stroke-width="2" marker-end="url(#arrowBlack)"/>
+          <text x="466" y="230" font-size="9.5" fill="#718096">분류·재조합</text>
+
+          <!-- ══ 2. Job Procedure ══ -->
+          <text x="20" y="264" font-size="11" font-weight="700" fill="#a0aec0" letter-spacing="1">2 · JOB PROCEDURE (데이터 분류 · 재조합)</text>
+          <rect x="240" y="274" width="420" height="58" rx="10" fill="#FFF1E8" stroke="#000000" stroke-width="2.5"/>
+          <text x="450" y="298" font-size="13" font-weight="700" fill="#000000" text-anchor="middle">Job Procedure (Stored Procedure)</text>
+          <text x="450" y="316" font-size="10.5" fill="#4a4a4a" text-anchor="middle">원천 데이터를 프로그램 요구사항에 맞게 분류·재조합해서 프로그램 DB에 적재</text>
+
+          <!-- 2 -> 3 : 적재 흐름 (아래) -->
+          <line x1="450" y1="332" x2="450" y2="380" stroke="#000000" stroke-width="2" marker-end="url(#arrowBlack)"/>
+          <text x="466" y="354" font-size="9.5" fill="#718096">적재</text>
+
+          <!-- ══ 3. 프로그램 DB (Oracle) ══ -->
+          <text x="20" y="388" font-size="11" font-weight="700" fill="#a0aec0" letter-spacing="1">3 · 프로그램 데이터베이스</text>
+          <rect x="270" y="398" width="360" height="56" rx="10" fill="#FFF1E8" stroke="#000000" stroke-width="2.5"/>
+          <text x="450" y="422" font-size="12.5" font-weight="700" fill="#000000" text-anchor="middle">Oracle Database (Linux 서버)</text>
+          <text x="450" y="440" font-size="10.5" fill="#4a4a4a" text-anchor="middle">대량 데이터 조회용 SP 개발 &amp; 쿼리 튜닝</text>
+
+          <!-- 4 -> 3 : 요청 흐름 (위) -->
+          <line x1="434" y1="512" x2="434" y2="470" stroke="#000000" stroke-width="2" marker-end="url(#arrowBlack)"/>
+          <text x="410" y="490" font-size="9.5" fill="#718096" text-anchor="end">조회 요청</text>
+
+          <!-- ══ 4. Gateway ══ -->
+          <text x="20" y="486" font-size="11" font-weight="700" fill="#a0aec0" letter-spacing="1">4 · GATEWAY 하위 서비스</text>
+          <rect x="140" y="512" width="620" height="122" rx="10" fill="#FFF1E8" stroke="#000000" stroke-width="2" />
+          <text x="450" y="535" font-size="11" font-weight="700" fill="#000000" text-anchor="middle" letter-spacing="0.5">GATEWAY — BFF 요청 URL에 맞춰 각 서비스로 라우팅</text>
+
+          <rect x="165" y="550" width="170" height="68" rx="8" fill="#fff" stroke="#000000" stroke-width="2.5"/>
+          <text x="250" y="574" font-size="12" font-weight="700" fill="#000000" text-anchor="middle">Data Provider</text>
+          <text x="250" y="590" font-size="10" fill="#4a4a4a" text-anchor="middle">단순 데이터 처리</text>
+          <text x="250" y="604" font-size="10" fill="#4a4a4a" text-anchor="middle">(Java · Spring Boot)</text>
+
+          <rect x="365" y="550" width="170" height="68" rx="8" fill="#fff" stroke="#000000" stroke-width="2.5"/>
+          <text x="450" y="574" font-size="12" font-weight="700" fill="#000000" text-anchor="middle">Real Time</text>
+          <text x="450" y="590" font-size="10" fill="#4a4a4a" text-anchor="middle">실시간 데이터 처리</text>
+          <text x="450" y="604" font-size="10" fill="#4a4a4a" text-anchor="middle">(Java · Spring Boot)</text>
+
+          <rect x="565" y="550" width="170" height="68" rx="8" fill="#fff" stroke="#000000" stroke-width="2.5"/>
+          <text x="650" y="574" font-size="12" font-weight="700" fill="#000000" text-anchor="middle">Simulator</text>
+          <text x="650" y="590" font-size="10" fill="#4a4a4a" text-anchor="middle">사용자 계산 요청 처리</text>
+          <text x="650" y="604" font-size="10" fill="#4a4a4a" text-anchor="middle">(Java · Spring Boot)</text>
+
+          <!-- 5 -> 4 : 요청 흐름 (위) -->
+          <line x1="434" y1="696" x2="434" y2="644" stroke="#000000" stroke-width="2" marker-end="url(#arrowBlack)"/>
+          <text x="410" y="674" font-size="9.5" fill="#718096" text-anchor="end">요청 라우팅</text>
+
+          <!-- ══ 5. BFF ══ -->
+          <text x="20" y="668" font-size="11" font-weight="700" fill="#a0aec0" letter-spacing="1">5 · BFF (BACKEND FOR FRONTEND)</text>
+          <rect x="250" y="696" width="400" height="60" rx="10" fill="#FFF1E8" stroke="#000000" stroke-width="2.5"/>
+          <text x="450" y="721" font-size="12.5" font-weight="700" fill="#000000" text-anchor="middle">Java / Spring Boot BFF (Linux 서버 배포)</text>
+          <text x="450" y="739" font-size="10" fill="#4a4a4a" text-anchor="middle">Client ↔ SSH·JWT 인증 연결 · Frontend/Backend Monorepo 구조로 전환 중</text>
+
+          <!-- 6 -> 5 : 요청 흐름 (위, 좌우 대칭) -->
+          <line x1="230" y1="810" x2="300" y2="757" stroke="#000000" stroke-width="2" marker-end="url(#arrowBlack)"/>
+          <line x1="670" y1="810" x2="600" y2="757" stroke="#000000" stroke-width="2" marker-end="url(#arrowBlack)"/>
+          <text x="450" y="786" font-size="9.5" fill="#718096" text-anchor="middle">SSH · JWT 인증 요청</text>
+
+          <!-- ══ 6. Client: Web / Window side by side ══ -->
+          <text x="20" y="794" font-size="11" font-weight="700" fill="#a0aec0" letter-spacing="1">6 · CLIENT (WINDOW → WEB 전환 중)</text>
+
+          <!-- Web Application (신규, 강조) -->
+          <rect x="60" y="810" width="340" height="160" rx="10" fill="#FFF1E8" stroke="#000000" stroke-width="2.5"/>
+          <text x="230" y="836" font-size="12.5" font-weight="700" fill="#000000" text-anchor="middle">Web Application</text>
+          <text x="230" y="853" font-size="10.5" fill="#4a4a4a" text-anchor="middle">Vue · TypeScript</text>
+          <text x="230" y="869" font-size="10" fill="#4a4a4a" text-anchor="middle">GoJS · Realgrid · Lightning Chart</text>
+          <line x1="90" y1="881" x2="370" y2="881" stroke="#e2e8f0" stroke-width="1"/>
+          <text x="230" y="899" font-size="10" font-weight="700" fill="#000000" text-anchor="middle">화면 설계 · 디렉토리 구조 설계</text>
+          <text x="230" y="915" font-size="10" font-weight="700" fill="#000000" text-anchor="middle">공통 컴포넌트 설계 — 전담</text>
+          <text x="230" y="936" font-size="10" fill="#a0aec0" text-anchor="middle">(전환 대상 · 신규)</text>
+
+          <!-- Window Application (구버전, 유지보수) -->
+          <rect x="500" y="810" width="340" height="160" rx="10" fill="#f8fafc" stroke="#cbd5e0" stroke-width="1.5" stroke-dasharray="5,4"/>
+          <text x="670" y="836" font-size="12.5" font-weight="700" fill="#718096" text-anchor="middle">Window Application</text>
+          <text x="670" y="853" font-size="10.5" fill="#a0aec0" text-anchor="middle">C# · DevExpress</text>
+          <line x1="530" y1="865" x2="810" y2="865" stroke="#e2e8f0" stroke-width="1"/>
+          <text x="670" y="883" font-size="10" font-weight="700" fill="#718096" text-anchor="middle">유지보수 진행</text>
+          <text x="670" y="899" font-size="10" fill="#a0aec0" text-anchor="middle">(전환 이전 · 운영 중인 구버전)</text>
+
+          <!-- Window -> Web : 전환 방향 (오른쪽 -> 왼쪽) -->
+          <path d="M 500 942 C 460 922, 440 922, 400 942" fill="none" stroke="#000000" stroke-width="2" stroke-dasharray="4,3" marker-end="url(#arrowBlack)"/>
+          <text x="450" y="918" font-size="9.5" fill="#718096" text-anchor="middle">전환 중</text>
+
+          <!-- Arrow defs -->
+          <defs>
+            <marker id="arrowGray" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+              <path d="M0,0 L8,4 L0,8 Z" fill="#cbd5e0"/>
+            </marker>
+            <marker id="arrowBlack" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+              <path d="M0,0 L8,4 L0,8 Z" fill="#000000"/>
+            </marker>
+          </defs>
+        </svg>
+      </div>
+
+      <div class="subsection-divider">다른 사내 프로젝트</div>
+
+      <div class="project-block" style="margin-left:0;">
+        <div class="project-header">
+          <span class="project-name">XML Converter — WinCC Map 데이터를 Web에 맞게 변환</span>
+        </div>
+        <p class="project-summary">
+          지멘스(Siemens) SCADA 프로그램 WinCC에서 사용자가 그려 놓은 Map을 .xml로 Export한 파일을,
+          Web 화면 위에 다시 그대로 복원하는 프로젝트입니다. xml의 x·y 좌표와 이미지 속성, 아핀 변환(Affine
+          Transformation) 등 컴퓨터 그래픽스 공식을 이용해 HTML·SVG로 변환해 웹 엔진이 해석 가능한 형태로 바꿨습니다.
+          프로그램 내부의 숨은 상수와 로직을 직접 찾아내 모든 요소를 화면에 재현했고, 각 요소에 실시간 데이터를
+          연동할 수 있는지까지 검증했습니다.
+        </p>
+
+        <h5>관련 글</h5>
+        <ul>
+          <li><a href="https://mynews10158.tistory.com/1" target="_blank" rel="noopener">WinCC xml to HTML - 01. The structure of WinCC xml</a></li>
+          <li><a href="https://mynews10158.tistory.com/2" target="_blank" rel="noopener">WinCC xml to HTML — 02. How to calculate the coordinates of the shapes in reference files.</a></li>
+          <li><a href="https://mynews10158.tistory.com/3" target="_blank" rel="noopener">WinCC xml to HTML — 03. When size values are negative numbers</a></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 개인 프로젝트 -->
+    <section class="r-section">
+      <h2>개인 프로젝트</h2>
+
+      <div class="project-block" style="margin-left:0;">
+        <div class="project-header">
+          <span class="project-name">
+            Inside Oracle — 인터랙티브 Oracle 학습서
+            <a href="./#book" rel="noopener">↗ 바로가기</a>
+          </span>
+        </div>
+        <p class="project-summary">
+          SQL 한 줄을 실행하면 Oracle 내부에서 파싱, 실행 계획 선택, 버퍼 캐시 Hit/Miss, 디스크 I/O가
+          어떤 순서로 일어나는지 단계별 애니메이션으로 보여주는 인터랙티브 학습서입니다. 백엔드 없이 브라우저 안에서
+          동작하는 정적 SPA로, SQL 파서·비용 기반 옵티마이저(CBO)·통계·캐시 모델을 TypeScript로 직접 구현해
+          "읽는 문서"가 아니라 값을 바꿔가며 결과를 실험해보는 방식으로 설계했습니다. 실무에서 다루는 Oracle 튜닝·SP
+          개발 경험을, 남들도 눈으로 이해할 수 있는 형태로 정리하고 싶다는 목적에서 시작한 개인 프로젝트입니다.
+        </p>
+
+        <h5>주요 특징</h5>
+        <ul>
+          <li>Oracle Instance 시뮬레이터 — SQL 입력 시 Soft/Hard Parse, Library/Buffer Cache Hit/Miss, Disk I/O를 13단계로 시각화</li>
+          <li>CBO 옵티마이저·조인·인덱스·쿼리 변환 시뮬레이터 — 액세스 패스·조인 방식별 비용과 동작을 직접 비교</li>
+          <li>한국어/English, 라이트/다크 테마 지원. 총 10개 챕터로 구성된 목차형 학습서 구조</li>
+        </ul>
+
+        <div class="tech-tags">
+          <span class="tech-tag"><svg class="tech-icon"><use href="#icon-typescript"/></svg>TypeScript</span>
+          <span class="tech-tag">React</span>
+          <span class="tech-tag">Vite</span>
+          <span class="tech-tag">Zustand</span>
+          <span class="tech-tag"><svg class="tech-icon"><use href="#icon-oracle"/></svg>Oracle CBO 시뮬레이션</span>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>
+</body>
+</html>

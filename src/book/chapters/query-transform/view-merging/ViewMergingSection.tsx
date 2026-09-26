@@ -16,7 +16,8 @@ import type { PlanRow } from '../../optimizer/shared/diagrams'
 const T = {
   ko: {
     title: 'View Merging',
-    subtitle: '뷰를 나타내는 쿼리 블록을 바깥 쿼리 블록에 합쳐서, 더 넓은 범위의 조인 순서 최적화와 액세스 경로 선택이 가능하게 해요.',
+    subtitle:
+      '뷰를 나타내는 쿼리 블록을 바깥 쿼리 블록에 합쳐서, 더 넓은 범위의 조인 순서 최적화와 액세스 경로 선택이 가능하게 해요.',
 
     whatTitle: 'View Merging이란?',
     whatDesc:
@@ -25,7 +26,8 @@ const T = {
     simpleTitle: 'Simple View Merging',
     simpleDesc:
       'Simple View Merging은 SELECT-PROJECT-JOIN 뷰, 즉 GROUP BY, DISTINCT, 외부 조인, MODEL, CONNECT BY, 집합 연산자, 집계 함수가 없는 뷰에 적용해요.',
-    simpleExampleDesc: '공식 문서 예시예요. 인라인 뷰 dept_locs_v가 바깥 쿼리와 병합돼요.',
+    simpleExampleDesc:
+      '공식 문서 예시예요. 인라인 뷰 dept_locs_v가 바깥 쿼리와 병합돼요.',
     simpleBefore: `-- 변환 전: 인라인 뷰
 SELECT e.first_name, e.last_name,
        dept_locs_v.street_address, dept_locs_v.postal_code
@@ -54,18 +56,23 @@ AND    e.last_name = 'Smith';`,
       'Complex View Merging은 모든 경우에 적용되지 않아요. 옵티마이저가 비용을 비교해서 병합이 유리할 때만 적용해요.',
 
     restrictTitle: '뷰 Merging이 제한되는 경우',
-    restrictDesc: '다음 요소가 뷰에 포함되어 있으면 Simple View Merging이 적용되지 않아요.',
+    restrictDesc:
+      '다음 요소가 뷰에 포함되어 있으면 Simple View Merging이 적용되지 않아요.',
     restrictTable: [
       ['GROUP BY', '집계 연산이 있으면 병합 후 결과가 달라질 수 있어요'],
       ['DISTINCT', '중복 제거 연산이 있으면 병합 후 결과가 달라질 수 있어요'],
       ['ROWNUM', '행 번호 필터는 병합 후 순서가 바뀔 수 있어요'],
-      ['외부 조인 (Outer Join)', '뷰 내부의 외부 조인은 병합 시 의미가 달라질 수 있어요'],
+      [
+        '외부 조인 (Outer Join)',
+        '뷰 내부의 외부 조인은 병합 시 의미가 달라질 수 있어요',
+      ],
       ['MODEL / CONNECT BY', '계층 쿼리·모델 절은 독립 블록으로 처리해야 해요'],
       ['집합 연산자 (UNION 등)', 'UNION, INTERSECT 등은 병합 불가 구조예요'],
     ],
 
     hintTitle: '힌트로 제어하기',
-    hintDesc: 'View Merging은 기본적으로 비용 기반으로 결정돼요. 힌트로 강제하거나 방지할 수 있어요.',
+    hintDesc:
+      'View Merging은 기본적으로 비용 기반으로 결정돼요. 힌트로 강제하거나 방지할 수 있어요.',
     hintSql: `-- 모든 뷰 병합 강제
 SELECT /*+ MERGE_ANY_VIEW */ e.first_name, dept_locs_v.street_address
 FROM   employees e,
@@ -92,7 +99,8 @@ WHERE  dept_locs_v.department_id = e.department_id;`,
   },
   en: {
     title: 'View Merging',
-    subtitle: 'Merges the query block representing a view into the containing query block, enabling a wider range of join order optimization and access path selection.',
+    subtitle:
+      'Merges the query block representing a view into the containing query block, enabling a wider range of join order optimization and access path selection.',
 
     whatTitle: 'What is View Merging?',
     whatDesc:
@@ -101,7 +109,8 @@ WHERE  dept_locs_v.department_id = e.department_id;`,
     simpleTitle: 'Simple View Merging',
     simpleDesc:
       'Simple View Merging applies to select-project-join views — views with no GROUP BY, DISTINCT, outer joins, MODEL, CONNECT BY, set operators, or aggregation.',
-    simpleExampleDesc: 'This Oracle documentation example shows the inline view dept_locs_v being merged into the outer query.',
+    simpleExampleDesc:
+      'This Oracle documentation example shows the inline view dept_locs_v being merged into the outer query.',
     simpleBefore: `-- Before: inline view
 SELECT e.first_name, e.last_name,
        dept_locs_v.street_address, dept_locs_v.postal_code
@@ -121,7 +130,8 @@ AND    d.department_id = e.department_id
 AND    e.last_name = 'Smith';`,
     simpleNote:
       'Before merge: the optimizer must run dept_locs_v first, then join its result to employees.\nAfter merge: all three tables — employees, departments, locations — can be joined in any order.',
-    planCaption: 'EXPLAIN PLAN — after View Merging (3-table join, no VIEW node)',
+    planCaption:
+      'EXPLAIN PLAN — after View Merging (3-table join, no VIEW node)',
 
     complexTitle: 'Complex View Merging',
     complexDesc:
@@ -130,18 +140,29 @@ AND    e.last_name = 'Smith';`,
       'Complex View Merging is not always applied. The optimizer compares costs and merges only when doing so is cheaper.',
 
     restrictTitle: 'When View Merging Is Restricted',
-    restrictDesc: 'Simple View Merging cannot be applied when the view contains any of the following.',
+    restrictDesc:
+      'Simple View Merging cannot be applied when the view contains any of the following.',
     restrictTable: [
       ['GROUP BY', 'Merging would change aggregate results'],
       ['DISTINCT', 'Merging would change deduplication behavior'],
       ['ROWNUM', 'Row numbering could change after merge'],
-      ['Outer Join', 'Outer join semantics inside a view may change after merge'],
-      ['MODEL / CONNECT BY', 'Hierarchical and model clauses must be processed as isolated blocks'],
-      ['Set operators (UNION, etc.)', 'UNION, INTERSECT, MINUS cannot be merged'],
+      [
+        'Outer Join',
+        'Outer join semantics inside a view may change after merge',
+      ],
+      [
+        'MODEL / CONNECT BY',
+        'Hierarchical and model clauses must be processed as isolated blocks',
+      ],
+      [
+        'Set operators (UNION, etc.)',
+        'UNION, INTERSECT, MINUS cannot be merged',
+      ],
     ],
 
     hintTitle: 'Controlling with Hints',
-    hintDesc: 'View Merging is cost-based by default. You can force or suppress it with hints.',
+    hintDesc:
+      'View Merging is cost-based by default. You can force or suppress it with hints.',
     hintSql: `-- Force merging of all views
 SELECT /*+ MERGE_ANY_VIEW */ e.first_name, dept_locs_v.street_address
 FROM   employees e,
@@ -169,33 +190,171 @@ WHERE  dept_locs_v.department_id = e.department_id;`,
 }
 
 const PLAN_ROWS_KO: PlanRow[] = [
-  { id: 0, depth: 0, operation: 'SELECT STATEMENT', rows: 1, cost: 5, time: '00:00:01',
-    note: 'VIEW 노드 없이 바로 HASH JOIN이 나타나요 — 뷰가 바깥 쿼리와 병합됐다는 신호예요.' },
-  { id: 1, depth: 1, operation: 'HASH JOIN', rows: 1, cost: 5, time: '00:00:01',
-    note: '3개 테이블이 하나의 조인 트리로 통합됐어요. 병합 전이라면 이 자리에 VIEW 오퍼레이션이 있었을 거예요.' },
-  { id: 2, depth: 2, operation: 'NESTED LOOPS', rows: 1, cost: 3, time: '00:00:01' },
-  { id: 3, depth: 3, operation: 'TABLE ACCESS BY INDEX ROWID', name: 'EMPLOYEES', rows: 1, cost: 2, time: '00:00:01' },
-  { id: 4, depth: 4, operation: 'INDEX RANGE SCAN', name: 'EMP_NAME_IX', rows: 1, cost: 1, time: '00:00:01',
-    note: 'e.last_name = \'Smith\' 조건으로 인덱스를 사용해요. 병합 덕분에 이 조건이 최상위에서 바로 적용돼요.' },
-  { id: 5, depth: 3, operation: 'TABLE ACCESS BY INDEX ROWID', name: 'DEPARTMENTS', rows: 1, cost: 1, time: '00:00:01' },
-  { id: 6, depth: 4, operation: 'INDEX UNIQUE SCAN', name: 'DEPT_ID_PK', rows: 1, cost: 0, time: '00:00:01' },
-  { id: 7, depth: 2, operation: 'TABLE ACCESS BY INDEX ROWID', name: 'LOCATIONS', rows: 1, cost: 1, time: '00:00:01' },
-  { id: 8, depth: 3, operation: 'INDEX UNIQUE SCAN', name: 'LOC_ID_PK', rows: 1, cost: 0, time: '00:00:01' },
+  {
+    id: 0,
+    depth: 0,
+    operation: 'SELECT STATEMENT',
+    rows: 1,
+    cost: 5,
+    time: '00:00:01',
+    note: 'VIEW 노드 없이 바로 HASH JOIN이 나타나요 — 뷰가 바깥 쿼리와 병합됐다는 신호예요.',
+  },
+  {
+    id: 1,
+    depth: 1,
+    operation: 'HASH JOIN',
+    rows: 1,
+    cost: 5,
+    time: '00:00:01',
+    note: '3개 테이블이 하나의 조인 트리로 통합됐어요. 병합 전이라면 이 자리에 VIEW 오퍼레이션이 있었을 거예요.',
+  },
+  {
+    id: 2,
+    depth: 2,
+    operation: 'NESTED LOOPS',
+    rows: 1,
+    cost: 3,
+    time: '00:00:01',
+  },
+  {
+    id: 3,
+    depth: 3,
+    operation: 'TABLE ACCESS BY INDEX ROWID',
+    name: 'EMPLOYEES',
+    rows: 1,
+    cost: 2,
+    time: '00:00:01',
+  },
+  {
+    id: 4,
+    depth: 4,
+    operation: 'INDEX RANGE SCAN',
+    name: 'EMP_NAME_IX',
+    rows: 1,
+    cost: 1,
+    time: '00:00:01',
+    note: "e.last_name = 'Smith' 조건으로 인덱스를 사용해요. 병합 덕분에 이 조건이 최상위에서 바로 적용돼요.",
+  },
+  {
+    id: 5,
+    depth: 3,
+    operation: 'TABLE ACCESS BY INDEX ROWID',
+    name: 'DEPARTMENTS',
+    rows: 1,
+    cost: 1,
+    time: '00:00:01',
+  },
+  {
+    id: 6,
+    depth: 4,
+    operation: 'INDEX UNIQUE SCAN',
+    name: 'DEPT_ID_PK',
+    rows: 1,
+    cost: 0,
+    time: '00:00:01',
+  },
+  {
+    id: 7,
+    depth: 2,
+    operation: 'TABLE ACCESS BY INDEX ROWID',
+    name: 'LOCATIONS',
+    rows: 1,
+    cost: 1,
+    time: '00:00:01',
+  },
+  {
+    id: 8,
+    depth: 3,
+    operation: 'INDEX UNIQUE SCAN',
+    name: 'LOC_ID_PK',
+    rows: 1,
+    cost: 0,
+    time: '00:00:01',
+  },
 ]
 
 const PLAN_ROWS_EN: PlanRow[] = [
-  { id: 0, depth: 0, operation: 'SELECT STATEMENT', rows: 1, cost: 5, time: '00:00:01',
-    note: 'No VIEW node appears — the view has been merged into the outer query.' },
-  { id: 1, depth: 1, operation: 'HASH JOIN', rows: 1, cost: 5, time: '00:00:01',
-    note: 'All three tables are combined into a single join tree. Before merging, a VIEW operation would appear here instead.' },
-  { id: 2, depth: 2, operation: 'NESTED LOOPS', rows: 1, cost: 3, time: '00:00:01' },
-  { id: 3, depth: 3, operation: 'TABLE ACCESS BY INDEX ROWID', name: 'EMPLOYEES', rows: 1, cost: 2, time: '00:00:01' },
-  { id: 4, depth: 4, operation: 'INDEX RANGE SCAN', name: 'EMP_NAME_IX', rows: 1, cost: 1, time: '00:00:01',
-    note: "Uses the name index for e.last_name = 'Smith'. Merging pushed this predicate to the top level, enabling early index access." },
-  { id: 5, depth: 3, operation: 'TABLE ACCESS BY INDEX ROWID', name: 'DEPARTMENTS', rows: 1, cost: 1, time: '00:00:01' },
-  { id: 6, depth: 4, operation: 'INDEX UNIQUE SCAN', name: 'DEPT_ID_PK', rows: 1, cost: 0, time: '00:00:01' },
-  { id: 7, depth: 2, operation: 'TABLE ACCESS BY INDEX ROWID', name: 'LOCATIONS', rows: 1, cost: 1, time: '00:00:01' },
-  { id: 8, depth: 3, operation: 'INDEX UNIQUE SCAN', name: 'LOC_ID_PK', rows: 1, cost: 0, time: '00:00:01' },
+  {
+    id: 0,
+    depth: 0,
+    operation: 'SELECT STATEMENT',
+    rows: 1,
+    cost: 5,
+    time: '00:00:01',
+    note: 'No VIEW node appears — the view has been merged into the outer query.',
+  },
+  {
+    id: 1,
+    depth: 1,
+    operation: 'HASH JOIN',
+    rows: 1,
+    cost: 5,
+    time: '00:00:01',
+    note: 'All three tables are combined into a single join tree. Before merging, a VIEW operation would appear here instead.',
+  },
+  {
+    id: 2,
+    depth: 2,
+    operation: 'NESTED LOOPS',
+    rows: 1,
+    cost: 3,
+    time: '00:00:01',
+  },
+  {
+    id: 3,
+    depth: 3,
+    operation: 'TABLE ACCESS BY INDEX ROWID',
+    name: 'EMPLOYEES',
+    rows: 1,
+    cost: 2,
+    time: '00:00:01',
+  },
+  {
+    id: 4,
+    depth: 4,
+    operation: 'INDEX RANGE SCAN',
+    name: 'EMP_NAME_IX',
+    rows: 1,
+    cost: 1,
+    time: '00:00:01',
+    note: "Uses the name index for e.last_name = 'Smith'. Merging pushed this predicate to the top level, enabling early index access.",
+  },
+  {
+    id: 5,
+    depth: 3,
+    operation: 'TABLE ACCESS BY INDEX ROWID',
+    name: 'DEPARTMENTS',
+    rows: 1,
+    cost: 1,
+    time: '00:00:01',
+  },
+  {
+    id: 6,
+    depth: 4,
+    operation: 'INDEX UNIQUE SCAN',
+    name: 'DEPT_ID_PK',
+    rows: 1,
+    cost: 0,
+    time: '00:00:01',
+  },
+  {
+    id: 7,
+    depth: 2,
+    operation: 'TABLE ACCESS BY INDEX ROWID',
+    name: 'LOCATIONS',
+    rows: 1,
+    cost: 1,
+    time: '00:00:01',
+  },
+  {
+    id: 8,
+    depth: 3,
+    operation: 'INDEX UNIQUE SCAN',
+    name: 'LOC_ID_PK',
+    rows: 1,
+    cost: 0,
+    time: '00:00:01',
+  },
 ]
 
 export function QtViewMergingSection() {
@@ -220,13 +379,23 @@ export function QtViewMergingSection() {
       <Prose>{t.simpleDesc}</Prose>
       <Prose>{t.simpleExampleDesc}</Prose>
       <div className="mt-4">
-        <SqlBlock sql={t.simpleBefore} badge={lang === 'ko' ? '변환 전' : 'Before'} badgeColor="rose" />
+        <SqlBlock
+          sql={t.simpleBefore}
+          badge={lang === 'ko' ? '변환 전' : 'Before'}
+          badgeColor="rose"
+        />
       </div>
       <div className="mt-4">
-        <SqlBlock sql={t.simpleAfter} badge={lang === 'ko' ? '변환 후' : 'After'} badgeColor="emerald" />
+        <SqlBlock
+          sql={t.simpleAfter}
+          badge={lang === 'ko' ? '변환 후' : 'After'}
+          badgeColor="emerald"
+        />
       </div>
       <InfoBox variant="note">
-        <pre className="whitespace-pre-wrap font-mono text-xs leading-relaxed">{t.simpleNote}</pre>
+        <pre className="font-mono text-xs leading-relaxed whitespace-pre-wrap">
+          {t.simpleNote}
+        </pre>
       </InfoBox>
       <ExplainPlanTable rows={planRows} caption={t.planCaption} lang={lang} />
 
@@ -241,7 +410,10 @@ export function QtViewMergingSection() {
       <SectionTitle>{t.restrictTitle}</SectionTitle>
       <Prose>{t.restrictDesc}</Prose>
       <Table
-        headers={[lang === 'ko' ? '요소' : 'Element', lang === 'ko' ? '이유' : 'Reason']}
+        headers={[
+          lang === 'ko' ? '요소' : 'Element',
+          lang === 'ko' ? '이유' : 'Reason',
+        ]}
         rows={t.restrictTable}
       />
 

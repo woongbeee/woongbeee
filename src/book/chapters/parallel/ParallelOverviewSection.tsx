@@ -20,7 +20,7 @@ const T = {
 
     whatTitle: '병렬 처리란?',
     whatDesc:
-      '하나의 SQL 문을 여러 개의 병렬 실행 서버(PX Server, Parallel eXecution Server)에 나눠서 동시에 처리하는 기법이에요.\n\n예를 들어 DOP(Degree of Parallelism, 병렬도)가 4라면, 테이블을 4조각으로 나눠 4개의 PX 서버가 각자 맡은 조각을 읽고 처리해요. 혼자서 10분 걸리던 집계 쿼리가 4명이 나눠 처리하면 약 2~3분으로 줄어드는 거예요.',
+      '하나의 SQL 문을 여러 개의 병렬 실행 서버(PX Server, Parallel execution Server)에 나눠서 동시에 처리하는 기법이에요.\n\n예를 들어 DOP(Degree of Parallelism, 병렬도)가 4라면, 테이블을 4조각으로 나눠 4개의 PX 서버가 각자 맡은 조각을 읽고 처리해요. 혼자서 10분 걸리던 집계 쿼리가 4명이 나눠 처리하면 약 2~3분으로 줄어드는 거예요.',
 
     conceptTitle: '병렬 처리가 빠른 이유',
     concepts: [
@@ -92,8 +92,16 @@ GROUP BY c.name;`,
     whenTable: [
       ['OLAP / DW 집계', '수백만 건 이상 집계·분석', '✅ 권장'],
       ['대용량 배치 ETL', '야간 대용량 변환·적재 작업', '✅ 권장'],
-      ['DDL (인덱스 생성 등)', 'CREATE INDEX, CREATE TABLE AS SELECT', '✅ 권장'],
-      ['소규모 OLTP 쿼리', '인덱스로 수십 건 조회', '❌ 불필요 (오히려 느려짐)'],
+      [
+        'DDL (인덱스 생성 등)',
+        'CREATE INDEX, CREATE TABLE AS SELECT',
+        '✅ 권장',
+      ],
+      [
+        '소규모 OLTP 쿼리',
+        '인덱스로 수십 건 조회',
+        '❌ 불필요 (오히려 느려짐)',
+      ],
       ['동시 사용자가 많은 환경', '피크 시간대 OLTP 서버', '⚠️ 신중히 판단'],
     ],
 
@@ -179,11 +187,31 @@ GROUP BY c.name;`,
     whenDesc:
       'Parallel processing is powerful but resource-intensive. With DOP = 4, CPU, I/O, and memory usage can each increase up to 4×.',
     whenTable: [
-      ['OLAP / DW aggregation', 'Millions of rows, analytic queries', '✅ Recommended'],
-      ['Large batch ETL', 'Overnight large-volume transform & load', '✅ Recommended'],
-      ['DDL (index creation, etc.)', 'CREATE INDEX, CREATE TABLE AS SELECT', '✅ Recommended'],
-      ['Small OLTP queries', 'Index lookups returning a few rows', '❌ Unnecessary (slower)'],
-      ['High-concurrency environments', 'Peak-time OLTP servers', '⚠️ Evaluate carefully'],
+      [
+        'OLAP / DW aggregation',
+        'Millions of rows, analytic queries',
+        '✅ Recommended',
+      ],
+      [
+        'Large batch ETL',
+        'Overnight large-volume transform & load',
+        '✅ Recommended',
+      ],
+      [
+        'DDL (index creation, etc.)',
+        'CREATE INDEX, CREATE TABLE AS SELECT',
+        '✅ Recommended',
+      ],
+      [
+        'Small OLTP queries',
+        'Index lookups returning a few rows',
+        '❌ Unnecessary (slower)',
+      ],
+      [
+        'High-concurrency environments',
+        'Peak-time OLTP servers',
+        '⚠️ Evaluate carefully',
+      ],
     ],
 
     summary:
@@ -231,25 +259,31 @@ export function ParallelOverviewSection() {
       <SectionTitle>{t.whenTitle}</SectionTitle>
       <Prose>{t.whenDesc}</Prose>
       <ParallelVsSerialDiagram lang={lang} />
-      <table className="mb-6 w-full overflow-hidden rounded-card border text-xs">
+      <table className="rounded-card mb-6 w-full overflow-hidden border text-xs">
         <thead>
-          <tr className="border-b bg-rail">
-            <th className="px-4 py-2.5 text-left font-mono font-bold text-ink-2">
+          <tr className="bg-rail border-b">
+            <th className="text-ink-2 px-4 py-2.5 text-left font-mono font-bold">
               {isKo ? '상황' : 'Situation'}
             </th>
-            <th className="px-4 py-2.5 text-left font-mono font-bold text-ink-2">
+            <th className="text-ink-2 px-4 py-2.5 text-left font-mono font-bold">
               {isKo ? '예시' : 'Example'}
             </th>
-            <th className="px-4 py-2.5 text-left font-mono font-bold text-ink-2">
+            <th className="text-ink-2 px-4 py-2.5 text-left font-mono font-bold">
               {isKo ? '권장' : 'Recommendation'}
             </th>
           </tr>
         </thead>
         <tbody>
           {t.whenTable.map((row, i) => (
-            <tr key={i} className={`border-b last:border-0 ${i % 2 === 0 ? 'bg-paper' : 'bg-rail'}`}>
+            <tr
+              key={i}
+              className={`border-b last:border-0 ${i % 2 === 0 ? 'bg-paper' : 'bg-rail'}`}
+            >
               {row.map((cell, ci) => (
-                <td key={ci} className="px-4 py-2 font-mono text-[11px] text-ink/80">
+                <td
+                  key={ci}
+                  className="text-ink/80 px-4 py-2 font-mono text-[11px]"
+                >
                   {cell}
                 </td>
               ))}
@@ -271,87 +305,135 @@ function ParallelVsSerialDiagram({ lang }: { lang: 'ko' | 'en' }) {
   const isKo = lang === 'ko'
 
   // 전체 작업을 100단위로 고정. 병렬 오버헤드 10% 가산
-  const ROWS: { label: string; dop: number; time: number; isSerial: boolean }[] = [
-    { label: isKo ? 'DOP 1 (직렬)' : 'DOP 1 (serial)', dop: 1,  time: 100, isSerial: true  },
-    { label: 'DOP 2',                                     dop: 2,  time: 60,  isSerial: false },
-    { label: 'DOP 4',                                     dop: 4,  time: 35,  isSerial: false },
-    { label: 'DOP 8',                                     dop: 8,  time: 23,  isSerial: false },
+  const ROWS: {
+    label: string
+    dop: number
+    time: number
+    isSerial: boolean
+  }[] = [
+    {
+      label: isKo ? 'DOP 1 (직렬)' : 'DOP 1 (serial)',
+      dop: 1,
+      time: 100,
+      isSerial: true,
+    },
+    { label: 'DOP 2', dop: 2, time: 60, isSerial: false },
+    { label: 'DOP 4', dop: 4, time: 35, isSerial: false },
+    { label: 'DOP 8', dop: 8, time: 23, isSerial: false },
   ]
   const MAX_TIME = 100
 
   // SVG 레이아웃
-  const W        = 560
-  const ROW_H    = 36
-  const ROW_GAP  = 14
-  const LABEL_W  = 96   // 레이블 열 너비
-  const BAR_AREA = W - LABEL_W - 100  // 바 그리는 영역 (오른쪽 100은 시간 레이블 공간)
-  const TOP_PAD  = 8
-  const rowY     = (i: number) => TOP_PAD + i * (ROW_H + ROW_GAP)
-  const H        = TOP_PAD + ROWS.length * (ROW_H + ROW_GAP) + 8
+  const W = 560
+  const ROW_H = 36
+  const ROW_GAP = 14
+  const LABEL_W = 96 // 레이블 열 너비
+  const BAR_AREA = W - LABEL_W - 100 // 바 그리는 영역 (오른쪽 100은 시간 레이블 공간)
+  const TOP_PAD = 8
+  const rowY = (i: number) => TOP_PAD + i * (ROW_H + ROW_GAP)
+  const H = TOP_PAD + ROWS.length * (ROW_H + ROW_GAP) + 8
 
   return (
-    <div className="mb-6 overflow-hidden rounded-panel border bg-rail p-4">
-      <svg viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ fontFamily: 'monospace' }}>
+    <div className="rounded-panel bg-rail mb-6 overflow-hidden border p-4">
+      <svg
+        viewBox={`0 0 ${W} ${H}`}
+        className="w-full"
+        style={{ fontFamily: 'var(--font-mono-stack)' }}
+      >
         {ROWS.map((row, i) => {
-          const y      = rowY(i)
-          const barW   = Math.round((row.time / MAX_TIME) * BAR_AREA)
+          const y = rowY(i)
+          const barW = Math.round((row.time / MAX_TIME) * BAR_AREA)
           const saving = Math.round((1 - row.time / MAX_TIME) * 100)
-          const barFill   = row.isSerial ? 'var(--color-red)' : 'var(--color-green)'
-          const barStroke = row.isSerial ? 'var(--color-red)' : 'var(--color-green)'
-          const textFill  = row.isSerial ? 'var(--color-red)' : 'var(--color-green)'
-          const midCY  = y + ROW_H / 2
+          const barFill = row.isSerial
+            ? 'var(--color-red)'
+            : 'var(--color-green)'
+          const barStroke = row.isSerial
+            ? 'var(--color-red)'
+            : 'var(--color-green)'
+          const textFill = row.isSerial
+            ? 'var(--color-red)'
+            : 'var(--color-green)'
+          const midCY = y + ROW_H / 2
 
           return (
             <g key={row.label}>
               {/* 행 레이블 */}
               <text
-                x={LABEL_W - 8} y={midCY + 4}
-                textAnchor="end" fontSize={9} fontWeight="bold"
-                fill={row.isSerial ? 'var(--color-ink-2)' : 'var(--color-green)'}
+                x={LABEL_W - 8}
+                y={midCY + 4}
+                textAnchor="end"
+                fontSize={9}
+                fontWeight="bold"
+                fill={
+                  row.isSerial ? 'var(--color-ink-2)' : 'var(--color-green)'
+                }
               >
                 {row.label}
               </text>
 
               {/* 배경 트랙 (전체 100% 너비) */}
               <rect
-                x={LABEL_W} y={y}
-                width={BAR_AREA} height={ROW_H}
-                rx={5} fill={row.isSerial ? 'var(--color-rail)' : 'var(--color-rail)'}
-                stroke={row.isSerial ? 'var(--color-red)' : 'var(--color-green)'}
+                x={LABEL_W}
+                y={y}
+                width={BAR_AREA}
+                height={ROW_H}
+                rx={5}
+                fill={row.isSerial ? 'var(--color-rail)' : 'var(--color-rail)'}
+                stroke={
+                  row.isSerial ? 'var(--color-red)' : 'var(--color-green)'
+                }
                 strokeWidth={1}
               />
 
               {/* 실제 소요 시간 바 */}
               <rect
-                x={LABEL_W} y={y}
-                width={barW} height={ROW_H}
-                rx={5} fill={barFill} stroke={barStroke} strokeWidth={1.5}
+                x={LABEL_W}
+                y={y}
+                width={barW}
+                height={ROW_H}
+                rx={5}
+                fill={barFill}
+                stroke={barStroke}
+                strokeWidth={1.5}
               />
 
               {/* 바 내부 텍스트: 충분히 넓을 때만 */}
               {barW > 48 && (
                 <text
-                  x={LABEL_W + barW / 2} y={midCY + 4}
-                  textAnchor="middle" fontSize={9} fontWeight="bold" fill={textFill}
+                  x={LABEL_W + barW / 2}
+                  y={midCY + 4}
+                  textAnchor="middle"
+                  fontSize={9}
+                  fontWeight="bold"
+                  fill={textFill}
                 >
-                  {row.time}{isKo ? '초' : 's'}
+                  {row.time}
+                  {isKo ? '초' : 's'}
                 </text>
               )}
 
               {/* 바 끝 세로선 */}
               <line
-                x1={LABEL_W + barW} y1={y + 4}
-                x2={LABEL_W + barW} y2={y + ROW_H - 4}
-                stroke={barStroke} strokeWidth={1.5}
+                x1={LABEL_W + barW}
+                y1={y + 4}
+                x2={LABEL_W + barW}
+                y2={y + ROW_H - 4}
+                stroke={barStroke}
+                strokeWidth={1.5}
               />
 
               {/* 오른쪽 시간 + 절감률 */}
               <text
-                x={LABEL_W + barW + 8} y={midCY + 4}
-                fontSize={9} fontWeight="bold" fill={textFill}
+                x={LABEL_W + barW + 8}
+                y={midCY + 4}
+                fontSize={9}
+                fontWeight="bold"
+                fill={textFill}
               >
                 {row.isSerial
-                  ? (isKo ? '기준' : 'baseline')
+                  ? isKo
+                    ? '기준'
+                    : 'baseline'
                   : `${row.time}${isKo ? '초' : 's'}  (-${saving}%)`}
               </text>
             </g>
@@ -359,7 +441,7 @@ function ParallelVsSerialDiagram({ lang }: { lang: 'ko' | 'en' }) {
         })}
       </svg>
 
-      <p className="mt-2 text-center font-mono text-[10px] text-ink-2">
+      <p className="text-ink-2 mt-2 text-center font-mono text-[10px]">
         {isKo
           ? 'DOP가 높을수록 바가 짧아져요 — 같은 작업을 더 빨리 끝낼 수 있어요'
           : 'Higher DOP = shorter bar — the same work completes faster'}

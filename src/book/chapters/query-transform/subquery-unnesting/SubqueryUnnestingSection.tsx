@@ -15,7 +15,8 @@ import type { PlanRow } from '../../optimizer/shared/diagrams'
 const T = {
   ko: {
     title: 'Subquery Unnesting',
-    subtitle: '중첩된 서브쿼리를 동등한 조인 문장으로 변환해서 옵티마이저가 더 넓은 범위에서 실행 계획을 최적화할 수 있게 해요.',
+    subtitle:
+      '중첩된 서브쿼리를 동등한 조인 문장으로 변환해서 옵티마이저가 더 넓은 범위에서 실행 계획을 최적화할 수 있게 해요.',
 
     whatTitle: 'Subquery Unnesting이란?',
     whatDesc:
@@ -89,7 +90,8 @@ WHERE e.salary > dept_avg.avg_sal;`,
     planTitle: '실행 계획에서 확인하는 방법',
     planDesc:
       'Unnesting이 적용되면 실행 계획에서 서브쿼리 블록이 사라지고 조인 오퍼레이션이 나타나요. 변환된 서브쿼리의 쿼리 블록 이름에 VW_SQ_ 접두사가 붙어 있어요.',
-    planCaption: 'EXPLAIN PLAN — Subquery Unnesting 적용 후 (IN 서브쿼리 → 조인)',
+    planCaption:
+      'EXPLAIN PLAN — Subquery Unnesting 적용 후 (IN 서브쿼리 → 조인)',
 
     hintTitle: '힌트로 제어하기',
     hintSql: `-- Unnesting 강제
@@ -113,7 +115,8 @@ WHERE  cust_id IN (SELECT cust_id FROM customers);`,
   },
   en: {
     title: 'Subquery Unnesting',
-    subtitle: 'Transforms nested queries into equivalent join statements so the optimizer can optimize the entire query as one unit.',
+    subtitle:
+      'Transforms nested queries into equivalent join statements so the optimizer can optimize the entire query as one unit.',
 
     whatTitle: 'What is Subquery Unnesting?',
     whatDesc:
@@ -121,10 +124,11 @@ WHERE  cust_id IN (SELECT cust_id FROM customers);`,
 
     benefitTitle: 'Why Unnesting?',
     benefitDesc:
-      "Before Unnesting: the subquery is treated as an isolated query block. For correlated subqueries, it may be re-executed for each outer row. The optimizer optimizes each block independently, limiting cross-block optimization.\n\nAfter Unnesting: a single join is produced, giving the CBO full freedom to choose join order, join method, and index selection across all tables.",
+      'Before Unnesting: the subquery is treated as an isolated query block. For correlated subqueries, it may be re-executed for each outer row. The optimizer optimizes each block independently, limiting cross-block optimization.\n\nAfter Unnesting: a single join is produced, giving the CBO full freedom to choose join order, join method, and index selection across all tables.',
 
     exampleTitle: 'Transformation Example (Oracle Docs)',
-    exampleDesc: 'This Oracle documentation example shows an IN subquery being unnested into a join.',
+    exampleDesc:
+      'This Oracle documentation example shows an IN subquery being unnested into a join.',
     beforeSql: `-- Before: IN subquery
 SELECT *
 FROM   sales
@@ -165,7 +169,7 @@ WHERE  e.department_id NOT IN (
 
     correlatedTitle: 'Correlated Subqueries',
     correlatedDesc:
-      "A correlated subquery references a column from the outer query. In theory, it runs once per outer row.\n\nWhen Unnesting is applied, the correlation becomes a join condition.",
+      'A correlated subquery references a column from the outer query. In theory, it runs once per outer row.\n\nWhen Unnesting is applied, the correlation becomes a join condition.',
     correlatedSql: `-- Before: correlated subquery
 SELECT e.last_name, e.salary
 FROM   employees e
@@ -212,25 +216,103 @@ WHERE  cust_id IN (SELECT cust_id FROM customers);`,
 }
 
 const PLAN_ROWS_KO: PlanRow[] = [
-  { id: 0, depth: 0, operation: 'SELECT STATEMENT', rows: 319, cost: 9, time: '00:00:01',
-    note: 'Unnesting 후 서브쿼리가 사라지고 단일 SELECT로 처리돼요.' },
-  { id: 1, depth: 1, operation: 'HASH JOIN', name: undefined, rows: 319, cost: 9, time: '00:00:01',
-    note: '서브쿼리가 Hash Join으로 변환됐어요. VW_SQ_1이 customers의 unnested 결과예요.' },
-  { id: 2, depth: 2, operation: 'VIEW', name: 'VW_SQ_1', rows: 319, cost: 3, time: '00:00:01',
-    note: 'VW_SQ_ 접두사: Subquery Unnesting으로 생성된 인라인 뷰예요. 서브쿼리가 이 뷰로 변환됐어요.' },
-  { id: 3, depth: 3, operation: 'TABLE ACCESS FULL', name: 'CUSTOMERS', rows: 319, cost: 3, time: '00:00:01' },
-  { id: 4, depth: 2, operation: 'TABLE ACCESS FULL', name: 'SALES', rows: 918843, cost: 6, time: '00:00:01' },
+  {
+    id: 0,
+    depth: 0,
+    operation: 'SELECT STATEMENT',
+    rows: 319,
+    cost: 9,
+    time: '00:00:01',
+    note: 'Unnesting 후 서브쿼리가 사라지고 단일 SELECT로 처리돼요.',
+  },
+  {
+    id: 1,
+    depth: 1,
+    operation: 'HASH JOIN',
+    name: undefined,
+    rows: 319,
+    cost: 9,
+    time: '00:00:01',
+    note: '서브쿼리가 Hash Join으로 변환됐어요. VW_SQ_1이 customers의 unnested 결과예요.',
+  },
+  {
+    id: 2,
+    depth: 2,
+    operation: 'VIEW',
+    name: 'VW_SQ_1',
+    rows: 319,
+    cost: 3,
+    time: '00:00:01',
+    note: 'VW_SQ_ 접두사: Subquery Unnesting으로 생성된 인라인 뷰예요. 서브쿼리가 이 뷰로 변환됐어요.',
+  },
+  {
+    id: 3,
+    depth: 3,
+    operation: 'TABLE ACCESS FULL',
+    name: 'CUSTOMERS',
+    rows: 319,
+    cost: 3,
+    time: '00:00:01',
+  },
+  {
+    id: 4,
+    depth: 2,
+    operation: 'TABLE ACCESS FULL',
+    name: 'SALES',
+    rows: 918843,
+    cost: 6,
+    time: '00:00:01',
+  },
 ]
 
 const PLAN_ROWS_EN: PlanRow[] = [
-  { id: 0, depth: 0, operation: 'SELECT STATEMENT', rows: 319, cost: 9, time: '00:00:01',
-    note: 'After Unnesting, the subquery disappears and the query is processed as a single SELECT.' },
-  { id: 1, depth: 1, operation: 'HASH JOIN', name: undefined, rows: 319, cost: 9, time: '00:00:01',
-    note: 'The subquery has been converted into a Hash Join. VW_SQ_1 holds the unnested customers subquery result.' },
-  { id: 2, depth: 2, operation: 'VIEW', name: 'VW_SQ_1', rows: 319, cost: 3, time: '00:00:01',
-    note: 'VW_SQ_ prefix: an inline view generated by Subquery Unnesting. The original subquery is now this view.' },
-  { id: 3, depth: 3, operation: 'TABLE ACCESS FULL', name: 'CUSTOMERS', rows: 319, cost: 3, time: '00:00:01' },
-  { id: 4, depth: 2, operation: 'TABLE ACCESS FULL', name: 'SALES', rows: 918843, cost: 6, time: '00:00:01' },
+  {
+    id: 0,
+    depth: 0,
+    operation: 'SELECT STATEMENT',
+    rows: 319,
+    cost: 9,
+    time: '00:00:01',
+    note: 'After Unnesting, the subquery disappears and the query is processed as a single SELECT.',
+  },
+  {
+    id: 1,
+    depth: 1,
+    operation: 'HASH JOIN',
+    name: undefined,
+    rows: 319,
+    cost: 9,
+    time: '00:00:01',
+    note: 'The subquery has been converted into a Hash Join. VW_SQ_1 holds the unnested customers subquery result.',
+  },
+  {
+    id: 2,
+    depth: 2,
+    operation: 'VIEW',
+    name: 'VW_SQ_1',
+    rows: 319,
+    cost: 3,
+    time: '00:00:01',
+    note: 'VW_SQ_ prefix: an inline view generated by Subquery Unnesting. The original subquery is now this view.',
+  },
+  {
+    id: 3,
+    depth: 3,
+    operation: 'TABLE ACCESS FULL',
+    name: 'CUSTOMERS',
+    rows: 319,
+    cost: 3,
+    time: '00:00:01',
+  },
+  {
+    id: 4,
+    depth: 2,
+    operation: 'TABLE ACCESS FULL',
+    name: 'SALES',
+    rows: 918843,
+    cost: 6,
+    time: '00:00:01',
+  },
 ]
 
 export function QtSubqueryUnnestingSection() {
@@ -259,10 +341,18 @@ export function QtSubqueryUnnestingSection() {
       <SectionTitle>{t.exampleTitle}</SectionTitle>
       <Prose>{t.exampleDesc}</Prose>
       <div className="mt-4">
-        <SqlBlock sql={t.beforeSql} badge={lang === 'ko' ? '변환 전' : 'Before'} badgeColor="rose" />
+        <SqlBlock
+          sql={t.beforeSql}
+          badge={lang === 'ko' ? '변환 전' : 'Before'}
+          badgeColor="rose"
+        />
       </div>
       <div className="mt-4">
-        <SqlBlock sql={t.afterSql} badge={lang === 'ko' ? '변환 후' : 'After'} badgeColor="emerald" />
+        <SqlBlock
+          sql={t.afterSql}
+          badge={lang === 'ko' ? '변환 후' : 'After'}
+          badgeColor="emerald"
+        />
       </div>
 
       <Divider />

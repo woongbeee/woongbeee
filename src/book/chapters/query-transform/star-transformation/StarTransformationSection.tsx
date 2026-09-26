@@ -14,7 +14,8 @@ import {
 const T = {
   ko: {
     title: 'Star Transformation',
-    subtitle: 'Star 스키마 쿼리에서 팩트 테이블 Full Scan을 피하기 위해 Bitmap 세미조인 조건을 추가하는 변환이에요.',
+    subtitle:
+      'Star 스키마 쿼리에서 팩트 테이블 Full Scan을 피하기 위해 Bitmap 세미조인 조건을 추가하는 변환이에요.',
 
     whatTitle: 'Star Transformation이란?',
     whatDesc:
@@ -25,7 +26,8 @@ const T = {
       'Star 스키마는 데이터 웨어하우스에서 가장 흔히 사용되는 구조예요. 중앙의 팩트 테이블(수천만~수십억 행)과 이를 둘러싼 차원 테이블(수백~수천 행)로 구성돼요.\n\n• 팩트 테이블: 측정값(매출액, 수량 등)과 차원 테이블의 외래키를 가진 큰 테이블\n• 차원 테이블: 시간, 고객, 제품, 지역 등 분석 기준이 되는 작은 테이블',
 
     exampleTitle: '변환 예시 (공식 문서)',
-    exampleDesc: '공식 문서 예시예요. sales 팩트 테이블과 times, customers, channels 차원 테이블을 조인하는 Star 쿼리가 변환돼요.',
+    exampleDesc:
+      '공식 문서 예시예요. sales 팩트 테이블과 times, customers, channels 차원 테이블을 조인하는 Star 쿼리가 변환돼요.',
     beforeSql: `-- 변환 전: Star 쿼리 (sales 팩트 테이블 Full Scan 가능성)
 SELECT c.cust_city, t.calendar_quarter_desc,
        SUM(s.amount_sold) sales_amount
@@ -61,16 +63,31 @@ GROUP BY c.cust_city, t.calendar_quarter_desc;`,
     prereqTitle: '적용 조건',
     prereqDesc: 'Star Transformation이 적용되려면 다음이 필요해요.',
     prereqTable: [
-      ['Bitmap 인덱스', '팩트 테이블의 각 조인 컬럼(time_id, cust_id, channel_id 등)에 Bitmap 인덱스가 있어야 해요'],
-      ['STAR_TRANSFORMATION_ENABLED', 'true 또는 TEMP_DISABLE로 설정해야 해요 (기본값: false)'],
-      ['Star 스키마 구조', '팩트 테이블과 여러 차원 테이블의 조인 구조여야 해요'],
+      [
+        'Bitmap 인덱스',
+        '팩트 테이블의 각 조인 컬럼(time_id, cust_id, channel_id 등)에 Bitmap 인덱스가 있어야 해요',
+      ],
+      [
+        'STAR_TRANSFORMATION_ENABLED',
+        'true 또는 TEMP_DISABLE로 설정해야 해요 (기본값: false)',
+      ],
+      [
+        'Star 스키마 구조',
+        '팩트 테이블과 여러 차원 테이블의 조인 구조여야 해요',
+      ],
     ],
 
     paramTitle: 'STAR_TRANSFORMATION_ENABLED 파라미터',
     paramTable: [
-      ['TRUE', 'Star Transformation 활성화. 옵티마이저가 팩트·차원 테이블을 자동 식별.'],
+      [
+        'TRUE',
+        'Star Transformation 활성화. 옵티마이저가 팩트·차원 테이블을 자동 식별.',
+      ],
       ['FALSE', 'Star Transformation 비활성화 (기본값).'],
-      ['TEMP_DISABLE', 'TRUE와 동일하지만 임시 테이블 변환(Cursor-Duration Temporary Table)은 제외.'],
+      [
+        'TEMP_DISABLE',
+        'TRUE와 동일하지만 임시 테이블 변환(Cursor-Duration Temporary Table)은 제외.',
+      ],
     ],
     paramSql: `-- 세션 수준 활성화
 ALTER SESSION SET star_transformation_enabled = TRUE;
@@ -109,7 +126,8 @@ GROUP BY c.cust_city;`,
   },
   en: {
     title: 'Star Transformation',
-    subtitle: 'Avoids full table scans of fact tables in star schema queries by adding bitmap semijoin predicates that use bitmap indexes.',
+    subtitle:
+      'Avoids full table scans of fact tables in star schema queries by adding bitmap semijoin predicates that use bitmap indexes.',
 
     whatTitle: 'What is Star Transformation?',
     whatDesc:
@@ -117,10 +135,11 @@ GROUP BY c.cust_city;`,
 
     starSchemaTitle: 'What is a Star Schema?',
     starSchemaDesc:
-      "A star schema is the most common structure in data warehouses. It consists of a central fact table (tens of millions to billions of rows) surrounded by smaller dimension tables (hundreds to thousands of rows).\n\n• Fact table: large table holding measurements (revenue, quantity, etc.) and foreign keys to dimension tables\n• Dimension tables: smaller lookup tables representing time, customers, products, regions, and other analysis axes",
+      'A star schema is the most common structure in data warehouses. It consists of a central fact table (tens of millions to billions of rows) surrounded by smaller dimension tables (hundreds to thousands of rows).\n\n• Fact table: large table holding measurements (revenue, quantity, etc.) and foreign keys to dimension tables\n• Dimension tables: smaller lookup tables representing time, customers, products, regions, and other analysis axes',
 
     exampleTitle: 'Transformation Example (Oracle Docs)',
-    exampleDesc: 'This Oracle documentation example shows a star query joining the sales fact table with three dimension tables being transformed.',
+    exampleDesc:
+      'This Oracle documentation example shows a star query joining the sales fact table with three dimension tables being transformed.',
     beforeSql: `-- Before: star query (risk of full scan on sales fact table)
 SELECT c.cust_city, t.calendar_quarter_desc,
        SUM(s.amount_sold) sales_amount
@@ -156,16 +175,31 @@ GROUP BY c.cust_city, t.calendar_quarter_desc;`,
     prereqTitle: 'Prerequisites',
     prereqDesc: 'Star Transformation requires all of the following.',
     prereqTable: [
-      ['Bitmap indexes', 'Bitmap indexes must exist on each join column of the fact table (time_id, cust_id, channel_id, etc.)'],
-      ['STAR_TRANSFORMATION_ENABLED', 'Must be set to TRUE or TEMP_DISABLE (default is FALSE)'],
-      ['Star schema structure', 'The query must join a fact table with multiple dimension tables'],
+      [
+        'Bitmap indexes',
+        'Bitmap indexes must exist on each join column of the fact table (time_id, cust_id, channel_id, etc.)',
+      ],
+      [
+        'STAR_TRANSFORMATION_ENABLED',
+        'Must be set to TRUE or TEMP_DISABLE (default is FALSE)',
+      ],
+      [
+        'Star schema structure',
+        'The query must join a fact table with multiple dimension tables',
+      ],
     ],
 
     paramTitle: 'STAR_TRANSFORMATION_ENABLED Parameter',
     paramTable: [
-      ['TRUE', 'Enables Star Transformation. The optimizer automatically identifies fact and dimension tables.'],
+      [
+        'TRUE',
+        'Enables Star Transformation. The optimizer automatically identifies fact and dimension tables.',
+      ],
       ['FALSE', 'Disables Star Transformation (default).'],
-      ['TEMP_DISABLE', 'Same as TRUE but excludes the cursor-duration temporary table transformation.'],
+      [
+        'TEMP_DISABLE',
+        'Same as TRUE but excludes the cursor-duration temporary table transformation.',
+      ],
     ],
     paramSql: `-- Enable at session level
 ALTER SESSION SET star_transformation_enabled = TRUE;
@@ -229,13 +263,23 @@ export function QtStarTransformationSection() {
       <SectionTitle>{t.exampleTitle}</SectionTitle>
       <Prose>{t.exampleDesc}</Prose>
       <div className="mt-4">
-        <SqlBlock sql={t.beforeSql} badge={lang === 'ko' ? '변환 전' : 'Before'} badgeColor="rose" />
+        <SqlBlock
+          sql={t.beforeSql}
+          badge={lang === 'ko' ? '변환 전' : 'Before'}
+          badgeColor="rose"
+        />
       </div>
       <div className="mt-4">
-        <SqlBlock sql={t.afterSql} badge={lang === 'ko' ? '변환 후' : 'After'} badgeColor="emerald" />
+        <SqlBlock
+          sql={t.afterSql}
+          badge={lang === 'ko' ? '변환 후' : 'After'}
+          badgeColor="emerald"
+        />
       </div>
       <InfoBox variant="note">
-        <pre className="whitespace-pre-wrap font-mono text-xs leading-relaxed">{t.exampleNote}</pre>
+        <pre className="font-mono text-xs leading-relaxed whitespace-pre-wrap">
+          {t.exampleNote}
+        </pre>
       </InfoBox>
 
       <Divider />
@@ -243,7 +287,10 @@ export function QtStarTransformationSection() {
       <SectionTitle>{t.prereqTitle}</SectionTitle>
       <Prose>{t.prereqDesc}</Prose>
       <Table
-        headers={[lang === 'ko' ? '조건' : 'Requirement', lang === 'ko' ? '설명' : 'Description']}
+        headers={[
+          lang === 'ko' ? '조건' : 'Requirement',
+          lang === 'ko' ? '설명' : 'Description',
+        ]}
         rows={t.prereqTable}
       />
 
@@ -251,7 +298,10 @@ export function QtStarTransformationSection() {
 
       <SectionTitle>{t.paramTitle}</SectionTitle>
       <Table
-        headers={[lang === 'ko' ? '값' : 'Value', lang === 'ko' ? '설명' : 'Description']}
+        headers={[
+          lang === 'ko' ? '값' : 'Value',
+          lang === 'ko' ? '설명' : 'Description',
+        ]}
         rows={t.paramTable}
       />
       <div className="mt-4">

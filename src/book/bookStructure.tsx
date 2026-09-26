@@ -92,15 +92,24 @@ export const BOOK_CHAPTERS: BookChapter[] = [
           },
           {
             id: 'dm-sql-transaction',
-            title: { ko: '모델이 표현하는 트랜잭션의 이해', en: 'Transactions in the Model' },
+            title: {
+              ko: '모델이 표현하는 트랜잭션의 이해',
+              en: 'Transactions in the Model',
+            },
           },
           {
             id: 'dm-sql-null',
-            title: { ko: 'Null 속성의 이해', en: 'Understanding Null Attributes' },
+            title: {
+              ko: 'Null 속성의 이해',
+              en: 'Understanding Null Attributes',
+            },
           },
           {
             id: 'dm-sql-identifier',
-            title: { ko: '본질 식별자와 인조 식별자', en: 'Natural vs. Surrogate Identifiers' },
+            title: {
+              ko: '본질 식별자와 인조 식별자',
+              en: 'Natural vs. Surrogate Identifiers',
+            },
           },
         ],
       },
@@ -174,7 +183,10 @@ export const BOOK_CHAPTERS: BookChapter[] = [
           },
           {
             id: 'sql-basics-date',
-            title: { ko: '날짜와 시간을 다루는 법', en: 'Date & Time Functions' },
+            title: {
+              ko: '날짜와 시간을 다루는 법',
+              en: 'Date & Time Functions',
+            },
           },
           {
             id: 'sql-basics-windowFunc',
@@ -285,7 +297,10 @@ export const BOOK_CHAPTERS: BookChapter[] = [
               },
               {
                 id: 'internals-process-background',
-                title: { ko: '백그라운드 프로세스', en: 'Background Processes' },
+                title: {
+                  ko: '백그라운드 프로세스',
+                  en: 'Background Processes',
+                },
               },
             ],
           },
@@ -293,15 +308,24 @@ export const BOOK_CHAPTERS: BookChapter[] = [
       },
       {
         id: 'internals-concurrency',
-        title: { ko: '데이터 동시성과 정합성', en: 'Data Concurrency & Consistency' },
+        title: {
+          ko: '데이터 동시성과 정합성',
+          en: 'Data Concurrency & Consistency',
+        },
         children: [
           {
             id: 'internals-concurrency-mvcc',
-            title: { ko: 'MVCC — 다중 버전 읽기 일관성', en: 'MVCC — Multiversion Read Consistency' },
+            title: {
+              ko: 'MVCC — 다중 버전 읽기 일관성',
+              en: 'MVCC — Multiversion Read Consistency',
+            },
           },
           {
             id: 'internals-concurrency-isolation',
-            title: { ko: '트랜잭션 격리 수준', en: 'Transaction Isolation Levels' },
+            title: {
+              ko: '트랜잭션 격리 수준',
+              en: 'Transaction Isolation Levels',
+            },
           },
           {
             id: 'internals-concurrency-locks',
@@ -429,7 +453,10 @@ export const BOOK_CHAPTERS: BookChapter[] = [
       },
       {
         id: 'index-unusable',
-        title: { ko: '인덱스를 못 쓰는 케이스', en: 'When Indexes Are Not Used' },
+        title: {
+          ko: '인덱스를 못 쓰는 케이스',
+          en: 'When Indexes Are Not Used',
+        },
       },
       {
         id: 'index-table-access',
@@ -468,7 +495,10 @@ export const BOOK_CHAPTERS: BookChapter[] = [
         children: [
           {
             id: 'partition-range',
-            title: { ko: 'Range / Interval 파티션', en: 'Range / Interval Partition' },
+            title: {
+              ko: 'Range / Interval 파티션',
+              en: 'Range / Interval Partition',
+            },
           },
           {
             id: 'partition-list',
@@ -521,6 +551,17 @@ export const BOOK_CHAPTERS: BookChapter[] = [
         id: 'parallel-coordinator',
         title: { ko: 'QC와 PX 서버', en: 'Query Coordinator & PX Servers' },
       },
+      {
+        id: 'parallel-pipeline',
+        title: { ko: '파이프라인 데이터 흐름', en: 'Pipeline Data Flow' },
+      },
+      {
+        id: 'parallel-multi-tq',
+        title: {
+          ko: '다단계 Table Queue 실전 예시',
+          en: 'Multi-Stage Table Queue Example',
+        },
+      },
     ],
   },
   {
@@ -540,11 +581,17 @@ export const BOOK_CHAPTERS: BookChapter[] = [
           },
           {
             id: 'optimizer-fundamentals-adaptive',
-            title: { ko: 'Adaptive Query Optimization', en: 'Adaptive Query Optimization' },
+            title: {
+              ko: 'Adaptive Query Optimization',
+              en: 'Adaptive Query Optimization',
+            },
           },
           {
             id: 'optimizer-fundamentals-approx',
-            title: { ko: 'Approximate Query Processing', en: 'Approximate Query Processing' },
+            title: {
+              ko: 'Approximate Query Processing',
+              en: 'Approximate Query Processing',
+            },
           },
           {
             id: 'optimizer-fundamentals-spm',
@@ -558,11 +605,17 @@ export const BOOK_CHAPTERS: BookChapter[] = [
         children: [
           {
             id: 'optimizer-execution-plans-explain',
-            title: { ko: 'EXPLAIN PLAN 사용법', en: 'Generating Plans with EXPLAIN PLAN' },
+            title: {
+              ko: 'EXPLAIN PLAN 사용법',
+              en: 'Generating Plans with EXPLAIN PLAN',
+            },
           },
           {
             id: 'optimizer-execution-plans-display',
-            title: { ko: '실행 계획 확인하기', en: 'Displaying Execution Plans' },
+            title: {
+              ko: '실행 계획 확인하기',
+              en: 'Displaying Execution Plans',
+            },
           },
           {
             id: 'optimizer-execution-plans-read',
@@ -570,7 +623,10 @@ export const BOOK_CHAPTERS: BookChapter[] = [
           },
           {
             id: 'optimizer-execution-plans-compare',
-            title: { ko: '실행 계획 비교하기', en: 'Comparing Execution Plans' },
+            title: {
+              ko: '실행 계획 비교하기',
+              en: 'Comparing Execution Plans',
+            },
           },
         ],
       },
@@ -629,7 +685,10 @@ export const BOOK_CHAPTERS: BookChapter[] = [
         children: [
           {
             id: 'qt-overview',
-            title: { ko: '쿼리 변환 개요', en: 'Query Transformation Overview' },
+            title: {
+              ko: '쿼리 변환 개요',
+              en: 'Query Transformation Overview',
+            },
           },
           {
             id: 'qt-or-expansion',
@@ -649,7 +708,10 @@ export const BOOK_CHAPTERS: BookChapter[] = [
           },
           {
             id: 'qt-materialized-view',
-            title: { ko: 'Query Rewrite with Materialized Views', en: 'Query Rewrite with Materialized Views' },
+            title: {
+              ko: 'Query Rewrite with Materialized Views',
+              en: 'Query Rewrite with Materialized Views',
+            },
           },
           {
             id: 'qt-star-transformation',
@@ -661,7 +723,10 @@ export const BOOK_CHAPTERS: BookChapter[] = [
           },
           {
             id: 'qt-simulator',
-            title: { ko: 'Query Transform Simulator', en: 'Query Transform Simulator' },
+            title: {
+              ko: 'Query Transform Simulator',
+              en: 'Query Transform Simulator',
+            },
             hasSimulator: true,
             simulatorLabel: {
               ko: '쿼리 변환 시뮬레이터 실행',
@@ -680,7 +745,10 @@ export const BOOK_CHAPTERS: BookChapter[] = [
           },
           {
             id: 'sort-memory',
-            title: { ko: 'Sort Area와 Temp 세그먼트', en: 'Sort Area & Temp Segment' },
+            title: {
+              ko: 'Sort Area와 Temp 세그먼트',
+              en: 'Sort Area & Temp Segment',
+            },
           },
           {
             id: 'sort-avoid',
@@ -705,7 +773,9 @@ export function getChapterById(id: string): BookChapter | undefined {
   return BOOK_CHAPTERS.find((c) => c.id === id)
 }
 
-function flattenSections(chapter: BookChapter): Array<{ chapter: BookChapter; section: BookSection }> {
+function flattenSections(
+  chapter: BookChapter
+): Array<{ chapter: BookChapter; section: BookSection }> {
   const result: Array<{ chapter: BookChapter; section: BookSection }> = []
   function walk(section: BookSection) {
     result.push({ chapter, section })
@@ -721,7 +791,9 @@ function flattenSections(chapter: BookChapter): Array<{ chapter: BookChapter; se
   return result
 }
 
-export function getSectionById(sectionId: string): { chapter: BookChapter; section: BookSection } | undefined {
+export function getSectionById(
+  sectionId: string
+): { chapter: BookChapter; section: BookSection } | undefined {
   for (const chapter of BOOK_CHAPTERS) {
     const flat = flattenSections(chapter)
     const found = flat.find((s) => s.section.id === sectionId)

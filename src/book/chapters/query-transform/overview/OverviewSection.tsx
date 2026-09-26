@@ -14,7 +14,8 @@ import { cn } from '@/lib/utils'
 const T = {
   ko: {
     title: '쿼리 변환 개요',
-    subtitle: 'Oracle CBO가 SQL을 실행하기 전 의미는 동일하지만 더 효율적인 형태로 변환하는 기법들을 알아봐요.',
+    subtitle:
+      'Oracle CBO가 SQL을 실행하기 전 의미는 동일하지만 더 효율적인 형태로 변환하는 기법들을 알아봐요.',
 
     whatTitle: '쿼리 변환이 뭐예요?',
     whatDesc:
@@ -80,7 +81,8 @@ const T = {
   },
   en: {
     title: 'Query Transformation Overview',
-    subtitle: "Learn the techniques Oracle's CBO applies to rewrite SQL into a semantically equivalent but more efficient form before execution.",
+    subtitle:
+      "Learn the techniques Oracle's CBO applies to rewrite SQL into a semantically equivalent but more efficient form before execution.",
 
     whatTitle: 'What is Query Transformation?',
     whatDesc:
@@ -109,7 +111,7 @@ const T = {
         color: 'border-purple/30 bg-purple/5',
         badge: 'bg-purple/10 text-purple',
         title: 'Predicate Pushing',
-        desc: "When view merging is not possible, pushes the outer WHERE predicates inside the view to reduce the number of rows the view processes.",
+        desc: 'When view merging is not possible, pushes the outer WHERE predicates inside the view to reduce the number of rows the view processes.',
       },
       {
         id: 'Subquery Unnesting',
@@ -142,7 +144,7 @@ const T = {
     ],
     noteTitle: 'Transformations Are Transparent',
     noteDesc:
-      "Query transformations happen automatically without user intervention. You write plain SQL and the optimizer rewrites it into a more efficient form. You can observe whether a transformation was applied by checking the Note section of EXPLAIN PLAN output, or by recognizing transformed query block names such as VW_SQ_1 or VW_JF_1.",
+      'Query transformations happen automatically without user intervention. You write plain SQL and the optimizer rewrites it into a more efficient form. You can observe whether a transformation was applied by checking the Note section of EXPLAIN PLAN output, or by recognizing transformed query block names such as VW_SQ_1 or VW_JF_1.',
   },
 }
 
@@ -171,15 +173,25 @@ export function QtOverviewSection() {
       <SectionTitle>{t.transformsTitle}</SectionTitle>
       <div className="mb-4 grid gap-3 sm:grid-cols-2">
         {t.transforms.map((item) => (
-          <div key={item.id} className={cn('rounded-panel border-2 p-4', item.color)}>
+          <div
+            key={item.id}
+            className={cn('rounded-panel border-2 p-4', item.color)}
+          >
             <div className="mb-2 flex items-center gap-2">
-              <IconBolt size={14} className="shrink-0 text-ink-2" />
-              <span className={cn('rounded px-1.5 py-0.5 font-mono text-[10px] font-bold', item.badge)}>
+              <IconBolt size={14} className="text-ink-2 shrink-0" />
+              <span
+                className={cn(
+                  'rounded px-1.5 py-0.5 font-mono text-[10px] font-bold',
+                  item.badge
+                )}
+              >
                 {item.id}
               </span>
             </div>
-            <p className="mb-1 font-mono text-xs font-bold text-ink/80">{item.title}</p>
-            <p className="text-xs leading-relaxed text-ink-2">{item.desc}</p>
+            <p className="text-ink/80 mb-1 font-mono text-xs font-bold">
+              {item.title}
+            </p>
+            <p className="text-ink-2 text-xs leading-relaxed">{item.desc}</p>
           </div>
         ))}
       </div>

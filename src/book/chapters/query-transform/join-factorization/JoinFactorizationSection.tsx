@@ -61,11 +61,11 @@ AND    t1.c1 > 1;`,
     planTitle: '실행 계획에서 확인하는 방법',
     planDesc:
       'Join Factorization이 적용되면 실행 계획에 VW_JF_ 접두사가 붙은 뷰 이름이 나타나요. 이 뷰가 UNION ALL 브랜치를 담고 있고, 바깥 쿼리가 이 뷰와 공통 테이블을 조인하는 구조예요.',
-    planCaption: 'EXPLAIN PLAN — Join Factorization 적용 후 (t1 스캔 1회, VW_JF_1 안에 UNION ALL)',
+    planCaption:
+      'EXPLAIN PLAN — Join Factorization 적용 후 (t1 스캔 1회, VW_JF_1 안에 UNION ALL)',
 
     restrictTitle: '적용 제한 사항',
-    restrictDesc:
-      'Join Factorization은 다음 경우에는 적용되지 않아요.',
+    restrictDesc: 'Join Factorization은 다음 경우에는 적용되지 않아요.',
     restrictItems: [
       'UNION ALL 브랜치에 DISTINCT가 있는 경우 — 중복 제거가 있으면 인수분해 후 결과가 달라질 수 있어요.',
       '비용 비교 결과 변환이 더 비쌀 때 — 공통 테이블이 작거나 브랜치 수가 적으면 효과가 없을 수 있어요.',
@@ -100,7 +100,7 @@ AND    t1.c1 > 1;`,
 
     howTitle: 'How Does It Work?',
     howDesc:
-      "The optimizer identifies common tables and join conditions across UNION ALL branches. It factors those common parts out of the UNION ALL, processes them once, and leaves only the branch-specific joins inside.\n\nIn the rewritten query, the factorized UNION ALL is expressed as an inline view whose name begins with the VW_JF_ prefix.",
+      'The optimizer identifies common tables and join conditions across UNION ALL branches. It factors those common parts out of the UNION ALL, processes them once, and leaves only the branch-specific joins inside.\n\nIn the rewritten query, the factorized UNION ALL is expressed as an inline view whose name begins with the VW_JF_ prefix.',
 
     exampleTitle: 'Transformation Example (Oracle Docs)',
     exampleDesc:
@@ -137,19 +137,18 @@ AND    t1.c1 > 1;`,
     planTitle: 'Verifying in the Execution Plan',
     planDesc:
       'When Join Factorization is applied, the execution plan shows a view name prefixed with VW_JF_. This view contains the UNION ALL branches, while the outer query joins the common table with that view.',
-    planCaption: 'EXPLAIN PLAN — after Join Factorization (t1 scanned once, UNION ALL inside VW_JF_1)',
+    planCaption:
+      'EXPLAIN PLAN — after Join Factorization (t1 scanned once, UNION ALL inside VW_JF_1)',
 
     restrictTitle: 'Restrictions',
-    restrictDesc:
-      'Join Factorization is not applied in the following cases.',
+    restrictDesc: 'Join Factorization is not applied in the following cases.',
     restrictItems: [
       'UNION ALL branches that use DISTINCT — deduplication makes factorization semantically unsafe.',
       'When the cost comparison shows the transformation is more expensive — if the common table is small or the branch count is low, factorization may not help.',
     ],
 
     supportTitle: 'Supported Join Types',
-    supportDesc:
-      'Join Factorization supports more than just inner joins.',
+    supportDesc: 'Join Factorization supports more than just inner joins.',
     supportItems: [
       'Outer joins — right-side tables that appear in all branches can be factorized',
       'Antijoins — right-side tables in NOT EXISTS / NOT IN rewrites',
@@ -168,41 +167,207 @@ AND    t1.c1 > 1;`,
 }
 
 const PLAN_ROWS_KO: PlanRow[] = [
-  { id: 0, depth: 0, operation: 'SELECT STATEMENT', rows: 10, cost: 8, time: '00:00:01' },
-  { id: 1, depth: 1, operation: 'HASH JOIN', rows: 10, cost: 8, time: '00:00:01',
-    note: 't1(공통 테이블)이 한 번만 스캔돼요. VW_JF_1(UNION ALL)과 조인해요.' },
-  { id: 2, depth: 2, operation: 'TABLE ACCESS FULL', name: 'T1', rows: 50, cost: 3, time: '00:00:01',
-    note: 't1이 단 한 번만 읽혀요. 변환 전에는 두 브랜치에서 각각 읽혔어요.' },
-  { id: 3, depth: 2, operation: 'VIEW', name: 'VW_JF_1', rows: 10, cost: 5, time: '00:00:01',
-    note: 'VW_JF_ 접두사: Join Factorization으로 생성된 인라인 뷰예요. 브랜치별 조인이 이 안에 있어요.' },
-  { id: 4, depth: 3, operation: 'UNION-ALL', rows: undefined, cost: undefined, time: undefined },
-  { id: 5, depth: 4, operation: 'HASH JOIN', rows: 5, cost: 3, time: '00:00:01',
-    note: '첫 번째 브랜치: t2와 t3의 조인. t1 없이 브랜치만의 조인이에요.' },
-  { id: 6, depth: 5, operation: 'TABLE ACCESS FULL', name: 'T2', rows: 10, cost: 2, time: '00:00:01' },
-  { id: 7, depth: 5, operation: 'TABLE ACCESS FULL', name: 'T3', rows: 5, cost: 1, time: '00:00:01' },
-  { id: 8, depth: 4, operation: 'HASH JOIN', rows: 5, cost: 2, time: '00:00:01',
-    note: '두 번째 브랜치: t2와 t4의 조인.' },
-  { id: 9, depth: 5, operation: 'TABLE ACCESS FULL', name: 'T2', rows: 10, cost: 2, time: '00:00:01' },
-  { id: 10, depth: 5, operation: 'TABLE ACCESS FULL', name: 'T4', rows: 5, cost: 1, time: '00:00:01' },
+  {
+    id: 0,
+    depth: 0,
+    operation: 'SELECT STATEMENT',
+    rows: 10,
+    cost: 8,
+    time: '00:00:01',
+  },
+  {
+    id: 1,
+    depth: 1,
+    operation: 'HASH JOIN',
+    rows: 10,
+    cost: 8,
+    time: '00:00:01',
+    note: 't1(공통 테이블)이 한 번만 스캔돼요. VW_JF_1(UNION ALL)과 조인해요.',
+  },
+  {
+    id: 2,
+    depth: 2,
+    operation: 'TABLE ACCESS FULL',
+    name: 'T1',
+    rows: 50,
+    cost: 3,
+    time: '00:00:01',
+    note: 't1이 단 한 번만 읽혀요. 변환 전에는 두 브랜치에서 각각 읽혔어요.',
+  },
+  {
+    id: 3,
+    depth: 2,
+    operation: 'VIEW',
+    name: 'VW_JF_1',
+    rows: 10,
+    cost: 5,
+    time: '00:00:01',
+    note: 'VW_JF_ 접두사: Join Factorization으로 생성된 인라인 뷰예요. 브랜치별 조인이 이 안에 있어요.',
+  },
+  {
+    id: 4,
+    depth: 3,
+    operation: 'UNION-ALL',
+    rows: undefined,
+    cost: undefined,
+    time: undefined,
+  },
+  {
+    id: 5,
+    depth: 4,
+    operation: 'HASH JOIN',
+    rows: 5,
+    cost: 3,
+    time: '00:00:01',
+    note: '첫 번째 브랜치: t2와 t3의 조인. t1 없이 브랜치만의 조인이에요.',
+  },
+  {
+    id: 6,
+    depth: 5,
+    operation: 'TABLE ACCESS FULL',
+    name: 'T2',
+    rows: 10,
+    cost: 2,
+    time: '00:00:01',
+  },
+  {
+    id: 7,
+    depth: 5,
+    operation: 'TABLE ACCESS FULL',
+    name: 'T3',
+    rows: 5,
+    cost: 1,
+    time: '00:00:01',
+  },
+  {
+    id: 8,
+    depth: 4,
+    operation: 'HASH JOIN',
+    rows: 5,
+    cost: 2,
+    time: '00:00:01',
+    note: '두 번째 브랜치: t2와 t4의 조인.',
+  },
+  {
+    id: 9,
+    depth: 5,
+    operation: 'TABLE ACCESS FULL',
+    name: 'T2',
+    rows: 10,
+    cost: 2,
+    time: '00:00:01',
+  },
+  {
+    id: 10,
+    depth: 5,
+    operation: 'TABLE ACCESS FULL',
+    name: 'T4',
+    rows: 5,
+    cost: 1,
+    time: '00:00:01',
+  },
 ]
 
 const PLAN_ROWS_EN: PlanRow[] = [
-  { id: 0, depth: 0, operation: 'SELECT STATEMENT', rows: 10, cost: 8, time: '00:00:01' },
-  { id: 1, depth: 1, operation: 'HASH JOIN', rows: 10, cost: 8, time: '00:00:01',
-    note: 'The common table t1 is scanned only once. It joins with VW_JF_1 (the UNION ALL view).' },
-  { id: 2, depth: 2, operation: 'TABLE ACCESS FULL', name: 'T1', rows: 50, cost: 3, time: '00:00:01',
-    note: 't1 is read just once. Before factorization it would have been scanned separately in each branch.' },
-  { id: 3, depth: 2, operation: 'VIEW', name: 'VW_JF_1', rows: 10, cost: 5, time: '00:00:01',
-    note: 'VW_JF_ prefix: an inline view generated by Join Factorization. The per-branch joins live inside.' },
-  { id: 4, depth: 3, operation: 'UNION-ALL', rows: undefined, cost: undefined, time: undefined },
-  { id: 5, depth: 4, operation: 'HASH JOIN', rows: 5, cost: 3, time: '00:00:01',
-    note: 'First branch: join of t2 and t3 — no t1 here.' },
-  { id: 6, depth: 5, operation: 'TABLE ACCESS FULL', name: 'T2', rows: 10, cost: 2, time: '00:00:01' },
-  { id: 7, depth: 5, operation: 'TABLE ACCESS FULL', name: 'T3', rows: 5, cost: 1, time: '00:00:01' },
-  { id: 8, depth: 4, operation: 'HASH JOIN', rows: 5, cost: 2, time: '00:00:01',
-    note: 'Second branch: join of t2 and t4.' },
-  { id: 9, depth: 5, operation: 'TABLE ACCESS FULL', name: 'T2', rows: 10, cost: 2, time: '00:00:01' },
-  { id: 10, depth: 5, operation: 'TABLE ACCESS FULL', name: 'T4', rows: 5, cost: 1, time: '00:00:01' },
+  {
+    id: 0,
+    depth: 0,
+    operation: 'SELECT STATEMENT',
+    rows: 10,
+    cost: 8,
+    time: '00:00:01',
+  },
+  {
+    id: 1,
+    depth: 1,
+    operation: 'HASH JOIN',
+    rows: 10,
+    cost: 8,
+    time: '00:00:01',
+    note: 'The common table t1 is scanned only once. It joins with VW_JF_1 (the UNION ALL view).',
+  },
+  {
+    id: 2,
+    depth: 2,
+    operation: 'TABLE ACCESS FULL',
+    name: 'T1',
+    rows: 50,
+    cost: 3,
+    time: '00:00:01',
+    note: 't1 is read just once. Before factorization it would have been scanned separately in each branch.',
+  },
+  {
+    id: 3,
+    depth: 2,
+    operation: 'VIEW',
+    name: 'VW_JF_1',
+    rows: 10,
+    cost: 5,
+    time: '00:00:01',
+    note: 'VW_JF_ prefix: an inline view generated by Join Factorization. The per-branch joins live inside.',
+  },
+  {
+    id: 4,
+    depth: 3,
+    operation: 'UNION-ALL',
+    rows: undefined,
+    cost: undefined,
+    time: undefined,
+  },
+  {
+    id: 5,
+    depth: 4,
+    operation: 'HASH JOIN',
+    rows: 5,
+    cost: 3,
+    time: '00:00:01',
+    note: 'First branch: join of t2 and t3 — no t1 here.',
+  },
+  {
+    id: 6,
+    depth: 5,
+    operation: 'TABLE ACCESS FULL',
+    name: 'T2',
+    rows: 10,
+    cost: 2,
+    time: '00:00:01',
+  },
+  {
+    id: 7,
+    depth: 5,
+    operation: 'TABLE ACCESS FULL',
+    name: 'T3',
+    rows: 5,
+    cost: 1,
+    time: '00:00:01',
+  },
+  {
+    id: 8,
+    depth: 4,
+    operation: 'HASH JOIN',
+    rows: 5,
+    cost: 2,
+    time: '00:00:01',
+    note: 'Second branch: join of t2 and t4.',
+  },
+  {
+    id: 9,
+    depth: 5,
+    operation: 'TABLE ACCESS FULL',
+    name: 'T2',
+    rows: 10,
+    cost: 2,
+    time: '00:00:01',
+  },
+  {
+    id: 10,
+    depth: 5,
+    operation: 'TABLE ACCESS FULL',
+    name: 'T4',
+    rows: 5,
+    cost: 1,
+    time: '00:00:01',
+  },
 ]
 
 export function QtJoinFactorizationSection() {
@@ -231,13 +396,23 @@ export function QtJoinFactorizationSection() {
       <SectionTitle>{t.exampleTitle}</SectionTitle>
       <Prose>{t.exampleDesc}</Prose>
       <div className="mt-4">
-        <SqlBlock sql={t.beforeSql} badge={lang === 'ko' ? '변환 전' : 'Before'} badgeColor="rose" />
+        <SqlBlock
+          sql={t.beforeSql}
+          badge={lang === 'ko' ? '변환 전' : 'Before'}
+          badgeColor="rose"
+        />
       </div>
       <div className="mt-4">
-        <SqlBlock sql={t.afterSql} badge={lang === 'ko' ? '변환 후' : 'After'} badgeColor="emerald" />
+        <SqlBlock
+          sql={t.afterSql}
+          badge={lang === 'ko' ? '변환 후' : 'After'}
+          badgeColor="emerald"
+        />
       </div>
       <InfoBox variant="note">
-        <pre className="whitespace-pre-wrap font-mono text-xs leading-relaxed">{t.exampleNote}</pre>
+        <pre className="font-mono text-xs leading-relaxed whitespace-pre-wrap">
+          {t.exampleNote}
+        </pre>
       </InfoBox>
 
       <Divider />
@@ -253,10 +428,10 @@ export function QtJoinFactorizationSection() {
       <div className="mt-4 space-y-2">
         {t.restrictItems.map((item, i) => (
           <div key={i} className="flex items-start gap-3">
-            <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-red/10 font-mono text-[10px] font-bold text-red">
+            <span className="bg-red/10 text-red mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full font-mono text-[10px] font-bold">
               {i + 1}
             </span>
-            <p className="text-sm leading-relaxed text-ink-2">{item}</p>
+            <p className="text-ink-2 text-sm leading-relaxed">{item}</p>
           </div>
         ))}
       </div>
@@ -268,10 +443,10 @@ export function QtJoinFactorizationSection() {
       <div className="mt-4 space-y-2">
         {t.supportItems.map((item, i) => (
           <div key={i} className="flex items-start gap-3">
-            <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-green/10 font-mono text-[10px] font-bold text-green">
+            <span className="bg-green/10 text-green mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full font-mono text-[10px] font-bold">
               {i + 1}
             </span>
-            <p className="text-sm leading-relaxed text-ink-2">{item}</p>
+            <p className="text-ink-2 text-sm leading-relaxed">{item}</p>
           </div>
         ))}
       </div>

@@ -15,7 +15,8 @@ import type { PlanRow } from '../../optimizer/shared/diagrams'
 const T = {
   ko: {
     title: 'Predicate Pushing',
-    subtitle: '뷰를 Merge할 수 없을 때, 외부 WHERE 조건을 뷰 내부로 밀어 넣어 처리 행 수를 줄이고 인덱스를 활용하게 해요.',
+    subtitle:
+      '뷰를 Merge할 수 없을 때, 외부 WHERE 조건을 뷰 내부로 밀어 넣어 처리 행 수를 줄이고 인덱스를 활용하게 해요.',
 
     whatTitle: 'Predicate Pushing이란?',
     whatDesc:
@@ -26,7 +27,8 @@ const T = {
       'View Merging은 뷰 자체를 없애고 테이블을 바깥 쿼리와 합치는 변환이에요. Predicate Pushing은 뷰를 그대로 유지하면서 조건만 안으로 밀어 넣는 변환이에요.\n\nUNION 뷰처럼 뷰를 Merge할 수 없는 경우에 Predicate Pushing이 특히 유용해요.',
 
     exampleTitle: '변환 예시 (공식 문서 — UNION 뷰)',
-    exampleDesc: '공식 문서 예시예요. UNION 뷰는 Merge할 수 없지만, 외부의 department_id = 50 조건을 뷰 안의 각 브랜치로 밀어 넣을 수 있어요.',
+    exampleDesc:
+      '공식 문서 예시예요. UNION 뷰는 Merge할 수 없지만, 외부의 department_id = 50 조건을 뷰 안의 각 브랜치로 밀어 넣을 수 있어요.',
     beforeSql: `-- 변환 전: 외부 조건이 뷰 밖에 있음
 SELECT last_name
 FROM   all_employees_vw
@@ -52,7 +54,8 @@ FROM (
 );`,
     exampleNote:
       'Pushing 전: 뷰가 employees와 contract_workers 전체를 UNION한 뒤 결과에서 department_id=50 필터링.\nPushing 후: 각 테이블에서 department_id=50인 행만 읽은 뒤 UNION — 읽는 행 수 대폭 감소.',
-    planCaption: 'EXPLAIN PLAN — Predicate Pushing 적용 후 (UNION 뷰 내부에 조건 이동)',
+    planCaption:
+      'EXPLAIN PLAN — Predicate Pushing 적용 후 (UNION 뷰 내부에 조건 이동)',
 
     transitiveTitle: 'Transitive Closure',
     transitiveDesc:
@@ -109,7 +112,8 @@ WHERE  e.department_id = v.department_id;`,
   },
   en: {
     title: 'Predicate Pushing',
-    subtitle: "When view merging is not possible, pushes outer WHERE conditions into the view's query block to reduce the rows processed and enable index access.",
+    subtitle:
+      "When view merging is not possible, pushes outer WHERE conditions into the view's query block to reduce the rows processed and enable index access.",
 
     whatTitle: 'What is Predicate Pushing?',
     whatDesc:
@@ -117,10 +121,11 @@ WHERE  e.department_id = v.department_id;`,
 
     vsTitle: 'View Merging vs Predicate Pushing',
     vsDesc:
-      "View Merging eliminates the view entirely by merging its tables into the outer query. Predicate Pushing keeps the view intact but moves conditions inside it.\n\nPredicate Pushing is especially useful for views that cannot be merged — such as UNION views.",
+      'View Merging eliminates the view entirely by merging its tables into the outer query. Predicate Pushing keeps the view intact but moves conditions inside it.\n\nPredicate Pushing is especially useful for views that cannot be merged — such as UNION views.',
 
     exampleTitle: 'Transformation Example (Oracle Docs — UNION View)',
-    exampleDesc: 'This Oracle documentation example shows a UNION view that cannot be merged. The outer predicate department_id = 50 is pushed into each branch of the UNION.',
+    exampleDesc:
+      'This Oracle documentation example shows a UNION view that cannot be merged. The outer predicate department_id = 50 is pushed into each branch of the UNION.',
     beforeSql: `-- Before: outer predicate sits outside the view
 SELECT last_name
 FROM   all_employees_vw
@@ -146,7 +151,8 @@ FROM (
 );`,
     exampleNote:
       'Before pushing: the view reads all rows from both tables, UNIONs them, then filters by department_id=50.\nAfter pushing: each table reads only department_id=50 rows before UNIONing — dramatically fewer rows processed.',
-    planCaption: 'EXPLAIN PLAN — after Predicate Pushing (predicate moved inside UNION view)',
+    planCaption:
+      'EXPLAIN PLAN — after Predicate Pushing (predicate moved inside UNION view)',
 
     transitiveTitle: 'Transitive Closure',
     transitiveDesc:
@@ -204,31 +210,139 @@ WHERE  e.department_id = v.department_id;`,
 }
 
 const PLAN_ROWS_KO: PlanRow[] = [
-  { id: 0, depth: 0, operation: 'SELECT STATEMENT', rows: 5, cost: 4, time: '00:00:01' },
-  { id: 1, depth: 1, operation: 'VIEW', name: 'ALL_EMPLOYEES_VW', rows: 5, cost: 4, time: '00:00:01',
-    note: '뷰는 Merge되지 않고 VIEW 노드로 남아 있어요. 하지만 내부에서 조건이 적용돼요.' },
-  { id: 2, depth: 2, operation: 'UNION-ALL', rows: undefined, cost: undefined, time: undefined,
-    note: 'UNION 뷰는 Merge 불가 — 대신 각 브랜치 내부로 department_id=50 조건이 Push됐어요.' },
-  { id: 3, depth: 3, operation: 'TABLE ACCESS BY INDEX ROWID', name: 'EMPLOYEES', rows: 5, cost: 2, time: '00:00:01' },
-  { id: 4, depth: 4, operation: 'INDEX RANGE SCAN', name: 'EMP_DEPT_IX', rows: 5, cost: 1, time: '00:00:01',
-    note: 'department_id=50 조건이 뷰 안으로 Push돼서 인덱스를 사용할 수 있게 됐어요.' },
-  { id: 5, depth: 3, operation: 'TABLE ACCESS BY INDEX ROWID', name: 'CONTRACT_WORKERS', rows: 0, cost: 2, time: '00:00:01' },
-  { id: 6, depth: 4, operation: 'INDEX RANGE SCAN', name: 'CW_DEPT_IX', rows: 0, cost: 1, time: '00:00:01',
-    note: '두 번째 브랜치에도 동일한 조건이 Push돼서 인덱스를 사용해요.' },
+  {
+    id: 0,
+    depth: 0,
+    operation: 'SELECT STATEMENT',
+    rows: 5,
+    cost: 4,
+    time: '00:00:01',
+  },
+  {
+    id: 1,
+    depth: 1,
+    operation: 'VIEW',
+    name: 'ALL_EMPLOYEES_VW',
+    rows: 5,
+    cost: 4,
+    time: '00:00:01',
+    note: '뷰는 Merge되지 않고 VIEW 노드로 남아 있어요. 하지만 내부에서 조건이 적용돼요.',
+  },
+  {
+    id: 2,
+    depth: 2,
+    operation: 'UNION-ALL',
+    rows: undefined,
+    cost: undefined,
+    time: undefined,
+    note: 'UNION 뷰는 Merge 불가 — 대신 각 브랜치 내부로 department_id=50 조건이 Push됐어요.',
+  },
+  {
+    id: 3,
+    depth: 3,
+    operation: 'TABLE ACCESS BY INDEX ROWID',
+    name: 'EMPLOYEES',
+    rows: 5,
+    cost: 2,
+    time: '00:00:01',
+  },
+  {
+    id: 4,
+    depth: 4,
+    operation: 'INDEX RANGE SCAN',
+    name: 'EMP_DEPT_IX',
+    rows: 5,
+    cost: 1,
+    time: '00:00:01',
+    note: 'department_id=50 조건이 뷰 안으로 Push돼서 인덱스를 사용할 수 있게 됐어요.',
+  },
+  {
+    id: 5,
+    depth: 3,
+    operation: 'TABLE ACCESS BY INDEX ROWID',
+    name: 'CONTRACT_WORKERS',
+    rows: 0,
+    cost: 2,
+    time: '00:00:01',
+  },
+  {
+    id: 6,
+    depth: 4,
+    operation: 'INDEX RANGE SCAN',
+    name: 'CW_DEPT_IX',
+    rows: 0,
+    cost: 1,
+    time: '00:00:01',
+    note: '두 번째 브랜치에도 동일한 조건이 Push돼서 인덱스를 사용해요.',
+  },
 ]
 
 const PLAN_ROWS_EN: PlanRow[] = [
-  { id: 0, depth: 0, operation: 'SELECT STATEMENT', rows: 5, cost: 4, time: '00:00:01' },
-  { id: 1, depth: 1, operation: 'VIEW', name: 'ALL_EMPLOYEES_VW', rows: 5, cost: 4, time: '00:00:01',
-    note: 'The view is not merged — it remains as a VIEW node. But the predicate has been pushed inside.' },
-  { id: 2, depth: 2, operation: 'UNION-ALL', rows: undefined, cost: undefined, time: undefined,
-    note: 'UNION view cannot be merged — instead, department_id=50 has been pushed into each branch.' },
-  { id: 3, depth: 3, operation: 'TABLE ACCESS BY INDEX ROWID', name: 'EMPLOYEES', rows: 5, cost: 2, time: '00:00:01' },
-  { id: 4, depth: 4, operation: 'INDEX RANGE SCAN', name: 'EMP_DEPT_IX', rows: 5, cost: 1, time: '00:00:01',
-    note: 'The department_id=50 predicate was pushed inside the view, enabling index access.' },
-  { id: 5, depth: 3, operation: 'TABLE ACCESS BY INDEX ROWID', name: 'CONTRACT_WORKERS', rows: 0, cost: 2, time: '00:00:01' },
-  { id: 6, depth: 4, operation: 'INDEX RANGE SCAN', name: 'CW_DEPT_IX', rows: 0, cost: 1, time: '00:00:01',
-    note: 'The same predicate is pushed into the second branch, also using an index.' },
+  {
+    id: 0,
+    depth: 0,
+    operation: 'SELECT STATEMENT',
+    rows: 5,
+    cost: 4,
+    time: '00:00:01',
+  },
+  {
+    id: 1,
+    depth: 1,
+    operation: 'VIEW',
+    name: 'ALL_EMPLOYEES_VW',
+    rows: 5,
+    cost: 4,
+    time: '00:00:01',
+    note: 'The view is not merged — it remains as a VIEW node. But the predicate has been pushed inside.',
+  },
+  {
+    id: 2,
+    depth: 2,
+    operation: 'UNION-ALL',
+    rows: undefined,
+    cost: undefined,
+    time: undefined,
+    note: 'UNION view cannot be merged — instead, department_id=50 has been pushed into each branch.',
+  },
+  {
+    id: 3,
+    depth: 3,
+    operation: 'TABLE ACCESS BY INDEX ROWID',
+    name: 'EMPLOYEES',
+    rows: 5,
+    cost: 2,
+    time: '00:00:01',
+  },
+  {
+    id: 4,
+    depth: 4,
+    operation: 'INDEX RANGE SCAN',
+    name: 'EMP_DEPT_IX',
+    rows: 5,
+    cost: 1,
+    time: '00:00:01',
+    note: 'The department_id=50 predicate was pushed inside the view, enabling index access.',
+  },
+  {
+    id: 5,
+    depth: 3,
+    operation: 'TABLE ACCESS BY INDEX ROWID',
+    name: 'CONTRACT_WORKERS',
+    rows: 0,
+    cost: 2,
+    time: '00:00:01',
+  },
+  {
+    id: 6,
+    depth: 4,
+    operation: 'INDEX RANGE SCAN',
+    name: 'CW_DEPT_IX',
+    rows: 0,
+    cost: 1,
+    time: '00:00:01',
+    note: 'The same predicate is pushed into the second branch, also using an index.',
+  },
 ]
 
 export function QtPredicatePushingSection() {
@@ -257,13 +371,23 @@ export function QtPredicatePushingSection() {
       <SectionTitle>{t.exampleTitle}</SectionTitle>
       <Prose>{t.exampleDesc}</Prose>
       <div className="mt-4">
-        <SqlBlock sql={t.beforeSql} badge={lang === 'ko' ? '변환 전' : 'Before'} badgeColor="rose" />
+        <SqlBlock
+          sql={t.beforeSql}
+          badge={lang === 'ko' ? '변환 전' : 'Before'}
+          badgeColor="rose"
+        />
       </div>
       <div className="mt-4">
-        <SqlBlock sql={t.afterSql} badge={lang === 'ko' ? '변환 후' : 'After'} badgeColor="emerald" />
+        <SqlBlock
+          sql={t.afterSql}
+          badge={lang === 'ko' ? '변환 후' : 'After'}
+          badgeColor="emerald"
+        />
       </div>
       <InfoBox variant="note">
-        <pre className="whitespace-pre-wrap font-mono text-xs leading-relaxed">{t.exampleNote}</pre>
+        <pre className="font-mono text-xs leading-relaxed whitespace-pre-wrap">
+          {t.exampleNote}
+        </pre>
       </InfoBox>
       <ExplainPlanTable rows={planRows} caption={t.planCaption} lang={lang} />
 
@@ -272,7 +396,9 @@ export function QtPredicatePushingSection() {
       <SectionTitle>{t.transitiveTitle}</SectionTitle>
       <Prose>{t.transitiveDesc}</Prose>
       <InfoBox variant="tip">
-        <pre className="whitespace-pre-wrap font-mono text-xs leading-relaxed">{t.transitiveExample}</pre>
+        <pre className="font-mono text-xs leading-relaxed whitespace-pre-wrap">
+          {t.transitiveExample}
+        </pre>
       </InfoBox>
       <div className="mt-4">
         <SqlBlock sql={t.transitiveSql} />
@@ -285,10 +411,10 @@ export function QtPredicatePushingSection() {
       <div className="mt-4 space-y-2">
         {t.pushBlockedItems.map((item, i) => (
           <div key={i} className="flex items-start gap-3">
-            <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-red/10 font-mono text-[10px] font-bold text-red">
+            <span className="bg-red/10 text-red mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full font-mono text-[10px] font-bold">
               {i + 1}
             </span>
-            <p className="text-sm leading-relaxed text-ink-2">{item}</p>
+            <p className="text-ink-2 text-sm leading-relaxed">{item}</p>
           </div>
         ))}
       </div>

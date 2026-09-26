@@ -15,7 +15,8 @@ import type { PlanRow } from '../../optimizer/shared/diagrams'
 const T = {
   ko: {
     title: 'OR Expansion',
-    subtitle: '최상위 OR 조건이 있는 쿼리를 UNION ALL 브랜치로 분리해서 각 브랜치마다 더 효율적인 액세스 경로를 사용할 수 있게 해요.',
+    subtitle:
+      '최상위 OR 조건이 있는 쿼리를 UNION ALL 브랜치로 분리해서 각 브랜치마다 더 효율적인 액세스 경로를 사용할 수 있게 해요.',
 
     whatTitle: 'OR Expansion이란?',
     whatDesc:
@@ -23,10 +24,11 @@ const T = {
 
     whyTitle: '왜 OR Expansion이 필요할까요?',
     whyDesc:
-      'OR 조건이 여러 컬럼에 걸쳐 있으면 인덱스를 효과적으로 사용하기 어려워요. 예를 들어 WHERE e.email=\'SSTILES\' OR d.department_name=\'Treasury\' 조건에서 email 인덱스와 department_name 인덱스를 동시에 활용하는 것은 불가능해요.\n\nOR Expansion은 이 쿼리를 두 개의 브랜치로 나눠서, 첫 번째 브랜치는 email 인덱스를, 두 번째 브랜치는 department_name 인덱스를 각각 사용할 수 있게 해요.',
+      "OR 조건이 여러 컬럼에 걸쳐 있으면 인덱스를 효과적으로 사용하기 어려워요. 예를 들어 WHERE e.email='SSTILES' OR d.department_name='Treasury' 조건에서 email 인덱스와 department_name 인덱스를 동시에 활용하는 것은 불가능해요.\n\nOR Expansion은 이 쿼리를 두 개의 브랜치로 나눠서, 첫 번째 브랜치는 email 인덱스를, 두 번째 브랜치는 department_name 인덱스를 각각 사용할 수 있게 해요.",
 
     exampleTitle: '변환 예시 (공식 문서)',
-    exampleDesc: '공식 문서의 예시예요. email과 department_name 두 조건이 OR로 연결된 쿼리가 UNION ALL로 분리돼요.',
+    exampleDesc:
+      '공식 문서의 예시예요. email과 department_name 두 조건이 OR로 연결된 쿼리가 UNION ALL로 분리돼요.',
     beforeSql: `-- 변환 전: OR 조건
 SELECT *
 FROM   employees e, departments d
@@ -82,7 +84,8 @@ AND    e.department_id = d.department_id;`,
   },
   en: {
     title: 'OR Expansion',
-    subtitle: 'Splits queries with top-level OR conditions into UNION ALL branches so each branch can use its own efficient access path.',
+    subtitle:
+      'Splits queries with top-level OR conditions into UNION ALL branches so each branch can use its own efficient access path.',
 
     whatTitle: 'What is OR Expansion?',
     whatDesc:
@@ -93,7 +96,8 @@ AND    e.department_id = d.department_id;`,
       "When an OR condition spans multiple columns, it is difficult to use any single index efficiently. For example, WHERE e.email='SSTILES' OR d.department_name='Treasury' cannot simultaneously use both the email index and the department_name index.\n\nOR Expansion splits the query into two branches — the first can use the email index and the second can use the department_name index — so both indexes are put to work.",
 
     exampleTitle: 'Transformation Example (Oracle Docs)',
-    exampleDesc: 'This example from the Oracle documentation shows a query with OR conditions being expanded into UNION ALL branches.',
+    exampleDesc:
+      'This example from the Oracle documentation shows a query with OR conditions being expanded into UNION ALL branches.',
     beforeSql: `-- Before: OR condition
 SELECT *
 FROM   employees e, departments d
@@ -150,41 +154,225 @@ AND    e.department_id = d.department_id;`,
 }
 
 const PLAN_ROWS_KO: PlanRow[] = [
-  { id: 0, depth: 0, operation: 'SELECT STATEMENT', rows: 2, cost: 8, time: '00:00:01',
-    note: 'UNION-ALL의 두 브랜치 결과를 합쳐 최종 반환해요.' },
-  { id: 1, depth: 1, operation: 'UNION-ALL', rows: undefined, cost: undefined, time: undefined,
-    note: 'OR Expansion으로 생성된 두 브랜치예요. 각 브랜치가 독립적으로 실행돼요.' },
-  { id: 2, depth: 2, operation: 'NESTED LOOPS', rows: 1, cost: 4, time: '00:00:01' },
-  { id: 3, depth: 3, operation: 'TABLE ACCESS BY INDEX ROWID', name: 'EMPLOYEES', rows: 1, cost: 2, time: '00:00:01' },
-  { id: 4, depth: 4, operation: 'INDEX RANGE SCAN', name: 'EMP_EMAIL_UK', rows: 1, cost: 1, time: '00:00:01',
-    note: '첫 번째 브랜치: email = \'SSTILES\' 조건으로 인덱스를 사용해요.' },
-  { id: 5, depth: 3, operation: 'TABLE ACCESS BY INDEX ROWID', name: 'DEPARTMENTS', rows: 1, cost: 2, time: '00:00:01' },
-  { id: 6, depth: 4, operation: 'INDEX UNIQUE SCAN', name: 'DEPT_ID_PK', rows: 1, cost: 1, time: '00:00:01' },
-  { id: 7, depth: 2, operation: 'NESTED LOOPS', rows: 1, cost: 4, time: '00:00:01' },
-  { id: 8, depth: 3, operation: 'TABLE ACCESS BY INDEX ROWID', name: 'DEPARTMENTS', rows: 1, cost: 2, time: '00:00:01' },
-  { id: 9, depth: 4, operation: 'INDEX RANGE SCAN', name: 'DEPT_NAME_IX', rows: 1, cost: 1, time: '00:00:01',
-    note: '두 번째 브랜치: department_name = \'Treasury\' 조건으로 별도 인덱스를 사용해요.' },
-  { id: 10, depth: 3, operation: 'TABLE ACCESS BY INDEX ROWID', name: 'EMPLOYEES', rows: 1, cost: 2, time: '00:00:01' },
-  { id: 11, depth: 4, operation: 'INDEX RANGE SCAN', name: 'EMP_DEPT_IX', rows: 1, cost: 1, time: '00:00:01' },
+  {
+    id: 0,
+    depth: 0,
+    operation: 'SELECT STATEMENT',
+    rows: 2,
+    cost: 8,
+    time: '00:00:01',
+    note: 'UNION-ALL의 두 브랜치 결과를 합쳐 최종 반환해요.',
+  },
+  {
+    id: 1,
+    depth: 1,
+    operation: 'UNION-ALL',
+    rows: undefined,
+    cost: undefined,
+    time: undefined,
+    note: 'OR Expansion으로 생성된 두 브랜치예요. 각 브랜치가 독립적으로 실행돼요.',
+  },
+  {
+    id: 2,
+    depth: 2,
+    operation: 'NESTED LOOPS',
+    rows: 1,
+    cost: 4,
+    time: '00:00:01',
+  },
+  {
+    id: 3,
+    depth: 3,
+    operation: 'TABLE ACCESS BY INDEX ROWID',
+    name: 'EMPLOYEES',
+    rows: 1,
+    cost: 2,
+    time: '00:00:01',
+  },
+  {
+    id: 4,
+    depth: 4,
+    operation: 'INDEX RANGE SCAN',
+    name: 'EMP_EMAIL_UK',
+    rows: 1,
+    cost: 1,
+    time: '00:00:01',
+    note: "첫 번째 브랜치: email = 'SSTILES' 조건으로 인덱스를 사용해요.",
+  },
+  {
+    id: 5,
+    depth: 3,
+    operation: 'TABLE ACCESS BY INDEX ROWID',
+    name: 'DEPARTMENTS',
+    rows: 1,
+    cost: 2,
+    time: '00:00:01',
+  },
+  {
+    id: 6,
+    depth: 4,
+    operation: 'INDEX UNIQUE SCAN',
+    name: 'DEPT_ID_PK',
+    rows: 1,
+    cost: 1,
+    time: '00:00:01',
+  },
+  {
+    id: 7,
+    depth: 2,
+    operation: 'NESTED LOOPS',
+    rows: 1,
+    cost: 4,
+    time: '00:00:01',
+  },
+  {
+    id: 8,
+    depth: 3,
+    operation: 'TABLE ACCESS BY INDEX ROWID',
+    name: 'DEPARTMENTS',
+    rows: 1,
+    cost: 2,
+    time: '00:00:01',
+  },
+  {
+    id: 9,
+    depth: 4,
+    operation: 'INDEX RANGE SCAN',
+    name: 'DEPT_NAME_IX',
+    rows: 1,
+    cost: 1,
+    time: '00:00:01',
+    note: "두 번째 브랜치: department_name = 'Treasury' 조건으로 별도 인덱스를 사용해요.",
+  },
+  {
+    id: 10,
+    depth: 3,
+    operation: 'TABLE ACCESS BY INDEX ROWID',
+    name: 'EMPLOYEES',
+    rows: 1,
+    cost: 2,
+    time: '00:00:01',
+  },
+  {
+    id: 11,
+    depth: 4,
+    operation: 'INDEX RANGE SCAN',
+    name: 'EMP_DEPT_IX',
+    rows: 1,
+    cost: 1,
+    time: '00:00:01',
+  },
 ]
 
 const PLAN_ROWS_EN: PlanRow[] = [
-  { id: 0, depth: 0, operation: 'SELECT STATEMENT', rows: 2, cost: 8, time: '00:00:01',
-    note: 'Merges results from both UNION-ALL branches and returns the final row set.' },
-  { id: 1, depth: 1, operation: 'UNION-ALL', rows: undefined, cost: undefined, time: undefined,
-    note: 'The two branches produced by OR Expansion. Each branch executes independently.' },
-  { id: 2, depth: 2, operation: 'NESTED LOOPS', rows: 1, cost: 4, time: '00:00:01' },
-  { id: 3, depth: 3, operation: 'TABLE ACCESS BY INDEX ROWID', name: 'EMPLOYEES', rows: 1, cost: 2, time: '00:00:01' },
-  { id: 4, depth: 4, operation: 'INDEX RANGE SCAN', name: 'EMP_EMAIL_UK', rows: 1, cost: 1, time: '00:00:01',
-    note: "First branch: uses the email index for the email = 'SSTILES' predicate." },
-  { id: 5, depth: 3, operation: 'TABLE ACCESS BY INDEX ROWID', name: 'DEPARTMENTS', rows: 1, cost: 2, time: '00:00:01' },
-  { id: 6, depth: 4, operation: 'INDEX UNIQUE SCAN', name: 'DEPT_ID_PK', rows: 1, cost: 1, time: '00:00:01' },
-  { id: 7, depth: 2, operation: 'NESTED LOOPS', rows: 1, cost: 4, time: '00:00:01' },
-  { id: 8, depth: 3, operation: 'TABLE ACCESS BY INDEX ROWID', name: 'DEPARTMENTS', rows: 1, cost: 2, time: '00:00:01' },
-  { id: 9, depth: 4, operation: 'INDEX RANGE SCAN', name: 'DEPT_NAME_IX', rows: 1, cost: 1, time: '00:00:01',
-    note: "Second branch: uses a separate department_name index for the department_name = 'Treasury' predicate." },
-  { id: 10, depth: 3, operation: 'TABLE ACCESS BY INDEX ROWID', name: 'EMPLOYEES', rows: 1, cost: 2, time: '00:00:01' },
-  { id: 11, depth: 4, operation: 'INDEX RANGE SCAN', name: 'EMP_DEPT_IX', rows: 1, cost: 1, time: '00:00:01' },
+  {
+    id: 0,
+    depth: 0,
+    operation: 'SELECT STATEMENT',
+    rows: 2,
+    cost: 8,
+    time: '00:00:01',
+    note: 'Merges results from both UNION-ALL branches and returns the final row set.',
+  },
+  {
+    id: 1,
+    depth: 1,
+    operation: 'UNION-ALL',
+    rows: undefined,
+    cost: undefined,
+    time: undefined,
+    note: 'The two branches produced by OR Expansion. Each branch executes independently.',
+  },
+  {
+    id: 2,
+    depth: 2,
+    operation: 'NESTED LOOPS',
+    rows: 1,
+    cost: 4,
+    time: '00:00:01',
+  },
+  {
+    id: 3,
+    depth: 3,
+    operation: 'TABLE ACCESS BY INDEX ROWID',
+    name: 'EMPLOYEES',
+    rows: 1,
+    cost: 2,
+    time: '00:00:01',
+  },
+  {
+    id: 4,
+    depth: 4,
+    operation: 'INDEX RANGE SCAN',
+    name: 'EMP_EMAIL_UK',
+    rows: 1,
+    cost: 1,
+    time: '00:00:01',
+    note: "First branch: uses the email index for the email = 'SSTILES' predicate.",
+  },
+  {
+    id: 5,
+    depth: 3,
+    operation: 'TABLE ACCESS BY INDEX ROWID',
+    name: 'DEPARTMENTS',
+    rows: 1,
+    cost: 2,
+    time: '00:00:01',
+  },
+  {
+    id: 6,
+    depth: 4,
+    operation: 'INDEX UNIQUE SCAN',
+    name: 'DEPT_ID_PK',
+    rows: 1,
+    cost: 1,
+    time: '00:00:01',
+  },
+  {
+    id: 7,
+    depth: 2,
+    operation: 'NESTED LOOPS',
+    rows: 1,
+    cost: 4,
+    time: '00:00:01',
+  },
+  {
+    id: 8,
+    depth: 3,
+    operation: 'TABLE ACCESS BY INDEX ROWID',
+    name: 'DEPARTMENTS',
+    rows: 1,
+    cost: 2,
+    time: '00:00:01',
+  },
+  {
+    id: 9,
+    depth: 4,
+    operation: 'INDEX RANGE SCAN',
+    name: 'DEPT_NAME_IX',
+    rows: 1,
+    cost: 1,
+    time: '00:00:01',
+    note: "Second branch: uses a separate department_name index for the department_name = 'Treasury' predicate.",
+  },
+  {
+    id: 10,
+    depth: 3,
+    operation: 'TABLE ACCESS BY INDEX ROWID',
+    name: 'EMPLOYEES',
+    rows: 1,
+    cost: 2,
+    time: '00:00:01',
+  },
+  {
+    id: 11,
+    depth: 4,
+    operation: 'INDEX RANGE SCAN',
+    name: 'EMP_DEPT_IX',
+    rows: 1,
+    cost: 1,
+    time: '00:00:01',
+  },
 ]
 
 export function QtOrExpansionSection() {
@@ -213,13 +401,23 @@ export function QtOrExpansionSection() {
       <SectionTitle>{t.exampleTitle}</SectionTitle>
       <Prose>{t.exampleDesc}</Prose>
       <div className="mt-4">
-        <SqlBlock sql={t.beforeSql} badge={lang === 'ko' ? '변환 전' : 'Before'} badgeColor="rose" />
+        <SqlBlock
+          sql={t.beforeSql}
+          badge={lang === 'ko' ? '변환 전' : 'Before'}
+          badgeColor="rose"
+        />
       </div>
       <div className="mt-4">
-        <SqlBlock sql={t.afterSql} badge={lang === 'ko' ? '변환 후' : 'After'} badgeColor="emerald" />
+        <SqlBlock
+          sql={t.afterSql}
+          badge={lang === 'ko' ? '변환 후' : 'After'}
+          badgeColor="emerald"
+        />
       </div>
       <InfoBox variant="note">
-        <pre className="whitespace-pre-wrap font-mono text-xs leading-relaxed">{t.exampleNote}</pre>
+        <pre className="font-mono text-xs leading-relaxed whitespace-pre-wrap">
+          {t.exampleNote}
+        </pre>
       </InfoBox>
 
       <Divider />

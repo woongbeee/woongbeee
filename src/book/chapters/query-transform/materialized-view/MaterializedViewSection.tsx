@@ -14,7 +14,8 @@ import {
 const T = {
   ko: {
     title: 'Query Rewrite with Materialized Views',
-    subtitle: 'Materialized View에 미리 계산된 결과를 활용하도록 쿼리를 자동으로 재작성해서 수백만 행의 집계를 피해요.',
+    subtitle:
+      'Materialized View에 미리 계산된 결과를 활용하도록 쿼리를 자동으로 재작성해서 수백만 행의 집계를 피해요.',
 
     whatTitle: 'Materialized View Query Rewrite란?',
     whatDesc:
@@ -45,17 +46,42 @@ FROM   cal_month_sales_mv;
     paramsTitle: '주요 초기화 파라미터',
     paramsDesc: 'Query Rewrite 동작을 제어하는 초기화 파라미터예요.',
     paramsTable: [
-      ['QUERY_REWRITE_ENABLED', 'TRUE (기본값)', 'Query Rewrite 활성화. FALSE로 끄거나, FORCE로 무결성 검사 없이 강제 적용.'],
-      ['QUERY_REWRITE_INTEGRITY', 'ENFORCED (기본값)', '가장 안전한 수준. 신선한 데이터와 검증된 제약조건을 가진 MV만 사용.'],
-      ['OPTIMIZER_MODE', 'ALL_ROWS (기본값)', 'Query Rewrite 여부에 영향. ALL_ROWS, FIRST_ROWS, FIRST_ROWS_n 지원.'],
+      [
+        'QUERY_REWRITE_ENABLED',
+        'TRUE (기본값)',
+        'Query Rewrite 활성화. FALSE로 끄거나, FORCE로 무결성 검사 없이 강제 적용.',
+      ],
+      [
+        'QUERY_REWRITE_INTEGRITY',
+        'ENFORCED (기본값)',
+        '가장 안전한 수준. 신선한 데이터와 검증된 제약조건을 가진 MV만 사용.',
+      ],
+      [
+        'OPTIMIZER_MODE',
+        'ALL_ROWS (기본값)',
+        'Query Rewrite 여부에 영향. ALL_ROWS, FIRST_ROWS, FIRST_ROWS_n 지원.',
+      ],
     ],
 
     integrityTitle: 'QUERY_REWRITE_INTEGRITY 수준',
-    integrityDesc: 'Query Rewrite가 허용하는 데이터 정확도 수준을 세 단계로 설정할 수 있어요.',
+    integrityDesc:
+      'Query Rewrite가 허용하는 데이터 정확도 수준을 세 단계로 설정할 수 있어요.',
     integrityTable: [
-      ['ENFORCED', '가장 안전 (기본값)', '신선한 데이터만 사용. Oracle이 직접 무결성을 강제할 수 있는 경우만 적용.'],
-      ['TRUSTED', '신뢰 기반', 'RELY 제약조건과 선언된 관계를 신뢰. Oracle이 직접 확인하지 않은 관계도 활용 가능.'],
-      ['STALE_TOLERATED', '최대 활용', '데이터가 오래되어도 MV 사용. 정확성보다 성능 우선이 필요한 경우에 사용.'],
+      [
+        'ENFORCED',
+        '가장 안전 (기본값)',
+        '신선한 데이터만 사용. Oracle이 직접 무결성을 강제할 수 있는 경우만 적용.',
+      ],
+      [
+        'TRUSTED',
+        '신뢰 기반',
+        'RELY 제약조건과 선언된 관계를 신뢰. Oracle이 직접 확인하지 않은 관계도 활용 가능.',
+      ],
+      [
+        'STALE_TOLERATED',
+        '최대 활용',
+        '데이터가 오래되어도 MV 사용. 정확성보다 성능 우선이 필요한 경우에 사용.',
+      ],
     ],
 
     prereqTitle: '적용 조건',
@@ -107,15 +133,16 @@ GROUP BY t.calendar_month_desc;`,
   },
   en: {
     title: 'Query Rewrite with Materialized Views',
-    subtitle: 'Automatically rewrites queries to use precomputed results stored in materialized views, avoiding full scans of millions of rows.',
+    subtitle:
+      'Automatically rewrites queries to use precomputed results stored in materialized views, avoiding full scans of millions of rows.',
 
     whatTitle: 'What is Query Rewrite with Materialized Views?',
     whatDesc:
-      "Query Rewrite with Materialized Views is an optimizer transformation that automatically rewrites a user query to access a materialized view instead of the underlying base tables. A materialized view physically stores precomputed join, aggregate, or calculation results.\n\nUsers write queries against the original tables as usual — Oracle transparently redirects the query to the smaller materialized view whenever doing so produces the same result.",
+      'Query Rewrite with Materialized Views is an optimizer transformation that automatically rewrites a user query to access a materialized view instead of the underlying base tables. A materialized view physically stores precomputed join, aggregate, or calculation results.\n\nUsers write queries against the original tables as usual — Oracle transparently redirects the query to the smaller materialized view whenever doing so produces the same result.',
 
     benefitTitle: 'Why Query Rewrite?',
     benefitDesc:
-      "Consider a query that computes monthly totals from a sales table with tens of millions of rows. Running it directly means scanning all those rows every time.\n\nIf a materialized view has already computed those monthly totals, the same result can be read from a view with only hundreds of rows. Query Rewrite handles this redirection automatically.",
+      'Consider a query that computes monthly totals from a sales table with tens of millions of rows. Running it directly means scanning all those rows every time.\n\nIf a materialized view has already computed those monthly totals, the same result can be read from a view with only hundreds of rows. Query Rewrite handles this redirection automatically.',
 
     exampleTitle: 'Transformation Example (Oracle Docs)',
     createMvSql: `-- Step 1: Create the materialized view (precompute monthly totals)
@@ -138,17 +165,42 @@ FROM   cal_month_sales_mv;
     paramsTitle: 'Key Initialization Parameters',
     paramsDesc: 'These parameters control Query Rewrite behavior.',
     paramsTable: [
-      ['QUERY_REWRITE_ENABLED', 'TRUE (default)', 'Enables Query Rewrite. Set FALSE to disable, or FORCE to bypass integrity checks.'],
-      ['QUERY_REWRITE_INTEGRITY', 'ENFORCED (default)', 'Safest level. Only uses fresh data and validated constraints.'],
-      ['OPTIMIZER_MODE', 'ALL_ROWS (default)', 'Affects whether Query Rewrite is considered. Supports ALL_ROWS, FIRST_ROWS, FIRST_ROWS_n.'],
+      [
+        'QUERY_REWRITE_ENABLED',
+        'TRUE (default)',
+        'Enables Query Rewrite. Set FALSE to disable, or FORCE to bypass integrity checks.',
+      ],
+      [
+        'QUERY_REWRITE_INTEGRITY',
+        'ENFORCED (default)',
+        'Safest level. Only uses fresh data and validated constraints.',
+      ],
+      [
+        'OPTIMIZER_MODE',
+        'ALL_ROWS (default)',
+        'Affects whether Query Rewrite is considered. Supports ALL_ROWS, FIRST_ROWS, FIRST_ROWS_n.',
+      ],
     ],
 
     integrityTitle: 'QUERY_REWRITE_INTEGRITY Levels',
-    integrityDesc: 'Three levels control how strictly Oracle validates data freshness and constraint integrity before applying Query Rewrite.',
+    integrityDesc:
+      'Three levels control how strictly Oracle validates data freshness and constraint integrity before applying Query Rewrite.',
     integrityTable: [
-      ['ENFORCED', 'Safest (default)', 'Only uses views with fresh data that Oracle can directly validate.'],
-      ['TRUSTED', 'Trust-based', 'Trusts RELY constraints and declared relationships that Oracle has not directly verified.'],
-      ['STALE_TOLERATED', 'Maximum capability', 'Uses materialized views even when their data is stale. Prioritizes performance over accuracy.'],
+      [
+        'ENFORCED',
+        'Safest (default)',
+        'Only uses views with fresh data that Oracle can directly validate.',
+      ],
+      [
+        'TRUSTED',
+        'Trust-based',
+        'Trusts RELY constraints and declared relationships that Oracle has not directly verified.',
+      ],
+      [
+        'STALE_TOLERATED',
+        'Maximum capability',
+        'Uses materialized views even when their data is stale. Prioritizes performance over accuracy.',
+      ],
     ],
 
     prereqTitle: 'Prerequisites',
@@ -227,10 +279,18 @@ export function QtMaterializedViewSection() {
         <SqlBlock sql={t.createMvSql} />
       </div>
       <div className="mt-4">
-        <SqlBlock sql={t.beforeSql} badge={lang === 'ko' ? '원본 쿼리' : 'Original Query'} badgeColor="rose" />
+        <SqlBlock
+          sql={t.beforeSql}
+          badge={lang === 'ko' ? '원본 쿼리' : 'Original Query'}
+          badgeColor="rose"
+        />
       </div>
       <div className="mt-4">
-        <SqlBlock sql={t.afterSql} badge={lang === 'ko' ? '재작성 후' : 'After Rewrite'} badgeColor="emerald" />
+        <SqlBlock
+          sql={t.afterSql}
+          badge={lang === 'ko' ? '재작성 후' : 'After Rewrite'}
+          badgeColor="emerald"
+        />
       </div>
 
       <Divider />
@@ -238,7 +298,11 @@ export function QtMaterializedViewSection() {
       <SectionTitle>{t.paramsTitle}</SectionTitle>
       <Prose>{t.paramsDesc}</Prose>
       <Table
-        headers={[lang === 'ko' ? '파라미터' : 'Parameter', lang === 'ko' ? '기본값' : 'Default', lang === 'ko' ? '설명' : 'Description']}
+        headers={[
+          lang === 'ko' ? '파라미터' : 'Parameter',
+          lang === 'ko' ? '기본값' : 'Default',
+          lang === 'ko' ? '설명' : 'Description',
+        ]}
         rows={t.paramsTable}
       />
 
@@ -247,7 +311,11 @@ export function QtMaterializedViewSection() {
       <SectionTitle>{t.integrityTitle}</SectionTitle>
       <Prose>{t.integrityDesc}</Prose>
       <Table
-        headers={[lang === 'ko' ? '수준' : 'Level', lang === 'ko' ? '특성' : 'Characteristic', lang === 'ko' ? '설명' : 'Description']}
+        headers={[
+          lang === 'ko' ? '수준' : 'Level',
+          lang === 'ko' ? '특성' : 'Characteristic',
+          lang === 'ko' ? '설명' : 'Description',
+        ]}
         rows={t.integrityTable}
       />
 
@@ -258,10 +326,10 @@ export function QtMaterializedViewSection() {
       <div className="mt-4 space-y-2">
         {t.prereqItems.map((item, i) => (
           <div key={i} className="flex items-start gap-3">
-            <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-blue font-mono text-[10px] font-bold text-paper">
+            <span className="bg-blue text-paper mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full font-mono text-[10px] font-bold">
               {i + 1}
             </span>
-            <p className="text-sm leading-relaxed text-ink-2">{item}</p>
+            <p className="text-ink-2 text-sm leading-relaxed">{item}</p>
           </div>
         ))}
       </div>

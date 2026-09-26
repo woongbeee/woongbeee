@@ -23,9 +23,15 @@ const T = {
       'DOP(Degree of Parallelism, 병렬도)는 하나의 쿼리를 처리하는 데 사용하는 병렬 실행 서버(PX Server)의 수예요.\n\nDOP가 4라면 Producer PX 서버 4개 + Consumer PX 서버 4개로 최대 8개의 PX 서버가 동시에 동작할 수 있어요. 이 두 그룹은 Table Queue(TQ)를 통해 데이터를 주고받아요.',
 
     setTitle: 'DOP 설정 방법',
-    setDesc: 'DOP는 여러 레벨에서 설정할 수 있고, 우선순위가 높은 설정이 적용돼요.',
+    setDesc:
+      'DOP는 여러 레벨에서 설정할 수 있고, 우선순위가 높은 설정이 적용돼요.',
     setTable: [
-      ['1순위', 'SQL 힌트', '/*+ PARALLEL(t, 4) */', '가장 강력. 옵티마이저 결정을 오버라이드해요.'],
+      [
+        '1순위',
+        'SQL 힌트',
+        '/*+ PARALLEL(t, 4) */',
+        '가장 강력. 옵티마이저 결정을 오버라이드해요.',
+      ],
       [
         '2순위',
         '테이블 속성',
@@ -90,9 +96,21 @@ SELECT /*+ PARALLEL */ COUNT(*) FROM large_table;`,
     limitDesc:
       'Oracle은 PARALLEL_MAX_SERVERS 파라미터로 인스턴스 전체의 최대 PX 서버 수를 제한해요.',
     limitTable: [
-      ['PARALLEL_MAX_SERVERS', '인스턴스 전체 PX 서버 최대 수', '기본값: CPU×5 정도'],
-      ['PARALLEL_MIN_SERVERS', '항상 유지하는 최소 PX 서버 수', '첫 병렬 쿼리의 시작 시간을 줄여줘요'],
-      ['PARALLEL_SERVERS_TARGET', 'Auto DOP 모드에서의 목표 PX 서버 수', 'AUTO 정책 사용 시 참조'],
+      [
+        'PARALLEL_MAX_SERVERS',
+        '인스턴스 전체 PX 서버 최대 수',
+        '기본값: CPU×5 정도',
+      ],
+      [
+        'PARALLEL_MIN_SERVERS',
+        '항상 유지하는 최소 PX 서버 수',
+        '첫 병렬 쿼리의 시작 시간을 줄여줘요',
+      ],
+      [
+        'PARALLEL_SERVERS_TARGET',
+        'Auto DOP 모드에서의 목표 PX 서버 수',
+        'AUTO 정책 사용 시 참조',
+      ],
     ],
     limitWarning:
       '사용 가능한 PX 서버가 부족하면 Oracle은 요청한 DOP를 낮추거나, 심한 경우 병렬 실행을 직렬로 다운그레이드해요. V$PX_PROCESS_SYSSTAT 뷰로 현재 PX 서버 사용 현황을 확인할 수 있어요.',
@@ -111,9 +129,15 @@ SELECT /*+ PARALLEL */ COUNT(*) FROM large_table;`,
       'DOP (Degree of Parallelism) is the number of Parallel Execution Servers (PX Servers) used to process a single query.\n\nWith DOP = 4, up to 8 PX Servers can operate simultaneously: 4 Producer servers + 4 Consumer servers. These two groups exchange data through Table Queues (TQ).',
 
     setTitle: 'How to Set DOP',
-    setDesc: 'DOP can be set at multiple levels; the highest-priority setting takes effect.',
+    setDesc:
+      'DOP can be set at multiple levels; the highest-priority setting takes effect.',
     setTable: [
-      ['Priority 1', 'SQL Hint', '/*+ PARALLEL(t, 4) */', 'Strongest — overrides the optimizer.'],
+      [
+        'Priority 1',
+        'SQL Hint',
+        '/*+ PARALLEL(t, 4) */',
+        'Strongest — overrides the optimizer.',
+      ],
       [
         'Priority 2',
         'Table Attribute',
@@ -176,15 +200,23 @@ SELECT /*+ PARALLEL */ COUNT(*) FROM large_table;`,
 
     limitTitle: 'PX Server Pool Management',
     limitDesc:
-      "Oracle caps the total PX Server count for an instance via the PARALLEL_MAX_SERVERS parameter.",
+      'Oracle caps the total PX Server count for an instance via the PARALLEL_MAX_SERVERS parameter.',
     limitTable: [
-      ['PARALLEL_MAX_SERVERS', 'Max PX Servers instance-wide', 'Default: roughly CPU × 5'],
+      [
+        'PARALLEL_MAX_SERVERS',
+        'Max PX Servers instance-wide',
+        'Default: roughly CPU × 5',
+      ],
       [
         'PARALLEL_MIN_SERVERS',
         'Minimum PX Servers always maintained',
         'Reduces startup latency for first parallel query',
       ],
-      ['PARALLEL_SERVERS_TARGET', 'Target PX Server count for Auto DOP', 'Referenced when AUTO policy is used'],
+      [
+        'PARALLEL_SERVERS_TARGET',
+        'Target PX Server count for Auto DOP',
+        'Referenced when AUTO policy is used',
+      ],
     ],
     limitWarning:
       'If available PX Servers are insufficient, Oracle reduces the requested DOP or, in severe cases, downgrades parallel execution to serial. Check V$PX_PROCESS_SYSSTAT for current PX Server utilization.',
@@ -243,7 +275,9 @@ export function ParallelDopSection() {
       <Prose>{t.limitDesc}</Prose>
       <Table
         headers={
-          isKo ? ['파라미터', '설명', '비고'] : ['Parameter', 'Description', 'Notes']
+          isKo
+            ? ['파라미터', '설명', '비고']
+            : ['Parameter', 'Description', 'Notes']
         }
         rows={t.limitTable}
       />

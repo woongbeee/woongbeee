@@ -1,5 +1,5 @@
 import { IconWand, IconTransform, IconArrowsSort } from '@tabler/icons-react'
-import { useSimulationStore } from '@/store/simulationStore'
+import { useLangStore } from '@/store/simulationStore'
 import {
   PageContainer,
   ChapterTitle,
@@ -72,7 +72,7 @@ const T = {
 }
 
 export function SqlTuningOverviewPage() {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const t = T[lang]
 
   return (

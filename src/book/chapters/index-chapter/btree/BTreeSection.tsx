@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
-import { useSimulationStore } from '@/store/simulationStore'
+import { useLangStore } from '@/store/simulationStore'
 import {
   PageContainer,
   ChapterTitle,
@@ -9,6 +9,7 @@ import {
   InfoBox,
   Divider,
   Table,
+  SqlBlock,
 } from '../../shared'
 import { IconBinaryTree } from '@tabler/icons-react'
 
@@ -292,7 +293,7 @@ interface CompositeSearchPath {
 // ── 메인 컴포넌트 ─────────────────────────────────────────────────────────────
 
 export function BTreeSection() {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const t = T[lang]
 
   const [searchTab, setSearchTab] = useState<'single' | 'composite'>('single')
@@ -568,10 +569,10 @@ export function BTreeSection() {
         </div>
 
         <div className="mt-4">
-          <p className="mb-1 font-mono text-[10px] font-bold uppercase tracking-widest text-ink-2">{t.cfTipQuery}</p>
-          <div className="rounded-panel border bg-ink px-4 py-3">
-            <pre className="font-mono text-[11px] leading-relaxed text-ink-3">{`SELECT index_name, clustering_factor, num_rows, blocks\nFROM   all_indexes\nWHERE  table_name = 'EMPLOYEES';`}</pre>
-          </div>
+          <SqlBlock
+            badge={t.cfTipQuery}
+            sql={`SELECT index_name, clustering_factor, num_rows, blocks\nFROM   all_indexes\nWHERE  table_name = 'EMPLOYEES';`}
+          />
         </div>
       </section>
     </PageContainer>

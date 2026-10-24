@@ -1,5 +1,5 @@
 import { IconRefresh, IconHistory, IconFlag, IconShieldCheck } from '@tabler/icons-react'
-import { useSimulationStore } from '@/store/simulationStore'
+import { useLangStore } from '@/store/simulationStore'
 import { PageContainer, ChapterTitle, InfoBox, ConceptGrid } from '../../shared'
 
 export { TransactionOverviewSection } from './TransactionOverviewSection'
@@ -8,7 +8,7 @@ export { TransactionCommitRollbackSection } from './TransactionCommitRollbackSec
 export { TransactionSavepointSection } from './TransactionSavepointSection'
 
 export function TransactionSection() {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const isKo = lang === 'ko'
 
   const conceptItems = isKo

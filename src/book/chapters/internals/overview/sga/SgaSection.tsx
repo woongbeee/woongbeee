@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useSimulationStore } from '@/store/simulationStore'
+import { useLangStore } from '@/store/simulationStore'
 import { ChapterTitle, SectionTitle, Prose, InfoBox, Divider } from '../../../shared'
 import { cn } from '@/lib/utils'
 import {
@@ -247,7 +247,7 @@ function ServerModeCard({
 // ── SgaSection ─────────────────────────────────────────────────────────────
 
 export function SgaSection() {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const t = T[lang]
 
   const [serverMode, setServerMode] = useState<'dedicated' | 'rac'>('dedicated')
@@ -357,7 +357,7 @@ export function SgaSection() {
                 exit={{ opacity: 0 }}
                 className="flex h-16 items-center justify-center rounded-panel border-2 border-dashed border-line lg:h-full lg:min-h-[10rem]"
               >
-                <span className="font-mono text-sm text-ink-2">{t.clickHint}</span>
+                <span className="font-sans text-sm text-ink-2">{t.clickHint}</span>
               </motion.div>
             )}
           </AnimatePresence>

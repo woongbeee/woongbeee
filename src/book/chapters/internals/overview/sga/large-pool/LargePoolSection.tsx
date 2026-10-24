@@ -1,4 +1,4 @@
-import { useSimulationStore } from '@/store/simulationStore'
+import { useLangStore } from '@/store/simulationStore'
 import {
   ChapterTitle, SectionTitle, SubTitle, Prose, InfoBox, Divider, SqlBlock,
 } from '../../../../shared'
@@ -345,7 +345,7 @@ function LargePoolDiagram({ lang }: { lang: 'ko' | 'en' }) {
 // ── Main component ──────────────────────────────────────────────────────────
 
 export function LargePoolSection() {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const t = T[lang]
 
   return (

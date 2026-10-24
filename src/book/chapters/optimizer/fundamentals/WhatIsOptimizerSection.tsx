@@ -1,5 +1,5 @@
 import { IconBolt, IconDatabase, IconLayersIntersect, IconMathFunction, IconSearch } from '@tabler/icons-react'
-import { useSimulationStore } from '@/store/simulationStore'
+import { useLangStore } from '@/store/simulationStore'
 import {
   PageContainer,
   ChapterTitle,
@@ -93,7 +93,7 @@ function OptimizerComponentDiagram({ lang }: { lang: 'ko' | 'en' }) {
                   <span className="font-mono text-[9px] font-bold" style={{ color: c.color }}>{c.phase}</span>
                   <span className="font-mono text-xs font-bold text-ink/80">{c.name}</span>
                 </div>
-                <span className="font-mono text-[10px] leading-relaxed text-ink-2">{c.desc}</span>
+                <span className="font-sans text-[10.5px] leading-relaxed text-ink-2">{c.desc}</span>
               </div>
               {i < components.length - 1 && (
                 <div className="flex items-center self-center text-ink-2/30">↓</div>
@@ -139,7 +139,7 @@ function EstimatorDiagram({ lang }: { lang: 'ko' | 'en' }) {
           style={{ borderColor: item.border, backgroundColor: item.bg, minWidth: 140 }}
         >
           <p className="font-mono text-xs font-bold whitespace-pre-line leading-snug" style={{ color: item.color }}>{item.label}</p>
-          <p className="mt-2 font-mono text-[10px] leading-relaxed text-ink-2 whitespace-pre-line">{item.desc}</p>
+          <p className="mt-2 font-sans text-[10.5px] leading-relaxed text-ink-2 whitespace-pre-line">{item.desc}</p>
         </div>
       ))}
       <div className="flex w-full items-center justify-center gap-2 rounded-panel border-2 border-green/30 bg-green/5 p-3">
@@ -383,7 +383,7 @@ function WhatIsOptimizerLanding({ lang }: { lang: 'ko' | 'en' }) {
 // ── Router ────────────────────────────────────────────────────────────────
 
 export function OptimizerFundamentalsPage({ sectionId }: { sectionId: string }) {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
 
   if (sectionId === 'optimizer-fundamentals-sql-processing') return <SqlProcessingSection />
   if (sectionId === 'optimizer-fundamentals-adaptive')       return <AdaptiveSection />

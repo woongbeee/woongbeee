@@ -14,8 +14,8 @@ import {
   IconPackageImport,
   IconTrash,
 } from '@tabler/icons-react'
-import { SqlHighlight } from './SqlHighlight'
-import { useSimulationStore } from '@/store/simulationStore'
+import { SqlHighlight } from '../../SqlHighlight'
+import { useLangStore } from '@/store/simulationStore'
 
 const T = {
   ko: {
@@ -771,7 +771,7 @@ function SqlCard({
 // ── Main component ─────────────────────────────────────────────────────────────
 
 export function MergeSection() {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const t = T[lang]
 
   return (

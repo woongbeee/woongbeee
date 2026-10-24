@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useInternalsStore } from '@/store/internalsStore'
 import type { StepSummary, SimulationStep } from '@/store/internalsStore'
-import { useSimulationStore } from '@/store/simulationStore'
+import { useLangStore } from '@/store/simulationStore'
 import { SAMPLE_QUERIES } from '@/data/index'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -40,7 +40,7 @@ function highlightSQL(text: string): string {
 
 export function LiveLog() {
   const stepLog = useInternalsStore((s) => s.stepLog)
-  const lang    = useSimulationStore((s) => s.lang)
+  const lang    = useLangStore((s) => s.lang)
   const endRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -139,7 +139,7 @@ export function SummaryTimeline({ selectedStep, onSelect }: {
 }) {
   const stepSummary = useInternalsStore((s) => s.stepSummary)
   const currentStep = useInternalsStore((s) => s.currentStep)
-  const lang        = useSimulationStore((s) => s.lang)
+  const lang        = useLangStore((s) => s.lang)
 
   return (
     <div className="flex h-full flex-col">
@@ -184,7 +184,7 @@ export function QueryInput() {
   const isRunning          = useInternalsStore((s) => s.isRunning)
   const setHighlightedStep = useInternalsStore((s) => s.setHighlightedStep)
   const flushBuffers       = useInternalsStore((s) => s.flushBuffers)
-  const lang               = useSimulationStore((s) => s.lang)
+  const lang               = useLangStore((s) => s.lang)
 
   const textareaRef  = useRef<HTMLTextAreaElement>(null)
   const highlightRef = useRef<HTMLDivElement>(null)

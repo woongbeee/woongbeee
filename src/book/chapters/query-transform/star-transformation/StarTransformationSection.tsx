@@ -1,5 +1,5 @@
 import { IconTransform } from '@tabler/icons-react'
-import { useSimulationStore } from '@/store/simulationStore'
+import { useLangStore } from '@/store/simulationStore'
 import {
   PageContainer,
   ChapterTitle,
@@ -239,7 +239,7 @@ GROUP BY c.cust_city;`,
 }
 
 export function QtStarTransformationSection() {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const t = T[lang]
 
   return (
@@ -277,9 +277,9 @@ export function QtStarTransformationSection() {
         />
       </div>
       <InfoBox variant="note">
-        <pre className="font-mono text-xs leading-relaxed whitespace-pre-wrap">
+        <div className="whitespace-pre-line">
           {t.exampleNote}
-        </pre>
+        </div>
       </InfoBox>
 
       <Divider />

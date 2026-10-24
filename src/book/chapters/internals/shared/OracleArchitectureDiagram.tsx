@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import { IconArrowNarrowRight, IconArrowNarrowDown } from '@tabler/icons-react'
 import { cn } from '@/lib/utils'
-import { useSimulationStore } from '@/store/simulationStore'
+import { useLangStore } from '@/store/simulationStore'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Oracle Database Instance 아키텍처 다이어그램 — 프로그램 전체 공용.
@@ -248,7 +248,7 @@ export function OracleArchitectureDiagram({
   callout,
   className,
 }: Props) {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const isKo = lang === 'ko'
   const lbl = (ko: string, en: string) => (isKo ? ko : en)
 

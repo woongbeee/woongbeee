@@ -1,5 +1,5 @@
 import { IconTransform } from '@tabler/icons-react'
-import { useSimulationStore } from '@/store/simulationStore'
+import { useLangStore } from '@/store/simulationStore'
 import {
   PageContainer,
   ChapterTitle,
@@ -9,8 +9,8 @@ import {
   Divider,
   SqlBlock,
 } from '../../shared'
-import { ExplainPlanTable } from '../../optimizer/shared/diagrams'
-import type { PlanRow } from '../../optimizer/shared/diagrams'
+import { ExplainPlanTable } from '../../ExplainPlanTable'
+import type { PlanRow } from '../../ExplainPlanTable'
 
 const T = {
   ko: {
@@ -346,7 +346,7 @@ const PLAN_ROWS_EN: PlanRow[] = [
 ]
 
 export function QtPredicatePushingSection() {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const t = T[lang]
   const planRows = lang === 'ko' ? PLAN_ROWS_KO : PLAN_ROWS_EN
 
@@ -385,9 +385,9 @@ export function QtPredicatePushingSection() {
         />
       </div>
       <InfoBox variant="note">
-        <pre className="font-mono text-xs leading-relaxed whitespace-pre-wrap">
+        <div className="whitespace-pre-line">
           {t.exampleNote}
-        </pre>
+        </div>
       </InfoBox>
       <ExplainPlanTable rows={planRows} caption={t.planCaption} lang={lang} />
 
@@ -396,9 +396,9 @@ export function QtPredicatePushingSection() {
       <SectionTitle>{t.transitiveTitle}</SectionTitle>
       <Prose>{t.transitiveDesc}</Prose>
       <InfoBox variant="tip">
-        <pre className="font-mono text-xs leading-relaxed whitespace-pre-wrap">
+        <div className="whitespace-pre-line">
           {t.transitiveExample}
-        </pre>
+        </div>
       </InfoBox>
       <div className="mt-4">
         <SqlBlock sql={t.transitiveSql} />

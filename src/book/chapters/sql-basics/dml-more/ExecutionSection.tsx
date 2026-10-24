@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import { PageContainer, ChapterTitle, SectionTitle, Prose } from '../../shared'
-import { useSimulationStore } from '@/store/simulationStore'
+import { useLangStore } from '@/store/simulationStore'
 import { IconPlayerPlay } from '@tabler/icons-react'
 import { EMPLOYEES, EMPLOYEE_COLUMNS } from '@/data'
 import {
@@ -13,7 +13,7 @@ import {
   type ExampleQuery,
 } from './executionQueries'
 import { parseAndExecute, type ParsedQuery } from './sqlEngine'
-import { SqlHighlight } from './SqlHighlight'
+import { SqlHighlight } from '../../SqlHighlight'
 import { EmpRow } from './EmpRow'
 
 const T = {
@@ -62,7 +62,7 @@ function ResultTable({
   parsed: ParsedQuery
   overrideResult?: ExampleQuery['overrideResult']
 }) {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const t = T[lang]
   const ALL_COLUMNS = EMPLOYEE_COLUMNS
   type EmpKey = (typeof EMPLOYEE_COLUMNS)[number]
@@ -384,7 +384,7 @@ function MergePanel({
 }: {
   mergeData: NonNullable<ExampleQuery['mergeData']>
 }) {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const t = T[lang]
   const statusStyle: Record<string, string> = {
     updated: 'bg-amber/10 border-amber/30',
@@ -516,7 +516,7 @@ function MergePanel({
 // ── Main component ──────────────────────────────────────────────────────────
 
 export function ExecutionSimulator() {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const t = T[lang]
   const [selectedId, setSelectedId] = useState<string>(EXAMPLE_QUERIES[0].id)
 

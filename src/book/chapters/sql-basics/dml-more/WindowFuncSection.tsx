@@ -9,8 +9,8 @@ import {
   IndexedContent,
 } from '../../shared'
 import { IconChartBar } from '@tabler/icons-react'
-import { SqlHighlight } from './SqlHighlight'
-import { useSimulationStore } from '@/store/simulationStore'
+import { SqlHighlight } from '../../SqlHighlight'
+import { useLangStore } from '@/store/simulationStore'
 import { EMPLOYEES } from '@/data'
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -931,7 +931,7 @@ const FRAME_KEYWORDS_SQL =
 // ── WindowFuncSection ────────────────────────────────────────────────────────
 
 export function WindowFuncSection() {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const t = T[lang]
   const [openFunc, setOpenFunc] = useState<string>(FUNC_ITEMS[0].name)
   const [openFrame, setOpenFrame] = useState<string>(FRAME_ITEMS[0].name)

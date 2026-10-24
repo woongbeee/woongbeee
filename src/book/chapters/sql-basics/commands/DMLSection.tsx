@@ -6,7 +6,7 @@ import {
   SqlBlock,
   AccordionSection,
 } from '../../shared'
-import { useSimulationStore } from '@/store/simulationStore'
+import { useLangStore } from '@/store/simulationStore'
 import {
   IconEdit,
   IconTable,
@@ -271,7 +271,7 @@ VALUES (2, 'Bob', 20);`,
 }
 
 export function DMLSection() {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const t = T[lang]
   const introDemo = CLAUSE_DEMOS.find((d) => d.sectionKey === 'intro')!
   const selectDemo = CLAUSE_DEMOS.find((d) => d.sectionKey === 'select')!

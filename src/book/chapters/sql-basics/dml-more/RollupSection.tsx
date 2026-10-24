@@ -13,7 +13,7 @@ import {
   IndexedContent,
 } from '../../shared'
 import { IconChartTreemap } from '@tabler/icons-react'
-import { useSimulationStore } from '@/store/simulationStore'
+import { useLangStore } from '@/store/simulationStore'
 import { EMPLOYEES, type Employee } from '@/data'
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -1937,7 +1937,7 @@ function RollupTabContent({
 }
 
 export function RollupSection() {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const t = T[lang] as TShape
   const [tab, setTab] = useState<Tab>('rollup')
 

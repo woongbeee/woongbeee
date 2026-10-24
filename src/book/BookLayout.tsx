@@ -1,6 +1,6 @@
 import { memo, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { useSimulationStore } from '@/store/simulationStore'
+import { useLangStore } from '@/store/simulationStore'
 import { useInternalsStore } from '@/store/internalsStore'
 import { TableOfContents } from './TableOfContents'
 import { BookContent } from './BookContent'
@@ -53,7 +53,7 @@ const DEFAULT_WIDTH = 260
 
 // Vertical tab — only visible when TOC is closed, sits to the right of the panel area
 const TocTab = memo(function TocTab({ onToggle }: { onToggle: () => void }) {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const t = T[lang]
   return (
     <button
@@ -73,10 +73,10 @@ const TocTab = memo(function TocTab({ onToggle }: { onToggle: () => void }) {
 })
 
 export function BookLayout() {
-  const lang = useSimulationStore((s) => s.lang)
-  const setLang = useSimulationStore((s) => s.setLang)
-  const theme = useSimulationStore((s) => s.theme)
-  const toggleTheme = useSimulationStore((s) => s.toggleTheme)
+  const lang = useLangStore((s) => s.lang)
+  const setLang = useLangStore((s) => s.setLang)
+  const theme = useLangStore((s) => s.theme)
+  const toggleTheme = useLangStore((s) => s.toggleTheme)
   const t = T[lang]
 
   const [tocOpen, setTocOpen]           = useState(true)

@@ -9,17 +9,17 @@ import {
 } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
-
-type CSSPropertiesWithVars = CSSProperties & { '--idx-w'?: string }
 import {
   INFOBOX_VARIANT,
   INFOBOX_LEGACY_COLOR,
   type InfoVariant,
   type InfoColor,
 } from '@/lib/theme'
-import { useSimulationStore } from '@/store/simulationStore'
-import { SqlHighlight } from './sql-basics/dml-more/SqlHighlight'
+import { useLangStore } from '@/store/simulationStore'
+import { SqlHighlight } from './SqlHighlight'
 import { IconHammer, IconChevronDown, IconX } from '@tabler/icons-react'
+
+type CSSPropertiesWithVars = CSSProperties & { '--idx-w'?: string }
 
 const H2 =
   'mt-8 mb-4 font-sans text-[1.375rem] font-semibold leading-[1.3] tracking-[-0.01em] text-ink'
@@ -37,7 +37,7 @@ const CALLOUT_TITLE = 'mb-1 font-sans text-[13px] font-semibold text-ink'
 const CALLOUT_BODY = 'font-read text-[13.5px] leading-[1.65] text-ink'
 
 export function WipBanner() {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   return (
     <div
       className={cn(
@@ -73,8 +73,6 @@ export function PageContainer({
     </div>
   )
 }
-
-export type Lang = 'ko' | 'en'
 
 export function ChapterTitle({
   icon,
@@ -142,7 +140,7 @@ export function InfoBox({
   title?: string
   children: ReactNode
 }) {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const v = variant ? INFOBOX_VARIANT[variant] : null
   const d = v ?? INFOBOX_LEGACY_COLOR[color ?? 'tip']
   const kicker = v ? v[lang] : null
@@ -214,10 +212,7 @@ export function Table({
             {headers.map((h, i) => (
               <th
                 key={i}
-                className={cn(
-                  'text-ink-2 px-3.5 py-2.5 font-sans text-[11px] font-semibold whitespace-nowrap',
-                  i === 0 ? 'text-left' : 'text-left'
-                )}
+                className="text-ink-2 px-3.5 py-2.5 text-left font-sans text-[11px] font-semibold whitespace-nowrap"
               >
                 {h}
               </th>
@@ -470,21 +465,6 @@ export function ConceptGrid({
           </div>
         </div>
       ))}
-    </div>
-  )
-}
-
-export function SimulatorPlaceholder({
-  label,
-}: {
-  label: string
-  color?: string
-}) {
-  return (
-    <div className="rounded-card border-line-2 text-ink-3 flex flex-col items-center justify-center gap-3 border-2 border-dashed p-12">
-      <span className="text-4xl">🚧</span>
-      <span className="font-mono text-sm font-semibold">{label}</span>
-      <span className="text-ink-3/60 font-mono text-xs">Coming soon</span>
     </div>
   )
 }

@@ -1,5 +1,5 @@
 import { IconShield } from '@tabler/icons-react'
-import { useSimulationStore } from '@/store/simulationStore'
+import { useLangStore } from '@/store/simulationStore'
 import {
   PageContainer,
   ChapterTitle,
@@ -107,7 +107,7 @@ WHERE  sql_quarantine IS NOT NULL;`,
 }
 
 export function SpmSection() {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const t = T[lang]
 
   return (

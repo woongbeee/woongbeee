@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 
 export type Lang = 'ko' | 'en'
-export type Theme = 'light' | 'dark'
+type Theme = 'light' | 'dark'
 
 const THEME_KEY = 'oracle-book-theme'
 
@@ -51,7 +51,3 @@ export const useLangStore = create<AppState>((set, get) => ({
     set({ theme: next })
   },
 }))
-
-// Legacy alias — keeps existing `useSimulationStore(s => s.lang)` and
-// `useSimulationStore(s => s.setLang)` call sites working without change.
-export const useSimulationStore = useLangStore

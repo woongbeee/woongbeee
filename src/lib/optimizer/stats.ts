@@ -4,7 +4,7 @@
 
 import type { TableStats } from './types'
 
-export const TABLE_STATS: Record<string, TableStats> = {
+const TABLE_STATS: Record<string, TableStats> = {
   // ── HR Schema ──────────────────────────────────────────────────────────
   REGIONS: {
     tableName: 'REGIONS',

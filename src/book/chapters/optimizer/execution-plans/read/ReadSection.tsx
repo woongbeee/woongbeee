@@ -1,5 +1,5 @@
 import { IconListSearch } from '@tabler/icons-react'
-import { useSimulationStore } from '@/store/simulationStore'
+import { useLangStore } from '@/store/simulationStore'
 import {
   PageContainer,
   ChapterTitle,
@@ -422,7 +422,7 @@ function MultilineTable({ headers, rows }: { headers: string[]; rows: string[][]
 }
 
 export function ReadSection() {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const t = T[lang]
   const isKo = lang === 'ko'
 

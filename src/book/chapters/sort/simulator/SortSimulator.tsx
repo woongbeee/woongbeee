@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { IconArrowsSort } from '@tabler/icons-react'
 import { cn } from '@/lib/utils'
-import { useSimulationStore } from '@/store/simulationStore'
+import { useLangStore } from '@/store/simulationStore'
 import {
   PageContainer,
   ChapterTitle,
@@ -121,7 +121,7 @@ const MODE_COLOR: Record<'optimal' | 'onepass' | 'multipass', string> = {
 }
 
 export function SortSimulator() {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const t = T[lang]
 
   const [pgaMb, setPgaMb] = useState(90) // 슬라이더는 %(1~100)로 받고 MB로 환산

@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useInternalsStore, STEP_PROCESS_LABEL } from '@/store/internalsStore'
 import type { Lang } from '@/store/simulationStore'
-import { useSimulationStore } from '@/store/simulationStore'
+import { useLangStore } from '@/store/simulationStore'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 
@@ -159,7 +159,7 @@ function LibraryCacheBlock({ compact = false }: { compact?: boolean }) {
   const currentStep   = useInternalsStore((s) => s.currentStep)
   const cachedQueries = useInternalsStore((s) => s.cachedQueries)
   const query         = useInternalsStore((s) => s.query)
-  const lang          = useSimulationStore((s) => s.lang)
+  const lang          = useLangStore((s) => s.lang)
   const active = useIsActive('library-cache')
 
   const isSearching = currentStep === 'library-cache-check'
@@ -254,7 +254,7 @@ function LibraryCacheBlock({ compact = false }: { compact?: boolean }) {
 
 function BufferCacheBlock({ compact = false }: { compact?: boolean }) {
   const currentStep = useInternalsStore((s) => s.currentStep)
-  const lang        = useSimulationStore((s) => s.lang)
+  const lang        = useLangStore((s) => s.lang)
   const active = useIsActive('buffer-cache')
 
   const isChecking = currentStep === 'buffer-cache-check'
@@ -334,7 +334,7 @@ function BufferCacheBlock({ compact = false }: { compact?: boolean }) {
 export function OracleDiagram({ compact = false }: { compact?: boolean }) {
   const currentStep     = useInternalsStore((s) => s.currentStep)
   const highlightedStep = useInternalsStore((s) => s.highlightedStep)
-  const lang            = useSimulationStore((s) => s.lang)
+  const lang            = useLangStore((s) => s.lang)
 
   const displayStep = highlightedStep ?? currentStep
   const stepLabel   = STEP_PROCESS_LABEL[lang][displayStep]

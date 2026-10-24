@@ -323,7 +323,7 @@ export function ParallelMultiTqSection() {
             })}
           </pre>
         </div>
-        <p className="text-ink-3 mt-1.5 font-mono text-[10px]">{t.planNote}</p>
+        <p className="text-ink-3 mt-1.5 font-sans text-[11px]">{t.planNote}</p>
       </div>
 
       <Divider />

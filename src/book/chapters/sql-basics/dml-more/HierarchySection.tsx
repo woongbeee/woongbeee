@@ -2,8 +2,8 @@ import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import { PageContainer, ChapterTitle, Prose, InfoBox } from '../../shared'
 import { IconSitemap } from '@tabler/icons-react'
-import { SqlHighlight } from './SqlHighlight'
-import { useSimulationStore } from '@/store/simulationStore'
+import { SqlHighlight } from '../../SqlHighlight'
+import { useLangStore } from '@/store/simulationStore'
 import type { Employee } from '@/data'
 
 // ── Data ───────────────────────────────────────────────────────────────────
@@ -174,7 +174,7 @@ const T = {
 type HierTab = 'basic' | 'path'
 
 export function HierarchySection() {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const t = T[lang]
   const [hierTab, setHierTab] = useState<HierTab>('basic')
   const [startId, setStartId] = useState<number | null>(null)

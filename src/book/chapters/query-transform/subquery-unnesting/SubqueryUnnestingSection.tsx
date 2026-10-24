@@ -1,5 +1,5 @@
 import { IconTransform } from '@tabler/icons-react'
-import { useSimulationStore } from '@/store/simulationStore'
+import { useLangStore } from '@/store/simulationStore'
 import {
   PageContainer,
   ChapterTitle,
@@ -9,8 +9,8 @@ import {
   Divider,
   SqlBlock,
 } from '../../shared'
-import { ExplainPlanTable } from '../../optimizer/shared/diagrams'
-import type { PlanRow } from '../../optimizer/shared/diagrams'
+import { ExplainPlanTable } from '../../ExplainPlanTable'
+import type { PlanRow } from '../../ExplainPlanTable'
 
 const T = {
   ko: {
@@ -316,7 +316,7 @@ const PLAN_ROWS_EN: PlanRow[] = [
 ]
 
 export function QtSubqueryUnnestingSection() {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const t = T[lang]
   const planRows = lang === 'ko' ? PLAN_ROWS_KO : PLAN_ROWS_EN
 

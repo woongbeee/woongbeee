@@ -16,9 +16,9 @@ import {
   IconArrowsHorizontal,
   IconGridDots,
 } from '@tabler/icons-react'
-import { useSimulationStore } from '@/store/simulationStore'
+import { useLangStore } from '@/store/simulationStore'
 import { JoinSimulator, JOIN_SQL, type JoinType } from '@/components/join-sim'
-import { SqlHighlight } from './SqlHighlight'
+import { SqlHighlight } from '../../SqlHighlight'
 
 // ── Data ───────────────────────────────────────────────────────────────────
 
@@ -420,7 +420,7 @@ const T = {
 // ── JoinSection ─────────────────────────────────────────────────────────────
 
 export function JoinSection() {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const t = T[lang]
   const [activeJoin, setActiveJoin] = useState<JoinType>('inner')
 

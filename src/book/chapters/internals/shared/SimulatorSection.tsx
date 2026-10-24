@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useSimulationStore } from '@/store/simulationStore'
+import { useLangStore } from '@/store/simulationStore'
 import { useInternalsStore } from '@/store/internalsStore'
 import { OracleDiagram } from '@/components/OracleDiagram'
 import { QueryInput, LiveLog, SummaryTimeline } from '@/components/QueryInput'
@@ -164,7 +164,7 @@ export function InternalsSimulatorSection() {
   const isComplete         = useInternalsStore((s) => s.isComplete)
   const highlightedStep    = useInternalsStore((s) => s.highlightedStep)
   const setHighlightedStep = useInternalsStore((s) => s.setHighlightedStep)
-  const lang               = useSimulationStore((s) => s.lang)
+  const lang               = useLangStore((s) => s.lang)
   const t = T[lang]
   const [activeTab, setActiveTab] = useState<SimTab>('simulator')
 

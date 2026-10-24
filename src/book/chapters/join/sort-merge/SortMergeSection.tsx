@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { IconArrowMerge } from '@tabler/icons-react'
-import { useSimulationStore } from '@/store/simulationStore'
+import { useLangStore } from '@/store/simulationStore'
 import {
   PageContainer,
   ChapterTitle,
@@ -254,7 +254,9 @@ function SortMergeSim({ lang }: { lang: 'ko' | 'en' }) {
   const lPassed = new Set(MERGE_STEPS.slice(0, stepIdx).filter(s => s.action !== 'match' || true).map(s => s.lPtr))
   const rPassed = new Set(MERGE_STEPS.slice(0, stepIdx).filter(s => s.action !== 'match' || true).map(s => s.rPtr))
 
-  const [playing, setPlaying] = useState(false)
+  const [playRequested, setPlaying] = useState(false)
+  // 끝에 도달하면 자동으로 정지 상태로 간주 (effect 안에서 setState 하지 않도록 파생값으로)
+  const playing = playRequested && !done
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   function clearTimer() { if (timerRef.current) { clearTimeout(timerRef.current); timerRef.current = null } }
 
@@ -270,10 +272,9 @@ function SortMergeSim({ lang }: { lang: 'ko' | 'en' }) {
 
   useEffect(() => {
     if (!playing) return
-    if (done) { setPlaying(false); return }
     timerRef.current = setTimeout(() => setStepIdx((s) => s + 1), 800)
     return clearTimer
-  }, [playing, done, stepIdx])
+  }, [playing, stepIdx])
 
   const ACTION_LABEL: Record<StepAction, string> = {
     'adv-left':  t.labelAdvLeft,
@@ -446,7 +447,7 @@ function SortMergeSim({ lang }: { lang: 'ko' | 'en' }) {
 }
 
 export function JoinSortMergeSection() {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const t = T[lang]
   const ht = hintT[lang]
 

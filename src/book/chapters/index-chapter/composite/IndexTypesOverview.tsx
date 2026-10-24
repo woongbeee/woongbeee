@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { useSimulationStore } from '@/store/simulationStore'
+import { useLangStore } from '@/store/simulationStore'
 import { cn } from '@/lib/utils'
 import { SectionTitle, SubTitle, Prose, InfoBox, Divider } from '../../shared'
 
@@ -231,7 +231,7 @@ function StateTable({ rows, headers }: { rows: StateRow[]; headers: StateHeaders
 
 
 export function IndexTypesOverview() {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const t = T[lang]
 
   return (

@@ -1,4 +1,4 @@
-import { useSimulationStore } from '@/store/simulationStore'
+import { useLangStore } from '@/store/simulationStore'
 import { PageContainer, WipBanner } from '../shared'
 import { JoinOverviewSection } from './overview/OverviewSection'
 import { JoinNestedLoopSection } from './nested-loop/NestedLoopSection'
@@ -8,7 +8,7 @@ import { JoinSemiSection } from './semi/SemiJoinSection'
 import { JoinSimulatorSection } from './simulator/JoinSimulatorSection'
 
 export function JoinPage({ sectionId }: { sectionId: string }) {
-  useSimulationStore((s) => s.lang)
+  useLangStore((s) => s.lang)
 
   if (sectionId === 'join-overview')    return <JoinOverviewSection />
   if (sectionId === 'join-nested-loop') return <JoinNestedLoopSection />

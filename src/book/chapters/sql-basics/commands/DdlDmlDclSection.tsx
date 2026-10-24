@@ -1,5 +1,5 @@
 import { PageContainer, ChapterTitle, SectionTitle } from '../../shared'
-import { useSimulationStore } from '@/store/simulationStore'
+import { useLangStore } from '@/store/simulationStore'
 import { cn } from '@/lib/utils'
 import {
   IconCategory,
@@ -137,7 +137,7 @@ const COLOR_MAP: Record<string, { card: string; badge: string; tag: string }> =
   }
 
 export function DdlDmlDclSection() {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const t = T[lang]
 
   return (

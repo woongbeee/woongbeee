@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { BOOK_CHAPTERS } from './bookStructure.tsx'
 import type { BookSection } from './bookStructure.tsx'
-import { useSimulationStore } from '@/store/simulationStore'
+import { useLangStore } from '@/store/simulationStore'
 import { cn } from '@/lib/utils'
 import {
   IconChevronRight,
@@ -44,7 +44,7 @@ function SectionItem({
   onSelect: (id: string) => void
   onExpand: () => void
 }) {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const isActive = section.id === activeSectionId
   const hasChildren = !!section.children?.length
   const childActive =
@@ -138,7 +138,7 @@ export function TableOfContents({
   onSelect,
   onToggle,
 }: Props) {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const defaultOpen = BOOK_CHAPTERS.reduce<Record<string, boolean>>(
     (acc, ch) => {
       acc[ch.id] = ch.sections.some((s) =>

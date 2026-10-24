@@ -11,7 +11,7 @@ import {
   IndexedContent,
 } from '../../shared'
 import { IconLayoutColumns } from '@tabler/icons-react'
-import { useSimulationStore } from '@/store/simulationStore'
+import { useLangStore } from '@/store/simulationStore'
 import { EMPLOYEES, type Employee } from '@/data'
 import { PivotAnimator, UnpivotAnimator } from './PivotAnimator'
 
@@ -335,7 +335,7 @@ function PivotTabContent({
 // ── Main component ─────────────────────────────────────────────────────────
 
 export function PivotSection() {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const t = T[lang]
   const [tab, setTab] = useState<Tab>('pivot')
 

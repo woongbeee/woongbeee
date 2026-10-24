@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { useSimulationStore } from '@/store/simulationStore'
+import { useLangStore } from '@/store/simulationStore'
 import {
   PageContainer,
   ChapterTitle,
@@ -321,7 +321,7 @@ function RowidVisualizer({ parts, breakdown, decodeNote, isKo }: {
 // ── 메인 컴포넌트 ─────────────────────────────────────────────────────────────
 
 export function RowidSection() {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const t = T[lang]
   const isKo = lang === 'ko'
 

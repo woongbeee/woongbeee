@@ -6,7 +6,7 @@ import {
   InfoBox,
   Divider,
 } from '../../shared'
-import { useSimulationStore } from '@/store/simulationStore'
+import { useLangStore } from '@/store/simulationStore'
 import { IconSortAscending } from '@tabler/icons-react'
 import { CLAUSE_DEMOS } from './clauseDemos'
 import { ClickableSyntaxRow, SyntaxRow } from './MiniSimulator'
@@ -83,7 +83,7 @@ const T = {
 }
 
 export function ClausesSection() {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const t = T[lang]
   const orderByDemo = CLAUSE_DEMOS.find((d) => d.sectionKey === 'orderby')!
   const groupByDemo = CLAUSE_DEMOS.find((d) => d.sectionKey === 'groupby')!

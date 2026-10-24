@@ -35,7 +35,7 @@ export interface ParsedQuery {
 
 // ── ORDER BY ──────────────────────────────────────────────────────────────
 
-export function parseOrderPart(
+function parseOrderPart(
   s: string,
   selectCols?: string[]
 ): { key: keyof Employee; dir: 'ASC' | 'DESC'; nulls?: 'FIRST' | 'LAST' } {
@@ -60,7 +60,7 @@ export function parseOrderPart(
   return { key, dir, nulls }
 }
 
-export function sortRows(
+function sortRows(
   rows: Employee[],
   key: keyof Employee,
   dir: 'ASC' | 'DESC',
@@ -106,7 +106,7 @@ export function sortRows(
 
 // ── GROUP BY / HAVING ─────────────────────────────────────────────────────
 
-export function parseGroupCols(selectPart: string): string[] {
+function parseGroupCols(selectPart: string): string[] {
   const cols: string[] = ['dept_id']
   const u = selectPart.toUpperCase()
   if (u.includes('COUNT')) cols.push('cnt')
@@ -120,7 +120,7 @@ export function parseGroupCols(selectPart: string): string[] {
   return cols
 }
 
-export function evalHaving(g: GroupRow, expr: string): boolean {
+function evalHaving(g: GroupRow, expr: string): boolean {
   const cntGte = expr.match(/COUNT\s*\(\s*\*\s*\)\s*>=\s*(\d+)/i)
   if (cntGte) return (g.cnt ?? 0) >= parseInt(cntGte[1])
   const cntGt = expr.match(/COUNT\s*\(\s*\*\s*\)\s*>\s*(\d+)/i)
@@ -138,11 +138,11 @@ export function evalHaving(g: GroupRow, expr: string): boolean {
 
 // ── WHERE ─────────────────────────────────────────────────────────────────
 
-export function filterRows(rows: Employee[], expr: string): Employee[] {
+function filterRows(rows: Employee[], expr: string): Employee[] {
   return rows.filter((r) => evalCond(r, expr))
 }
 
-export function evalCond(r: Employee, expr: string): boolean {
+function evalCond(r: Employee, expr: string): boolean {
   const trimmed = expr.trim()
 
   const notBetween = trimmed.match(
@@ -240,7 +240,7 @@ export function evalCond(r: Employee, expr: string): boolean {
   return true
 }
 
-export function findTopLevelAnd(u: string): number {
+function findTopLevelAnd(u: string): number {
   let depth = 0
   for (let i = 0; i < u.length - 4; i++) {
     if (u[i] === '(') depth++
@@ -250,7 +250,7 @@ export function findTopLevelAnd(u: string): number {
   return -1
 }
 
-export function findTopLevelOr(u: string): number {
+function findTopLevelOr(u: string): number {
   let depth = 0
   for (let i = 0; i < u.length - 3; i++) {
     if (u[i] === '(') depth++
@@ -262,7 +262,7 @@ export function findTopLevelOr(u: string): number {
 
 // ── SELECT / UPDATE 투영·적용 ─────────────────────────────────────────────
 
-export function projectRow(r: Employee, cols: string[]): Employee {
+function projectRow(r: Employee, cols: string[]): Employee {
   const out: Partial<Employee> = {}
   for (const c of cols) {
     const k = c as keyof Employee
@@ -271,7 +271,7 @@ export function projectRow(r: Employee, cols: string[]): Employee {
   return out as Employee
 }
 
-export function applySet(r: Employee, setExpr: string): Employee {
+function applySet(r: Employee, setExpr: string): Employee {
   const clone = { ...r }
   const salMul = setExpr.match(/salary\s*=\s*salary\s*\*\s*([\d.]+)/i)
   if (salMul) {

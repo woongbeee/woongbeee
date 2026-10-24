@@ -19,7 +19,7 @@ export type SimulationStep =
   | 'complete'
 
 // Components that get highlighted per step (SGA blocks + background processes)
-export const STEP_COMPONENTS: Partial<Record<SimulationStep, string[]>> = {
+const STEP_COMPONENTS: Partial<Record<SimulationStep, string[]>> = {
   parsing:               ['server-process', 'pga'],
   'library-cache-check': ['library-cache', 'pmon'],
   'library-cache-hit':   ['library-cache'],
@@ -69,7 +69,6 @@ interface InternalsActions {
   flushBuffers: () => void
 }
 
-export type { Lang } from './simulationStore'
 
 export const STEP_PROCESS_LABEL: Record<string, Partial<Record<SimulationStep, string>>> = {
   ko: {

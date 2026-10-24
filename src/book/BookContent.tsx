@@ -1,6 +1,6 @@
-import { memo, useEffect, useRef } from 'react'
+import { lazy, memo, Suspense, useEffect, useRef } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { useSimulationStore } from '@/store/simulationStore'
+import { useLangStore } from '@/store/simulationStore'
 import { getAdjacentSections, getSectionById } from './bookStructure.tsx'
 import { cn } from '@/lib/utils'
 import {
@@ -9,50 +9,32 @@ import {
   IconChevronRight,
 } from '@tabler/icons-react'
 
-// Chapter pages
-import { IntroductionPage } from './chapters/introduction/IntroductionPage'
-import { SqlBasicsPage } from './chapters/sql-basics'
-import { InternalsPage } from './chapters/internals'
-import { IndexChapterPage } from './chapters/index-chapter'
-import { JoinPage } from './chapters/join'
-import { OptimizerChapterPage } from './chapters/optimizer'
-import { QueryTransformPage } from './chapters/query-transform'
-import { SortPage } from './chapters/sort'
-import { SqlTuningOverviewPage } from './chapters/sql-tuning/SqlTuningOverviewPage'
-import { QueryTransformLandingPage } from './chapters/sql-tuning/QueryTransformLandingPage'
-import { SortLandingPage } from './chapters/sql-tuning/SortLandingPage'
-import { PartitionPage } from './chapters/partition'
-import { ParallelPage } from './chapters/parallel'
-import { DataModelingPage } from './chapters/data-modeling'
+// Chapter pages — 챕터별 청크로 지연 로드 (named export → lazy 용 default 로 감쌈)
+const IntroductionPage = lazy(() => import('./chapters/introduction/IntroductionPage').then((m) => ({ default: m.IntroductionPage })))
+const DataModelingPage = lazy(() => import('./chapters/data-modeling').then((m) => ({ default: m.DataModelingPage })))
+const SqlBasicsPage = lazy(() => import('./chapters/sql-basics').then((m) => ({ default: m.SqlBasicsPage })))
+const InternalsPage = lazy(() => import('./chapters/internals').then((m) => ({ default: m.InternalsPage })))
+const JoinPage = lazy(() => import('./chapters/join').then((m) => ({ default: m.JoinPage })))
+const IndexChapterPage = lazy(() => import('./chapters/index-chapter').then((m) => ({ default: m.IndexChapterPage })))
+const PartitionPage = lazy(() => import('./chapters/partition').then((m) => ({ default: m.PartitionPage })))
+const ParallelPage = lazy(() => import('./chapters/parallel').then((m) => ({ default: m.ParallelPage })))
+const OptimizerChapterPage = lazy(() => import('./chapters/optimizer').then((m) => ({ default: m.OptimizerChapterPage })))
+const QueryTransformPage = lazy(() => import('./chapters/query-transform').then((m) => ({ default: m.QueryTransformPage })))
+const SortPage = lazy(() => import('./chapters/sort').then((m) => ({ default: m.SortPage })))
+const SqlTuningOverviewPage = lazy(() => import('./chapters/sql-tuning/SqlTuningOverviewPage').then((m) => ({ default: m.SqlTuningOverviewPage })))
+const QueryTransformLandingPage = lazy(() => import('./chapters/sql-tuning/QueryTransformLandingPage').then((m) => ({ default: m.QueryTransformLandingPage })))
+const SortLandingPage = lazy(() => import('./chapters/sql-tuning/SortLandingPage').then((m) => ({ default: m.SortLandingPage })))
 
 interface Props {
   sectionId: string
   onNavigate: (sectionId: string) => void
 }
 
-// Chapters migrated to the token system (dark-capable). Others are pinned light
-// via data-theme="light" until they migrate (DESIGN.md §6).
-const DARK_READY = [
-  'intro-',
-  'dm-',
-  'sql-basics-',
-  'internals-',
-  'join-',
-  'index-',
-  'partition-',
-  'parallel-',
-  'optimizer-',
-  'qt-',
-  'sort-',
-  'sql-tuning-',
-]
-const isDarkReady = (id: string) => DARK_READY.some((p) => id.startsWith(p))
-
 export const BookContent = memo(function BookContent({
   sectionId,
   onNavigate,
 }: Props) {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const info = getSectionById(sectionId)
   const adjacent = getAdjacentSections(sectionId)
   const scrollRef = useRef<HTMLDivElement>(null)
@@ -82,10 +64,9 @@ export const BookContent = memo(function BookContent({
         </span>
       </div>
 
-      {/* Content area — migrated chapters follow the theme; others pinned light */}
+      {/* Content area */}
       <div
         ref={scrollRef}
-        data-theme={isDarkReady(sectionId) ? undefined : 'light'}
         className={cn(
           'bg-paper-sunk text-ink min-h-0 flex-1',
           sectionId === 'optimizer-simulator'
@@ -102,7 +83,9 @@ export const BookContent = memo(function BookContent({
             transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
             className="h-full"
           >
-            <SectionRouter sectionId={sectionId} />
+            <Suspense fallback={null}>
+              <SectionRouter sectionId={sectionId} />
+            </Suspense>
           </motion.div>
         </AnimatePresence>
       </div>

@@ -181,35 +181,3 @@ export function ScanDiagram({ config, title }: { config: ScanConfig; title: stri
   )
 }
 
-// ── 스캔 단계 패널 ─────────────────────────────────────────────────────────────
-// 각 스캔 섹션에서 steps 배열을 넘겨 쓰는 공통 패널
-
-export interface ScanStep {
-  label: string
-  detail: string
-  color: string  // tailwind dot 색 (bg-xxx-400)
-}
-
-export function ScanStepList({ steps }: { steps: ScanStep[] }) {
-  return (
-    <div className="space-y-2">
-      {steps.map((s, i) => (
-        <motion.div
-          key={i}
-          initial={{ opacity: 0, x: -6 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: i * 0.06, duration: 0.2 }}
-          className="flex items-start gap-3 rounded-panel border bg-paper px-4 py-3"
-        >
-          <span className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full font-mono text-[11px] font-bold text-paper ${s.color}`}>
-            {i + 1}
-          </span>
-          <div>
-            <p className="mb-0.5 font-mono text-[11px] font-bold text-ink">{s.label}</p>
-            <p className="text-[11px] leading-relaxed text-ink-2">{s.detail}</p>
-          </div>
-        </motion.div>
-      ))}
-    </div>
-  )
-}

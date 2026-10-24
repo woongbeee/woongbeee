@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useSimulationStore } from '@/store/simulationStore'
+import { useLangStore } from '@/store/simulationStore'
 import { ChapterTitle, SectionTitle, SubTitle, Prose, InfoBox, Divider } from '../../../../shared'
 import { cn } from '@/lib/utils'
 import { OracleArchitectureDiagram } from '../../../shared/OracleArchitectureDiagram'
@@ -572,7 +572,7 @@ function IoComparisonSection({ lang }: { lang: 'ko' | 'en' }) {
 // ── Main component ──────────────────────────────────────────────────────────
 
 export function RedoLogBufferSection() {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const t = T[lang]
 
   return (

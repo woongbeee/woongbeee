@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useSimulationStore } from '@/store/simulationStore'
+import { useLangStore } from '@/store/simulationStore'
 import {
-  PageContainer, ChapterTitle, SectionTitle, Prose, InfoBox, Divider,
+  PageContainer, ChapterTitle, SectionTitle, Prose, InfoBox, Divider, SqlBlock,
 } from '../../shared'
 import { IconRoute } from '@tabler/icons-react'
 
@@ -375,7 +375,7 @@ function BufferCacheAnatomyDiagram({ isKo }: { isKo: boolean }) {
           onClick={() => toggle('bufferCache')}
         />
         {/* BC 레이블 — 상단 중앙, 충분한 여백 */}
-        <text x={BC_X + BC_W / 2} y={BC_Y + 18} textAnchor="middle" fontSize={9} fontFamily="monospace" fontWeight="bold" fill={active === 'bufferCache' ? 'var(--color-amber)' : 'var(--color-ink-3)'} style={{ cursor: 'pointer' }} onClick={() => toggle('bufferCache')}>
+        <text x={BC_X + BC_W / 2} y={BC_Y + 18} textAnchor="middle" fontSize={9} fontFamily="var(--font-mono)" fontWeight="bold" fill={active === 'bufferCache' ? 'var(--color-amber)' : 'var(--color-ink-3)'} style={{ cursor: 'pointer' }} onClick={() => toggle('bufferCache')}>
           Buffer Cache (SGA)
         </text>
 
@@ -383,7 +383,7 @@ function BufferCacheAnatomyDiagram({ isKo }: { isKo: boolean }) {
 
         {/* ── Buffer Block 그리드 */}
         {/* "Buffer Blocks" 레이블 — 그리드 상단에 여백 확보 */}
-        <text x={BB_X + (BB_COLS * BB_CW) / 2} y={BB_LABEL_Y} textAnchor="middle" fontSize={8} fontFamily="monospace" fontWeight="bold" fill={active === 'bufferBlock' ? 'var(--color-amber)' : 'var(--color-ink-2)'} style={{ cursor: 'pointer' }} onClick={() => toggle('bufferBlock')}>
+        <text x={BB_X + (BB_COLS * BB_CW) / 2} y={BB_LABEL_Y} textAnchor="middle" fontSize={8} fontFamily="var(--font-mono)" fontWeight="bold" fill={active === 'bufferBlock' ? 'var(--color-amber)' : 'var(--color-ink-2)'} style={{ cursor: 'pointer' }} onClick={() => toggle('bufferBlock')}>
           Buffer Blocks
         </text>
         {/* 배경 박스 — 레이블 아래부터 */}
@@ -454,7 +454,7 @@ function BufferCacheAnatomyDiagram({ isKo }: { isKo: boolean }) {
                 style={{ cursor: 'pointer' }}
                 onClick={() => toggle('hashBucket')}
               />
-              <text x={BUCK_X} y={by + 4} textAnchor="middle" fontSize={9} fontFamily="monospace" fontWeight="bold" fill={isHlBucket ? 'var(--color-amber)' : 'var(--color-ink-2)'} style={{ pointerEvents: 'none' }}>
+              <text x={BUCK_X} y={by + 4} textAnchor="middle" fontSize={9} fontFamily="var(--font-mono)" fontWeight="bold" fill={isHlBucket ? 'var(--color-amber)' : 'var(--color-ink-2)'} style={{ pointerEvents: 'none' }}>
                 {ri}
               </text>
 
@@ -485,7 +485,7 @@ function BufferCacheAnatomyDiagram({ isKo }: { isKo: boolean }) {
                           stroke={active === 'bufferHandle' ? 'var(--color-amber)' : 'var(--color-green)'}
                           strokeWidth={active === 'bufferHandle' ? 2 : 1} rx={4}
                         />
-                        <text x={bx + BH_W / 2} y={bhY - 10} textAnchor="middle" fontSize={8} fontFamily="monospace" fontWeight="bold" fill={active === 'bufferHandle' ? 'var(--color-amber)' : 'var(--color-green)'}>
+                        <text x={bx + BH_W / 2} y={bhY - 10} textAnchor="middle" fontSize={8} fontFamily="var(--font-mono)" fontWeight="bold" fill={active === 'bufferHandle' ? 'var(--color-amber)' : 'var(--color-green)'}>
                           Handle
                         </text>
                         <line
@@ -506,7 +506,7 @@ function BufferCacheAnatomyDiagram({ isKo }: { isKo: boolean }) {
                       style={{ cursor: 'pointer' }}
                       onClick={() => toggle('bufferHeader')}
                     />
-                    <text x={bx + BH_W / 2} y={by + 3} textAnchor="middle" fontSize={8} fontFamily="monospace" fill={isHlBH ? 'var(--color-amber)' : isPinned ? 'var(--color-green)' : 'var(--color-ink-2)'} style={{ pointerEvents: 'none' }}>
+                    <text x={bx + BH_W / 2} y={by + 3} textAnchor="middle" fontSize={8} fontFamily="var(--font-mono)" fill={isHlBH ? 'var(--color-amber)' : isPinned ? 'var(--color-green)' : 'var(--color-ink-2)'} style={{ pointerEvents: 'none' }}>
                       {isPinned ? 'BH·pin=1' : `BH·${ri}${bi}`}
                     </text>
 
@@ -528,7 +528,7 @@ function BufferCacheAnatomyDiagram({ isKo }: { isKo: boolean }) {
         })}
 
         {/* ── Hash Bucket 열 레이블 — 버킷 루프 이후 렌더해서 circles 위에 표시 */}
-        <text x={BUCK_X} y={FIRST_BUCK_Y - 16} textAnchor="middle" fontSize={8} fontFamily="monospace" fill="var(--color-ink-3)">Buckets</text>
+        <text x={BUCK_X} y={FIRST_BUCK_Y - 16} textAnchor="middle" fontSize={8} fontFamily="var(--font-mono)" fill="var(--color-ink-3)">Buckets</text>
 
         {/* ── Latch 태그 — BC 왼쪽 바깥, 버킷들 옆에 배치. 루프 바깥에서 최상단 렌더 */}
         {(() => {
@@ -553,7 +553,7 @@ function BufferCacheAnatomyDiagram({ isKo }: { isKo: boolean }) {
                 stroke={isHlLatch ? 'var(--color-amber)' : 'var(--color-amber)'}
                 strokeWidth={isHlLatch ? 2 : 1} rx={4}
               />
-              <text x={LATCH_X + LATCH_W / 2} y={LATCH_Y + 14} textAnchor="middle" fontSize={8} fontFamily="monospace" fontWeight="bold" fill={isHlLatch ? 'var(--color-amber)' : 'var(--color-amber)'}>
+              <text x={LATCH_X + LATCH_W / 2} y={LATCH_Y + 14} textAnchor="middle" fontSize={8} fontFamily="var(--font-mono)" fontWeight="bold" fill={isHlLatch ? 'var(--color-amber)' : 'var(--color-amber)'}>
                 Latch
               </text>
             </g>
@@ -733,10 +733,10 @@ function BufferCacheDiagram({ isKo, activeStep }: { isKo: boolean; activeStep: n
         style={{ display: 'block', overflow: 'visible' }}
       >
         {/* Section labels — SVG 안에서 비율 유지 */}
-        <text x={GRID_X / 2} y={10} textAnchor="middle" fontSize={8} fontFamily="monospace" fontWeight="bold" fill="var(--color-ink-3)" letterSpacing={1}>
+        <text x={GRID_X / 2} y={10} textAnchor="middle" fontSize={8} fontFamily="var(--font-mono)" fontWeight="bold" fill="var(--color-ink-3)" letterSpacing={1}>
           {isKo ? 'HASH BUCKET + BUFFER HEADER' : 'HASH BUCKET + BUFFER HEADER'}
         </text>
-        <text x={GRID_X + (GRID_COLS * CELL_W) / 2} y={10} textAnchor="middle" fontSize={8} fontFamily="monospace" fontWeight="bold" fill="var(--color-ink-3)" letterSpacing={1}>
+        <text x={GRID_X + (GRID_COLS * CELL_W) / 2} y={10} textAnchor="middle" fontSize={8} fontFamily="var(--font-mono)" fontWeight="bold" fill="var(--color-ink-3)" letterSpacing={1}>
           BUFFER BLOCK
         </text>
         <g transform={`translate(0, 14)`}>
@@ -797,7 +797,7 @@ function BufferCacheDiagram({ isKo, activeStep }: { isKo: boolean; activeStep: n
                     <text
                       x={x + CELL_W / 2} y={y + CELL_H / 2 + 4}
                       textAnchor="middle"
-                      fontSize={9} fontWeight="bold" fill="var(--color-green)" fontFamily="monospace"
+                      fontSize={9} fontWeight="bold" fill="var(--color-green)" fontFamily="var(--font-mono)"
                     >
                       {bufZone === 'row' ? 'HIT' : bufZone === 'disk' ? 'I/O' : 'HIT'}
                     </text>
@@ -842,7 +842,7 @@ function BufferCacheDiagram({ isKo, activeStep }: { isKo: boolean; activeStep: n
                 />
                 <text
                   x={BUCKET_X + BUCKET_R} y={cy + 4}
-                  textAnchor="middle" fontSize={9} fontFamily="monospace"
+                  textAnchor="middle" fontSize={9} fontFamily="var(--font-mono)"
                   fontWeight="bold"
                   fill={isTarget ? 'var(--color-amber)' : 'var(--color-ink-2)'}
                 >
@@ -890,7 +890,7 @@ function BufferCacheDiagram({ isKo, activeStep }: { isKo: boolean; activeStep: n
                       />
                       <text
                         x={x + BH_W / 2} y={y + BH_H / 2 + 4}
-                        textAnchor="middle" fontSize={9} fontFamily="monospace"
+                        textAnchor="middle" fontSize={9} fontFamily="var(--font-mono)"
                         fontWeight={isHit || isPinned ? 'bold' : 'normal'}
                         fill={isPinned ? 'var(--color-green)' : isHit ? 'var(--color-green)' : isTarget ? 'var(--color-amber)' : 'var(--color-ink-2)'}
                       >
@@ -924,7 +924,7 @@ function BufferCacheDiagram({ isKo, activeStep }: { isKo: boolean; activeStep: n
               <text
                 x={GRID_X + (GRID_COLS * CELL_W) / 2}
                 y={GRID_Y + (GRID_ROWS * CELL_H) / 2 - 6}
-                textAnchor="middle" fontSize={12} fontFamily="monospace"
+                textAnchor="middle" fontSize={12} fontFamily="var(--font-mono)"
                 fontWeight="bold" fill="var(--color-red)"
               >
                 {isKo ? '💾 디스크 I/O' : '💾 Disk I/O'}
@@ -932,7 +932,7 @@ function BufferCacheDiagram({ isKo, activeStep }: { isKo: boolean; activeStep: n
               <text
                 x={GRID_X + (GRID_COLS * CELL_W) / 2}
                 y={GRID_Y + (GRID_ROWS * CELL_H) / 2 + 10}
-                textAnchor="middle" fontSize={9} fontFamily="monospace"
+                textAnchor="middle" fontSize={9} fontFamily="var(--font-mono)"
                 fill="var(--color-red)" opacity={0.8}
               >
                 db file sequential read
@@ -954,7 +954,7 @@ function BufferCacheDiagram({ isKo, activeStep }: { isKo: boolean; activeStep: n
           {/* ── Bucket label brace on left */}
           <text
             x={6} y={SVG_H / 2}
-            textAnchor="middle" fontSize={9} fontFamily="monospace"
+            textAnchor="middle" fontSize={9} fontFamily="var(--font-mono)"
             fill="var(--color-ink-3)"
             transform={`rotate(-90, 6, ${SVG_H / 2})`}
           >
@@ -1177,7 +1177,7 @@ function FlowDiagram({
 // ── 메인 컴포넌트 ─────────────────────────────────────────────────────────────
 
 export function TableAccessSection() {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const t = T[lang]
   const isKo = lang === 'ko'
 
@@ -1241,10 +1241,7 @@ export function TableAccessSection() {
 
       <SectionTitle>{t.coveringTitle}</SectionTitle>
       <Prose>{t.coveringDesc}</Prose>
-      <div className="mt-3 rounded-panel border bg-ink px-4 py-3">
-        <p className="mb-2 font-mono text-[10px] font-bold uppercase tracking-widest text-ink-2">SQL</p>
-        <pre className="overflow-x-auto font-mono text-[12px] leading-relaxed text-ink-3">{t.coveringSql}</pre>
-      </div>
+      <div className="mt-4"><SqlBlock sql={t.coveringSql} /></div>
     </PageContainer>
   )
 }

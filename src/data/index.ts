@@ -2,30 +2,9 @@ import type { Schema } from './types'
 import { HR_SCHEMA } from './hrSchema'
 import { CO_SCHEMA } from './coSchema'
 
-export { HR_SCHEMA } from './hrSchema'
-export { CO_SCHEMA } from './coSchema'
-export type {
-  Schema,
-  SchemaTable,
-  ColumnDef,
-  ForeignKey,
-  RowData,
-} from './types'
+// 스키마 타입은 './types', 대용량 가상 데이터는 './largeDataGenerator' 에서 직접 import.
 export { EMPLOYEES, EMPLOYEE_COLUMNS, employeeCell } from './hr'
 export type { Employee } from './hr'
-export {
-  getLargeDataset,
-  getLargeTable,
-  getAllLargeTables,
-  getCardinalityRatio,
-  recommendIndexType,
-  generateLargeDataset,
-} from './largeDataGenerator'
-export type {
-  LargeDataset,
-  LargeTable,
-  LargeColumn,
-} from './largeDataGenerator'
 
 export const SCHEMAS: Schema[] = [
   {

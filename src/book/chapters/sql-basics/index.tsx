@@ -1,4 +1,4 @@
-import { useSimulationStore } from '@/store/simulationStore'
+import { useLangStore } from '@/store/simulationStore'
 import { DdlDmlDclSection } from './commands/DdlDmlDclSection'
 import { DDLSection } from './commands/DDLSection'
 import { DMLSection } from './commands/DMLSection'
@@ -62,7 +62,7 @@ interface Props {
 }
 
 export function SqlBasicsPage({ sectionId }: Props) {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
 
   if (sectionId === 'sql-basics-ddl-dml-dcl') return <DdlDmlDclSection />
   if (sectionId === 'sql-basics-ddl')          return <DDLSection />

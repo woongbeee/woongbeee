@@ -1,9 +1,9 @@
 import { useState } from 'react'
-import { useSimulationStore } from '@/store/simulationStore'
+import { useLangStore } from '@/store/simulationStore'
 import { IconPlayerPlay } from '@tabler/icons-react'
 import { Divider } from '../../shared'
-import type { PlanRow } from '../shared/diagrams'
-import { ExplainPlanTable } from '../shared/diagrams'
+import type { PlanRow } from '../../ExplainPlanTable'
+import { ExplainPlanTable } from '../../ExplainPlanTable'
 
 interface AnnotatedLine {
   line: string
@@ -1416,7 +1416,7 @@ const DIFF_LABEL = {
 // ── 메인 컴포넌트 ─────────────────────────────────────────────────────────────
 
 export function OptimizerSimulator() {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const isKo = lang === 'ko'
   const [selected, setSelected] = useState<number>(1)
 

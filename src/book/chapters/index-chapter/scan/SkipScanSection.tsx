@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useSimulationStore } from '@/store/simulationStore'
+import { useLangStore } from '@/store/simulationStore'
 import {
   PageContainer, ChapterTitle, SectionTitle, Prose, InfoBox, Divider, SqlBlock,
 } from '../../shared'
@@ -135,7 +135,7 @@ const T = {
 }
 
 export function SkipScanSection() {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const t = T[lang]
   const isKo = lang === 'ko'
 
@@ -176,10 +176,7 @@ export function SkipScanSection() {
         </div>
       </div>
 
-      <div className="mb-3 rounded-card border bg-ink px-3 py-2">
-        <p className="mb-1 font-mono text-[10px] font-bold uppercase tracking-widest text-ink-2">{t.sqlLabel}</p>
-        <pre className="font-mono text-[11px] leading-relaxed text-ink-3">{t.sql}</pre>
-      </div>
+      <SqlBlock badge={t.sqlLabel} sql={t.sql} className="mb-3" />
       <div className="mb-4 flex gap-2">
         <button
           onClick={() => setMode(mode === 'scan' ? 'idle' : 'scan')}

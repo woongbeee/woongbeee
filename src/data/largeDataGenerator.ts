@@ -1,7 +1,7 @@
 /**
  * Large Dataset Generator for Oracle Index Visualization
  *
- * 앱 최초 import 시 1회 생성되어 모듈 캐시에 유지됨.
+ * getLargeTable() 최초 호출 시 해당 테이블만 1회 생성되어 모듈 캐시에 유지됨.
  * 각 테이블은 인덱스 유형별 시나리오를 커버하는 카디널리티 프로파일을 가짐:
  *
  * EMPLOYEES  (10,000 rows) — B-Tree(PK), Bitmap(GENDER/STATUS/DEPT), 복합(DEPT+JOB)
@@ -124,16 +124,16 @@ function addDays(dateStr: string, days: number): string {
 
 // ── Row type ─────────────────────────────────────────────────────────────────
 
-export type LargeRow = Record<string, string | number | null>
+type LargeRow = Record<string, string | number | null>
 
-export interface LargeColumn {
+interface LargeColumn {
   name: string
   type: string
   /** 해당 컬럼이 어떤 인덱스 유형에 적합한지 힌트 */
   indexHint?: 'btree-unique' | 'btree-nonunique' | 'bitmap' | 'composite' | 'fbi' | 'range'
 }
 
-export interface LargeTable {
+interface LargeTable {
   name: string
   description: string
   /** 테이블 특징 설명 — 인덱스 패널에서 사용 */
@@ -401,110 +401,34 @@ function generateAuditLog(count: number, empCount: number): LargeTable {
 }
 
 // ── Public API ────────────────────────────────────────────────────────────────
+// 테이블별 지연 생성 + 캐시. 요청된 테이블만 만든다 (전체 36만 행을 한 번에 만들지 않음).
 
-export interface LargeDataset {
-  employees:  LargeTable
-  products:   LargeTable
-  orders:     LargeTable
-  orderItems: LargeTable
-  auditLog:   LargeTable
-  /** 생성 소요 시간 ms */
-  generatedAt: number
-  elapsedMs:   number
+// CO_SCHEMA의 STORES 기준 (10개)
+const STORE_COUNT = 10
+const EMP_COUNT   = 10_000
+const PROD_COUNT  = 1_000
+const ORD_COUNT   = 50_000
+const ITEMS_COUNT = 100_000
+const LOG_COUNT   = 200_000
+
+const TABLE_GENERATORS: Record<string, () => LargeTable> = {
+  EMPLOYEES:   () => generateEmployees(EMP_COUNT),
+  PRODUCTS:    () => generateProducts(PROD_COUNT),
+  ORDERS:      () => generateOrders(ORD_COUNT, EMP_COUNT, STORE_COUNT),
+  ORDER_ITEMS: () => generateOrderItems(ITEMS_COUNT, ORD_COUNT, PROD_COUNT),
+  AUDIT_LOG:   () => generateAuditLog(LOG_COUNT, EMP_COUNT),
 }
 
-/**
- * 대용량 데이터를 생성한다.
- * 모듈 캐시로 1회만 실행되므로 호출 비용 없음.
- *
- * @param scale 1.0 = 기본 크기 (EMP 10k, ORD 50k, ITEMS 100k, LOG 200k)
- *              0.1 ~ 2.0 범위를 권장. 기본값 1.0
- */
-export function generateLargeDataset(scale = 1.0): LargeDataset {
-  const t0 = performance.now()
+const tableCache = new Map<string, LargeTable>()
 
-  const EMP_COUNT   = Math.max(100,   Math.round(10_000  * scale))
-  const PROD_COUNT  = Math.max(50,    Math.round(1_000   * scale))
-  const ORD_COUNT   = Math.max(500,   Math.round(50_000  * scale))
-  const ITEMS_COUNT = Math.max(1_000, Math.round(100_000 * scale))
-  const LOG_COUNT   = Math.max(2_000, Math.round(200_000 * scale))
-
-  // CO_SCHEMA의 STORES 기준 (10개)
-  const STORE_COUNT = 10
-
-  const employees  = generateEmployees(EMP_COUNT)
-  const products   = generateProducts(PROD_COUNT)
-  const orders     = generateOrders(ORD_COUNT, EMP_COUNT, STORE_COUNT)
-  const orderItems = generateOrderItems(ITEMS_COUNT, ORD_COUNT, PROD_COUNT)
-  const auditLog   = generateAuditLog(LOG_COUNT, EMP_COUNT)
-
-  return {
-    employees,
-    products,
-    orders,
-    orderItems,
-    auditLog,
-    generatedAt: Date.now(),
-    elapsedMs:   Math.round(performance.now() - t0),
-  }
-}
-
-// ── Module-level singleton ────────────────────────────────────────────────────
-// 이 파일을 import하면 즉시 생성이 시작됨 (Vite lazy import로 defer 가능)
-let _cache: LargeDataset | null = null
-
-export function getLargeDataset(): LargeDataset {
-  if (!_cache) {
-    _cache = generateLargeDataset(1.0)
-  }
-  return _cache
-}
-
-/** 테이블 이름으로 단일 LargeTable 반환 */
+/** 테이블 이름으로 단일 LargeTable 반환 (최초 호출 시 1회 생성) */
 export function getLargeTable(name: string): LargeTable | undefined {
-  const ds = getLargeDataset()
-  const map: Record<string, LargeTable> = {
-    EMPLOYEES:   ds.employees,
-    PRODUCTS:    ds.products,
-    ORDERS:      ds.orders,
-    ORDER_ITEMS: ds.orderItems,
-    AUDIT_LOG:   ds.auditLog,
-  }
-  return map[name.toUpperCase()]
-}
-
-/** 모든 LargeTable 목록 반환 */
-export function getAllLargeTables(): LargeTable[] {
-  const ds = getLargeDataset()
-  return [ds.employees, ds.products, ds.orders, ds.orderItems, ds.auditLog]
-}
-
-/**
- * 카디널리티 비율 계산 (0~1, 높을수록 B-Tree에 적합)
- * NDV / rowCount
- */
-export function getCardinalityRatio(table: LargeTable, columnName: string): number {
-  const stat = table.columnStats[columnName]
-  if (!stat || table.rows.length === 0) return 0
-  return Math.min(1, stat.ndv / table.rows.length)
-}
-
-/**
- * 인덱스 유형 추천
- * - ratio > 0.01  → B-Tree (고카디널리티)
- * - ratio <= 0.01 → Bitmap (저카디널리티)
- * - indexHint = 'fbi' → Function-Based Index
- * - indexHint = 'composite' → 복합 인덱스 후보
- */
-export function recommendIndexType(
-  table: LargeTable,
-  columnName: string,
-): 'btree-unique' | 'btree-nonunique' | 'bitmap' | 'composite' | 'fbi' | 'range' | 'none' {
-  const col = table.columns.find((c) => c.name === columnName)
-  if (!col) return 'none'
-  if (col.indexHint === 'fbi' || col.indexHint === 'composite') return col.indexHint
-  const ratio = getCardinalityRatio(table, columnName)
-  if (col.indexHint === 'btree-unique') return 'btree-unique'
-  if (ratio > 0.01) return 'btree-nonunique'
-  return 'bitmap'
+  const key = name.toUpperCase()
+  const cached = tableCache.get(key)
+  if (cached) return cached
+  const generate = TABLE_GENERATORS[key]
+  if (!generate) return undefined
+  const table = generate()
+  tableCache.set(key, table)
+  return table
 }

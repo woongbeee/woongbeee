@@ -1,4 +1,4 @@
-import { useSimulationStore } from '@/store/simulationStore'
+import { useLangStore } from '@/store/simulationStore'
 import { ChapterTitle, SectionTitle, Prose, InfoBox, Divider } from '../../../shared'
 import { IconCpu } from '@tabler/icons-react'
 
@@ -345,7 +345,7 @@ function ProcessArchDiagram({ isKo }: { isKo: boolean }) {
 // ── Main Component ─────────────────────────────────────────────────────────────
 
 export function ProcessOverviewSection() {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const isKo = lang === 'ko'
   const t = T[lang]
 

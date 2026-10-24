@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import type { ReactNode } from 'react'
 import { cn } from '@/lib/utils'
-import { useSimulationStore } from '@/store/simulationStore'
+import { useLangStore } from '@/store/simulationStore'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Oracle Multitenant — CDB / PDB 구조 다이어그램 (공용).
@@ -110,7 +110,7 @@ function Frame({ kicker, hue, children, className }: { kicker: string; hue: Hue;
 }
 
 export function OracleCdbDiagram({ className }: { className?: string }) {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const isKo = lang === 'ko'
   const [active, setActive] = useState<CdbRegionId | null>(null)
   const pick = (id: CdbRegionId) => setActive((p) => (p === id ? null : id))

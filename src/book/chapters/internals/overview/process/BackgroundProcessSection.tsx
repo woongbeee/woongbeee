@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useSimulationStore } from '@/store/simulationStore'
+import { useLangStore } from '@/store/simulationStore'
 import { ChapterTitle, SectionTitle, Prose, InfoBox, Divider } from '../../../shared'
 import { IconSettings } from '@tabler/icons-react'
 
@@ -368,7 +368,7 @@ function CommitFlowDiagram({ isKo }: { isKo: boolean }) {
 // ── Main Component ─────────────────────────────────────────────────────────────
 
 export function BackgroundProcessSection() {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const t = T[lang]
   const [activeId, setActiveId] = useState<string>(t.processes[0].id)
 

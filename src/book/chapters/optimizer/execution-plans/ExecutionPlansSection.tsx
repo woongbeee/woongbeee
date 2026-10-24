@@ -5,7 +5,7 @@ import {
   IconListSearch,
   IconArrowsShuffle,
 } from '@tabler/icons-react'
-import { useSimulationStore } from '@/store/simulationStore'
+import { useLangStore } from '@/store/simulationStore'
 import { PageContainer, ChapterTitle, SectionTitle, ConceptGrid } from '../../shared'
 import { ExplainSection } from './explain/ExplainSection'
 import { DisplaySection } from './display/DisplaySection'
@@ -75,7 +75,7 @@ const LANDING_TEXT = {
 }
 
 export function OptimizerExecutionPlansPage({ sectionId }: { sectionId: string }) {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
 
   if (sectionId === 'optimizer-execution-plans-explain') return <ExplainSection />
   if (sectionId === 'optimizer-execution-plans-display') return <DisplaySection />

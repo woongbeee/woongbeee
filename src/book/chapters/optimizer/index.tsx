@@ -1,5 +1,5 @@
 import { IconBolt } from '@tabler/icons-react'
-import { useSimulationStore } from '@/store/simulationStore'
+import { useLangStore } from '@/store/simulationStore'
 import { PageContainer, ChapterTitle, ConceptGrid } from '../shared'
 import { OptimizerFundamentalsPage } from './fundamentals/WhatIsOptimizerSection'
 import { OptimizerExecutionPlansPage } from './execution-plans/ExecutionPlansSection'
@@ -26,7 +26,7 @@ const LANDING_ITEMS = {
 }
 
 export function OptimizerChapterPage({ sectionId }: { sectionId: string }) {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const isKo = lang === 'ko'
 
   if (sectionId === 'optimizer-simulator') return <OptimizerSimulator />

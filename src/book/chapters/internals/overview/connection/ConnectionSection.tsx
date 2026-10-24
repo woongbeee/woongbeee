@@ -1,5 +1,5 @@
 import { IconPlugConnected } from '@tabler/icons-react'
-import { useSimulationStore } from '@/store/simulationStore'
+import { useLangStore } from '@/store/simulationStore'
 import {
   PageContainer, ChapterTitle, SectionTitle, Prose, StepList, Table, InfoBox, Divider,
 } from '../../../shared'
@@ -144,7 +144,7 @@ function RacDiagram({ caption }: { caption: string }) {
 }
 
 export function ConnectionSection() {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const t = T[lang]
 
   return (

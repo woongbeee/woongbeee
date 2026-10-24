@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
-import { useSimulationStore } from '@/store/simulationStore'
+import { useLangStore } from '@/store/simulationStore'
 import {
   EMPLOYEES,
   EMPLOYEE_COLUMNS,
@@ -10,11 +10,11 @@ import {
 } from '@/data'
 import { parseAndExecute, type GroupRow } from './sqlEngine'
 import type { ClauseDemo } from './clauseDemos'
-import { SqlHighlight } from './SqlHighlight'
+import { SqlHighlight } from '../../SqlHighlight'
 
 // ── MiniSimulatorTable ─────────────────────────────────────────────────────
 
-export function MiniSimulatorTable({ sql }: { sql: string }) {
+function MiniSimulatorTable({ sql }: { sql: string }) {
   const ALL_COLS: readonly (keyof Employee)[] = EMPLOYEE_COLUMNS
   const parsed = parseAndExecute(sql, EMPLOYEES)
 
@@ -276,14 +276,14 @@ export function MiniSimulatorTable({ sql }: { sql: string }) {
 
 // ── MiniSimulator ──────────────────────────────────────────────────────────
 
-export function MiniSimulator({
+function MiniSimulator({
   demo,
   variantIdx = 0,
 }: {
   demo: ClauseDemo
   variantIdx?: number
 }) {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const variants = demo.variants
   const activeSql = variants ? variants[variantIdx].sql : demo.sql
   const activeDesc = variants ? variants[variantIdx].desc[lang] : undefined

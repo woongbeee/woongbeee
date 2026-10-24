@@ -9,7 +9,7 @@ import {
   Table,
   AccordionSection,
 } from '../../shared'
-import { useSimulationStore } from '@/store/simulationStore'
+import { useLangStore } from '@/store/simulationStore'
 import { IconTable } from '@tabler/icons-react'
 
 const T = {
@@ -347,7 +347,7 @@ VALUES (emp_seq.NEXTVAL, 'Alice');`,
 }
 
 export function DDLSection() {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const t = T[lang]
   return (
     <PageContainer>

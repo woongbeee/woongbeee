@@ -3,7 +3,7 @@
 
 import { motion } from 'framer-motion'
 import type { OptimizerResult, AccessPath, JoinStep, OptimizerPhase } from '@/lib/optimizer/types'
-import { useSimulationStore } from '@/store/simulationStore'
+import { useLangStore } from '@/store/simulationStore'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 
@@ -238,7 +238,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 }
 
 export function OptimizerPanel({ result }: OptimizerPanelProps) {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   if (!result) {
     return (
       <div className="flex h-full items-center justify-center">

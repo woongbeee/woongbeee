@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { ReactNode } from 'react'
-import { useSimulationStore } from '@/store/simulationStore'
+import { useLangStore } from '@/store/simulationStore'
 import {
   PageContainer, ChapterTitle, Prose, SubTitle,
   InfoBox, Table, ConceptGrid, AccordionSection, Divider,
@@ -290,7 +290,7 @@ const STORAGE_T = {
 // ── RowidDiagram ───────────────────────────────────────────────────────────
 
 function RowidDiagram() {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const isKo = lang === 'ko'
 
   const parts = [
@@ -459,7 +459,7 @@ const BLOCK_ZONES: BlockZoneDef[] = [
 ]
 
 function BlockDiagram() {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const [active, setActive] = useState<BlockZoneId>('itl')
   const isKo = lang === 'ko'
   const activeZone = BLOCK_ZONES.find((z) => z.id === active)!
@@ -596,7 +596,7 @@ function BlockDiagram() {
 // ── PctDiagram ────────────────────────────────────────────────────────────
 
 function PctDiagram() {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const isKo = lang === 'ko'
 
   // 위에서부터: PCTFREE(10%) / Row Data(60%) / Free Space(30%)
@@ -729,7 +729,7 @@ function PctDiagram() {
 // ── ExtentDiagram ──────────────────────────────────────────────────────────
 
 function ExtentDiagram() {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const isKo = lang === 'ko'
 
   return (
@@ -761,7 +761,7 @@ function ExtentDiagram() {
 // ── SegmentDiagram ─────────────────────────────────────────────────────────
 
 function SegmentDiagram() {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const isKo = lang === 'ko'
 
   const stages = [
@@ -825,7 +825,7 @@ function SegmentDiagram() {
 // ── HwmDiagram ─────────────────────────────────────────────────────────────
 
 function HwmDiagram() {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const isKo = lang === 'ko'
 
   const BLOCK_COUNT = 10
@@ -913,7 +913,7 @@ function HwmDiagram() {
 // ── TablespaceDiagram ──────────────────────────────────────────────────────
 
 function TablespaceDiagram() {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const isKo = lang === 'ko'
 
   // USERS Tablespace 내부 구조: Segment → Extent → Block 관계 시각화
@@ -998,7 +998,7 @@ function TablespaceDiagram() {
 // Tablespace ↔ .dbf 데이터 파일 의 논리-물리 관계
 
 function StorageHierarchyDiagram() {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const isKo = lang === 'ko'
 
   const lbl = (ko: string, en: string) => isKo ? ko : en
@@ -1260,7 +1260,7 @@ const IO_POPUP_T = {
 }
 
 export function StorageSection() {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const t = STORAGE_T[lang]
   const io = IO_POPUP_T[lang]
 

@@ -16,7 +16,7 @@ const SYSTEM_PARAMS = {
 
 // ── Selectivity ─────────────────────────────────────────────────────────
 
-export function computeSelectivity(predicate: Predicate): number {
+function computeSelectivity(predicate: Predicate): number {
   const cs = getColumnStats(predicate.table, predicate.column)
   const ts = getTableStats(predicate.table)
   if (!cs || !ts) return 0.1  // default if no stats
@@ -62,14 +62,14 @@ export function computeSelectivity(predicate: Predicate): number {
   }
 }
 
-export function combineSelectivities(sels: number[]): number {
+function combineSelectivities(sels: number[]): number {
   // Oracle multiplies independent selectivities
   return sels.reduce((acc, s) => acc * s, 1)
 }
 
 // ── Cardinality ──────────────────────────────────────────────────────────
 
-export function computeCardinality(tableName: string, selectivity: number): number {
+function computeCardinality(tableName: string, selectivity: number): number {
   const ts = getTableStats(tableName)
   if (!ts) return 100
   return Math.max(1, Math.round(ts.numRows * selectivity))

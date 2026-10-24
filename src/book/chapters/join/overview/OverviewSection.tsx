@@ -9,7 +9,7 @@ import {
   IconArrowsHorizontal,
   IconGridDots,
 } from '@tabler/icons-react'
-import { useSimulationStore } from '@/store/simulationStore'
+import { useLangStore } from '@/store/simulationStore'
 import {
   PageContainer,
   ChapterTitle,
@@ -19,7 +19,7 @@ import {
 } from '../../shared'
 import { cn } from '@/lib/utils'
 import { JoinSimulator, JOIN_SQL, type JoinType } from '@/components/join-sim'
-import { SqlHighlight } from '../../sql-basics/dml-more/SqlHighlight'
+import { SqlHighlight } from '../../SqlHighlight'
 
 const T = {
   ko: {
@@ -422,7 +422,7 @@ function JoinDiagram({ type }: { type: JoinType }) {
 }
 
 export function JoinOverviewSection() {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const t = T[lang]
   const [activeJoin, setActiveJoin] = useState<JoinType>('inner')
 

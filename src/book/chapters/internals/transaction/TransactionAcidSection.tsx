@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { IconShieldCheck } from '@tabler/icons-react'
-import { useSimulationStore } from '@/store/simulationStore'
+import { useLangStore } from '@/store/simulationStore'
 import {
   PageContainer,
   ChapterTitle,
@@ -165,7 +165,7 @@ function AcidCard({ letter, name, desc, detail, color, collapseLabel, expandLabe
 }
 
 export function TransactionAcidSection() {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const t = T[lang]
   const isKo = lang === 'ko'
 

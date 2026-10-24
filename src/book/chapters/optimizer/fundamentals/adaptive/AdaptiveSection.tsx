@@ -1,5 +1,5 @@
 import { IconRefresh } from '@tabler/icons-react'
-import { useSimulationStore } from '@/store/simulationStore'
+import { useLangStore } from '@/store/simulationStore'
 import {
   PageContainer,
   ChapterTitle,
@@ -232,7 +232,7 @@ Note: - this is an adaptive plan (rows marked '-' are inactive)`,
 }
 
 export function AdaptiveSection() {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const t = T[lang]
 
   return (

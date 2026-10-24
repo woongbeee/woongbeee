@@ -96,8 +96,11 @@
     --font-ui-ko
   ); /* index.css body 가 참조 — 이름 유지 */
   --font-read-active: var(--font-read-ko);
+  /* JetBrains Mono 에는 한글 글리프가 없다. 바로 뒤에 Noto Sans KR 을 둬서
+     font-mono 안의 한글이 OS 기본 폰트(맑은 고딕 등)가 아닌 본문 폰트로 폴백되게 한다. */
   --font-mono-stack:
-    'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    'JetBrains Mono', 'Noto Sans KR', ui-monospace, SFMono-Regular, Menlo,
+    Consolas, monospace;
 }
 
 :root:lang(en) {

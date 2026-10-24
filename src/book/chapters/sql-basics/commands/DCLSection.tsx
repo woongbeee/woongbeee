@@ -9,7 +9,7 @@ import {
   Table,
   AccordionSection,
 } from '../../shared'
-import { useSimulationStore } from '@/store/simulationStore'
+import { useLangStore } from '@/store/simulationStore'
 import { IconShieldLock } from '@tabler/icons-react'
 
 const T = {
@@ -186,7 +186,7 @@ REVOKE hr_readonly FROM alice;`,
 }
 
 export function DCLSection() {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const t = T[lang]
   return (
     <PageContainer>

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { IconTransform } from '@tabler/icons-react'
 import { cn } from '@/lib/utils'
-import { useSimulationStore } from '@/store/simulationStore'
+import { useLangStore } from '@/store/simulationStore'
 import {
   PageContainer,
   ChapterTitle,
@@ -9,8 +9,8 @@ import {
   InfoBox,
   SqlBlock,
 } from '../../shared'
-import { ExplainPlanTable } from '../../optimizer/shared/diagrams'
-import type { PlanRow } from '../../optimizer/shared/diagrams'
+import { ExplainPlanTable } from '../../ExplainPlanTable'
+import type { PlanRow } from '../../ExplainPlanTable'
 
 interface Scenario {
   key: string
@@ -719,7 +719,7 @@ AND    e.salary > 10000
 ]
 
 export function QtSimulator() {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const isKo = lang === 'ko'
   const [selected, setSelected] = useState(SCENARIOS[0].key)
   const scenario = SCENARIOS.find((s) => s.key === selected) ?? SCENARIOS[0]

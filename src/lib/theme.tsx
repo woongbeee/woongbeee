@@ -5,15 +5,14 @@
 // 이 파일은 그 토큰을 가리키는 Tailwind 클래스 / var(--…) 문자열 "매핑"만:
 //   · InfoBox variant → 좌측선·라벨 색 + ko/en 라벨 (INFOBOX_VARIANT / INFOBOX_LEGACY_COLOR)
 //   · 다이어그램·코드 색 (DIAGRAM / DATA_PALETTE / CODE)
-//   · ACCENT_COLORS — 레거시(챕터별 raw Tailwind 색 세트). 값은 미사용, AccentColor
-//     타입만 bookStructure.tsx 가 참조. Phase 3에서 제거.
+//   · AccentColor — 챕터 색 키 타입 (bookStructure.tsx 의 chapter.color)
 //
 // 컴포넌트 파일에 색상 맵(Record<…, {bg,text,border}>)을 새로 만들지 말고 여기서 import.
 // 이 파일에 `#rrggbb` 리터럴이 있으면 버그다 (2026-08-30 기준 0개).
 // ============================================================================
 
 // ── 챕터 / 액센트 색 (레거시) ────────────────────────────────────────────────
-// AccentColor 타입만 bookStructure.tsx 에서 참조. ACCENT_COLORS 값은 현재 미사용.
+// bookStructure.tsx 의 chapter.color 키. 클래스 세트는 Phase 3 에서 토큰 기반으로 재정의.
 
 export type AccentColor =
   | 'blue'
@@ -29,130 +28,6 @@ export type AccentColor =
   | 'brand-teal'
   | 'brand-orange'
   | 'brand-salmon'
-
-export interface AccentColorSet {
-  /** Chapter icon tint (TOC, bookStructure.tsx). */
-  icon: string
-  /** Breadcrumb / label text. */
-  text: string
-  border: string
-  /** Card & chip fill. */
-  bg: string
-  /** Small indicator dot. */
-  dot: string
-  /** Pill / tag. */
-  badge: string
-}
-
-export const ACCENT_COLORS: Record<AccentColor, AccentColorSet> = {
-  blue: {
-    icon: 'text-blue-500',
-    text: 'text-blue-600',
-    border: 'border-blue-200',
-    bg: 'bg-blue-50/60',
-    dot: 'bg-blue-400',
-    badge: 'bg-blue-100 text-blue-700',
-  },
-  violet: {
-    icon: 'text-violet-500',
-    text: 'text-violet-600',
-    border: 'border-violet-200',
-    bg: 'bg-violet-50/60',
-    dot: 'bg-violet-400',
-    badge: 'bg-violet-100 text-violet-700',
-  },
-  emerald: {
-    icon: 'text-emerald-500',
-    text: 'text-emerald-600',
-    border: 'border-emerald-200',
-    bg: 'bg-emerald-50/60',
-    dot: 'bg-emerald-400',
-    badge: 'bg-emerald-100 text-emerald-700',
-  },
-  orange: {
-    icon: 'text-orange-500',
-    text: 'text-orange-600',
-    border: 'border-orange-200',
-    bg: 'bg-orange-50/60',
-    dot: 'bg-orange-400',
-    badge: 'bg-orange-100 text-orange-700',
-  },
-  cyan: {
-    icon: 'text-cyan-500',
-    text: 'text-cyan-600',
-    border: 'border-cyan-200',
-    bg: 'bg-cyan-50/60',
-    dot: 'bg-cyan-400',
-    badge: 'bg-cyan-100 text-cyan-700',
-  },
-  rose: {
-    icon: 'text-rose-500',
-    text: 'text-rose-600',
-    border: 'border-rose-200',
-    bg: 'bg-rose-50/60',
-    dot: 'bg-rose-400',
-    badge: 'bg-rose-100 text-rose-700',
-  },
-  amber: {
-    icon: 'text-amber-500',
-    text: 'text-amber-600',
-    border: 'border-amber-200',
-    bg: 'bg-amber-50/60',
-    dot: 'bg-amber-400',
-    badge: 'bg-amber-100 text-amber-700',
-  },
-  teal: {
-    icon: 'text-teal-500',
-    text: 'text-teal-600',
-    border: 'border-teal-200',
-    bg: 'bg-teal-50/60',
-    dot: 'bg-teal-400',
-    badge: 'bg-teal-100 text-teal-700',
-  },
-
-  'brand-pink': {
-    icon: 'text-brand-pink',
-    text: 'text-brand-pink-dark',
-    border: 'border-brand-pink/30',
-    bg: 'bg-brand-pink-light',
-    dot: 'bg-brand-pink',
-    badge: 'bg-brand-pink/15 text-brand-pink-dark',
-  },
-  'brand-navy': {
-    icon: 'text-brand-navy',
-    text: 'text-brand-navy-dark',
-    border: 'border-brand-navy/25',
-    bg: 'bg-brand-navy-light',
-    dot: 'bg-brand-navy',
-    badge: 'bg-brand-navy/15 text-brand-navy-dark',
-  },
-  'brand-teal': {
-    icon: 'text-brand-teal',
-    text: 'text-brand-teal-dark',
-    border: 'border-brand-teal/30',
-    bg: 'bg-brand-teal-light',
-    dot: 'bg-brand-teal',
-    badge: 'bg-brand-teal/15 text-brand-teal-dark',
-  },
-  'brand-orange': {
-    icon: 'text-brand-orange',
-    text: 'text-brand-orange-dark',
-    border: 'border-brand-orange/30',
-    bg: 'bg-brand-orange-light',
-    dot: 'bg-brand-orange',
-    badge: 'bg-brand-orange/15 text-brand-orange-dark',
-  },
-  'brand-salmon': {
-    icon: 'text-brand-salmon',
-    text: 'text-brand-salmon-dark',
-    border: 'border-brand-salmon/30',
-    bg: 'bg-brand-salmon-light',
-    dot: 'bg-brand-salmon',
-    badge: 'bg-brand-salmon/15 text-brand-salmon-dark',
-  },
-}
-
-export const DEFAULT_ACCENT: AccentColor = 'blue'
 
 // ── InfoBox variant ──────────────────────────────────────────────────────────
 // shared.tsx <InfoBox> 가 참조. Notion 콜아웃 = 좌측 3px 색선 + mono 색 라벨(배경 없음).

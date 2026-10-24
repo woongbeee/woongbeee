@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { IconArrowMerge } from '@tabler/icons-react'
-import { useSimulationStore } from '@/store/simulationStore'
+import { useLangStore } from '@/store/simulationStore'
 import {
   PageContainer,
   ChapterTitle,
@@ -187,8 +187,14 @@ function NLSimulation({ lang }: { lang: 'ko' | 'en' }) {
   const [innerStep, setInnerStep] = useState(0)
   const [results, setResults] = useState<NLResult[]>([])
   const [prevOuterIdx, setPrevOuterIdx] = useState<number | null>(null)
-  const [playing, setPlaying] = useState(false)
+  const [playRequested, setPlaying] = useState(false)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  // 자동재생 시퀀스상의 다음 위치. 끝에 도달하면 자동으로 정지 상태로 간주
+  // (effect 안에서 setState 하지 않도록 파생값으로)
+  const nextSeqIdx =
+    NL_PLAY_SEQ.findIndex((s) => s.outerIdx === (outerIdx ?? -1) && s.innerStep === innerStep) + 1
+  const playing = playRequested && nextSeqIdx < NL_PLAY_SEQ.length
 
   function clearTimer() { if (timerRef.current) { clearTimeout(timerRef.current); timerRef.current = null } }
 
@@ -242,13 +248,6 @@ function NLSimulation({ lang }: { lang: 'ko' | 'en' }) {
   // 자동재생 ticker
   useEffect(() => {
     if (!playing) return
-    const seqIdx = NL_PLAY_SEQ.findIndex(
-      (s) => s.outerIdx === (outerIdx ?? -1) && s.innerStep === innerStep
-    )
-    const nextSeqIdx = seqIdx + 1
-    if (nextSeqIdx >= NL_PLAY_SEQ.length) {
-      setPlaying(false); return
-    }
     const next = NL_PLAY_SEQ[nextSeqIdx]
     const outerChanged = outerIdx !== next.outerIdx
     const delay = outerChanged ? 1200 : 700
@@ -279,7 +278,7 @@ function NLSimulation({ lang }: { lang: 'ko' | 'en' }) {
       }
     }, delay)
     return clearTimer
-  }, [playing, outerIdx, innerStep])
+  }, [playing, nextSeqIdx, outerIdx, innerStep])
 
   // 재생 시작 시 첫 번째 outer 선택
   useEffect(() => {
@@ -479,7 +478,7 @@ function NLSimulation({ lang }: { lang: 'ko' | 'en' }) {
 }
 
 export function JoinNestedLoopSection() {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const t = T[lang]
   const ht = hintT[lang]
 

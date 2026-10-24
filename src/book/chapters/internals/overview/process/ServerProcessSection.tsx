@@ -1,4 +1,4 @@
-import { useSimulationStore } from '@/store/simulationStore'
+import { useLangStore } from '@/store/simulationStore'
 import { ChapterTitle, SectionTitle, Prose, InfoBox, Divider } from '../../../shared'
 import { IconServer } from '@tabler/icons-react'
 
@@ -501,7 +501,7 @@ function SharedDiagram({ isKo }: { isKo: boolean }) {
 // ── Main Component ─────────────────────────────────────────────────────────────
 
 export function ServerProcessSection() {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const isKo = lang === 'ko'
   const t = T[lang]
 

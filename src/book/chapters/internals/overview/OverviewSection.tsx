@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useSimulationStore } from '@/store/simulationStore'
+import { useLangStore } from '@/store/simulationStore'
 import { ChapterTitle, Prose, InfoBox } from '../../shared'
 import { OracleArchitectureDiagram } from '../shared/OracleArchitectureDiagram'
 import type { ArchComponentId } from '../shared/OracleArchitectureDiagram'
@@ -611,7 +611,7 @@ const T = {
 // ── OverviewSection ────────────────────────────────────────────────────────
 
 export function OverviewSection() {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const t = T[lang]
   const [activeIdx, setActiveIdx] = useState<number | null>(null)
 
@@ -702,7 +702,7 @@ export function OverviewSection() {
                 exit={{ opacity: 0 }}
                 className="flex h-24 items-center justify-center rounded-panel border-2 border-dashed border-line lg:h-full lg:min-h-[16rem]"
               >
-                <span className="font-mono text-sm text-ink-2">{t.clickHint}</span>
+                <span className="font-sans text-sm text-ink-2">{t.clickHint}</span>
               </motion.div>
             )}
           </AnimatePresence>
@@ -744,7 +744,7 @@ function ClickableMap({
   activeIds: ArchComponentId[]
   onSelect: (id: ArchComponentId) => void
 }) {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
 
   return (
     <div className="w-full">

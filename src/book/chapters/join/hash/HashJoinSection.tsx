@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { IconArrowMerge } from '@tabler/icons-react'
-import { useSimulationStore } from '@/store/simulationStore'
+import { useLangStore } from '@/store/simulationStore'
 import {
   PageContainer,
   ChapterTitle,
@@ -215,7 +215,9 @@ function HashJoinSim({ lang }: { lang: 'ko' | 'en' }) {
     if (match) setProbeResults((rs) => rs.slice(0, -1))
     setProbeStep((s) => s - 1)
   }
-  const [playing, setPlaying] = useState(false)
+  const [playRequested, setPlaying] = useState(false)
+  // Probe 가 끝나면 자동으로 정지 상태로 간주 (effect 안에서 setState 하지 않도록 파생값으로)
+  const playing = playRequested && !probeDone
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   function clearTimer() { if (timerRef.current) { clearTimeout(timerRef.current); timerRef.current = null } }
 
@@ -243,7 +245,6 @@ function HashJoinSim({ lang }: { lang: 'ko' | 'en' }) {
       timerRef.current = setTimeout(() => setPhase('probe'), 1000)
       return clearTimer
     }
-    if (probeDone) { setPlaying(false); return }
     timerRef.current = setTimeout(() => {
       const next = probeStep + 1
       const row = PROBE_ROWS[next - 1]
@@ -252,7 +253,7 @@ function HashJoinSim({ lang }: { lang: 'ko' | 'en' }) {
       setProbeStep(next)
     }, 800)
     return clearTimer
-  }, [playing, buildDone, phase, probeDone, probeStep])
+  }, [playing, buildDone, phase, probeStep])
 
   return (
     <div className="rounded-panel border border-line bg-paper-sunk p-5">
@@ -542,7 +543,7 @@ function HashJoinSim({ lang }: { lang: 'ko' | 'en' }) {
 }
 
 export function JoinHashSection() {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const t = T[lang]
   const isKo = lang === 'ko'
 

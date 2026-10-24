@@ -1,5 +1,5 @@
 import { IconArrowMerge } from '@tabler/icons-react'
-import { useSimulationStore } from '@/store/simulationStore'
+import { useLangStore } from '@/store/simulationStore'
 import {
   PageContainer,
   ChapterTitle,
@@ -11,8 +11,8 @@ import {
   Table,
   SqlBlock,
 } from '../../shared'
-import { ExplainPlanTable } from '../shared/diagrams'
-import type { PlanRow } from '../shared/diagrams'
+import { ExplainPlanTable } from '../../ExplainPlanTable'
+import type { PlanRow } from '../../ExplainPlanTable'
 
 const T = {
   ko: {
@@ -144,7 +144,7 @@ const PLAN_ROWS_EN: PlanRow[] = [
 ]
 
 export function OptimizerJoinSortMergePage() {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const t = T[lang]
   const planRows = lang === 'ko' ? PLAN_ROWS_KO : PLAN_ROWS_EN
   const isKo = lang === 'ko'

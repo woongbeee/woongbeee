@@ -1,6 +1,6 @@
 import { memo, useState, useMemo, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useSimulationStore } from '@/store/simulationStore'
+import { useLangStore } from '@/store/simulationStore'
 import { GLOSSARY, getTermsForSection, sortTerms, type GlossaryTerm } from '@/data/glossary'
 import { cn } from '@/lib/utils'
 import { IconSearch, IconX, IconChevronRight } from '@tabler/icons-react'
@@ -46,7 +46,7 @@ const GlossaryTab = memo(function GlossaryTab({
   open: boolean
   onToggle: () => void
 }) {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const t = T[lang]
   return (
     <button
@@ -100,7 +100,7 @@ export function GlossaryPanel({ sectionId, open, onToggle }: Props) {
 }
 
 function GlossaryBody({ sectionId }: { sectionId: string }) {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const t = T[lang]
 
   const [query, setQuery] = useState('')
@@ -278,7 +278,7 @@ const TermRow = memo(function TermRow({
   expanded: boolean
   onToggle: (termName: string) => void
 }) {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   return (
     <button
       onClick={() => onToggle(term.term)}

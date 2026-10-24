@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { useSimulationStore } from '@/store/simulationStore'
+import { useLangStore } from '@/store/simulationStore'
 import { ChapterTitle, SectionTitle, Prose, InfoBox, Divider, SubTitle, SqlBlock, StepList } from '../../../../shared'
 import { cn } from '@/lib/utils'
 import { OracleArchitectureDiagram } from '@/book/chapters/internals/shared/OracleArchitectureDiagram'
@@ -581,7 +581,7 @@ function LruDiagram({ lang }: { lang: 'ko' | 'en' }) {
 // ── Main Section ───────────────────────────────────────────────────────────
 
 export function SgaBufferCacheSection() {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const t = T[lang]
 
   return (

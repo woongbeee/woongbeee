@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useSimulationStore } from '@/store/simulationStore'
+import { useLangStore } from '@/store/simulationStore'
 import {
   PageContainer, ChapterTitle, SectionTitle, Prose, InfoBox, Divider, Table, SqlBlock,
 } from '../../shared'
@@ -148,7 +148,7 @@ const T = {
 }
 
 export function FastFullScanSection() {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const t = T[lang]
   const isKo = lang === 'ko'
 

@@ -1,6 +1,6 @@
 import { memo, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useSimulationStore } from '@/store/simulationStore'
+import { useLangStore } from '@/store/simulationStore'
 import { SCHEMAS } from '@/data/index'
 import type { SchemaTable } from '@/data/types'
 import { SchemaView, TableView } from '@/components/DataPanel'
@@ -25,7 +25,7 @@ const pickBtn = (active: boolean) =>
   )
 
 const SchemaTab = memo(function SchemaTab({ open, onToggle }: { open: boolean; onToggle: () => void }) {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const t = T[lang]
   return (
     <button
@@ -81,7 +81,7 @@ export function SchemaPanel({ open, onToggle }: Props) {
 type ViewMode = 'schema' | 'table'
 
 function SchemaPanelBody() {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const t = T[lang]
 
   const [selectedSchemaIdx, setSelectedSchemaIdx] = useState(0)

@@ -769,10 +769,6 @@ export const BOOK_CHAPTERS: BookChapter[] = [
   },
 ]
 
-export function getChapterById(id: string): BookChapter | undefined {
-  return BOOK_CHAPTERS.find((c) => c.id === id)
-}
-
 function flattenSections(
   chapter: BookChapter
 ): Array<{ chapter: BookChapter; section: BookSection }> {

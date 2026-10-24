@@ -47,13 +47,13 @@ npx prettier --write .  # 코드 포매팅 (format 스크립트 없음, 직접 �
 
 `BookContent`는 `sectionId`를 받아 `bookStructure.ts`의 `getSectionById()`로 챕터를 확인한 뒤, `SectionRouter`가 섹션 ID 접두사로 챕터 컴포넌트를 결정한다(`startsWith('internals-')` 등). **새 챕터를 추가할 때 섹션 ID 접두사가 `SectionRouter`의 분기 조건과 일치해야 한다.**
 
-챕터 페이지 컴포넌트는 `sectionId`만 prop으로 받으며, `lang`은 `useSimulationStore`(`useLangStore` alias)에서 직접 읽는다:
+챕터 페이지 컴포넌트는 `sectionId`만 prop으로 받으며, `lang`은 `useLangStore`에서 직접 읽는다:
 
 ```ts
 interface Props {
   sectionId: string   // 현재 활성 섹션 ID
 }
-// lang은 컴포넌트 내부에서: const lang = useSimulationStore(s => s.lang)
+// lang은 컴포넌트 내부에서: const lang = useLangStore(s => s.lang)
 ```
 
 `bookStructure.ts`의 `BOOK_CHAPTERS`가 단일 진실 공급원(TOC 데이터). 새 섹션 추가 시 여기만 수정하면 TOC·breadcrumb·Prev/Next가 자동 반영된다.
@@ -83,7 +83,7 @@ interface Props {
 새 챕터 추가 체크리스트:
 1. `BOOK_CHAPTERS`에 챕터 항목 추가 (`color`는 `BookContent.tsx`의 `COLOR_MAP` 키 중 하나여야 함: `blue|violet|emerald|orange|cyan|rose|amber|teal|brand-pink|brand-navy|brand-teal|brand-orange|brand-salmon`)
 2. 챕터 페이지 컴포넌트 생성 (`src/book/chapters/`)
-3. `BookContent.tsx`의 `SectionRouter`에 접두사 분기 추가
+3. `BookContent.tsx` 상단에 `lazy(() => import(...))`로 챕터 컴포넌트 등록 + `SectionRouter`에 접두사 분기 추가 (챕터는 코드 스플리팅되어 별도 청크로 로드된다 — 정적 import 금지)
 4. 시뮬레이터 섹션(전체 높이 레이아웃이 필요한 섹션)은 `BookContent.tsx`의 `SectionRouter`에서 별도 처리 필요 (레이아웃 wrapper 없이 직접 렌더링)
 
 ### 시뮬레이션 데이터 흐름
@@ -104,7 +104,7 @@ interface Props {
 
 **`simulationStore.ts` — 전역 앱 상태**
 - `lang: 'ko' | 'en'` + `setLang` 만 포함
-- 정식 export 이름은 `useLangStore`. `useSimulationStore`는 하위 호환용 alias — **새 코드에서는 `useLangStore`를 사용할 것**
+- export 이름은 `useLangStore` 하나뿐 (구 `useSimulationStore` alias는 제거됨). `theme`/`setTheme`/`toggleTheme`도 포함
 - 모든 챕터 페이지·레이아웃·GlossaryPanel이 이 스토어에서 `lang`을 읽음
 
 **`internalsStore.ts` — Internals Simulator 전용 상태**
@@ -134,8 +134,8 @@ Oracle CBO를 모방한 순수 TypeScript 구현:
 - `hrSchema.ts` — HR 스키마 7개 테이블 + 샘플 데이터 (원본 스키마)
 - `coSchema.ts` — CO(Customer Orders) 스키마 5개 테이블 + 샘플 데이터
 - `hr.ts` — **쿼리 예시용 EMPLOYEES 데이터셋.** `hrSchema.ts` 에서 1회 파생. 챕터에서 쿼리문 예시를 보여줄 때 쓰는 공용 `Employee` 타입(7필드 축약 뷰), `EMPLOYEES` 배열, `EMPLOYEE_COLUMNS`(컬럼 순서 단일 기준), `employeeCell(emp, col)` 헬퍼(셀 값 → 문자열, NULL 처리). **각 섹션이 데이터 타입·컬럼 배열을 매번 새로 정의하지 말고 여기서 import.** 서브셋이 필요하면 `Pick<Employee, ...>`.
-- `largeDataGenerator.ts` — 대용량 가상 데이터 생성기 (Mulberry32 PRNG, 시드 기반). 모듈 import 시 1회 생성 후 캐시됨
-- `index.ts` — 배럴 파일. `SCHEMAS`, `SAMPLE_QUERIES`, 두 스키마, `EMPLOYEES`/`Employee`/`EMPLOYEE_COLUMNS`/`employeeCell`(from `hr.ts`), `largeDataGenerator`를 re-export
+- `largeDataGenerator.ts` — 대용량 가상 데이터 생성기 (Mulberry32 PRNG). 공개 API는 `getLargeTable(name)` 하나 — 요청된 테이블만 최초 호출 시 1회 생성 후 캐시 (전체 36만 행을 한 번에 만들지 않음). barrel 경유 없이 직접 import
+- `index.ts` — 배럴 파일. `SCHEMAS`, `SAMPLE_QUERIES`, `EMPLOYEES`/`Employee`/`EMPLOYEE_COLUMNS`/`employeeCell`(from `hr.ts`)만 export. 스키마 타입은 `./types`에서 직접 import
 
 **sql-basics `dml-more/` 공유 모듈** (구 `shared.ts` 를 역할별로 분리):
 - `sqlEngine.ts` — 예시 쿼리 문자열을 파싱해 `EMPLOYEES` 위에서 흉내 실행하는 순수 유틸(`parseAndExecute`, WHERE/ORDER/GROUP 평가, `ParsedQuery`/`GroupRow` 타입). `ExecutionSection`·`MiniSimulator` 공유.
@@ -183,7 +183,7 @@ const T = {
 
 각 챕터의 구체적인 섹션→파일 매핑은 해당 챕터의 `index.tsx`(또는 라우터 파일)를 직접 읽는 것이 가장 정확하다. 대표 패턴만 기록한다.
 
-**TOC 활성화 범위:** `TableOfContents.tsx`에서 `isReady = chapter.num <= N`으로 제어. 현재 `chapter.num <= 7` (Chapter 0~7)가 활성화되어 있다. 콘텐츠 완성 시 이 숫자를 올린다.
+**TOC 활성화 범위:** `TableOfContents.tsx`에서 `isReady = chapter.num <= N`으로 제어. 현재 `chapter.num <= 9` (전 챕터)가 활성화되어 있다. 콘텐츠 완성 시 이 숫자를 올린다.
 
 **`WipBanner`** — 미완성 섹션 최상단에 배치. 현재 `BitmapSection`, `CompositeSection`에 적용 중.
 
@@ -194,7 +194,7 @@ const T = {
   - `scope` prop (기본 `"all"`) — `"sga"`\|`"pga"`\|`"bg-processes"`\|`"database"`를 넘기면 Instance 전체 대신 해당 영역 하나만 확대해서 단독 렌더링한다(Instance 외곽·Client/Server Process 행·다른 영역 생략). SGA 하위 페이지(SharedPool·BufferCache·LargePool·RedoLogBuffer)는 `scope="sga"` + `highlightIds`로 정적 표시, PGA 개요 페이지는 `scope="pga"`로 사용.
   - 기타 props: `highlightIds`(영역+자식 강조, 나머지는 기본 스타일 유지 — blur 없음), `hideClient`, `hideDatabase`, `callout`
   - **클릭 이벤트를 다이어그램에 직접 연결할 때는 `Box`/`Frame`/`Instance` 컨테이너 각각의 `onClick`에 `e.stopPropagation()`이 걸려 있어야 한다** — 없으면 자식(Shared Pool 등) 클릭이 부모(SGA Frame)까지 버블링되어 항상 부모만 반응하는 것처럼 보이는 버그가 재발한다.
-- `OracleInstanceMap.tsx`/`SgaPositionDiagram.tsx`/`OracleMemoryDiagram.tsx`는 **레거시** — 새 코드에서 쓰지 말 것. dim(블러) 처리가 남아있고 클릭 이벤트에 stopPropagation이 없어 위 버그가 재현될 수 있다. 정의 파일만 남아있고 실제 페이지에서는 더 이상 참조되지 않는다.
+- 구 레거시 다이어그램(`OracleInstanceMap`/`SgaPositionDiagram`/`OracleMemoryDiagram`)은 삭제됨. 다시 만들지 말 것.
 - `StorageSection.tsx`: 각 계층(Block·Extent·Segment·Tablespace)은 `AccordionSection` 안에 전용 Diagram 컴포넌트 + `Prose` + `Table` 구조
 
 **Index 챕터 특이사항:**
@@ -203,7 +203,7 @@ const T = {
 - `IndexPage.tsx`는 dead code — 실제 진입점은 `index.tsx`의 `IndexChapterPage`
 
 **Optimizer 챕터 특이사항:**
-- `shared/diagrams.tsx`에 `ExplainPlanTable`, `PlanRow` 타입 등 공유 다이어그램 컴포넌트 위치
+- `shared/diagrams.tsx`에 옵티마이저 전용 다이어그램 위치. `ExplainPlanTable`/`PlanRow`는 챕터 공용이라 `src/book/chapters/ExplainPlanTable.tsx`로 분리됨 (query-transform도 사용)
 - `OptimizerSimulator`는 `BookContent`의 `SectionRouter`에서 레이아웃 wrapper 없이 직접 렌더링
 - `fundamentals/WhatIsOptimizerSection.tsx`가 `optimizer-fundamentals` 분기의 라우터 역할. `FundamentalsSection.tsx`는 삭제됨
 - `join/` 하위 디렉토리에 `JoinOverviewSection`, `NestedLoopSection`, `HashJoinSection`, `SortMergeSection` 위치 (`optimizer-join-*` 섹션 ID 처리)
@@ -243,12 +243,10 @@ const T = {
 | `StepList` | 번호 배지가 있는 단계 목록 | `steps: { title, desc }[]`. `activeIndex`/`onStepClick`으로 인터랙티브 가능 |
 | `AccordionSection` | 클릭해서 펼치는 섹션 | `title`, `defaultOpen` prop |
 | `WipBanner` | 작성 중인 페이지 상단 경고 | 미완성 섹션에 표시 |
-| `SimulatorPlaceholder` | 시뮬레이터 예정 자리 | `label`, `color` prop |
 | `TermPopup` | 인라인 용어 팝업 | 클릭 시 말풍선. `open`/`onOpen`/`onClose` state 필요 |
 
 `OracleArchitectureDiagram` (`src/book/chapters/internals/shared/OracleArchitectureDiagram.tsx`) — **Oracle 인스턴스 내부 구조 다이어그램의 공통 컴포넌트** (프로그램 전체 공용). `variant="simple"`(이름표+클릭 이벤트) / `variant="detail"`(영역별 인라인 설명, 클릭 없음). props: `variant`, `onSelect?`, `highlightIds?: ArchComponentId[]`, `hideClient?`, `hideDatabase?`, `callout?`. 자세한 설명은 위 "Internals 챕터 특이사항" 참고.
 
-`OracleInstanceMap` (`src/book/chapters/internals/shared/OracleInstanceMap.tsx`) — **레거시**. Internals 챕터 전용, 좁은 사이드바·DBWn 애니메이션 용도로만 잔존. props: `highlightIds: InstanceComponentId[]`, `hideClient?`, `horizontal?`, `callout?`. 새 코드는 `OracleArchitectureDiagram` 사용.
 
 #### InfoBox variant 선택 기준
 
@@ -269,7 +267,11 @@ const T = {
 <SqlBlock sql={t.mySql} badge="예시" badgeColor="blue" desc="설명 텍스트" />
 ```
 
-`SqlHighlight` (`sql-basics/dml-more/SqlHighlight.tsx`) — `--` 이후를 회색 이탤릭 주석으로 처리. `shared.tsx`가 이 파일을 직접 import함.
+`SqlHighlight` (`src/book/chapters/SqlHighlight.tsx`, `shared.tsx` 옆) — `--` 이후를 회색 이탤릭 주석으로 처리. 챕터 공용 프리미티브라 특정 챕터 폴더에 두지 않는다.
+
+`ExplainPlanTable` (`src/book/chapters/ExplainPlanTable.tsx`) — 실행 계획 표 + `PlanRow` 타입. optimizer·query-transform 공용.
+
+**공용 컴포넌트 위치 규칙:** 두 챕터 이상이 쓰는 컴포넌트는 `src/book/chapters/` 최상위(또는 `src/components/`)에 둔다. 한 챕터 폴더 안에 두고 다른 챕터가 `../../<other-chapter>/...`로 import 하지 않는다.
 
 **`src/components/join-sim/`** — 챕터 경계를 넘어 재사용되는 조인 시뮬레이션 컴포넌트. `<JoinSimulator type="left" queryDesc="..." />` 형태로 사용하며 employees ⋈ departments 결합 과정을 단계별 애니메이션(재생/이전/다음/초기화)으로 보여준다. **SQL 코드 블록과 벤/격자 다이어그램은 포함하지 않는다** — 각 사용처(`sql-basics/dml-more/JoinSection.tsx`, `join/overview/OverviewSection.tsx`)가 `JOIN_SQL`(barrel에서 export)과 자체 다이어그램 구현을 옆에 직접 배치한다. 조인 결과 테이블은 `shared.tsx`의 `ResultTable`을 사용하고, 소스 테이블(EMPLOYEES/DEPARTMENTS)은 행 하이라이트 애니메이션이 핵심이라 raw `<table>` + framer-motion 유지 (단, `ResultTable`과 시각적으로 통일된 스타일).
 
@@ -359,7 +361,7 @@ SVG 레이아웃 상수는 **의존 관계 순서대로** 선언한다 — 버�
 - `lucide-react` — 일부 구형 컴포넌트에서 잔존. **새 코드에서는 Tabler 사용**
 - `@base-ui/react` + `shadcn` — UI 컴포넌트 기반
 - `tailwindcss` v4 — CSS-first 설정 방식 (`@import "tailwindcss"` in `index.css`)
-- `react-scan` — 개발 전용 렌더링 성능 모니터. 프로덕션 빌드에 포함되지 않도록 주의
+- `react-scan` — 개발 전용 렌더링 성능 모니터. `main.tsx`에서 `import.meta.env.DEV`일 때만 동적 import → 프로덕션 번들 미포함. 정적 import로 되돌리지 말 것
 
 ## 테마 / 스타일링 — 디자인 소스 단일화
 
@@ -370,9 +372,12 @@ SVG 레이아웃 상수는 **의존 관계 순서대로** 선언한다 — 버�
   - **§2a/2b** — `--color-ios-*`(5색×3) / `--color-brand-*`(5색×3). `shared.tsx`의 `INFOBOX_VARIANT`·`ACCENT_COLORS` 클래스 문자열이 참조 중.
   - **§2c** — 목표 디자인 시스템(Claude Design 캔버스 "Database Learning Book", **다크 우선**): `--color-accent`, `--color-ok|warn|danger|info|coral`, `--color-data-1..8`, `--color-code-*`, `--radius-chip|btn|card|hero`(Tailwind 기본 `--radius-*` 안 건드림), 테마 종속 `--color-canvas|surface|chrome|ink|ink-muted|line|line-strong|chip|field|hover|track|thead`. **아직 소비처 없음** — Phase 2에서 연결.
   - **§3** — `:root[data-theme="light"]`가 §2c 서피스 토큰을 라이트로 override.
-- **`src/lib/theme.tsx`** (구 `theme.ts` — JSX 아이콘 때문에 `.tsx`) — 색을 다루는 **유일한 TS 매핑 모듈**: `ACCENT_COLORS`(챕터 액센트 클래스 세트), `INFOBOX_VARIANT`+`INFOBOX_LEGACY_COLOR`, `CONCEPT_TINT`, `SIMULATOR_TINT`, `STEP_COLORS`, `DIAGRAM`/`DATA_PALETTE`/`CODE`(SVG용 `var(--color-*)` 문자열). importer: `shared.tsx`, `BookContent.tsx`, `IntroductionPage.tsx`, `bookStructure.tsx`.
+- **`src/lib/theme.tsx`** (구 `theme.ts` — JSX 아이콘 때문에 `.tsx`) — 색을 다루는 **유일한 TS 매핑 모듈**: `AccentColor`(챕터 색 키 타입), `INFOBOX_VARIANT`+`INFOBOX_LEGACY_COLOR`, `DIAGRAM`/`DATA_PALETTE`/`CODE`(SVG용 `var(--color-*)` 문자열 — Phase 3 이관용, 아직 소비처 없음). importer: `shared.tsx`, `bookStructure.tsx`.
 - **`src/index.css`** — `@import` 3줄(tailwindcss, `./styles/tokens.css`, tw-animate-css) + 구조 규칙(`body`, `#root`, `.react-flow__*` 오버라이드)만. React Flow 커스텀은 여기 `.react-flow__*` 셀렉터에만.
 - **폰트** — UI/제목/라벨: KO=`Noto Sans KR`, EN=`Inter`. 장문 본문: KO=`Noto Sans KR`, EN=`Newsreader`(세리프). 코드·수치·표·뱃지: `JetBrains Mono`. `index.html`의 Google Fonts `<link>`로 로드. 원본 스택은 `tokens.css`의 `--font-ui-ko`/`--font-ui-en`/`--font-read-ko`/`--font-read-en`/`--font-mono-stack`(`:root`, `@theme` 밖)에 정의되고, `@theme` 블록 안의 `--font-sans`/`--font-read`/`--font-mono`가 그 값을 재참조해서 Tailwind `font-sans`/`font-read`/`font-mono` 유틸을 생성한다. `App.tsx`가 `<html lang>`을 `useLangStore`와 동기화 → `:root:lang(en)`이 `--font-sans-active`/`--font-read-active` 스왑.
+  - **폰트가 중첩으로 덮이지 않게:** `InfoBox`·`Prose`처럼 `font-read`를 가진 컨테이너 안에 `<pre className="font-mono">` 등으로 문장을 감싸지 말 것 (본문 폰트가 mono로 덮임). 줄바꿈이 필요하면 `<div className="whitespace-pre-line">`. `font-mono`는 코드·수치·뱃지 전용 — 설명 문장은 `font-sans`/`font-read`.
+  - SVG `fontFamily`는 `"var(--font-mono)"`/`"var(--font-sans-active)"`만. 일반 `"monospace"` 금지 (JetBrains Mono가 적용되지 않음).
+  - mono 스택은 `'JetBrains Mono', 'Noto Sans KR', …` — JetBrains Mono에 한글이 없어 한글은 Noto Sans KR로 폴백된다.
   - ⚠ **`@theme` 안에서 변수를 자기 자신으로 참조하지 말 것** (`--font-mono: var(--font-mono);` 같은 패턴) — CSS 커스텀 프로퍼티 순환으로 간주되어 guaranteed-invalid 처리되고, 해당 Tailwind 유틸 전체가 조용히 브라우저 기본값으로 폴백된다. 실제 값은 항상 다른 이름의 변수(`-active`/`-stack` 접미사 등)에 두고 `@theme`에서는 그 이름을 참조한다.
 - shadcn 스타일 프리셋: `base-nova` (`components.json`).
 

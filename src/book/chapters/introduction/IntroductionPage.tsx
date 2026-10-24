@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { useSimulationStore } from '@/store/simulationStore'
+import { useLangStore } from '@/store/simulationStore'
 import { PageContainer } from '../shared'
 import { cn } from '@/lib/utils'
 import {
@@ -243,7 +243,7 @@ const prose = 'whitespace-pre-line font-read text-[15px] leading-[1.75] text-ink
 const card = 'rounded-card border border-line bg-paper'
 
 export function IntroductionPage() {
-  const lang = useSimulationStore((s) => s.lang)
+  const lang = useLangStore((s) => s.lang)
   const t = T[lang]
 
   return (

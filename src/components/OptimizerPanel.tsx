@@ -4,15 +4,20 @@
 import { motion } from 'framer-motion'
 import type { OptimizerResult, AccessPath, JoinStep, OptimizerPhase } from '@/lib/optimizer/types'
 import { useLangStore } from '@/store/simulationStore'
-import { Badge } from '@/components/ui/badge'
+import { InfoBox } from '@/book/chapters/shared'
+import { ExplainPlanTable, type PlanRow } from '@/book/chapters/ExplainPlanTable'
 import { cn } from '@/lib/utils'
+
+const CARD = 'overflow-hidden rounded-card border border-line-2 bg-paper'
+const CARD_HEAD = 'flex items-center gap-2 border-b border-line-2 bg-rail px-3 py-1.5'
+const CHIP = 'shrink-0 rounded-chip px-1.5 py-px font-mono text-[9px] font-bold'
 
 // ── Phase Header ──────────────────────────────────────────────────────────
 
-const PHASE_CLS: Record<OptimizerPhase['name'], { badge: string; border: string; bg: string; text: string }> = {
-  'Query Transformer': { badge: 'bg-amber-500',  border: 'border-amber-200', bg: 'bg-amber-50',  text: 'text-amber-800' },
-  'Estimator':         { badge: 'bg-blue-600',   border: 'border-blue-200',  bg: 'bg-blue-50',   text: 'text-blue-800' },
-  'Plan Generator':    { badge: 'bg-orange-500', border: 'border-orange-200',bg: 'bg-orange-50', text: 'text-orange-800' },
+const PHASE_CLS: Record<OptimizerPhase['name'], { dot: string; text: string }> = {
+  'Query Transformer': { dot: 'bg-amber', text: 'text-amber' },
+  'Estimator':         { dot: 'bg-blue',  text: 'text-blue' },
+  'Plan Generator':    { dot: 'bg-green', text: 'text-green' },
 }
 
 function PhaseHeader({ phase, index }: { phase: OptimizerPhase; index: number }) {
@@ -23,23 +28,21 @@ function PhaseHeader({ phase, index }: { phase: OptimizerPhase; index: number })
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.08 }}
-      className={cn('overflow-hidden rounded-lg border', c.border, c.bg)}
+      className={CARD}
     >
-      <div className={cn('flex items-center gap-2 border-b px-3 py-2', c.border)}>
-        <span className={cn('flex h-5 w-5 shrink-0 items-center justify-center rounded-full font-mono text-[10px] font-bold text-white', c.badge)}>
+      <div className={CARD_HEAD}>
+        <span className={cn('flex h-5 w-5 shrink-0 items-center justify-center rounded-full font-mono text-[10px] font-bold text-white', c.dot)}>
           {index + 1}
         </span>
         <span className={cn('font-mono text-xs font-bold', c.text)}>{phase.name}</span>
-        <span className="ml-auto font-mono text-[10px] text-muted-foreground">{phase.description}</span>
+        <span className="ml-auto truncate font-mono text-[10px] text-ink-3">{phase.description}</span>
         {phase.cost !== undefined && (
-          <Badge variant="outline" className={cn('font-mono text-[10px]', c.border, c.text)}>
-            cost {phase.cost.toFixed(1)}
-          </Badge>
+          <span className={cn(CHIP, 'border border-line bg-paper text-ink-2')}>cost {phase.cost.toFixed(1)}</span>
         )}
       </div>
       <div className="space-y-0.5 px-3 py-2">
         {phase.details.map((d, i) => (
-          <div key={i} className="flex items-start gap-1.5 font-mono text-[11px] text-muted-foreground">
+          <div key={i} className="flex items-start gap-1.5 font-mono text-[11px] text-ink-2">
             <span className={cn('mt-0.5 shrink-0', c.text)}>›</span>
             <span>{d}</span>
           </div>
@@ -67,38 +70,30 @@ function AccessPathRow({ path, maxCost }: { path: AccessPath; maxCost: number })
   return (
     <div
       className={cn(
-        'rounded-md border px-2.5 py-1.5',
-        isChosen ? 'border-blue-200 bg-blue-50' : 'border-border bg-muted/30 opacity-60'
+        'rounded-card border px-2.5 py-1.5',
+        isChosen ? 'border-blue bg-blue/[0.06]' : 'border-line bg-rail opacity-60'
       )}
     >
       <div className="mb-1 flex items-center gap-2">
-        <Badge
-          variant="outline"
-          className={cn(
-            'h-4 shrink-0 font-mono text-[9px]',
-            isChosen ? 'border-blue-300 text-blue-700' : 'text-muted-foreground'
-          )}
-        >
+        <span className={cn(CHIP, isChosen ? 'bg-blue/15 text-blue' : 'bg-ink/10 text-ink-3')}>
           {ACCESS_PATH_LABEL[path.type] ?? path.type}
-        </Badge>
+        </span>
         {path.indexName && (
-          <span className="font-mono text-[10px] text-muted-foreground">{path.indexName}</span>
+          <span className="font-mono text-[10px] text-ink-3">{path.indexName}</span>
         )}
-        <span className={cn('ml-auto font-mono text-[10px] font-bold', isChosen ? 'text-blue-700' : 'text-muted-foreground')}>
+        <span className={cn('ml-auto font-mono text-[10px] font-bold', isChosen ? 'text-blue' : 'text-ink-3')}>
           cost {path.cost.toFixed(1)}
         </span>
-        {isChosen && (
-          <Badge className="h-4 bg-blue-600 font-mono text-[9px]">CHOSEN</Badge>
-        )}
+        {isChosen && <span className={cn(CHIP, 'bg-blue text-white')}>CHOSEN</span>}
       </div>
       {/* Cost bar */}
-      <div className="relative h-1 overflow-hidden rounded-full bg-border">
+      <div className="relative h-1 overflow-hidden rounded-full bg-line">
         <div
-          className={cn('h-full rounded-full transition-all', isChosen ? 'bg-blue-500' : 'bg-muted-foreground/30')}
+          className={cn('h-full rounded-full transition-all', isChosen ? 'bg-blue' : 'bg-ink-3/40')}
           style={{ width: `${pct}%` }}
         />
       </div>
-      <div className="mt-1 font-mono text-[10px] text-muted-foreground">{path.reason}</div>
+      <div className="mt-1 font-mono text-[10px] text-ink-2">{path.reason}</div>
     </div>
   )
 }
@@ -108,10 +103,10 @@ function TableAccessCard({ tableName, accessPaths }: { tableName: string; access
   const chosen = accessPaths.find((p) => p.chosen)
 
   return (
-    <div className="overflow-hidden rounded-lg border bg-card">
-      <div className="flex items-center gap-2 border-b bg-muted/50 px-3 py-1.5">
-        <span className="font-mono text-xs font-bold text-foreground">{tableName}</span>
-        <span className="font-mono text-[10px] text-muted-foreground">
+    <div className={CARD}>
+      <div className={CARD_HEAD}>
+        <span className="font-mono text-xs font-bold text-ink">{tableName}</span>
+        <span className="font-mono text-[10px] text-ink-3">
           card {chosen?.cardinality} · sel {((chosen?.selectivity ?? 1) * 100).toFixed(1)}%
         </span>
       </div>
@@ -126,10 +121,10 @@ function TableAccessCard({ tableName, accessPaths }: { tableName: string; access
 
 // ── Join Step Card ────────────────────────────────────────────────────────
 
-const JOIN_METHOD_CLS: Record<string, { border: string; bg: string; text: string; badge: string }> = {
-  NESTED_LOOPS:    { border: 'border-blue-200',   bg: 'bg-blue-50',   text: 'text-blue-700',   badge: 'bg-blue-600' },
-  HASH_JOIN:       { border: 'border-orange-200', bg: 'bg-orange-50', text: 'text-orange-700', badge: 'bg-orange-500' },
-  SORT_MERGE_JOIN: { border: 'border-amber-200',  bg: 'bg-amber-50',  text: 'text-amber-700',  badge: 'bg-amber-500' },
+const JOIN_METHOD_CLS: Record<string, { text: string; chip: string }> = {
+  NESTED_LOOPS:    { text: 'text-blue',   chip: 'bg-blue/15 text-blue' },
+  HASH_JOIN:       { text: 'text-purple', chip: 'bg-purple/15 text-purple' },
+  SORT_MERGE_JOIN: { text: 'text-amber',  chip: 'bg-amber/15 text-amber' },
 }
 
 function JoinStepCard({ step, index }: { step: JoinStep; index: number }) {
@@ -140,84 +135,48 @@ function JoinStepCard({ step, index }: { step: JoinStep; index: number }) {
       initial={{ opacity: 0, x: -6 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: 0.1 + index * 0.06 }}
-      className={cn('rounded-lg border p-2.5', c.border, c.bg)}
+      className="rounded-card border border-line-2 bg-paper p-2.5"
     >
       <div className="mb-1 flex items-center gap-2">
         <span className={cn('font-mono text-xs font-bold', c.text)}>
           {step.leftTable} ⋈ {step.rightTable}
         </span>
-        <Badge className={cn('h-4 font-mono text-[9px]', c.badge)}>
-          {step.method.replace(/_/g, ' ')}
-        </Badge>
-        <span className="ml-auto font-mono text-[10px] text-muted-foreground">
-          cost {step.cost.toFixed(1)}
-        </span>
+        <span className={cn(CHIP, c.chip)}>{step.method.replace(/_/g, ' ')}</span>
+        <span className="ml-auto font-mono text-[10px] text-ink-3">cost {step.cost.toFixed(1)}</span>
       </div>
-      <div className={cn('flex items-center gap-3 font-mono text-[10px]', c.text)}>
+      <div className="flex items-center gap-3 font-mono text-[10px] text-ink">
         <span>left {step.inputCardinality.left}</span>
-        <span className="text-muted-foreground">×</span>
+        <span className="text-ink-3">×</span>
         <span>right {step.inputCardinality.right}</span>
-        <span className="text-muted-foreground">→</span>
+        <span className="text-ink-3">→</span>
         <span className="font-semibold">out {step.outputCardinality}</span>
-        <span className="text-muted-foreground">on {step.condition.leftColumn}={step.condition.rightColumn}</span>
+        <span className="text-ink-3">on {step.condition.leftColumn}={step.condition.rightColumn}</span>
       </div>
-      <div className="mt-1 font-mono text-[10px] text-muted-foreground">{step.reason}</div>
+      <div className="mt-1 font-mono text-[10px] text-ink-2">{step.reason}</div>
     </motion.div>
   )
 }
 
-// ── Execution Plan Tree ───────────────────────────────────────────────────
+// ── Execution Plan → 공용 ExplainPlanTable 행으로 변환 ─────────────────────
 
-function ExecutionPlanTree({ result }: { result: OptimizerResult }) {
+function toPlanRows(result: OptimizerResult): PlanRow[] {
   const { plan } = result
-  const rows: Array<{ indent: number; label: string; cost: string; rows: number }> = []
+  const rows: PlanRow[] = []
+  const push = (depth: number, operation: string, cost: number, card: number, name?: string) =>
+    rows.push({ id: rows.length, depth, operation, name, cost: Number(cost.toFixed(1)), rows: card })
 
-  if (plan.joinSteps.length > 0) {
-    rows.push({ indent: 0, label: 'SELECT STATEMENT', cost: plan.totalCost.toFixed(1), rows: plan.estimatedRows })
-    for (let i = plan.joinSteps.length - 1; i >= 0; i--) {
-      const j = plan.joinSteps[i]
-      rows.push({ indent: 1 + (plan.joinSteps.length - 1 - i), label: j.method.replace(/_/g, ' '), cost: j.cost.toFixed(1), rows: j.outputCardinality })
-    }
-  } else {
-    rows.push({ indent: 0, label: 'SELECT STATEMENT', cost: plan.totalCost.toFixed(1), rows: plan.estimatedRows })
+  push(0, 'SELECT STATEMENT', plan.totalCost, plan.estimatedRows)
+  for (let i = plan.joinSteps.length - 1; i >= 0; i--) {
+    const j = plan.joinSteps[i]
+    push(1 + (plan.joinSteps.length - 1 - i), j.method.replace(/_/g, ' '), j.cost, j.outputCardinality)
   }
 
+  const depth = plan.joinSteps.length > 0 ? plan.joinSteps.length + 1 : 1
   for (const ap of plan.tableAccessPlans) {
-    const depth = plan.joinSteps.length > 0 ? plan.joinSteps.length + 1 : 1
-    rows.push({
-      indent: depth,
-      label: `${ap.chosen.type.replace(/_/g, ' ')} ${ap.tableName}${ap.chosen.indexName ? ` [${ap.chosen.indexName}]` : ''}`,
-      cost: ap.chosen.cost.toFixed(1),
-      rows: ap.chosen.cardinality,
-    })
+    const name = ap.chosen.indexName ? `${ap.tableName} [${ap.chosen.indexName}]` : ap.tableName
+    push(depth, ap.chosen.type.replace(/_/g, ' '), ap.chosen.cost, ap.chosen.cardinality, name)
   }
-
-  return (
-    <div className="overflow-hidden rounded-lg border bg-card">
-      <div className="border-b bg-muted/50 px-3 py-1.5">
-        <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-          Execution Plan
-        </span>
-      </div>
-      <div className="space-y-0.5 p-2">
-        {rows.map((row, i) => (
-          <div
-            key={i}
-            className={cn(
-              'flex items-center gap-2 rounded px-2 py-1 font-mono text-[11px]',
-              i === 0 ? 'bg-orange-50 text-orange-700' : 'text-muted-foreground'
-            )}
-            style={{ marginLeft: row.indent * 16 }}
-          >
-            {row.indent > 0 && <span className="text-muted-foreground/50">└─</span>}
-            <span className="flex-1">{row.label}</span>
-            <span className="text-muted-foreground">cost={row.cost}</span>
-            <span className="text-muted-foreground">rows={row.rows}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
+  return rows
 }
 
 // ── Main Panel ────────────────────────────────────────────────────────────
@@ -229,10 +188,10 @@ interface OptimizerPanelProps {
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
     <div className="mb-2 flex items-center gap-2">
-      <span className="font-mono text-[9px] font-bold uppercase tracking-[0.15em] text-muted-foreground">
+      <span className="font-mono text-[10px] font-bold uppercase tracking-[0.1em] text-ink-2">
         {children}
       </span>
-      <div className="h-px flex-1 bg-border" />
+      <div className="h-px flex-1 bg-line" />
     </div>
   )
 }
@@ -241,10 +200,10 @@ export function OptimizerPanel({ result }: OptimizerPanelProps) {
   const lang = useLangStore((s) => s.lang)
   if (!result) {
     return (
-      <div className="flex h-full items-center justify-center">
-        <p className="font-mono text-xs text-muted-foreground">
+      <div className="flex h-full items-center justify-center px-4">
+        <p className="text-center font-sans text-xs text-ink-3">
           {lang === 'ko'
-            ? '쿼리를 실행하면 Optimizer 분석 결과가 표시됩니다.'
+            ? '쿼리를 실행하면 옵티마이저 분석 결과가 여기에 나타나요.'
             : 'Run a query to see the Optimizer analysis.'}
         </p>
       </div>
@@ -288,17 +247,16 @@ export function OptimizerPanel({ result }: OptimizerPanelProps) {
         </div>
       )}
 
-      {/* Execution Plan Tree */}
-      <ExecutionPlanTree result={result} />
+      {/* Execution Plan */}
+      <ExplainPlanTable rows={toPlanRows(result)} caption="Execution Plan" lang={lang} />
 
       {/* Warnings */}
       {plan.warnings.length > 0 && (
-        <div className="rounded-lg border border-amber-200 bg-amber-50 p-2.5">
-          <div className="mb-1 font-mono text-[10px] font-bold text-amber-700">⚠ Optimizer Warnings</div>
+        <InfoBox variant="warning">
           {plan.warnings.map((w, i) => (
-            <div key={i} className="font-mono text-[11px] text-amber-700">› {w}</div>
+            <div key={i}>› {w}</div>
           ))}
-        </div>
+        </InfoBox>
       )}
     </div>
   )

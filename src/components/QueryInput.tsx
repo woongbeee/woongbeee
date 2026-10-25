@@ -4,18 +4,8 @@ import { useInternalsStore } from '@/store/internalsStore'
 import type { StepSummary, SimulationStep } from '@/store/internalsStore'
 import { useLangStore } from '@/store/simulationStore'
 import { SAMPLE_QUERIES } from '@/data/index'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
+import { StepList } from '@/book/chapters/shared'
 import { cn } from '@/lib/utils'
-
-// ── Step result styles ─────────────────────────────────────────────────────
-
-const RESULT_CLS: Record<StepSummary['result'], { dot: string; badge: string; selected: string }> = {
-  hit:  { dot: 'bg-blue-500',   badge: 'border-blue-200 text-blue-700',   selected: 'bg-blue-50 border-blue-200' },
-  miss: { dot: 'bg-orange-500', badge: 'border-orange-200 text-orange-700', selected: 'bg-orange-50 border-orange-200' },
-  ok:   { dot: 'bg-green-500',  badge: 'border-green-200 text-green-700',  selected: 'bg-green-50 border-green-200' },
-  info: { dot: 'bg-amber-500',  badge: 'border-amber-200 text-amber-700',  selected: 'bg-amber-50 border-amber-200' },
-}
 
 // ── SQL Syntax Highlighter ─────────────────────────────────────────────────
 
@@ -29,10 +19,10 @@ function highlightSQL(text: string): string {
     .replace(/>/g, '&gt;')
 
   return escaped.split(/('[^']*')/g).map((part, i) => {
-    if (i % 2 === 1) return `<span class="text-emerald-500">${part}</span>`
+    if (i % 2 === 1) return `<span class="text-sy-str">${part}</span>`
     return part
-      .replace(SQL_NUMBERS,  (m) => `<span class="text-amber-500">${m}</span>`)
-      .replace(SQL_KEYWORDS, (m) => `<span class="text-blue-500 font-bold">${m.toUpperCase()}</span>`)
+      .replace(SQL_NUMBERS,  (m) => `<span class="text-sy-num">${m}</span>`)
+      .replace(SQL_KEYWORDS, (m) => `<span class="text-sy-kw font-bold">${m.toUpperCase()}</span>`)
   }).join('')
 }
 
@@ -50,9 +40,9 @@ export function LiveLog() {
   return (
     <div className="flex h-full flex-col justify-end gap-0.5">
       {stepLog.length === 0 ? (
-        <p className="font-mono text-xs text-muted-foreground">
+        <p className="font-sans text-xs text-ink-3">
           {lang === 'ko'
-            ? '쿼리를 실행하면 Oracle 내부 처리 과정이 여기에 표시됩니다.'
+            ? '쿼리를 실행하면 Oracle 안에서 일어나는 처리 과정이 여기에 나타나요.'
             : 'Run a query to see Oracle internal processing steps here.'}
         </p>
       ) : (
@@ -63,11 +53,11 @@ export function LiveLog() {
             animate={{ opacity: 1, x: 0 }}
             className="flex gap-2 font-mono text-xs"
           >
-            <span className="whitespace-nowrap text-muted-foreground">
+            <span className="whitespace-nowrap text-ink-3">
               {new Date(log.timestamp).toLocaleTimeString(lang === 'ko' ? 'ko-KR' : 'en-US', { hour12: false })}
             </span>
-            <span className="text-orange-500">›</span>
-            <span className="text-foreground">{log.message}</span>
+            <span className="text-amber">›</span>
+            <span className="text-ink">{log.message}</span>
           </motion.div>
         ))
       )}
@@ -78,59 +68,11 @@ export function LiveLog() {
 
 // ── Summary timeline ───────────────────────────────────────────────────────
 
-function SummaryItem({
-  summary, index, isSelected, isCurrent, onClick,
-}: {
-  summary: StepSummary
-  index: number
-  isSelected: boolean
-  isCurrent: boolean
-  onClick: () => void
-}) {
-  const c = RESULT_CLS[summary.result]
-
-  return (
-    <motion.button
-      initial={{ opacity: 0, y: 4 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.04 }}
-      onClick={onClick}
-      className={cn(
-        'flex w-full items-start gap-2 rounded-lg border px-2 py-1.5 text-left transition-all',
-        isSelected ? c.selected : isCurrent ? 'border-border bg-muted/40' : 'border-transparent hover:border-border hover:bg-muted/40'
-      )}
-    >
-      <div className="flex shrink-0 flex-col items-center">
-        <div
-          className={cn(
-            'flex h-5 w-5 items-center justify-center rounded-full font-mono text-[9px] font-bold',
-            isSelected ? `${c.dot} text-white` : 'bg-muted text-muted-foreground'
-          )}
-        >
-          {index + 1}
-        </div>
-      </div>
-      <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-1.5">
-          <span className="min-w-0 flex-1 truncate font-mono text-[11px] font-bold text-foreground">
-            {summary.label}
-          </span>
-          <Badge variant="outline" className={cn('h-4 shrink-0 font-mono text-[8px] font-bold uppercase', c.badge)}>
-            {summary.result}
-          </Badge>
-        </div>
-        {isSelected && (
-          <motion.p
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            className="mt-0.5 font-mono text-[10px] leading-snug text-muted-foreground"
-          >
-            {summary.message}
-          </motion.p>
-        )}
-      </div>
-    </motion.button>
-  )
+const RESULT_LABEL: Record<StepSummary['result'], string> = {
+  hit: 'HIT',
+  miss: 'MISS',
+  ok: 'OK',
+  info: 'INFO',
 }
 
 export function SummaryTimeline({ selectedStep, onSelect }: {
@@ -138,44 +80,35 @@ export function SummaryTimeline({ selectedStep, onSelect }: {
   onSelect: (step: SimulationStep | null) => void
 }) {
   const stepSummary = useInternalsStore((s) => s.stepSummary)
-  const currentStep = useInternalsStore((s) => s.currentStep)
   const lang        = useLangStore((s) => s.lang)
+  const items       = stepSummary.filter((s) => s.step !== 'complete')
+  const activeIndex = items.findIndex((s) => s.step === selectedStep)
 
   return (
-    <div className="flex h-full flex-col">
-      <div className="mb-1.5 flex items-center gap-2">
-        <span className="font-mono text-[9px] font-bold uppercase tracking-widest text-muted-foreground">
-          {lang === 'ko' ? '처리 요약' : 'Execution Summary'}
-        </span>
-        <div className="h-px flex-1 bg-border" />
-        {selectedStep && (
+    <div>
+      {selectedStep && (
+        <div className="flex justify-end">
           <button
             onClick={() => onSelect(null)}
-            className="font-mono text-[9px] text-muted-foreground transition-colors hover:text-foreground"
+            className="font-mono text-[10px] text-ink-3 transition-colors hover:text-ink"
           >
-            {lang === 'ko' ? '핀 해제 ✕' : 'Unpin ✕'}
+            {lang === 'ko' ? '고정 해제 ✕' : 'Unpin ✕'}
           </button>
-        )}
-      </div>
-      <div className="flex-1 space-y-0.5 overflow-y-auto">
-        {stepSummary
-          .filter((s) => s.step !== 'complete')
-          .map((s, i) => (
-            <SummaryItem
-              key={s.step + i}
-              summary={s}
-              index={i}
-              isSelected={selectedStep === s.step}
-              isCurrent={currentStep === s.step}
-              onClick={() => onSelect(selectedStep === s.step ? null : s.step)}
-            />
-          ))}
-      </div>
+        </div>
+      )}
+      <StepList
+        steps={items.map((s) => ({ title: `${s.label} · ${RESULT_LABEL[s.result]}`, desc: s.message }))}
+        activeIndex={activeIndex >= 0 ? activeIndex : undefined}
+        onStepClick={(i) => onSelect(items[i].step === selectedStep ? null : items[i].step)}
+      />
     </div>
   )
 }
 
 // ── Main Component ─────────────────────────────────────────────────────────
+
+// join-sim 컨트롤 버튼과 같은 모양
+const BTN = 'self-end rounded-card border px-3 py-1.5 font-mono text-xs transition-colors disabled:cursor-not-allowed disabled:opacity-40'
 
 export function QueryInput() {
   const [input, setInput] = useState('')
@@ -214,7 +147,7 @@ export function QueryInput() {
   }
 
   return (
-    <div className="flex h-full flex-col gap-2 overflow-y-auto bg-card p-3">
+    <div className="flex h-full flex-col gap-2 overflow-y-auto bg-paper p-3">
 
       {/* Sample queries */}
       <div className="flex flex-wrap gap-1">
@@ -222,7 +155,7 @@ export function QueryInput() {
           <button
             key={i}
             onClick={() => { setInput(q); textareaRef.current?.focus() }}
-            className="rounded-md border bg-background px-2 py-0.5 font-mono text-[10px] text-muted-foreground transition-colors hover:border-foreground hover:text-foreground"
+            className="rounded-chip border border-line bg-paper px-2 py-0.5 font-mono text-[10px] text-ink-2 transition-colors hover:border-line-2 hover:bg-rail hover:text-ink"
           >
             {q.length > 35 ? q.slice(0, 35) + '…' : q}
           </button>
@@ -232,13 +165,13 @@ export function QueryInput() {
       {/* Input row */}
       <div className="flex gap-2">
         <div className="relative flex-1">
-          <span className="absolute left-3 top-2.5 z-10 font-mono text-sm font-bold text-orange-500">
+          <span className="absolute left-3 top-2.5 z-10 font-mono text-sm font-bold text-amber">
             SQL&gt;
           </span>
           <div
             ref={highlightRef}
             aria-hidden="true"
-            className="pointer-events-none absolute inset-0 overflow-hidden whitespace-pre-wrap break-words rounded-lg border border-transparent bg-background py-2 pl-14 pr-3 font-mono text-sm leading-[1.5rem]"
+            className="pointer-events-none absolute inset-0 overflow-hidden whitespace-pre-wrap break-words rounded-card border border-transparent bg-code-bg py-2 pl-14 pr-3 font-mono text-sm leading-[1.5rem] text-ink"
             dangerouslySetInnerHTML={{ __html: highlightSQL(input) || '' }}
           />
           <textarea
@@ -250,38 +183,40 @@ export function QueryInput() {
             placeholder="SELECT * FROM EMPLOYEES"
             rows={2}
             disabled={isRunning}
-            className="relative w-full resize-none rounded-lg border border-input bg-transparent py-2 pl-14 pr-3 font-mono text-sm text-transparent caret-foreground outline-none transition-all placeholder:text-muted-foreground focus:border-ring focus:ring-2 focus:ring-ring/20 disabled:opacity-50"
+            className="relative w-full resize-none rounded-card border border-code-border bg-transparent py-2 pl-14 pr-3 font-mono text-sm leading-[1.5rem] text-transparent caret-ink outline-none transition-all placeholder:text-ink-3 focus:border-blue focus:ring-2 focus:ring-blue/20 disabled:opacity-50"
           />
         </div>
 
-        <Button onClick={handleRun} disabled={!input.trim() || isRunning} className="self-end">
+        <button
+          onClick={handleRun}
+          disabled={!input.trim() || isRunning}
+          className={cn(BTN, 'border-amber/40 bg-amber/8 font-bold text-amber hover:bg-amber/15')}
+        >
           {isRunning ? (
             <motion.span animate={{ opacity: [1, 0.4, 1] }} transition={{ repeat: Infinity, duration: 1 }}>
               {lang === 'ko' ? '실행 중…' : 'Running…'}
             </motion.span>
           ) : 'RUN ⏎'}
-        </Button>
+        </button>
 
-        <Button
-          variant="outline"
+        <button
           onClick={flushBuffers}
           disabled={isRunning}
           title={lang === 'ko'
             ? 'Buffer Cache의 Dirty Buffer를 DBWn이 Data File로 씁니다 (Checkpoint)'
             : 'DBWn writes Dirty Buffers from Buffer Cache to Data Files (Checkpoint)'}
-          className="self-end font-mono text-sm"
+          className={cn(BTN, 'border-line bg-paper text-ink-2 hover:bg-rail hover:text-ink')}
         >
           Buffer Flush
-        </Button>
+        </button>
 
-        <Button
-          variant="ghost"
+        <button
           onClick={handleReset}
           disabled={isRunning}
-          className="self-end font-mono text-sm"
+          className={cn(BTN, 'border-transparent text-ink-2 hover:bg-rail hover:text-ink')}
         >
           {lang === 'ko' ? '초기화' : 'Reset'}
-        </Button>
+        </button>
       </div>
     </div>
   )

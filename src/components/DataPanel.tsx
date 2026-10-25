@@ -1,11 +1,14 @@
 import type { Schema, SchemaTable } from '@/data/types'
-import { Badge } from '@/components/ui/badge'
+import { ResultTable, type ResultColumn } from '@/book/chapters/shared'
 import { cn } from '@/lib/utils'
 
+// PK/FK 뱃지 — ResultTable 헤더 뱃지와 같은 색 규칙 (PK=blue, FK=purple)
+const KEY_BADGE = 'rounded-[2px] px-1 py-px font-mono text-[8.5px] font-bold'
+
 function ColumnKeyBadge({ isPrimaryKey, isForeignKey }: { isPrimaryKey?: boolean; isForeignKey?: boolean }) {
-  if (isPrimaryKey && isForeignKey) return <Badge variant="outline" className="h-4 border-purple-300 px-1 text-[8px] text-purple-700">PK/FK</Badge>
-  if (isPrimaryKey) return <Badge variant="outline" className="h-4 border-amber-300 px-1 text-[8px] text-amber-700">PK</Badge>
-  if (isForeignKey) return <Badge variant="outline" className="h-4 border-blue-300 px-1 text-[8px] text-blue-700">FK</Badge>
+  if (isPrimaryKey && isForeignKey) return <span className={cn(KEY_BADGE, 'bg-purple/15 text-purple')}>PK/FK</span>
+  if (isPrimaryKey) return <span className={cn(KEY_BADGE, 'bg-blue/15 text-blue')}>PK</span>
+  if (isForeignKey) return <span className={cn(KEY_BADGE, 'bg-purple/15 text-purple')}>FK</span>
   return null
 }
 
@@ -13,40 +16,35 @@ export function SchemaView({ schema }: { schema: Schema }) {
   return (
     <div className="space-y-2.5 p-3">
       {schema.tables.map((table) => (
-        <div
-          key={table.name}
-          className="overflow-hidden rounded-lg border bg-card shadow-xs"
-        >
+        <div key={table.name} className="overflow-hidden rounded-card border border-line-2 bg-paper">
           {/* Table header */}
-          <div className="flex items-center gap-2 border-b bg-muted/50 px-3 py-2">
-            <span className="font-mono text-xs font-bold text-foreground">{table.name}</span>
-            <span className="ml-auto text-[10px] text-muted-foreground">{table.description}</span>
+          <div className="flex items-center gap-2 border-b border-line-2 bg-rail px-3 py-2">
+            <span className="font-mono text-xs font-bold text-ink">{table.name}</span>
+            <span className="ml-auto truncate font-sans text-[10px] text-ink-2">{table.description}</span>
           </div>
 
           {/* Columns */}
           <div>
             {table.columns.map((col) => (
-              <div key={col.name} className="flex items-center gap-2 border-b px-3 py-[4px] last:border-b-0">
-                <span className="w-9 shrink-0 font-mono text-[9px] font-bold">
+              <div key={col.name} className="flex items-center gap-2 border-b border-line px-3 py-[4px] last:border-b-0">
+                <span className="w-9 shrink-0">
                   <ColumnKeyBadge isPrimaryKey={col.isPrimaryKey} isForeignKey={col.isForeignKey} />
                 </span>
-                <span className="flex-1 font-mono text-[11px] text-foreground">{col.name}</span>
-                <span className="font-mono text-[10px] text-muted-foreground">{col.type}</span>
-                {!col.nullable && (
-                  <Badge variant="outline" className="h-4 border-red-200 px-1 text-[8px] text-red-600">NN</Badge>
-                )}
+                <span className="flex-1 font-mono text-[11px] text-ink">{col.name}</span>
+                <span className="font-mono text-[10px] text-ink-3">{col.type}</span>
+                {!col.nullable && <span className={cn(KEY_BADGE, 'bg-red/15 text-red')}>NN</span>}
               </div>
             ))}
           </div>
 
           {/* FK relationships */}
           {table.foreignKeys.length > 0 && (
-            <div className="border-t bg-muted/30 px-3 py-1.5">
+            <div className="border-t border-line bg-rail px-3 py-1.5">
               {table.foreignKeys.map((fk, i) => (
                 <div key={i} className="flex items-center gap-1 font-mono text-[10px]">
-                  <span className="text-blue-600">{fk.column}</span>
-                  <span className="text-muted-foreground">→</span>
-                  <span className="text-foreground">{fk.refTable}.{fk.refColumn}</span>
+                  <span className="text-purple">{fk.column}</span>
+                  <span className="text-ink-3">→</span>
+                  <span className="text-ink">{fk.refTable}.{fk.refColumn}</span>
                 </div>
               ))}
             </div>
@@ -58,84 +56,24 @@ export function SchemaView({ schema }: { schema: Schema }) {
 }
 
 export function TableView({ table }: { table: SchemaTable }) {
+  const columns: ResultColumn[] = table.columns.map((col) => ({
+    label: col.name,
+    badge: col.isPrimaryKey ? 'PK' : col.isForeignKey ? 'FK' : undefined,
+    type: col.type,
+  }))
+  const rows = table.rows.map((row) => table.columns.map((col) => row[col.name] ?? null))
+
   return (
-    <div className="flex h-full flex-col">
-      {/* Header */}
-      <div className="shrink-0 border-b bg-muted/50 px-4 py-2.5">
-        <div className="flex items-center gap-2">
-          <span className="font-mono text-xs font-bold text-foreground">{table.schema}.{table.name}</span>
-          <span className="text-[10px] text-muted-foreground">{table.description}</span>
-        </div>
-        <div className="mt-1.5 flex flex-wrap gap-1">
-          {table.columns.map((col) => (
-            <Badge
-              key={col.name}
-              variant="outline"
-              className={cn(
-                'h-5 font-mono text-[10px]',
-                col.isPrimaryKey ? 'border-amber-300 text-amber-700' :
-                col.isForeignKey ? 'border-blue-300 text-blue-700' :
-                'text-muted-foreground'
-              )}
-            >
-              {col.name}
-            </Badge>
-          ))}
-        </div>
-      </div>
-
-      {/* Table data */}
-      <div className="flex-1 overflow-auto">
-        <table className="w-full border-collapse text-xs">
-          <thead className="sticky top-0 bg-muted/80 shadow-[0_1px_0] shadow-border">
-            <tr>
-              {table.columns.map((col) => (
-                <th
-                  key={col.name}
-                  className={cn(
-                    'whitespace-nowrap border-r px-3 py-2 text-left font-mono font-semibold last:border-r-0',
-                    col.isPrimaryKey ? 'text-amber-700' :
-                    col.isForeignKey ? 'text-blue-700' :
-                    'text-muted-foreground'
-                  )}
-                >
-                  {col.name}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {table.rows.map((row, i) => (
-              <tr
-                key={i}
-                className="border-b transition-colors hover:bg-muted/40"
-              >
-                {table.columns.map((col) => (
-                  <td key={col.name} className="whitespace-nowrap border-r px-3 py-1.5 font-mono last:border-r-0">
-                    {row[col.name] === null ? (
-                      <span className="italic text-muted-foreground">NULL</span>
-                    ) : (
-                      <span className={cn(
-                        col.isPrimaryKey ? 'text-amber-700' :
-                        col.isForeignKey ? 'text-blue-700' :
-                        'text-foreground'
-                      )}>
-                        {String(row[col.name])}
-                      </span>
-                    )}
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      <div className="shrink-0 border-t bg-muted/50 px-4 py-1.5">
-        <span className="font-mono text-[10px] text-muted-foreground">
-          {table.rows.length} rows · {table.columns.length} cols{table.foreignKeys.length > 0 && ` · ${table.foreignKeys.length} FK`}
-        </span>
-      </div>
+    <div className="p-3">
+      <ResultTable
+        title={`${table.schema}.${table.name}`}
+        meta={[table.description]}
+        columns={columns}
+        rows={rows}
+        footer={[
+          `${table.rows.length} rows · ${table.columns.length} cols${table.foreignKeys.length > 0 ? ` · ${table.foreignKeys.length} FK` : ''}`,
+        ]}
+      />
     </div>
   )
 }

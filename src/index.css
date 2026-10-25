@@ -37,20 +37,20 @@ body {
 }
 
 /* ── React Flow overrides ─────────────────────────────────────────────────── */
-/* 색은 tokens.css의 shadcn 변수를 경유. Phase 2에서 --color-* 시맨틱 토큰으로 이관. */
-.react-flow__background { background: hsl(var(--background)) !important; }
+/* 색은 tokens.css §2c 시맨틱 토큰(--color-*)만. */
+.react-flow__background { background: var(--color-paper-sunk) !important; }
 
 .react-flow__controls button {
-  background: hsl(var(--card)) !important;
-  border-color: hsl(var(--border)) !important;
-  color: hsl(var(--muted-foreground)) !important;
+  background: var(--color-paper) !important;
+  border-color: var(--color-line) !important;
+  color: var(--color-ink-2) !important;
   box-shadow: 0 1px 3px rgba(0,0,0,0.06) !important;
 }
 .react-flow__controls button:hover {
-  background: hsl(var(--muted)) !important;
-  color: hsl(var(--foreground)) !important;
+  background: var(--color-rail) !important;
+  color: var(--color-ink) !important;
 }
 .react-flow__minimap {
-  background: hsl(var(--card)) !important;
-  border: 1px solid hsl(var(--border)) !important;
+  background: var(--color-paper) !important;
+  border: 1px solid var(--color-line) !important;
 }

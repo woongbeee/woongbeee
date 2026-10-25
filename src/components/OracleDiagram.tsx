@@ -3,46 +3,33 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useInternalsStore, STEP_PROCESS_LABEL } from '@/store/internalsStore'
 import type { Lang } from '@/store/simulationStore'
 import { useLangStore } from '@/store/simulationStore'
-import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 
 // ── Color maps (module-level constants, never recreated) ───────────────────
+// 영역별 색·상태 규칙은 공용 OracleArchitectureDiagram 의 HUE 와 동일:
+// 기본 = bg-paper + 옅은 테두리, 활성 = 틴트 + inset ring. 색은 viz-* 토큰만.
 
-type Accent = 'blue' | 'orange' | 'amber' | 'neutral' | 'indigo' | 'teal' | 'slate'
+type Hue = 'blue' | 'amber' | 'green' | 'purple' | 'slate'
 
-const ACCENT: Record<Accent, { border: string; bg: string; text: string; ring: string }> = {
-  blue:    { border: 'border-blue-500',    bg: 'bg-blue-100',    text: 'text-blue-800',   ring: 'ring-blue-300' },
-  indigo:  { border: 'border-indigo-500',  bg: 'bg-indigo-100',  text: 'text-indigo-800', ring: 'ring-indigo-300' },
-  teal:    { border: 'border-teal-500',    bg: 'bg-teal-100',    text: 'text-teal-800',   ring: 'ring-teal-300' },
-  orange:  { border: 'border-orange-500',  bg: 'bg-orange-100',  text: 'text-orange-800', ring: 'ring-orange-300' },
-  amber:   { border: 'border-amber-500',   bg: 'bg-amber-100',   text: 'text-amber-800',  ring: 'ring-amber-300' },
-  slate:   { border: 'border-slate-400',   bg: 'bg-slate-100',   text: 'text-slate-700',  ring: 'ring-slate-200' },
-  neutral: { border: 'border-border',      bg: 'bg-card',        text: 'text-foreground',  ring: '' },
+const HUE: Record<Hue, { text: string; base: string; lit: string; ring: string; accent: string }> = {
+  blue:   { text: 'text-viz-blue',   base: 'border-viz-blue/50',   lit: 'border-viz-blue bg-viz-blue/10',     ring: 'ring-viz-blue/40',   accent: 'border-l-viz-blue' },
+  amber:  { text: 'text-viz-amber',  base: 'border-viz-amber/50',  lit: 'border-viz-amber bg-viz-amber/10',   ring: 'ring-viz-amber/40',  accent: 'border-l-viz-amber' },
+  green:  { text: 'text-viz-green',  base: 'border-viz-green/50',  lit: 'border-viz-green bg-viz-green/10',   ring: 'ring-viz-green/40',  accent: 'border-l-viz-green' },
+  purple: { text: 'text-viz-purple', base: 'border-viz-purple/50', lit: 'border-viz-purple bg-viz-purple/10', ring: 'ring-viz-purple/40', accent: 'border-l-viz-purple' },
+  slate:  { text: 'text-ink-2',      base: 'border-line-2',        lit: 'border-ink-3 bg-rail',               ring: 'ring-line-2',        accent: 'border-l-line-2' },
 }
 
-const IDLE_TINT: Record<Accent, string> = {
-  blue:    'border-blue-200/80 bg-blue-50/60',
-  indigo:  'border-indigo-200/80 bg-indigo-50/60',
-  teal:    'border-teal-200/80 bg-teal-50/60',
-  orange:  'border-orange-200/80 bg-orange-50/60',
-  amber:   'border-amber-200/80 bg-amber-50/60',
-  slate:   'border-slate-200/80 bg-slate-50/60',
-  neutral: 'border-border bg-card',
+const boxCls = (hue: Hue, active: boolean) => {
+  const h = HUE[hue]
+  return active ? cn(h.lit, 'ring-1 ring-inset', h.ring) : cn('bg-paper', h.base)
 }
-
-const PROCESS_COLOR = {
-  amber:  { idle: 'border-amber-200/80 bg-amber-50/60',   active: 'border-amber-500 bg-amber-100 ring-amber-300', text: 'text-amber-800',  dot: 'text-amber-500' },
-  orange: { idle: 'border-orange-200/80 bg-orange-50/60', active: 'border-orange-500 bg-orange-100 ring-orange-300', text: 'text-orange-800', dot: 'text-orange-500' },
-  teal:   { idle: 'border-teal-200/80 bg-teal-50/60',     active: 'border-teal-500 bg-teal-100 ring-teal-300',     text: 'text-teal-800',   dot: 'text-teal-500' },
-  indigo: { idle: 'border-indigo-200/80 bg-indigo-50/60', active: 'border-indigo-500 bg-indigo-100 ring-indigo-300', text: 'text-indigo-800', dot: 'text-indigo-500' },
-} as const
 
 const BLOCK_STATE_CLS: Record<string, string> = {
-  cached:   'bg-blue-100 text-blue-800 border-blue-300',
-  hit:      'bg-blue-300 text-blue-900 border-blue-600 font-bold',
-  scanning: 'bg-amber-100 text-amber-800 border-amber-400',
-  free:     'bg-muted text-muted-foreground border-border',
-  loading:  'bg-orange-100 text-orange-800 border-orange-400',
+  cached:   'border-viz-blue/40 bg-viz-blue/10 text-viz-blue',
+  hit:      'border-viz-blue bg-viz-blue text-white',
+  scanning: 'border-viz-amber bg-viz-amber/15 text-viz-amber',
+  free:     'border-line bg-rail text-ink-3',
+  loading:  'border-viz-red bg-viz-red/10 text-viz-red',
 }
 
 function useIsActive(id: string) {
@@ -56,69 +43,66 @@ interface BlockProps {
   label: string
   sublabel?: string
   description: string
-  accent: Accent
+  hue: Hue
   className?: string
   compact?: boolean
   children?: React.ReactNode
 }
 
-function Block({ id, label, sublabel, description, accent, className = '', compact = false, children }: BlockProps) {
+function Block({ id, label, sublabel, description, hue, className = '', compact = false, children }: BlockProps) {
   const active = useIsActive(id)
-  const c = ACCENT[accent]
-  const idle = IDLE_TINT[accent]
 
   return (
     <motion.div
       animate={active ? { scale: [1, 1.03, 1] } : { scale: 1 }}
       transition={{ duration: 0.4, repeat: active ? Infinity : 0, repeatDelay: 0.3 }}
       className={cn(
-        'relative flex flex-col rounded-lg border-2 transition-all duration-200',
+        'relative flex flex-col rounded-card border transition-all duration-200',
         compact ? 'p-1.5' : 'p-2.5',
-        active ? [c.border, c.bg, 'ring-2', c.ring, 'shadow-md'] : idle,
+        boxCls(hue, active),
         className
       )}
     >
       <div>
-        <div className={cn('text-xs font-semibold', active ? c.text : 'text-foreground')}>
+        <div className={cn('font-sans text-[11.5px] font-semibold', HUE[hue].text)}>
           {label}
         </div>
         {sublabel && (
-          <div className={cn('text-[10px]', active ? c.text : 'text-muted-foreground')}>
+          <div className="font-sans text-[10px] text-ink-3">
             {sublabel}
           </div>
         )}
       </div>
-      {!compact && <div className="mt-1 text-[10px] leading-snug text-muted-foreground">{description}</div>}
+      {!compact && <div className="mt-1 font-sans text-[10px] leading-snug text-ink-2">{description}</div>}
       {children && <div className={compact ? 'mt-1' : 'mt-2'}>{children}</div>}
     </motion.div>
   )
 }
 
-function ProcessBadge({ id, label, description, color = 'amber', compact = false }: {
-  id: string; label: string; description: string; color?: keyof typeof PROCESS_COLOR; compact?: boolean
+function ProcessBadge({ id, label, description, compact = false }: {
+  id: string; label: string; description: string; compact?: boolean
 }) {
   const active = useIsActive(id)
-  const c = PROCESS_COLOR[color]
 
   return (
     <motion.div
       animate={active ? { y: [0, -3, 0], scale: [1, 1.06, 1] } : { y: 0, scale: 1 }}
       transition={{ duration: 0.45, repeat: active ? Infinity : 0, repeatDelay: 0.2 }}
       className={cn(
-        'flex flex-col items-center rounded-lg border-2 transition-all duration-200',
+        'flex flex-col items-center rounded-card border transition-all duration-200',
         compact ? 'px-1.5 py-1.5' : 'px-2 py-2',
-        active ? [c.active, 'ring-2 shadow-md'] : c.idle
+        boxCls('amber', active)
       )}
       title={description}
     >
-      <span className={cn('text-[11px] font-bold', active ? c.text : 'text-foreground')}>
+      <span className="font-mono text-[11px] font-bold tracking-wide text-viz-amber">
         {label}
       </span>
       {active && (
         <motion.span
           animate={{ opacity: [1, 0.4, 1] }}
           transition={{ repeat: Infinity, duration: 0.8 }}
-          className={cn('mt-0.5 text-[9px] font-bold', c.dot)}
+          className="mt-0.5 font-mono text-[9px] font-bold text-viz-amber"
         >
           ● ACTIVE
         </motion.span>
@@ -127,28 +111,14 @@ function ProcessBadge({ id, label, description, color = 'amber', compact = false
   )
 }
 
-function SectionLabel({ children, color = 'default' }: { children: React.ReactNode; color?: 'default' | 'blue' | 'indigo' | 'amber' | 'slate' }) {
-  const textCls = {
-    default: 'text-muted-foreground',
-    blue:    'text-blue-600',
-    indigo:  'text-indigo-600',
-    amber:   'text-amber-700',
-    slate:   'text-slate-500',
-  }[color]
-  const lineCls = {
-    default: 'bg-border',
-    blue:    'bg-blue-200',
-    indigo:  'bg-indigo-200',
-    amber:   'bg-amber-200',
-    slate:   'bg-slate-200',
-  }[color]
-
+// 라벨 붙은 외곽 프레임 — OracleArchitectureDiagram 의 Frame 과 같은 모양
+function Frame({ kicker, hue, className, children }: { kicker: string; hue: Hue; className?: string; children: React.ReactNode }) {
   return (
-    <div className="mb-2 flex items-center gap-2">
-      <span className={cn('text-[9px] font-bold uppercase tracking-[0.15em]', textCls)}>
-        {children}
-      </span>
-      <div className={cn('h-px flex-1', lineCls)} />
+    <div className={cn('rounded-panel border border-l-[3px] border-line bg-paper', HUE[hue].accent, className)}>
+      <div className="mb-2 font-mono text-[9px] font-bold uppercase tracking-[0.12em] text-ink-3">
+        {kicker}
+      </div>
+      {children}
     </div>
   )
 }
@@ -173,18 +143,16 @@ function LibraryCacheBlock({ compact = false }: { compact?: boolean }) {
       animate={active ? { scale: [1, 1.03, 1] } : { scale: 1 }}
       transition={{ duration: 0.4, repeat: active ? Infinity : 0, repeatDelay: 0.3 }}
       className={cn(
-        'relative flex flex-col rounded-lg border-2 transition-all duration-200',
+        'relative flex flex-col rounded-card border transition-all duration-200',
         compact ? 'p-1.5' : 'p-2.5',
-        active
-          ? 'border-indigo-500 bg-indigo-100 ring-2 ring-indigo-300 shadow-md'
-          : 'border-indigo-200/80 bg-indigo-50/60'
+        boxCls('blue', active)
       )}
     >
-      <div className={cn('text-xs font-semibold', active ? 'text-indigo-800' : 'text-foreground')}>
+      <div className="font-sans text-[11.5px] font-semibold text-viz-blue">
         Library Cache
       </div>
       {!compact && (
-        <div className="mt-1 text-[10px] leading-snug text-muted-foreground">
+        <div className="mt-1 font-sans text-[10px] leading-snug text-ink-2">
           {lang === 'ko' ? '파싱된 SQL·실행 계획 캐싱. Soft Parse 활성화' : 'Caches parsed SQL & execution plans. Enables Soft Parse'}
         </div>
       )}
@@ -195,10 +163,10 @@ function LibraryCacheBlock({ compact = false }: { compact?: boolean }) {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="mt-2 overflow-hidden rounded-md border border-indigo-200 bg-white/90"
+            className="mt-2 overflow-hidden rounded-card border border-line-2 bg-paper"
           >
-            <div className="border-b border-indigo-100 bg-indigo-50 px-2 py-1">
-              <span className="font-mono text-[9px] font-bold uppercase tracking-widest text-indigo-500">
+            <div className="border-b border-line-2 bg-rail px-2 py-1">
+              <span className="font-mono text-[9px] font-bold uppercase tracking-[0.12em] text-ink-3">
                 cached cursor pool
               </span>
             </div>
@@ -209,21 +177,24 @@ function LibraryCacheBlock({ compact = false }: { compact?: boolean }) {
                   <motion.div
                     key={cq}
                     initial={{ opacity: 0, x: -4 }}
-                    animate={{ opacity: 1, x: 0, background: isMatch && (isHit || isSearching) ? '#e0e7ff' : 'transparent' }}
+                    animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: isSearching ? i * 0.18 : 0, duration: 0.35 }}
-                    className="flex items-center gap-1.5 rounded px-1.5 py-0.5"
+                    className={cn(
+                      'flex items-center gap-1.5 rounded-chip px-1.5 py-0.5 transition-colors duration-300',
+                      isMatch && (isHit || isSearching) && 'bg-viz-blue/10'
+                    )}
                   >
-                    <span className={cn('shrink-0 font-mono text-[8px] font-bold', isMatch ? 'text-indigo-600' : 'text-muted-foreground')}>
+                    <span className={cn('shrink-0 font-mono text-[8px] font-bold', isMatch ? 'text-viz-blue' : 'text-ink-3')}>
                       #{i + 1}
                     </span>
-                    <span className={cn('flex-1 truncate font-mono text-[9px]', isMatch ? 'font-bold text-indigo-800' : 'text-muted-foreground')}>
+                    <span className={cn('flex-1 truncate font-mono text-[9px]', isMatch ? 'font-bold text-ink' : 'text-ink-3')}>
                       {cq}
                     </span>
                     {isMatch && isHit && (
                       <motion.span
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
-                        className="shrink-0 rounded bg-indigo-600 px-1 font-mono text-[8px] font-bold text-white"
+                        className="shrink-0 rounded-chip bg-viz-blue px-1 font-mono text-[8px] font-bold text-white"
                       >
                         HIT
                       </motion.span>
@@ -235,11 +206,11 @@ function LibraryCacheBlock({ compact = false }: { compact?: boolean }) {
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className="flex items-center gap-1.5 rounded border border-dashed border-orange-300 bg-orange-50 px-1.5 py-0.5"
+                  className="flex items-center gap-1.5 rounded-chip border border-dashed border-viz-red/50 bg-viz-red/10 px-1.5 py-0.5"
                 >
-                  <span className="shrink-0 font-mono text-[8px] font-bold text-orange-500">?</span>
-                  <span className="flex-1 truncate font-mono text-[9px] text-orange-600">{query}</span>
-                  <span className="shrink-0 rounded bg-orange-500 px-1 font-mono text-[8px] font-bold text-white">MISS</span>
+                  <span className="shrink-0 font-mono text-[8px] font-bold text-viz-red">?</span>
+                  <span className="flex-1 truncate font-mono text-[9px] text-viz-red">{query}</span>
+                  <span className="shrink-0 rounded-chip bg-viz-red px-1 font-mono text-[8px] font-bold text-white">MISS</span>
                 </motion.div>
               )}
             </div>
@@ -277,18 +248,16 @@ function BufferCacheBlock({ compact = false }: { compact?: boolean }) {
       animate={active ? { scale: [1, 1.03, 1] } : { scale: 1 }}
       transition={{ duration: 0.4, repeat: active ? Infinity : 0, repeatDelay: 0.3 }}
       className={cn(
-        'relative flex flex-col rounded-lg border-2 transition-all duration-200',
+        'relative flex flex-col rounded-card border transition-all duration-200',
         compact ? 'p-1.5' : 'p-2.5',
-        active
-          ? 'border-blue-500 bg-blue-100 ring-2 ring-blue-300 shadow-md'
-          : 'border-blue-200/80 bg-blue-50/60'
+        boxCls('blue', active)
       )}
     >
-      <div className={cn('text-xs font-semibold', active ? 'text-blue-800' : 'text-foreground')}>
+      <div className="font-sans text-[11.5px] font-semibold text-viz-blue">
         Database Buffer Cache
       </div>
       {!compact && (
-        <div className="mt-1 text-[10px] leading-snug text-muted-foreground">
+        <div className="mt-1 font-sans text-[10px] leading-snug text-ink-2">
           {lang === 'ko' ? '디스크 블록 메모리 캐시. LRU 관리' : 'In-memory disk block cache. LRU managed'}
         </div>
       )}
@@ -308,7 +277,7 @@ function BufferCacheBlock({ compact = false }: { compact?: boolean }) {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: isChecking ? i * 0.1 : 0 }}
                 className={cn(
-                  'rounded border px-1 py-0.5 text-center font-mono text-[8px] font-bold',
+                  'rounded-chip border px-1 py-0.5 text-center font-mono text-[8px] font-bold',
                   BLOCK_STATE_CLS[blk.state]
                 )}
               >
@@ -316,7 +285,7 @@ function BufferCacheBlock({ compact = false }: { compact?: boolean }) {
               </motion.div>
             ))}
             {(isMiss || isDiskIo) && (
-              <div className="col-span-3 mt-0.5 font-mono text-[9px] text-orange-600">
+              <div className="col-span-3 mt-0.5 font-mono text-[9px] text-viz-red">
                 {isDiskIo
                   ? (lang === 'ko' ? '↑ Disk → Buffer 로드 중…' : '↑ Loading Disk → Buffer…')
                   : (lang === 'ko' ? '블록 없음 → Disk I/O 필요' : 'Block not found → Disk I/O required')}
@@ -346,12 +315,12 @@ export function OracleDiagram({ compact = false }: { compact?: boolean }) {
   const innerPadSm = compact ? 'p-1.5' : 'p-2.5'
 
   return (
-    <div className={cn('flex h-full flex-col', gap, pad)}>
+    <div className={cn('flex h-full flex-col bg-paper-sunk', gap, pad)}>
       {/* Instance header */}
       <div className="flex shrink-0 items-center gap-3">
-        <div className="flex items-center gap-2 rounded-lg border border-blue-300 bg-blue-50 px-3 py-1.5">
-          <span className="h-2 w-2 rounded-full bg-blue-500" />
-          <span className="font-mono text-xs font-bold text-blue-800">Oracle Database Instance</span>
+        <div className="flex items-center gap-2 rounded-card border border-line-2 bg-paper px-3 py-1.5">
+          <span className="h-2 w-2 rounded-full bg-viz-blue" />
+          <span className="font-mono text-xs font-bold text-ink">Oracle Database Instance</span>
         </div>
         <AnimatePresence mode="wait">
           {currentStep !== 'idle' && (
@@ -362,11 +331,11 @@ export function OracleDiagram({ compact = false }: { compact?: boolean }) {
               exit={{ opacity: 0, x: 6 }}
               className="flex items-center gap-2"
             >
-              <Badge variant="outline" className="font-mono text-[10px] font-bold">
+              <span className="rounded-chip border border-line bg-paper px-2 py-0.5 font-mono text-[10px] font-bold text-ink">
                 {highlightedStep ? `📌 ${highlightedStep}` : `▶ ${currentStep}`}
-              </Badge>
+              </span>
               {stepLabel && (
-                <span className="font-mono text-[10px] text-muted-foreground">{stepLabel}</span>
+                <span className="font-mono text-[10px] text-ink-2">{stepLabel}</span>
               )}
             </motion.div>
           )}
@@ -375,53 +344,49 @@ export function OracleDiagram({ compact = false }: { compact?: boolean }) {
 
       {/* Server Process + PGA */}
       <div className="grid shrink-0 grid-cols-2 gap-2">
-        <Block id="server-process" label="Server Process" description={D.serverProcess} accent="teal" compact={compact} />
-        <Block id="pga" label="PGA" sublabel="Program Global Area" description={D.pga} accent="teal" compact={compact} />
+        <Block id="server-process" label="Server Process" description={D.serverProcess} hue="green" compact={compact} />
+        <Block id="pga" label="PGA" sublabel="Program Global Area" description={D.pga} hue="purple" compact={compact} />
       </div>
 
       {/* SGA */}
-      <div className={cn('flex min-h-0 flex-1 flex-col rounded-xl border-2 border-blue-300 bg-blue-50/50 shadow-sm', innerPad)}>
-        <SectionLabel color="blue">SGA — System Global Area</SectionLabel>
+      <Frame kicker="SGA — System Global Area" hue="blue" className={cn('flex min-h-0 flex-1 flex-col', innerPad)}>
 
         {/* Shared Pool */}
-        <div className={cn('mb-2 shrink-0 rounded-lg border-2 border-indigo-200 bg-indigo-50/70', innerPadSm)}>
-          <SectionLabel color="indigo">Shared Pool</SectionLabel>
+        <Frame kicker="Shared Pool" hue="blue" className={cn('mb-2 shrink-0', innerPadSm)}>
           <div className="grid grid-cols-2 gap-2">
             <LibraryCacheBlock compact={compact} />
-            <Block id="dict-cache" label="Data Dictionary Cache" description={D.dictCache} accent="indigo" compact={compact} />
+            <Block id="dict-cache" label="Data Dictionary Cache" description={D.dictCache} hue="blue" compact={compact} />
           </div>
-        </div>
+        </Frame>
 
         {/* Buffer Cache + Redo + Undo */}
         <div className="grid flex-1 grid-cols-3 gap-2">
           <BufferCacheBlock compact={compact} />
-          <Block id="redo-buffer" label="Redo Log Buffer" description={D.redoBuffer} accent="orange" compact={compact} />
-          <Block id="undo" label="Undo Segment" description={D.undo} accent="amber" compact={compact} />
+          <Block id="redo-buffer" label="Redo Log Buffer" description={D.redoBuffer} hue="amber" compact={compact} />
+          <Block id="undo" label="Undo Segment" description={D.undo} hue="green" compact={compact} />
         </div>
-      </div>
+      </Frame>
 
       {/* Background Processes */}
-      <div className={cn('shrink-0 rounded-xl border-2 border-amber-200 bg-amber-50/40 shadow-sm', innerPad)}>
-        <SectionLabel color="amber">Background Processes</SectionLabel>
+      <Frame kicker="Background Processes" hue="amber" className={cn('shrink-0', innerPad)}>
         <div className="grid grid-cols-5 gap-2">
-          <ProcessBadge id="dbwr" label="DBWn" description={D.dbwr} color="orange" compact={compact} />
-          <ProcessBadge id="lgwr" label="LGWR" description={D.lgwr} color="orange" compact={compact} />
-          <ProcessBadge id="ckpt" label="CKPT" description={D.ckpt} color="amber"  compact={compact} />
-          <ProcessBadge id="smon" label="SMON" description={D.smon} color="amber"  compact={compact} />
-          <ProcessBadge id="pmon" label="PMON" description={D.pmon} color="teal"   compact={compact} />
+          <ProcessBadge id="dbwr" label="DBWn" description={D.dbwr} compact={compact} />
+          <ProcessBadge id="lgwr" label="LGWR" description={D.lgwr} compact={compact} />
+          <ProcessBadge id="ckpt" label="CKPT" description={D.ckpt} compact={compact} />
+          <ProcessBadge id="smon" label="SMON" description={D.smon} compact={compact} />
+          <ProcessBadge id="pmon" label="PMON" description={D.pmon} compact={compact} />
         </div>
-      </div>
+      </Frame>
 
       {/* Disk */}
-      <div className={cn('shrink-0 rounded-xl border-2 border-slate-300 bg-slate-50/60 shadow-sm', innerPad)}>
-        <SectionLabel color="slate">Disk Storage</SectionLabel>
+      <Frame kicker="Disk Storage" hue="slate" className={cn('shrink-0', innerPad)}>
         <div className="grid grid-cols-4 gap-2">
-          <Block id="disk"          label="Data Files"       description={D.dataFiles}   accent="slate" compact={compact} />
-          <Block id="redo-log-file" label="Online Redo Logs" description={D.redoLogs}    accent="slate" compact={compact} />
-          <Block id="control-file"  label="Control File"     description={D.controlFile} accent="slate" compact={compact} />
-          <Block id="archive-log"   label="Archive Logs"     description={D.archiveLogs} accent="slate" compact={compact} />
+          <Block id="disk"          label="Data Files"       description={D.dataFiles}   hue="slate" compact={compact} />
+          <Block id="redo-log-file" label="Online Redo Logs" description={D.redoLogs}    hue="slate" compact={compact} />
+          <Block id="control-file"  label="Control File"     description={D.controlFile} hue="slate" compact={compact} />
+          <Block id="archive-log"   label="Archive Logs"     description={D.archiveLogs} hue="slate" compact={compact} />
         </div>
-      </div>
+      </Frame>
     </div>
   )
 }

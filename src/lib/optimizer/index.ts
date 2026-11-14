@@ -1,6 +1,6 @@
-// Public surface of the CBO simulator. `optimize()` is the only entry point
-// consumed outside this folder (src/store/internalsStore.ts).
-// Types come from '@/lib/optimizer/types' directly; the rest of the modules
-// (parser, estimator, stats) are implementation detail — import them from
-// their own files when working inside src/lib/optimizer/.
+// Public surface of the CBO simulator.
+//   parseSQL()  — Syntax Check + Semantic Check
+//   optimize()  — Query Transformer → Estimator → Plan Generator (+ Row Source Tree)
+// 소비처는 시뮬레이터 엔진(src/lib/simulator). 타입은 './types' 에서 직접 import.
+export { parseSQL } from './parser'
 export { optimize } from './planGenerator'

@@ -12,12 +12,7 @@ function initialTheme(): Theme {
   } catch {
     /* localStorage unavailable — fall through */
   }
-  try {
-    if (window.matchMedia?.('(prefers-color-scheme: dark)').matches) return 'dark'
-  } catch {
-    /* no matchMedia */
-  }
-  return 'light'
+  return 'dark' // 기본은 다크 모드 — 사용자가 토글로 고른 값만 저장해 두고 따른다
 }
 
 function persistTheme(theme: Theme) {

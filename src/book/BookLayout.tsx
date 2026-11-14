@@ -1,12 +1,11 @@
 import { memo, useState } from 'react'
+import { AppFooter } from '@/components/AppFooter'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useLangStore } from '@/store/simulationStore'
-import { useInternalsStore } from '@/store/internalsStore'
 import { TableOfContents } from './TableOfContents'
 import { BookContent } from './BookContent'
 import { GlossaryPanel } from './GlossaryPanel'
 import { SchemaPanel } from './SchemaPanel'
-import { Badge } from '@/components/ui/badge'
 import { IconLanguage, IconSettings, IconChevronRight, IconDatabase, IconSun, IconMoon } from '@tabler/icons-react'
 
 const T: Record<
@@ -72,7 +71,11 @@ const TocTab = memo(function TocTab({ onToggle }: { onToggle: () => void }) {
   )
 })
 
-export function BookLayout() {
+interface Props {
+  onOpenSimulator: () => void // 메인(Internals Simulator)으로 돌아가기
+}
+
+export function BookLayout({ onOpenSimulator }: Props) {
   const lang = useLangStore((s) => s.lang)
   const setLang = useLangStore((s) => s.setLang)
   const theme = useLangStore((s) => s.theme)
@@ -126,7 +129,7 @@ export function BookLayout() {
           <span className="hidden font-mono text-[10px] text-ink-3 lg:inline">updated {__BUILD_DATE__}</span>
           <span className="hidden h-3.5 w-px bg-line lg:block" />
           <button
-            onClick={() => window.open(`${window.location.pathname}#simulator`, '_blank', 'width=1400,height=900')}
+            onClick={onOpenSimulator}
             className="flex items-center gap-1.5 rounded-chip border border-line bg-paper px-2.5 py-1 font-mono text-[10px] font-medium text-ink-2 transition-colors hover:bg-rail hover:text-ink"
           >
             <IconSettings size={12} />
@@ -147,7 +150,6 @@ export function BookLayout() {
           >
             {theme === 'dark' ? <IconSun size={13} /> : <IconMoon size={13} />}
           </button>
-          <SimulationBadge />
         </div>
       </header>
 
@@ -205,18 +207,7 @@ export function BookLayout() {
           />
         )}
       </div>
+      <AppFooter />
     </div>
   )
 }
-
-// Isolated: only re-renders on isRunning changes
-const SimulationBadge = memo(function SimulationBadge() {
-  const isRunning = useInternalsStore((s) => s.isRunning)
-  if (!isRunning) return null
-  return (
-    <Badge variant="outline" className="border-line font-mono text-[10px] text-ink-2">
-      <span className="mr-1.5 inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-ink-3" />
-      RUNNING
-    </Badge>
-  )
-})

@@ -2,16 +2,12 @@
 // Reusable Oracle execution plan viewer.
 // Supports three tabs: Plan Tree · Row Source Operations · Statistics (Call / Wait Events)
 //
-// Usage A — raw data:
+// Usage:
 //   <ExecutionPlanViewer nodes={nodes} stats={stats} />
-//
-// Usage B — from OptimizerResult (auto-converts):
-//   <ExecutionPlanViewer fromResult={optimizerResult} />
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
-import type { OptimizerResult } from '@/lib/optimizer/types'
 import {
   IconChevronDown,
   IconChevronRight,
@@ -81,7 +77,6 @@ export interface PlanStats {
 export interface ExecutionPlanViewerProps {
   nodes?: PlanNode[]
   stats?: PlanStats
-  fromResult?: OptimizerResult | null
   sql?: string
   defaultTab?: TabId
   tabs?: TabId[]          // 표시할 탭 목록. 생략 시 전체 표시
@@ -91,124 +86,6 @@ export interface ExecutionPlanViewerProps {
 }
 
 type TabId = 'plan' | 'rowsource' | 'statistics'
-
-// ── Convert OptimizerResult → PlanNode[] + PlanStats ─────────────────────────
-
-function fromOptimizerResult(result: OptimizerResult): { nodes: PlanNode[]; stats: PlanStats } {
-  const { plan, phases } = result
-  const nodes: PlanNode[] = []
-  let id = 1
-
-  nodes.push({
-    id: id++,
-    parentId: null,
-    operation: 'SELECT STATEMENT',
-    cost: plan.totalCost,
-    estimatedRows: plan.estimatedRows,
-    optimizerMode: 'ALL_ROWS',
-  } as PlanNode & { optimizerMode: string })
-
-  if (plan.joinSteps.length > 0) {
-    let parentId = 1
-    for (let i = plan.joinSteps.length - 1; i >= 0; i--) {
-      const j = plan.joinSteps[i]
-      nodes.push({
-        id: id++,
-        parentId,
-        operation: j.method.replace(/_/g, ' '),
-        cost: j.cost,
-        estimatedRows: j.outputCardinality,
-        note: j.reason,
-      })
-      parentId = id - 1
-    }
-    const joinParentId = nodes[nodes.length - 1].id
-    for (const ap of plan.tableAccessPlans) {
-      const opParts = ap.chosen.type.replace(/_/g, ' ').split(' ')
-      const options = opParts.slice(2).join(' ') || undefined
-      const operation = opParts.slice(0, 2).join(' ')
-      nodes.push({
-        id: id++,
-        parentId: joinParentId,
-        operation,
-        options,
-        objectName: ap.tableName,
-        objectType: ap.chosen.indexName ? 'INDEX' : 'TABLE',
-        cost: ap.chosen.cost,
-        estimatedRows: ap.chosen.cardinality,
-        ioCost: ap.chosen.ioCost,
-        cpuCost: ap.chosen.cpuCost,
-        note: ap.chosen.reason,
-      })
-      if (ap.chosen.indexName) {
-        nodes.push({
-          id: id++,
-          parentId: id - 2,
-          operation: 'INDEX',
-          options: ap.chosen.type.includes('UNIQUE') ? 'UNIQUE SCAN' : 'RANGE SCAN',
-          objectName: ap.chosen.indexName,
-          objectType: 'INDEX',
-          cost: ap.chosen.ioCost,
-          estimatedRows: ap.chosen.cardinality,
-        })
-      }
-    }
-  } else {
-    for (const ap of plan.tableAccessPlans) {
-      const opParts = ap.chosen.type.replace(/_/g, ' ').split(' ')
-      const options = opParts.slice(2).join(' ') || undefined
-      const operation = opParts.slice(0, 2).join(' ')
-      nodes.push({
-        id: id++,
-        parentId: 1,
-        operation,
-        options,
-        objectName: ap.tableName,
-        objectType: ap.chosen.indexName ? 'INDEX' : 'TABLE',
-        cost: ap.chosen.cost,
-        estimatedRows: ap.chosen.cardinality,
-        ioCost: ap.chosen.ioCost,
-        cpuCost: ap.chosen.cpuCost,
-        note: ap.chosen.reason,
-      })
-      if (ap.chosen.indexName) {
-        nodes.push({
-          id: id++,
-          parentId: id - 2,
-          operation: 'INDEX',
-          options: ap.chosen.type.includes('UNIQUE') ? 'UNIQUE SCAN' : 'RANGE SCAN',
-          objectName: ap.chosen.indexName,
-          objectType: 'INDEX',
-          cost: ap.chosen.ioCost,
-          estimatedRows: ap.chosen.cardinality,
-        })
-      }
-    }
-  }
-
-  const estCost = plan.totalCost
-  const stats: PlanStats = {
-    sql: plan.query.rawSQL,
-    optimizerMode: 'ALL_ROWS',
-    optimizerCost: estCost,
-    optimizerRows: plan.estimatedRows,
-    callStats: [
-      { name: 'Parse',   count: 1, cpuMs: Math.round(estCost * 0.02),  elapsedMs: Math.round(estCost * 0.03),  diskReads: 0,  queryReads: 0,  currentReads: 0,  rowsProcessed: 0 },
-      { name: 'Execute', count: 1, cpuMs: 0,                            elapsedMs: 0,                           diskReads: 0,  queryReads: 0,  currentReads: 0,  rowsProcessed: 0 },
-      { name: 'Fetch',   count: Math.ceil(plan.estimatedRows / 100),    cpuMs: Math.round(estCost * 0.8),  elapsedMs: Math.round(estCost * 1.2),  diskReads: Math.round(estCost * 0.3),  queryReads: Math.round(plan.estimatedRows * 0.1),  currentReads: 0,  rowsProcessed: plan.estimatedRows },
-    ],
-    waitEvents: [
-      { event: 'db file sequential read', waits: Math.round(estCost * 0.2), timeoutCount: 0, totalWaitMs: Math.round(estCost * 0.5), avgWaitMs: 3, maxWaitMs: 12 },
-      { event: 'db file scattered read',  waits: Math.round(estCost * 0.1), timeoutCount: 0, totalWaitMs: Math.round(estCost * 0.3), avgWaitMs: 5, maxWaitMs: 18 },
-    ],
-    note: phases.flatMap((p) => p.details),
-    predInfo: plan.query.predicates.map(
-      (pred) => `access("${pred.table}"."${pred.column}" ${pred.operator} '${pred.value}')`
-    ),
-  }
-
-  return { nodes, stats }
-}
 
 // ── Tree helpers ──────────────────────────────────────────────────────────────
 
@@ -752,7 +629,6 @@ const TAB_LABELS: Record<TabId, { ko: string; en: string; icon: React.ReactNode 
 export function ExecutionPlanViewer({
   nodes: nodesProp,
   stats: statsProp,
-  fromResult,
   sql,
   defaultTab = 'plan',
   tabs,
@@ -763,18 +639,10 @@ export function ExecutionPlanViewer({
   const visibleTabs = tabs ?? (Object.keys(TAB_LABELS) as TabId[])
   const [activeTab, setActiveTab] = useState<TabId>(defaultTab)
 
-  const { nodes, stats } = (() => {
-    if (fromResult) {
-      const converted = fromOptimizerResult(fromResult)
-      return {
-        nodes: converted.nodes,
-        stats: { ...converted.stats, sql: sql ?? converted.stats.sql },
-      }
-    }
-    return { nodes: nodesProp ?? [], stats: sql ? { ...statsProp, sql } : statsProp }
-  })()
+  const nodes = nodesProp ?? []
+  const stats = sql ? { ...statsProp, sql } : statsProp
 
-  if (nodes.length === 0 && !fromResult) {
+  if (nodes.length === 0) {
     return (
       <div className="flex h-20 items-center justify-center rounded-xl border bg-muted/20 font-mono text-xs text-muted-foreground">
         No execution plan data

@@ -39,7 +39,7 @@ npx prettier --write .  # 코드 포매팅 (format 스크립트 없음, 직접 �
 
 ### 앱 진입점 및 뷰 전환
 
-`App.tsx`가 `AppView: 'landing' | 'book'` 로컬 state로 최상위 뷰를 제어한다. `'landing'` 시 `#root`에 `.landing` 클래스가 붙어 전체 배경 스타일이 달라진다.
+`App.tsx`가 `AppView: 'simulator' | 'book'`으로 최상위 뷰를 제어한다. **메인(첫 화면)은 Internals Simulator**(`src/simulator/SimulatorPage.tsx`)이고, URL 해시가 `#book`이면 학습서(`BookLayout`)를 렌더한다. 해시가 단일 진실 공급원(`useSyncExternalStore` + `hashchange`)이라 새로고침·뒤로 가기가 그대로 동작한다. 시뮬레이터 상단의 "학습서로 이동하기" 버튼(`onOpenBook`)과 학습서 헤더의 "Internals Simulator" 버튼(`onOpenSimulator`)이 해시를 바꿔 서로 오간다. 두 뷰 모두 `lazy()`로 코드 스플리팅. `?print=<sectionId>`는 PDF 인쇄용 단독 렌더.
 
 ### Book 레이아웃 (`src/book/`)
 
@@ -86,17 +86,23 @@ interface Props {
 3. `BookContent.tsx` 상단에 `lazy(() => import(...))`로 챕터 컴포넌트 등록 + `SectionRouter`에 접두사 분기 추가 (챕터는 코드 스플리팅되어 별도 청크로 로드된다 — 정적 import 금지)
 4. 시뮬레이터 섹션(전체 높이 레이아웃이 필요한 섹션)은 `BookContent.tsx`의 `SectionRouter`에서 별도 처리 필요 (레이아웃 wrapper 없이 직접 렌더링)
 
-### 시뮬레이션 데이터 흐름
+### Internals Simulator (`src/simulator/` + `src/lib/simulator/`)
 
 ```
-사용자 SQL 입력 (QueryInput)
-  → internalsStore.startSimulation()
-      → lib/optimizer/index.ts: optimize(sql)   ← CBO 실행 계획 생성
-      → 13단계 시뮬레이션 루프 (각 단계마다 activeComponents 업데이트)
-  → OracleDiagram (activeComponents에 따라 블록 하이라이트/애니메이션)
-  → OptimizerPanel (OptimizerResult 표시)
-  → QueryInput 하단 (stepLog 실시간, stepSummary 완료 후)
+SQL 입력 (SqlConsole)
+  → internalsStore.run(sql)
+      → lib/simulator/engine.ts: runStatement(instance, sql)   ← 순수 함수, Trace 를 통째로 계산
+          → lib/optimizer: parseSQL() → optimize()             ← Syntax/Semantic Check, CBO
+  → 스토어는 Trace.steps 위에서 cursor(재생 위치)만 움직인다
+  → InstanceDiagram(단계별 InstanceState 스냅숏) · PipelineBar · DetailPanel(단계 해설 · Optimizer · 통계)
 ```
+
+- **엔진은 순수 함수** — `(이전 InstanceState, 입력) → Trace`. 각 `SimStep` 이 그 시점의 상태 스냅숏(`state`)을 들고 있어 앞뒤 이동이 자유롭다. 무작위 요소 없음(같은 입력 → 같은 결과).
+- **단계 순서는 Oracle 공식 문서(SQL Tuning Guide "SQL Processing", Concepts)를 따른다:** Parse Call → Syntax Check → Semantic Check → Shared Pool Check → (Hard Parse 만) Optimization ①Transformer ②Estimator ③Plan Generator → Row Source Generation → Execute → Fetch. 각 단계의 `doc` 키가 `DOCS` 의 공식 문서 링크로 이어진다.
+- **Buffer Cache 는 실제 블록 주소로 움직인다** — `execution.ts` 가 샘플 행에 조건을 실제로 적용해 "어느 행 → 어느 블록"을 구한다. 인덱스 스캔과 `TABLE ACCESS BY INDEX ROWID` 는 별도 단계.
+- **DML 순서:** Lock(Current Mode Get) → Redo(Redo Log Buffer) → Undo 블록 → 데이터 블록. 샘플 행 자체는 바꾸지 않는다(블록·Lock·Undo·Redo 움직임만 재현).
+- **Online Redo Log 는 3개 그룹** — CURRENT 그룹이 `REDO_LOG_BYTES` 를 넘으면 문장 끝에 Log Switch → ARCn → Checkpoint 단계가 이어진다(`Run.finish()`).
+- 새 다이어그램 컴포넌트 id 를 엔진의 `active`/`flows` 에 쓰면 `simulator/componentNames.ts` 에도 추가한다.
 
 ### 상태 관리 (`src/store/`)
 
@@ -108,25 +114,20 @@ interface Props {
 - 모든 챕터 페이지·레이아웃·GlossaryPanel이 이 스토어에서 `lang`을 읽음
 
 **`internalsStore.ts` — Internals Simulator 전용 상태**
-- `currentStep / isRunning / isComplete` — 시뮬레이션 제어
-- `activeComponents: Set<string>` — OracleDiagram에서 어떤 블록을 활성화할지
-- `highlightedStep` — stepSummary 타임라인 클릭 시 해당 단계로 핀 고정 (null이면 현재 단계 따라감)
-- `cachedQueries` — Library Cache 쿼리 목록 (최대 8개, FIFO). 3개 시드 쿼리로 초기화
-- `bufferFlushed` — `flushBuffers()` 호출 후 `true`가 되어 다음 시뮬레이션에서 반드시 Buffer Miss 발생; 시뮬레이션 완료 시 자동 `false` 리셋
+- `instance` — 마지막 문장까지 반영된 `InstanceState` (다음 문장의 출발점)
+- `trace` / `cursor` — 지금 보고 있는 문장의 단계 목록과 재생 위치. `selectStep`·`selectState` 셀렉터로 읽는다
+- `playing` / `speed` — 자동 재생. `run(sql)`·`command(cmd)`·`play/pause/next/prev/goTo`·`restart`
+- `baseStats` — 현재 trace 실행 직전의 통계 (문장별 증가분 계산용)
 
-`startSimulation()`은 실행 시점에 `useLangStore.getState().lang`으로 현재 언어를 가져온다.
-
-Library Cache Hit 판단: `trim().toUpperCase()` 정규화 후 `cachedQueries`와 완전 일치 비교. Buffer Cache Hit 판단: `bufferFlushed`가 false이면 `Math.random() > 0.5`로 무작위 결정.
+Library Cache Hit 판단은 문장 텍스트의 해시(SQL_ID) 완전 일치 — 대소문자·공백·리터럴이 다르면 Hard Parse.
 
 ### CBO 옵티마이저 (`src/lib/optimizer/`)
 
 Oracle CBO를 모방한 순수 TypeScript 구현:
-- `parser.ts` — SQL SELECT 파싱 (테이블, 컬럼, WHERE 조건, JOIN 추출)
-- `stats.ts` — 12개 테이블의 시뮬레이션 통계 (NDV, numRows, numBlocks 등)
-- `estimator.ts` — 선택도(selectivity) 계산, 액세스 패스 비용 추정, 조인 비용 추정
-- `planGenerator.ts` — 3단계 최적화: Query Transformer → Estimator → Plan Generator
-
-`stats.ts`의 `TABLE_STATS` 테이블 이름이 `hrSchema.ts`·`coSchema.ts`의 스키마 이름과 일치해야 CBO가 올바르게 동작한다.
+- `parser.ts` — `parseSQL()`: Syntax Check(ORA-009xx) → Semantic Check(ORA-00942/00904). SELECT(JOIN · IN/EXISTS 서브쿼리 · GROUP BY · ORDER BY · FETCH FIRST · ROWNUM) · INSERT…VALUES · UPDATE · DELETE · COMMIT · ROLLBACK. 다루지 않는 문장은 조용히 무시하지 말고 `unsupported(ko, en)` 로 거절한다
+- `stats.ts` — 통계를 손으로 적지 않고 `@/data` 의 샘플 행에서 직접 센다 (NUM_ROWS · NDV · LOW/HIGH · 인덱스). 교육용으로 블록당 `ROWS_PER_BLOCK`=4행
+- `estimator.ts` — Selectivity → Cardinality → Cost, Access Path 후보 생성
+- `planGenerator.ts` — Query Transformer(Subquery Unnesting→Semi Join, Outer→Inner, Transitive Closure 등) → 조인 순서·방법 선택 → Row Source Tree(`planNodes`)
 
 ### 데이터 스키마 (`src/data/`)
 

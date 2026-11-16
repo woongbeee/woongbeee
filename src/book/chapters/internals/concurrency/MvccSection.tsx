@@ -362,8 +362,6 @@ export function MvccSection() {
         }
       />
 
-      <Divider />
-
       <div className="mt-8">
         <InfoBox variant="warning">
           <strong>{t.undoTitle}</strong>

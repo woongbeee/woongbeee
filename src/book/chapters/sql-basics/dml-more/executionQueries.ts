@@ -77,8 +77,8 @@ export const SELECT_STEPS: ExecStep[] = [
     phase: '④ 결과 반환',
     label: { ko: '결과 반환', en: 'Return results' },
     desc: {
-      ko: '최종 결과 집합이 클라이언트(PGA)로 전달돼요.',
-      en: 'The final result set is returned to the client (PGA).',
+      ko: '최종 결과 집합이 클라이언트로 전달돼요.',
+      en: 'The final result set is returned to the client.',
     },
     color: 'emerald',
   },
@@ -159,8 +159,8 @@ export const UPDATE_STEPS: ExecStep[] = [
       en: 'The change is recorded in a separate history file. If the server crashes, Oracle reads this file to replay and recover the change.',
     },
     hint: {
-      ko: 'Redo Log: "무슨 변경이 있었는지" 기록하는 장부예요. 장애 후 재시작 시 Oracle이 이 장부를 보고 커밋된 변경 사항을 빠짐없이 복원해요. 지금 자세히 몰라도 돼요.',
-      en: 'Redo Log: a journal of "what changed." After a crash, Oracle replays this journal to restore all committed changes. No need to know the details yet.',
+      ko: 'Redo Log: "무슨 변경이 있었는지" 기록하는 장부예요. 실제 Oracle은 블록을 바꾸기 직전에 이 기록부터 만들어요(여기서는 이해하기 쉽게 마지막 단계로 뒀어요). 장애 후 재시작 시 Oracle이 이 장부를 보고 커밋된 변경 사항을 빠짐없이 복원해요. 지금 자세히 몰라도 돼요.',
+      en: 'Redo Log: a journal of "what changed." Oracle actually generates this record just before it changes a block (it is shown last here for simplicity). After a crash, Oracle replays this journal to restore all committed changes. No need to know the details yet.',
     },
     color: 'emerald',
   },
@@ -246,8 +246,8 @@ export const DELETE_STEPS: ExecStep[] = [
       en: 'The deletion is recorded in a history file so Oracle can recover it if the server crashes.',
     },
     hint: {
-      ko: 'Redo Log: "무슨 변경이 있었는지" 기록하는 장부예요. 장애 후 재시작 시 Oracle이 이 장부를 보고 커밋된 변경 사항을 복원해요. 지금 자세히 몰라도 돼요.',
-      en: 'Redo Log: a journal of "what changed." After a crash, Oracle replays this journal to restore committed changes. No need to know the details yet.',
+      ko: 'Redo Log: "무슨 변경이 있었는지" 기록하는 장부예요. 실제 Oracle은 블록을 바꾸기 직전에 이 기록부터 만들어요(여기서는 이해하기 쉽게 마지막 단계로 뒀어요). 장애 후 재시작 시 Oracle이 이 장부를 보고 커밋된 변경 사항을 복원해요. 지금 자세히 몰라도 돼요.',
+      en: 'Redo Log: a journal of "what changed." Oracle actually generates this record just before it changes a block (it is shown last here for simplicity). After a crash, Oracle replays this journal to restore committed changes. No need to know the details yet.',
     },
     color: 'emerald',
   },
@@ -363,8 +363,8 @@ function buildExampleQueries(emps: Employee[]): ExampleQuery[] {
           phase: '③ 결과 반환',
           label: { ko: '결과 반환', en: 'Return results' },
           desc: {
-            ko: `${totalCount}개 행 전체가 최종 결과 집합으로 클라이언트(PGA)에 전달돼요.`,
-            en: `All ${totalCount} rows are returned to the client (PGA) as the final result set.`,
+            ko: `${totalCount}개 행 전체가 최종 결과 집합으로 클라이언트에 전달돼요.`,
+            en: `All ${totalCount} rows are returned to the client as the final result set.`,
           },
           color: 'emerald',
         },
@@ -593,8 +593,8 @@ function buildExampleQueries(emps: Employee[]): ExampleQuery[] {
             en: `All ${dept60Count} row changes are recorded in a history file. If the server crashes, Oracle uses this file to recover the changes.`,
           },
           hint: {
-            ko: 'Redo Log: "무슨 변경이 있었는지" 기록하는 장부예요. 장애 후 재시작 시 Oracle이 이 장부를 보고 커밋된 변경 사항을 복원해요. 지금 자세히 몰라도 돼요.',
-            en: 'Redo Log: a journal of "what changed." After a crash, Oracle replays this journal to restore committed changes. No need to know the details yet.',
+            ko: 'Redo Log: "무슨 변경이 있었는지" 기록하는 장부예요. 실제 Oracle은 블록을 바꾸기 직전에 이 기록부터 만들어요(여기서는 이해하기 쉽게 마지막 단계로 뒀어요). 장애 후 재시작 시 Oracle이 이 장부를 보고 커밋된 변경 사항을 복원해요. 지금 자세히 몰라도 돼요.',
+            en: 'Redo Log: a journal of "what changed." Oracle actually generates this record just before it changes a block (it is shown last here for simplicity). After a crash, Oracle replays this journal to restore committed changes. No need to know the details yet.',
           },
           color: 'emerald',
         },
@@ -683,8 +683,8 @@ function buildExampleQueries(emps: Employee[]): ExampleQuery[] {
             en: 'The deletion is recorded in a history file so Oracle can recover it if the server crashes.',
           },
           hint: {
-            ko: 'Redo Log: "무슨 변경이 있었는지" 기록하는 장부예요. 장애 후 재시작 시 Oracle이 이 장부를 보고 커밋된 변경 사항을 복원해요. 지금 자세히 몰라도 돼요.',
-            en: 'Redo Log: a journal of "what changed." After a crash, Oracle replays this journal to restore committed changes. No need to know the details yet.',
+            ko: 'Redo Log: "무슨 변경이 있었는지" 기록하는 장부예요. 실제 Oracle은 블록을 바꾸기 직전에 이 기록부터 만들어요(여기서는 이해하기 쉽게 마지막 단계로 뒀어요). 장애 후 재시작 시 Oracle이 이 장부를 보고 커밋된 변경 사항을 복원해요. 지금 자세히 몰라도 돼요.',
+            en: 'Redo Log: a journal of "what changed." Oracle actually generates this record just before it changes a block (it is shown last here for simplicity). After a crash, Oracle replays this journal to restore committed changes. No need to know the details yet.',
           },
           color: 'emerald',
         },
@@ -704,7 +704,7 @@ function buildExampleQueries(emps: Employee[]): ExampleQuery[] {
           phase: '① FROM',
           label: { ko: 'FROM — 테이블 접근', en: 'FROM — Access table' },
           desc: {
-            ko: 'EMPLOYEES 테이블을 식별하고 전체 행을 읽어 들이에요.',
+            ko: 'EMPLOYEES 테이블을 식별하고 전체 행을 읽어 들여요.',
             en: 'Oracle identifies EMPLOYEES and reads all rows into the work area.',
           },
           color: 'violet',
@@ -785,7 +785,7 @@ function buildExampleQueries(emps: Employee[]): ExampleQuery[] {
           phase: '① FROM',
           label: { ko: 'FROM — 테이블 접근', en: 'FROM — Access table' },
           desc: {
-            ko: 'EMPLOYEES 테이블 전체를 읽어 들이에요.',
+            ko: 'EMPLOYEES 테이블 전체를 읽어 들여요.',
             en: 'All rows of EMPLOYEES are read.',
           },
           color: 'violet',
@@ -914,15 +914,15 @@ function buildExampleQueries(emps: Employee[]): ExampleQuery[] {
           phase: '① FROM',
           label: { ko: 'FROM — 테이블 접근', en: 'FROM — Access table' },
           desc: {
-            ko: 'EMPLOYEES 테이블 전체를 읽어 들이에요.',
+            ko: 'EMPLOYEES 테이블 전체를 읽어 들여요.',
             en: 'All rows of EMPLOYEES are read.',
           },
           color: 'violet',
         },
         {
           id: 'where',
-          phase: '② WHERE (없음)',
-          label: { ko: 'WHERE — 없음', en: 'WHERE — (none)' },
+          phase: '② WHERE',
+          label: { ko: 'WHERE — 행 필터링', en: 'WHERE — Filter rows' },
           desc: {
             ko: 'dept_id IN (60, 80) 조건으로 IT(60)·Sales(80) 부서 직원만 남겨요.',
             en: 'dept_id IN (60, 80) keeps only IT and Sales department employees.',
@@ -1108,7 +1108,7 @@ function buildExampleQueries(emps: Employee[]): ExampleQuery[] {
             en: 'USING — Access source data',
           },
           desc: {
-            ko: 'USING 절에 지정된 원본(new_salaries)을 읽어 들이에요. 이 원본이 대상 테이블(employees)과 비교할 기준 데이터가 돼요.',
+            ko: 'USING 절에 지정된 원본(new_salaries)을 읽어 들여요. 이 원본이 대상 테이블(employees)과 비교할 기준 데이터가 돼요.',
             en: 'The source specified in USING (new_salaries) is read. This becomes the reference data to compare against the target table (employees).',
           },
           color: 'violet',
@@ -1189,7 +1189,7 @@ function buildExampleQueries(emps: Employee[]): ExampleQuery[] {
             en: 'All 4 changes (2 UPDATEs, 2 INSERTs) are written to the history file for crash recovery.',
           },
           hint: {
-            ko: 'Redo Log: "무슨 변경이 있었는지" 기록하는 장부예요. 장애 후 재시작 시 Oracle이 이 장부로 커밋된 변경을 복원해요. 지금 자세히 몰라도 돼요.',
+            ko: 'Redo Log: "무슨 변경이 있었는지" 기록하는 장부예요. 실제 Oracle은 블록을 바꾸기 직전에 이 기록부터 만들어요(여기서는 이해하기 쉽게 마지막 단계로 뒀어요). 장애 후 재시작 시 Oracle이 이 장부로 커밋된 변경을 복원해요. 지금 자세히 몰라도 돼요.',
             en: 'Redo Log: a journal of changes. After a crash, Oracle replays this journal to restore committed changes. No need to know the details yet.',
           },
           color: 'emerald',
@@ -1217,7 +1217,7 @@ function buildExampleQueries(emps: Employee[]): ExampleQuery[] {
           phase: '① FROM',
           label: { ko: 'FROM — 테이블 접근', en: 'FROM — Access table' },
           desc: {
-            ko: 'EMPLOYEES 테이블 전체를 읽어 들이에요.',
+            ko: 'EMPLOYEES 테이블 전체를 읽어 들여요.',
             en: 'All rows of EMPLOYEES are read.',
           },
           color: 'violet',
@@ -1274,7 +1274,7 @@ function buildExampleQueries(emps: Employee[]): ExampleQuery[] {
           label: { ko: '결과 반환', en: 'Return results' },
           desc: {
             ko: '상세 4행 + 부서 소계 3행 + 전체 총계 1행 = 총 8행이 반환돼요.',
-            en: '6 detail rows + 3 dept subtotals + 1 grand total = 10 rows returned.',
+            en: '4 detail rows + 3 dept subtotals + 1 grand total = 8 rows returned.',
           },
           color: 'emerald',
         },
@@ -1308,7 +1308,7 @@ function buildExampleQueries(emps: Employee[]): ExampleQuery[] {
           phase: '① FROM',
           label: { ko: 'FROM — 테이블 접근', en: 'FROM — Access table' },
           desc: {
-            ko: 'EMPLOYEES 테이블 전체를 읽어 들이에요.',
+            ko: 'EMPLOYEES 테이블 전체를 읽어 들여요.',
             en: 'All rows of EMPLOYEES are read.',
           },
           color: 'violet',
@@ -1331,8 +1331,8 @@ function buildExampleQueries(emps: Employee[]): ExampleQuery[] {
           phase: '③ CUBE vs ROLLUP 차이',
           label: { ko: 'CUBE vs ROLLUP', en: 'CUBE vs ROLLUP' },
           desc: {
-            ko: 'ROLLUP은 왼쪽 컬럼부터 하나씩 제거하는 계층 구조예요. CUBE는 모든 조합을 구하므로 컬럼 순서와 무관하게 같은 결과가 나와요. 이 쿼리에서 ROLLUP보다 job_title 소계 3행이 추가로 생겨요.',
-            en: 'ROLLUP removes columns from the right hierarchically. CUBE computes all combinations regardless of column order. This query produces 3 extra job-only subtotal rows compared to ROLLUP.',
+            ko: 'ROLLUP은 오른쪽 컬럼부터 하나씩 빼 가며 소계를 만드는 계층 구조예요. CUBE는 모든 조합을 구하므로 컬럼 순서와 무관하게 같은 결과가 나와요. 이 쿼리에서는 ROLLUP보다 job_title 소계 4행이 더 생겨요.',
+            en: 'ROLLUP removes columns from the right hierarchically. CUBE computes all combinations regardless of column order. This query produces 4 extra job-only subtotal rows compared to ROLLUP.',
           },
           color: 'orange',
         },
@@ -1361,8 +1361,8 @@ function buildExampleQueries(emps: Employee[]): ExampleQuery[] {
           phase: '⑥ 결과 반환',
           label: { ko: '결과 반환', en: 'Return results' },
           desc: {
-            ko: '상세 6행 + 부서 소계 3행 + 직무 소계 3행 + 총계 1행 = 총 13행이 반환돼요.',
-            en: '6 detail + 3 dept subtotals + 3 job subtotals + 1 grand total = 13 rows returned.',
+            ko: '상세 4행 + 부서 소계 3행 + 직무 소계 4행 + 총계 1행 = 총 12행이 반환돼요.',
+            en: '4 detail + 3 dept subtotals + 4 job subtotals + 1 grand total = 12 rows returned.',
           },
           color: 'emerald',
         },

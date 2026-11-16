@@ -20,15 +20,15 @@ const T = {
 
     whatTitle: 'NULL이란?',
     whatDesc:
-      'NULL은 "해당 속성에 값이 존재하지 않는다"는 뜻이에요.\n\n예를 들어 직원 테이블에서 "팩스번호"가 NULL이면 팩스가 없다는 거예요. 빈 문자열(\'\')이나 숫자 0과는 완전히 달라요. NULL은 어떤 값과 비교해도 결과가 UNKNOWN(알 수 없음)이 돼요.',
+      'NULL은 "해당 속성에 값이 존재하지 않는다"는 뜻이에요.\n\n예를 들어 직원 테이블에서 "팩스번호"가 NULL이면 팩스가 없다는 거예요. 숫자 0이나 공백 한 칸(\' \')과는 완전히 달라요. 다만 Oracle에서는 길이가 0인 빈 문자열(\'\')을 NULL로 취급해요. NULL은 어떤 값과 비교해도 결과가 UNKNOWN(알 수 없음)이 돼요.',
 
     nullMathTitle: 'NULL과 연산',
     nullMathDesc:
-      'NULL이 포함된 연산은 항상 NULL이 돼요. 이것을 모르면 예상치 못한 쿼리 결과가 나와요.',
+      'NULL이 포함된 산술 연산은 항상 NULL이 돼요. 반면 문자열 연결(||)은 NULL을 빈 문자열처럼 다뤄요. 이것을 모르면 예상치 못한 쿼리 결과가 나와요.',
     nullMathHeaders: ['연산', '결과', '설명'],
     nullMathRows: [
       ['NULL + 100', 'NULL', '숫자 연산 — NULL이 있으면 결과도 NULL'],
-      ['NULL || \'텍스트\'', 'NULL', '문자열 연결 — NULL이 있으면 결과도 NULL'],
+      ['NULL || \'텍스트\'', "'텍스트'", '문자열 연결 — Oracle은 NULL을 빈 문자열처럼 이어 붙여요'],
       ['NULL = NULL', 'UNKNOWN', '비교 연산 — NULL끼리 비교해도 TRUE가 아님'],
       ['NULL <> 1', 'UNKNOWN', 'NULL은 1이 아니다는 것도 확인 불가'],
       ['NULL IS NULL', 'TRUE', '유일하게 NULL 확인하는 올바른 방법'],
@@ -106,19 +106,19 @@ FROM   employees;`,
   en: {
     title: 'Understanding Null Attributes',
     subtitle:
-      "NULL means \"no value exists\" — it's not 0, not an empty string, but a special unknown state. Mastering NULL prevents hard-to-find query bugs.",
+      "NULL means \"no value exists\" — it's not 0 and not a blank space, but a special unknown state. Mastering NULL prevents hard-to-find query bugs.",
 
     whatTitle: 'What is NULL?',
     whatDesc:
-      "NULL means \"this attribute has no value.\"\n\nFor example, if an employee's fax_number is NULL, it means they don't have a fax — not that it's blank or zero. NULL is fundamentally different from '' or 0. Any comparison involving NULL produces UNKNOWN (not TRUE or FALSE).",
+      "NULL means \"this attribute has no value.\"\n\nFor example, if an employee's fax_number is NULL, it means they don't have a fax — not that it's blank or zero. NULL is fundamentally different from 0 or a single space (' '). Note, however, that Oracle treats a zero-length string ('') as NULL. Any comparison involving NULL produces UNKNOWN (not TRUE or FALSE).",
 
     nullMathTitle: 'NULL in Expressions',
     nullMathDesc:
-      'Any expression involving NULL evaluates to NULL. Missing this leads to unexpected query results.',
+      'Any arithmetic expression involving NULL evaluates to NULL, while string concatenation (||) treats NULL like an empty string. Missing this leads to unexpected query results.',
     nullMathHeaders: ['Expression', 'Result', 'Explanation'],
     nullMathRows: [
       ['NULL + 100', 'NULL', 'Arithmetic — NULL in, NULL out'],
-      ["NULL || 'text'", 'NULL', 'String concat — NULL in, NULL out'],
+      ["NULL || 'text'", "'text'", 'String concat — Oracle treats NULL as an empty string'],
       ['NULL = NULL', 'UNKNOWN', 'Comparison — even NULL = NULL is not TRUE'],
       ['NULL <> 1', 'UNKNOWN', 'Cannot confirm NULL is not equal to 1'],
       ['NULL IS NULL', 'TRUE', 'The correct way to test for NULL'],

@@ -127,7 +127,7 @@ export function OptimizerStatsPage() {
 
       <Divider />
 
-      <div className="mt-2">
+      <div>
         <SectionTitle>{t.selectivityTitle}</SectionTitle>
         <Prose>{t.selectivityDesc}</Prose>
 

@@ -162,8 +162,8 @@ export const GLOSSARY: GlossaryTerm[] = [
   {
     term: 'Control File',
     definition: {
-      ko: '데이터베이스의 물리적 구조(데이터 파일, 리두 로그 파일 경로, SCN 등)를 기록하는 바이너리 파일. 손상 시 복구 불가.',
-      en: 'A binary file recording the physical structure of the database (data file paths, redo log paths, SCN). Critical — corruption means recovery failure.',
+      ko: '데이터베이스의 물리적 구조(데이터 파일, 리두 로그 파일 경로, SCN 등)를 기록하는 바이너리 파일. 없으면 데이터베이스를 열 수 없어서 보통 여러 벌로 다중화해 둠. 모두 손상되면 백업에서 복원하거나 CREATE CONTROLFILE로 다시 만들어야 함.',
+      en: 'A binary file recording the physical structure of the database (data file paths, redo log paths, SCN). The database cannot be opened without it, so it is normally multiplexed. If every copy is lost, it must be restored from backup or re-created with CREATE CONTROLFILE.',
     },
     sectionIds: ['internals-overview', 'internals-processes'],
   },
@@ -205,8 +205,8 @@ export const GLOSSARY: GlossaryTerm[] = [
   {
     term: 'Data Block Address (DBA)',
     definition: {
-      ko: '파일 번호와 블록 번호로 표현되는 64비트 블록 주소. ROWID에서 추출되어 Buffer Cache의 해시 버킷 탐색에 사용됨.',
-      en: 'A 64-bit block address expressed as file# + block#, extracted from ROWID to locate blocks in the Buffer Cache hash buckets.',
+      ko: '파일 번호(10비트)와 블록 번호(22비트)로 표현되는 32비트 블록 주소. ROWID에서 추출되어 Buffer Cache의 해시 버킷 탐색에 사용됨.',
+      en: 'A 32-bit block address expressed as file# (10 bits) + block# (22 bits), extracted from ROWID to locate blocks in the Buffer Cache hash buckets.',
     },
     sectionIds: ['index-table-access-buffer', 'internals-sga-buffer-cache'],
   },
@@ -547,8 +547,8 @@ export const GLOSSARY: GlossaryTerm[] = [
   {
     term: 'LMT (Locally Managed Tablespace)',
     definition: {
-      ko: '테이블스페이스 내부 비트맵으로 Extent 할당·해제를 관리하는 방식. Oracle 10g 이후 기본값이며 딕셔너리 관리(DMT) 방식보다 경합이 적고 빠름. AUTOALLOCATE 또는 UNIFORM SIZE 옵션 선택 가능.',
-      en: 'Tablespace mode that manages Extent allocation using an internal bitmap. The default since Oracle 10g; less contention and faster than Dictionary Managed Tablespace (DMT). Supports AUTOALLOCATE or UNIFORM SIZE options.',
+      ko: '테이블스페이스 내부 비트맵으로 Extent 할당·해제를 관리하는 방식. Oracle 9i 이후 기본값이며 딕셔너리 관리(DMT) 방식보다 경합이 적고 빠름. AUTOALLOCATE 또는 UNIFORM SIZE 옵션 선택 가능.',
+      en: 'Tablespace mode that manages Extent allocation using an internal bitmap. The default since Oracle 9i; less contention and faster than Dictionary Managed Tablespace (DMT). Supports AUTOALLOCATE or UNIFORM SIZE options.',
     },
     sectionIds: ['internals-storage'],
   },
@@ -739,8 +739,8 @@ export const GLOSSARY: GlossaryTerm[] = [
   {
     term: 'PMON',
     definition: {
-      ko: 'Process Monitor. 비정상 종료된 세션의 리소스를 정리하고, Listener에 서비스를 등록하는 백그라운드 프로세스.',
-      en: 'Process Monitor background process. Cleans up resources from abnormally terminated sessions and registers services with the Listener.',
+      ko: 'Process Monitor. 비정상 종료된 프로세스를 감지하고 그 리소스 정리를 맡는 백그라운드 프로세스. Listener에 서비스를 등록하는 일은 12c부터 LREG(Listener Registration)가 담당.',
+      en: 'Process Monitor background process. Detects abnormally terminated processes and is responsible for cleaning up their resources. Registering services with the Listener has been handled by LREG (Listener Registration) since 12c.',
     },
     sectionIds: ['internals-processes'],
   },
@@ -929,8 +929,8 @@ export const GLOSSARY: GlossaryTerm[] = [
   {
     term: 'Soft Parse',
     definition: {
-      ko: '동일한 SQL이 Library Cache에 이미 존재해 파싱·최적화 과정을 건너뛰고 기존 실행 계획을 재사용하는 것.',
-      en: 'Reusing an existing execution plan from Library Cache, skipping the parse and optimization steps for an identical SQL.',
+      ko: '동일한 SQL이 Library Cache에 이미 존재해, 문법·의미 검사만 하고 최적화 과정은 건너뛴 채 기존 실행 계획을 재사용하는 것.',
+      en: 'Reusing an existing execution plan from Library Cache for an identical SQL: the syntax and semantic checks still run, but optimization is skipped.',
     },
     sectionIds: ['internals-sga', 'internals-simulator'],
   },
@@ -1115,8 +1115,8 @@ export const GLOSSARY: GlossaryTerm[] = [
   {
     term: 'MERGE INTO',
     definition: {
-      ko: "조건에 따라 INSERT와 UPDATE를 한 번에 처리하는 구문. 'Upsert' 패턴 — 일치하는 행이 있으면 UPDATE, 없으면 INSERT. WHEN NOT MATCHED THEN DELETE도 지원.",
-      en: "Performs INSERT and UPDATE in a single statement based on a condition — the 'upsert' pattern. Updates matched rows, inserts unmatched ones. Also supports WHEN NOT MATCHED THEN DELETE.",
+      ko: "조건에 따라 INSERT와 UPDATE를 한 번에 처리하는 구문. 'Upsert' 패턴 — 일치하는 행이 있으면 UPDATE, 없으면 INSERT. WHEN MATCHED THEN UPDATE 뒤에 DELETE WHERE를 붙이면 갱신된 행 중 조건에 맞는 행을 삭제할 수도 있음.",
+      en: "Performs INSERT and UPDATE in a single statement based on a condition — the 'upsert' pattern. Updates matched rows, inserts unmatched ones. A DELETE WHERE clause after WHEN MATCHED THEN UPDATE can also remove updated rows that meet a condition.",
     },
     sectionIds: ['sql-basics-merge'],
   },
@@ -1141,8 +1141,8 @@ export const GLOSSARY: GlossaryTerm[] = [
   {
     term: 'NVL',
     definition: {
-      ko: 'expr이 NULL이면 replacement를 반환하고, NULL이 아니면 expr을 그대로 반환하는 Oracle 함수. expr과 replacement의 데이터 타입이 같아야 함.',
-      en: 'Oracle function that returns replacement if expr is NULL, otherwise returns expr. Both arguments must have compatible data types.',
+      ko: 'expr이 NULL이면 replacement를 반환하고, NULL이 아니면 expr을 그대로 반환하는 Oracle 함수. 두 인자의 타입이 다르면 replacement가 expr의 타입으로 암묵적 변환되고, 변환할 수 없으면 오류.',
+      en: 'Oracle function that returns replacement if expr is NULL, otherwise returns expr. If the types differ, replacement is implicitly converted to the type of expr; an error is raised if it cannot be converted.',
     },
     sectionIds: ['sql-basics-null'],
   },

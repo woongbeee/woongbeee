@@ -1343,7 +1343,7 @@ export function StorageSection() {
         </div>
 
         <Divider />
-        <div className="mt-2">
+        <div>
           <SubTitle>{lang === 'ko' ? 'Segment의 종류' : 'Types of Segment'}</SubTitle>
           <ConceptGrid items={t.segmentTypes} />
           <div className="mt-4">
@@ -1377,7 +1377,7 @@ export function StorageSection() {
         </div>
 
         <Divider />
-        <div className="mt-2">
+        <div>
           <SubTitle>{t.lmtTitle}</SubTitle>
           <Prose>{t.lmtDesc}</Prose>
           <Table

@@ -63,7 +63,7 @@ const T = {
       { year: '2001', text: 'Oracle 9i — 인터넷(Internet) 시대에 맞춰 XML, Java 통합' },
       { year: '2013', text: 'Oracle 12c — 멀티테넌트(Multitenant, 클라우드) 아키텍처 도입' },
       { year: '2018', text: 'Oracle 18c부터 연 1회 정기 릴리즈(Release) 정책으로 전환' },
-      { year: '2023', text: 'Oracle 23ai — AI 벡터 검색(AI Vector Search) 등 AI 기능 전면 통합. 46년의 역사' },
+      { year: '2024', text: 'Oracle 23ai — AI 벡터 검색(AI Vector Search) 등 AI 기능 전면 통합' },
       { year: '2025', text: 'Oracle 26ai — AI 에이전트(Agent) 워크플로우, 통합 하이브리드 벡터 검색(Unified Hybrid Vector Search), JSON·그래프·관계형 데이터 통합 모델 등 AI 네이티브(AI-Native) 기능 전면 강화. 장기 지원(LTS) 릴리즈' },
     ],
 
@@ -120,7 +120,7 @@ const T = {
       {
         org: 'Amazon',
         category: '글로벌 IT',
-        reason: '지금은 자체 DB로 대규모 마이그레이션(Migration)을 진행 중이지만, 수년간 Oracle을 핵심 DB로 운영했던 대표적인 사례예요.',
+        reason: '2019년에 자체 DB로 옮겨 가는 마이그레이션(Migration)을 마쳤지만, 그 전까지 20년 가까이 Oracle을 핵심 DB로 운영했던 대표적인 사례예요.',
       },
       {
         org: '건강보험심사평가원·국세청',
@@ -163,7 +163,7 @@ const T = {
       { year: '2001', text: 'Oracle 9i — XML and Java integration for the internet age' },
       { year: '2013', text: 'Oracle 12c — multitenant (cloud) architecture introduced' },
       { year: '2018', text: 'Oracle 18c begins annual release cadence' },
-      { year: '2023', text: 'Oracle 23ai — AI Vector Search and deep AI integration across the platform' },
+      { year: '2024', text: 'Oracle 23ai — AI Vector Search and deep AI integration across the platform' },
       { year: '2025', text: 'Oracle 26ai — AI-native LTS release: agentic AI workflows, Unified Hybrid Vector Search, unified relational/JSON/graph data model, and SQL Firewall built-in' },
     ],
 
@@ -220,7 +220,7 @@ const T = {
       {
         org: 'Amazon',
         category: 'Global Tech',
-        reason: 'A landmark example: Amazon ran Oracle as its core DB for years before launching a large-scale migration to its own database services.',
+        reason: 'A landmark example: Amazon ran Oracle as its core DB for nearly two decades before finishing its migration to its own database services in 2019.',
       },
       {
         org: 'HIRA · NTS (Korea)',

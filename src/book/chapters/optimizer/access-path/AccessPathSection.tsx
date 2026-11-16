@@ -106,7 +106,7 @@ export function OptimizerAccessPathPage() {
 
       <Divider />
 
-      <div className="mt-2">
+      <div>
         <SectionTitle>{t.vizTitle}</SectionTitle>
         <AccessModeButtons active={activeMode} onChange={setActiveMode} lang={lang} />
         <AccessPathDiagram mode={activeMode} lang={lang} />
@@ -114,7 +114,7 @@ export function OptimizerAccessPathPage() {
 
       <Divider />
 
-      <div className="mt-2">
+      <div>
         <div className="grid gap-6 sm:grid-cols-2">
           <div>
             <SubTitle>{t.ftsTitle}</SubTitle>
@@ -143,7 +143,7 @@ export function OptimizerAccessPathPage() {
 
       <Divider />
 
-      <div className="mt-2">
+      <div>
         <SectionTitle>{t.compareTitle}</SectionTitle>
         <Prose>{t.compareDesc}</Prose>
         <CostCompareChart lang={lang} />

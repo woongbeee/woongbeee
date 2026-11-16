@@ -54,7 +54,7 @@ const T = {
     ],
     cardNotationLabel: 'IE / 바커 표기법 — 관계 차수 기호',
     cardNotationDesc:
-      'IE 표기법은 "까마귀발(Crow\'s Foot)" 기호로 다(多) 쪽을 표현하고, 바커 표기법은 관계선 끝에 한 줄(1) 또는 두 줄 형태로 표기해요.',
+      'IE 표기법은 "까마귀발(Crow\'s Foot)" 기호로 다(多) 쪽을 표현하고, 바커 표기법도 다(多) 쪽에는 까마귀발을 쓰지만, 1쪽에는 아무 기호 없이 선만 그어요.',
 
     // 관계 선택사양
     optTitle: '관계 선택사양 (Optionality)',
@@ -74,7 +74,7 @@ const T = {
     compareRows: [
       ['개발 주체', 'Information Engineering', 'Richard Barker (Oracle CASE*Method)'],
       ['엔터티 모양', '사각형', '사각형 (모서리 둥글게)'],
-      ['다(多) 기호', '까마귀발 (⁼<)', '관계선 끝 두 줄'],
+      ['다(多) 기호', '까마귀발 (⁼<)', '까마귀발 (1쪽은 기호 없음)'],
       ['필수 기호', '수직선 |', '실선'],
       ['선택 기호', '원 ○', '점선'],
       ['관계명 위치', '관계선 위/아래', '관계선 양쪽 동사구'],
@@ -145,7 +145,7 @@ const T = {
     ],
     cardNotationLabel: 'IE / Barker Notation — Cardinality Symbols',
     cardNotationDesc:
-      "IE notation uses the \"Crow's Foot\" symbol for the many side. Barker notation uses a single or double stroke at the end of the relationship line.",
+      "IE notation uses the \"Crow's Foot\" symbol for the many side. Barker notation also uses a crow's foot on the many side, but draws a plain line with no symbol on the one side.",
 
     optTitle: 'Optionality',
     optDesc:
@@ -163,7 +163,7 @@ const T = {
     compareRows: [
       ['Origin', 'Information Engineering', 'Richard Barker (Oracle CASE*Method)'],
       ['Entity shape', 'Rectangle', 'Rounded rectangle'],
-      ['Many symbol', "Crow's foot (⁼<)", 'Double stroke at line end'],
+      ['Many symbol', "Crow's foot (⁼<)", "Crow's foot (no symbol on the one side)"],
       ['Mandatory symbol', 'Vertical bar |', 'Solid line'],
       ['Optional symbol', 'Circle ○', 'Dashed line'],
       ['Name placement', 'Above / below the line', 'Verb phrases on both sides'],
@@ -275,7 +275,7 @@ function RelationshipNameDiagram({ lang }: { lang: 'ko' | 'en' }) {
 // ROW_H=100, IE행 offset=0, 바커행 offset=48
 // 기호 공간 SYM=20 (엔터티 경계와 선 사이)
 // 까마귀발: 선 끝(anchor)에서 엔터티 방향으로 fan. anchor는 lineL/lineR
-// 바커 多기호: anchor에서 엔터티 방향으로 2줄
+// 바커 多기호: IE와 같은 까마귀발, 1쪽은 기호 없이 선만
 
 function CardinalityDiagram({ lang }: { lang: 'ko' | 'en' }) {
   const isKo = lang === 'ko'
@@ -332,7 +332,7 @@ function CardinalityDiagram({ lang }: { lang: 'ko' | 'en' }) {
           // 까마귀발: anchor=sym2L, 엔터티 방향=오른쪽(+)
           <g>
             {/* 위쪽 갈래 */}
-            <line x1={sym2L} y1={bkLY} x2={sym2L + CF_LEN} y2={bkLY - CF_SPREAD} stroke={C_IE} strokeWidth={1.5} />
+            <line x1={sym2L} y1={ieLY} x2={sym2L + CF_LEN} y2={ieLY - CF_SPREAD} stroke={C_IE} strokeWidth={1.5} />
             {/* 가운데 갈래 */}
             <line x1={sym2L} y1={ieLY} x2={sym2L + CF_LEN} y2={ieLY} stroke={C_IE} strokeWidth={1.5} />
             {/* 아래쪽 갈래 */}
@@ -354,29 +354,26 @@ function CardinalityDiagram({ lang }: { lang: 'ko' | 'en' }) {
         ) : ieL1
 
         // ── 바커 기호 렌더 (인라인) ──
-        // 바커 1 기호: 수직선 하나
-        // 바커 N 기호: 수직선 2개 (간격 6px)
-        const BK_BAR_H = 9
-        const BK_GAP   = 7 // 두 번째 선 간격
+        // 바커 1 기호: 기호 없음 (관계선이 엔터티까지 그대로 닿음)
+        // 바커 N 기호: 까마귀발 (선 끝 anchor에서 엔터티 경계까지 세 갈래)
+        const BK_SPREAD = 8
+        const bkX1 = hasLN ? sym1R : E1x + EW // 관계선 시작
+        const bkX2 = g.rightN ? sym2L : E2x   // 관계선 끝
 
         const bkRightSym = g.rightN ? (
-          // N쪽 오른쪽: 2줄, anchor=sym2L, 엔터티 방향=오른쪽
           <g>
-            <line x1={sym2L}        y1={bkLY - BK_BAR_H} x2={sym2L}        y2={bkLY + BK_BAR_H} stroke={C_BK} strokeWidth={1.8} />
-            <line x1={sym2L + BK_GAP} y1={bkLY - BK_BAR_H} x2={sym2L + BK_GAP} y2={bkLY + BK_BAR_H} stroke={C_BK} strokeWidth={1.8} />
+            <line x1={sym2L} y1={bkLY} x2={E2x} y2={bkLY - BK_SPREAD} stroke={C_BK} strokeWidth={1.5} />
+            <line x1={sym2L} y1={bkLY} x2={E2x} y2={bkLY} stroke={C_BK} strokeWidth={1.5} />
+            <line x1={sym2L} y1={bkLY} x2={E2x} y2={bkLY + BK_SPREAD} stroke={C_BK} strokeWidth={1.5} />
           </g>
-        ) : (
-          <line x1={sym2L} y1={bkLY - BK_BAR_H} x2={sym2L} y2={bkLY + BK_BAR_H} stroke={C_BK} strokeWidth={1.8} />
-        )
+        ) : null
         const bkLeftSym = hasLN ? (
-          // M:N 왼쪽도 N: 2줄, anchor=sym1R, 엔터티 방향=왼쪽
           <g>
-            <line x1={sym1R}         y1={bkLY - BK_BAR_H} x2={sym1R}         y2={bkLY + BK_BAR_H} stroke={C_BK} strokeWidth={1.8} />
-            <line x1={sym1R - BK_GAP} y1={bkLY - BK_BAR_H} x2={sym1R - BK_GAP} y2={bkLY + BK_BAR_H} stroke={C_BK} strokeWidth={1.8} />
+            <line x1={sym1R} y1={bkLY} x2={E1x + EW} y2={bkLY - BK_SPREAD} stroke={C_BK} strokeWidth={1.5} />
+            <line x1={sym1R} y1={bkLY} x2={E1x + EW} y2={bkLY} stroke={C_BK} strokeWidth={1.5} />
+            <line x1={sym1R} y1={bkLY} x2={E1x + EW} y2={bkLY + BK_SPREAD} stroke={C_BK} strokeWidth={1.5} />
           </g>
-        ) : (
-          <line x1={sym1R} y1={bkLY - BK_BAR_H} x2={sym1R} y2={bkLY + BK_BAR_H} stroke={C_BK} strokeWidth={1.8} />
-        )
+        ) : null
 
         return (
           <g key={g.card}>
@@ -403,7 +400,7 @@ function CardinalityDiagram({ lang }: { lang: 'ko' | 'en' }) {
             <rect x={E2x} y={bkY} width={EW} height={EH} rx={BK_R} fill={C_BK} fillOpacity={0.08} stroke={C_BK} strokeOpacity={0.5} strokeWidth={1} />
             <text x={E2x + EW/2} y={bkLY + 4} textAnchor="middle" fontSize={10} fontWeight={600} fill={C_BK}>{g.lB}</text>
             {/* 관계선 */}
-            <line x1={sym1R} y1={bkLY} x2={sym2L} y2={bkLY} stroke={C_BK} strokeWidth={1.5} />
+            <line x1={bkX1} y1={bkLY} x2={bkX2} y2={bkLY} stroke={C_BK} strokeWidth={1.5} />
             {/* 기호 */}
             {bkLeftSym}
             {bkRightSym}
@@ -450,7 +447,7 @@ function OptionalityDiagram({ lang }: { lang: 'ko' | 'en' }) {
       oL: 'M' as const, oR: 'O' as const,
       desc: isKo
         ? '필수(|) — 선택(○) : 주문 없는 고객 가능, 고객 없는 주문은 불가'
-        : 'Mandatory(|) — Optional(○) : Customer can exist without an order',
+        : 'Mandatory(|) — Optional(○) : A customer can exist without an order, but every order needs a customer',
     },
     {
       lA: isKo ? '주문' : 'Order', lB: isKo ? '주문상세' : 'OrderItem',
@@ -463,8 +460,8 @@ function OptionalityDiagram({ lang }: { lang: 'ko' | 'en' }) {
       lA: isKo ? '직원' : 'Employee', lB: isKo ? '부서' : 'Department',
       oL: 'O' as const, oR: 'M' as const,
       desc: isKo
-        ? '선택(○) — 필수(|) : 직원은 부서 없이 존재 가능, 직원은 반드시 어떤 부서에 속해야 해요'
-        : 'Optional(○) — Mandatory(|) : Employee can be unassigned; but must belong to a dept',
+        ? '선택(○) — 필수(|) : 직원이 없는 부서는 있을 수 있지만, 직원은 반드시 어떤 부서에 속해야 해요'
+        : 'Optional(○) — Mandatory(|) : A department may have no employees, but every employee must belong to one',
     },
   ]
   const HEADER_H = 16

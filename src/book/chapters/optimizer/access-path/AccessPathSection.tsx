@@ -47,7 +47,7 @@ const T = {
       'SELECT 컬럼이 인덱스에 전부 포함(Covering Index)될 때',
     ],
     compareTitle: '비용 비교 — FTS vs Index Scan',
-    compareDesc: '아래는 동일 테이블에서 조건 선택도에 따라 CBO가 추정하는 상대적 비용 변화입니다.',
+    compareDesc: '아래는 동일 테이블에서 조건 선택도에 따라 CBO가 추정하는 상대적 비용 변화예요.',
     sql: `-- 실행 계획 확인 방법\nEXPLAIN PLAN FOR\nSELECT employee_id, department_id\nFROM   hr.employees\nWHERE  department_id > 50;\n\nSELECT * FROM TABLE(DBMS_XPLAN.DISPLAY);\n\n-- FIRST_ROWS 힌트 → Index Range Scan 유도\nSELECT /*+ FIRST_ROWS(25) */ employee_id, department_id\nFROM   hr.employees\nWHERE  department_id > 50;`,
   },
   en: {

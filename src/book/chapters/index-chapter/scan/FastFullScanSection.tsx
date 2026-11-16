@@ -88,7 +88,7 @@ const T = {
         desc: 'COUNT(*)는 행이 존재하는지만 확인하면 되니까, 컬럼 값이 필요 없어요. PK 같은 어떤 인덱스든 써서 전체 인덱스 세그먼트를 멀티블록 I/O로 읽으면 돼요. 테이블 블록에 전혀 접근하지 않아서 전체 카운트 중에 가장 빠른 방법이에요.',
         sql: `SELECT COUNT(*)\nFROM employees;\n-- PK 등 어떤 인덱스든 활용 가능\n-- 인덱스 세그먼트를 멀티블록 I/O로 직접 읽음\n-- 테이블 접근 전혀 없음\n-- 실행 계획: INDEX FAST FULL SCAN` },
       { badge: '집계 함수', badgeColor: 'violet' as const,
-        desc: 'MAX, MIN, SUM은 정렬된 순서가 필요 없어요. 인덱스 세그먼트 전체를 멀티블록 I/O로 읽으면 되니까, Full Scan(1블록씩)보다 I/O 횟수가 훨씬 적어요. ORDER BY가 없는 집계라면 Fast Full Scan이 Full Scan보다 항상 유리해요.',
+        desc: 'MAX, MIN, SUM은 정렬된 순서가 필요 없어요. 인덱스 세그먼트 전체를 멀티블록 I/O로 읽으면 되니까, Full Scan(1블록씩)보다 I/O 횟수가 훨씬 적어요. ORDER BY가 없는 집계라면 Fast Full Scan이 Full Scan보다 대체로 유리해요.',
         sql: `SELECT MAX(salary), MIN(salary)\nFROM employees;\n-- IDX_EMP_SALARY가 salary 컬럼을 포함\n-- ORDER BY 불필요 → 정렬 순서 무관\n-- Full Scan(단일 블록)보다 I/O 횟수 대폭 감소\n-- 실행 계획: INDEX FAST FULL SCAN` },
       { badge: 'INDEX_FFS 힌트', badgeColor: 'blue' as const,
         desc: '옵티마이저가 Full Scan이나 Full Table Scan을 선택했을 때 Fast Full Scan으로 강제하는 방법이에요. 정렬이 필요 없는 쿼리인데 통계가 오래돼서 잘못된 플랜이 나올 때 유용하게 써요.',

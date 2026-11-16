@@ -71,10 +71,8 @@ SUBPARTITION TEMPLATE (
 SELECT * FROM orders_rl
 WHERE  order_date >= DATE '2024-01-01'
   AND  region = 'SEOUL';`,
-
-    templateTitle: 'SUBPARTITION TEMPLATE',
     templateDesc:
-      'SUBPARTITION TEMPLATE를 사용하면 모든 부모 파티션에 동일한 서브파티션 구조를 자동 적용합니다. 새 부모 파티션이 추가될 때도 템플릿 구조가 자동 적용됩니다.',
+      'SUBPARTITION TEMPLATE를 사용하면 모든 부모 파티션에 동일한 서브파티션 구조를 자동 적용해요. 새 부모 파티션이 추가될 때도 템플릿 구조가 자동 적용돼요.',
 
     pruningTitle: 'Composite 파티션 Pruning',
     pruningTable: [
@@ -155,8 +153,6 @@ SUBPARTITION TEMPLATE (
 SELECT * FROM orders_rl
 WHERE  order_date >= DATE '2024-01-01'
   AND  region = 'CA';`,
-
-    templateTitle: 'SUBPARTITION TEMPLATE',
     templateDesc:
       'SUBPARTITION TEMPLATE automatically applies the same subpartition structure to all parent partitions, including any new partitions added later.',
 

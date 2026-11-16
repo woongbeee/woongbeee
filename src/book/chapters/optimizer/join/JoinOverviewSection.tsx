@@ -21,9 +21,9 @@ const T = {
     decisionDesc:
       'CBO는 각 조인 방식의 비용(단일 블록 I/O, 멀티블록 I/O, CPU)을 계산해서 가장 낮은 비용의 방식을 선택해요. 주요 결정 요인은 다음과 같아요.',
     decisionTable: [
-      ['조인 조건 유형', '등치(=) → 세 방식 모두 가능\n비등치(<, >, BETWEEN) → Sort Merge만 가능', '조건 타입이 가장 강한 제약'],
+      ['조인 조건 유형', '등치(=) → 세 방식 모두 가능\n비등치(<, >, BETWEEN) → Nested Loop 또는 Sort Merge (Hash Join은 불가)', '조건 타입이 가장 강한 제약'],
       ['예상 결과 행 수', '소량 → Nested Loop 선호\n대량 → Hash Join 선호', 'rows = outer rows × selectivity'],
-      ['Inner 인덱스 존재', '선택도 높은 인덱스 있음 → Nested Loop 효율적', 'Index Range/Unique Scan 비용 반영'],
+      ['Inner 인덱스 존재', '소수의 행만 찾아 주는 인덱스 있음 → Nested Loop 효율적', 'Index Range/Unique Scan 비용 반영'],
       ['OPTIMIZER_MODE', 'FIRST_ROWS → Nested Loop 선호\nALL_ROWS → Hash Join 선호 가능', '첫 행 빠른 반환 vs 전체 처리량'],
       ['PGA 메모리 충분도', 'PGA 크면 Hash Join 인메모리 처리\nPGA 부족 시 Sort Merge가 유리할 수 있음', 'PGA_AGGREGATE_TARGET 설정 영향'],
     ],
@@ -67,7 +67,7 @@ WHERE  e.department_id = d.department_id;`,
     decisionDesc:
       'The CBO computes the cost (single-block I/O, multiblock I/O, CPU) of each join method and selects the cheapest. The key decision factors are as follows.',
     decisionTable: [
-      ['Join condition type', 'Equality (=) → all three methods available\nNon-equality (<, >, BETWEEN) → Sort Merge only', 'Strongest constraint on method choice'],
+      ['Join condition type', 'Equality (=) → all three methods available\nNon-equality (<, >, BETWEEN) → Nested Loop or Sort Merge (no Hash Join)', 'Strongest constraint on method choice'],
       ['Expected result rows', 'Small → prefers Nested Loop\nLarge → prefers Hash Join', 'rows = outer rows × selectivity'],
       ['Inner index availability', 'Highly selective index → Nested Loop efficient', 'Reflects Index Range/Unique Scan cost'],
       ['OPTIMIZER_MODE', 'FIRST_ROWS → prefers Nested Loop\nALL_ROWS → may prefer Hash Join', 'Fast first row vs total throughput'],

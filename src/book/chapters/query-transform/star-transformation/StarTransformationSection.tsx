@@ -115,8 +115,6 @@ SELECT /*+ NO_STAR_TRANSFORMATION */
 FROM   sales s, customers c
 WHERE  s.cust_id = c.cust_id
 GROUP BY c.cust_city;`,
-
-    summaryTitle: 'Star Transformation 핵심 정리',
     summaryItems: [
       'Star 스키마에서 팩트 테이블 Full Scan을 피하기 위해 Bitmap 세미조인 조건을 추가해요.',
       '팩트 테이블 조인 컬럼에 Bitmap 인덱스가 있어야 해요.',
@@ -227,8 +225,6 @@ SELECT /*+ NO_STAR_TRANSFORMATION */
 FROM   sales s, customers c
 WHERE  s.cust_id = c.cust_id
 GROUP BY c.cust_city;`,
-
-    summaryTitle: 'Star Transformation Key Takeaways',
     summaryItems: [
       'Avoids fact table full scans in star schema queries by adding bitmap semijoin predicates.',
       'Requires bitmap indexes on the fact table join columns.',

@@ -165,11 +165,11 @@ function UgaLocationDiagram({ lang }: { lang: 'ko' | 'en' }) {
         {/* column headers */}
         <text x={DED_X + HALF_W / 2} y={HEADER_Y} fontFamily="var(--font-sans-active)" fontSize={11}
           fontWeight="bold" fill="var(--color-blue)" textAnchor="middle">
-          {isKo ? 'Dedicated Server' : 'Dedicated Server'}
+          {'Dedicated Server'}
         </text>
         <text x={SHR_X + HALF_W / 2} y={HEADER_Y} fontFamily="var(--font-sans-active)" fontSize={11}
           fontWeight="bold" fill="var(--color-green)" textAnchor="middle">
-          {isKo ? 'Shared Server' : 'Shared Server'}
+          {'Shared Server'}
         </text>
 
         {/* divider */}

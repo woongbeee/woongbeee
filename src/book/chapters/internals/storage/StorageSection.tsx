@@ -112,8 +112,6 @@ const STORAGE_T = {
   ko: {
     sectionTitle: '데이터 저장 구조',
 
-    blockTitle: 'Block — 최소 I/O 단위',
-
     rowidTitle: 'ROWID — 행의 물리적 주소',
     rowidDesc: 'ROWID는 Oracle이 테이블의 각 행에 부여하는 고유한 물리적 주소예요. 실제 컬럼 값으로 저장되지 않고, 파일·블록·슬롯 위치로부터 즉석에서 계산돼요.\n\nExtended ROWID는 Base64로 인코딩된 18자리 문자열로, 4개 구성 요소로 이루어져요.',
     rowidFormat: [
@@ -129,9 +127,9 @@ const STORAGE_T = {
     extentSizeDesc: 'Extent 하나에 들어있는 블록 수와 크기는 Tablespace 관리 방식에 따라 달라져요. LMT(Locally Managed Tablespace)에서 AUTOALLOCATE를 쓰면 Oracle이 Segment 크기에 맞게 자동으로 64 KB → 1 MB → 8 MB → 64 MB 순으로 Extent를 키워나가요. UNIFORM SIZE를 지정하면 처음부터 끝까지 같은 크기(예: 1 MB)로 고정돼요.',
     extentSizeTable: [
       ['첫 번째 Extent', '64 KB (블록 8KB 기준 → 8개 블록)', 'AUTOALLOCATE 초기값'],
-      ['두 번째~넷째', '64 KB 유지', '1 MB 미만 Segment'],
-      ['다섯 번째 이후', '1 MB (128블록)', '1 MB 이상 Segment부터 자동 확장'],
-      ['더 커지면', '8 MB, 64 MB 순으로 증가', '대형 테이블 순차 I/O 최적화'],
+      ['2~16번째', '64 KB 유지', 'Segment가 1 MB가 될 때까지'],
+      ['17번째 이후', '1 MB (128블록)', 'Segment가 1 MB를 넘으면 자동 확장'],
+      ['더 커지면', '8 MB, 64 MB 순으로 증가', 'Segment가 64 MB, 1 GB를 넘을 때 (버전에 따라 조금 달라요)'],
       ['UNIFORM SIZE 1 MB', '128블록 고정', '수동 지정 시 처음부터 끝까지 동일'],
     ],
     extentParamDesc: 'Extent 동작을 제어하는 주요 스토리지 파라미터예요. CREATE TABLE / CREATE TABLESPACE 구문에서 지정하거나, Locally Managed 방식이면 대부분 Oracle이 자동으로 관리해요.',
@@ -139,14 +137,13 @@ const STORAGE_T = {
       ['INITIAL', 'Segment가 처음 생성될 때 할당되는 첫 번째 Extent 크기예요. 기본값은 Tablespace 설정에 따라 64 KB ~ 1 MB예요.'],
       ['NEXT', '두 번째 이후 Extent 크기예요. DMT(Dictionary Managed Tablespace) 방식에서만 의미 있고, LMT(Locally Managed)에서는 Oracle이 무시해요.'],
       ['MINEXTENTS', 'Segment 생성 시 미리 확보할 최소 Extent 수예요. 기본값 1. 큰 테이블을 만들 때 미리 늘려두면 점진적 확장 오버헤드를 줄일 수 있어요.'],
-      ['MAXEXTENTS', 'Segment가 가질 수 있는 최대 Extent 수예요. UNLIMITED를 권장해요. 너무 작게 지정하면 "ORA-01628: max # extents reached" 오류가 발생해요.'],
+      ['MAXEXTENTS', 'Segment가 가질 수 있는 최대 Extent 수예요. UNLIMITED를 권장해요. 너무 작게 지정하면 "ORA-01631: max # extents reached in table" 오류가 발생해요.'],
       ['PCTINCREASE', '매 Extent 할당 시 크기를 몇 % 씩 키울지 설정해요. DMT(Dictionary Managed Tablespace) 전용이에요. LMT(Locally Managed)에서는 무시되고 0으로 고정돼요.'],
       ['UNIFORM SIZE', 'CREATE TABLESPACE 시 지정해요. 해당 Tablespace의 모든 Extent를 동일 크기로 강제해요. 예: EXTENT MANAGEMENT LOCAL UNIFORM SIZE 1M.'],
     ],
 
     segmentTitle: 'Segment — 오브젝트 저장 공간',
     segmentDesc: 'Extent들이 모여 하나의 Segment가 돼요. Segment는 테이블·인덱스처럼 데이터베이스 오브젝트 하나와 1:1로 대응해요. EMPLOYEES 테이블을 만들면 Oracle은 그 테이블 전용 Segment를 하나 만들고, 거기에 Extent를 할당해줘요.\n\n처음엔 작은 Extent 하나로 시작하지만, 데이터가 쌓여서 꽉 차면 Oracle이 자동으로 새 Extent를 붙여서 Segment를 늘려요. 파티션 테이블은 파티션 하나당 Segment 하나가 생겨요.\n\nOracle 11g 이후에는 기본적으로 지연 Segment 생성(Deferred Segment Creation)이 적용돼요. CREATE TABLE 시점에는 메타데이터만 만들고, 첫 번째 INSERT가 일어날 때 실제 Segment(디스크 공간)가 할당돼요. 수천 개의 테이블을 만드는 설치 스크립트가 불필요한 공간을 차지하지 않도록 설계된 동작이에요.',
-    segmentGrowthDesc: 'Segment는 데이터가 늘어날수록 자동으로 Extent를 추가하며 성장해요. 아래는 EMPLOYEES 테이블의 Segment가 커지는 과정이에요.',
     hwmTitle: 'HWM — High Water Mark',
     hwmDesc: 'HWM(High Water Mark, 최고 수위 표시)은 Segment 안에서 "한 번이라도 데이터가 쓰인 적 있는 마지막 블록"의 경계선이에요. HWM 위쪽은 한 번도 사용된 적 없는 미포맷 블록이고, HWM 아래쪽은 현재 데이터가 있거나 DELETE로 비워진 블록이에요.\n\nHWM의 핵심은 한 번 올라가면 절대 내려오지 않는다는 거예요. 테이블에서 모든 행을 DELETE해도 HWM은 그대로예요. Full Table Scan(전체 테이블 스캔)은 HWM까지의 모든 블록을 읽기 때문에, 대량 삭제 후에도 스캔 비용이 줄지 않아요.\n\nHWM을 실제로 낮추려면 TRUNCATE TABLE, ALTER TABLE ... SHRINK SPACE, 또는 테이블을 재생성(MOVE)해야 해요.\n\nASSM(Automatic Segment Space Management, 자동 세그먼트 공간 관리)에서는 HWM와 Low HWM 두 개의 경계가 있어요. Low HWM 아래는 포맷이 완전히 끝난 블록이고, Low HWM~HWM 사이는 할당은 됐지만 일부만 포맷된 구간이에요. Full Table Scan은 이 구조를 활용해서 Low HWM까지는 연속으로 읽고, 그 위는 포맷된 블록만 골라 읽어요.',
     segmentTypes: [
@@ -193,14 +190,10 @@ const STORAGE_T = {
       ['권장 여부', '✅ 기본값·권장', '⚠️ Legacy — 신규 사용 금지'],
     ],
     tablespaceNote: 'DBA는 Tablespace에 파일을 추가(ALTER TABLESPACE ... ADD DATAFILE)하거나 AUTOEXTEND ON을 설정해서 공간이 자동으로 늘어나게 할 수 있어요. 여러 .dbf 파일에 걸쳐 있어도 Oracle이 하나의 논리적 공간으로 합쳐서 관리해요.',
-
-    infoTitle: '핵심 정리',
     infoBody: 'Block이 I/O의 기본 단위이고, Extent가 할당의 기본 단위이며, Segment가 오브젝트와 1:1로 대응하고, Tablespace가 DBA 관리의 논리 단위예요. ROWID = 오브젝트#+파일#+블록#+슬롯# 4요소로 행 위치를 O(1)에 특정해요.',
   },
   en: {
     sectionTitle: 'Data Storage Structure',
-
-    blockTitle: 'Block — Smallest I/O Unit',
 
     rowidTitle: 'ROWID — Physical Address of a Row',
     rowidDesc: 'A ROWID is the unique physical address Oracle assigns to every row in a table. It is not stored as a column value — Oracle derives it on-the-fly from the file, block, and slot position of the row.\n\nThe Extended ROWID is an 18-character Base64-encoded string made up of four components.',
@@ -217,9 +210,9 @@ const STORAGE_T = {
     extentSizeDesc: 'The number of blocks and the size of each Extent depend on how the Tablespace is managed. With AUTOALLOCATE (the default for LMT — Locally Managed Tablespaces), Oracle automatically scales Extent sizes from 64 KB → 1 MB → 8 MB → 64 MB as the Segment grows. With UNIFORM SIZE, every Extent in the tablespace stays the same size (e.g. 1 MB) from creation to the end.',
     extentSizeTable: [
       ['1st Extent', '64 KB (8 blocks at 8 KB each)', 'AUTOALLOCATE default'],
-      ['2nd–4th Extents', 'Stay at 64 KB', 'Segment under 1 MB'],
-      ['5th Extent onward', '1 MB (128 blocks)', 'Auto-promoted once segment exceeds 1 MB'],
-      ['Grows further', '8 MB, then 64 MB', 'Optimises sequential I/O for large tables'],
+      ['2nd–16th Extents', 'Stay at 64 KB', 'Until the segment reaches 1 MB'],
+      ['17th Extent onward', '1 MB (128 blocks)', 'Auto-promoted once segment exceeds 1 MB'],
+      ['Grows further', '8 MB, then 64 MB', 'Once the segment passes 64 MB and 1 GB (varies slightly by version)'],
       ['UNIFORM SIZE 1 MB', '128 blocks, fixed', 'Same size from first to last Extent'],
     ],
     extentParamDesc: 'Key storage parameters that control Extent behaviour. Set them in CREATE TABLE / CREATE TABLESPACE, or leave them to Oracle when using Locally Managed Tablespaces.',
@@ -227,14 +220,13 @@ const STORAGE_T = {
       ['INITIAL', 'Size of the very first Extent when a Segment is created. Defaults to 64 KB – 1 MB depending on the tablespace setting.'],
       ['NEXT', 'Size of subsequent Extents. Only meaningful for DMT (Dictionary Managed Tablespace); ignored (overridden by Oracle) in LMT (Locally Managed).'],
       ['MINEXTENTS', 'Minimum number of Extents to pre-allocate at Segment creation. Default 1. Setting it higher avoids incremental growth overhead for large tables.'],
-      ['MAXEXTENTS', 'Maximum Extents a Segment may hold. UNLIMITED is recommended. Too small a value causes "ORA-01628: max # extents reached".'],
+      ['MAXEXTENTS', 'Maximum Extents a Segment may hold. UNLIMITED is recommended. Too small a value causes "ORA-01631: max # extents reached in table".'],
       ['PCTINCREASE', 'Percentage to grow each successive Extent. DMT (Dictionary Managed Tablespace) only. Ignored and fixed at 0 in LMT (Locally Managed) tablespaces.'],
       ['UNIFORM SIZE', 'Specified at CREATE TABLESPACE level. Forces every Extent in the tablespace to the same size. E.g. EXTENT MANAGEMENT LOCAL UNIFORM SIZE 1M.'],
     ],
 
     segmentTitle: 'Segment — Object Storage Space',
     segmentDesc: 'Extents group together to form a Segment. Each Segment maps one-to-one to a database object — one table, one index, one Segment. When you create an EMPLOYEES table, Oracle allocates a dedicated Segment for it and assigns Extents to hold the rows.\n\nIt starts with a single small Extent. As data fills up, Oracle automatically adds new Extents to grow the Segment. Partitioned tables get one Segment per partition.\n\nSince Oracle 11g, Deferred Segment Creation is enabled by default. CREATE TABLE only creates metadata; the actual Segment (disk space) is allocated on the very first INSERT. This prevents installation scripts that create thousands of tables from wasting disk space.',
-    segmentGrowthDesc: 'A Segment grows automatically by adding Extents as data accumulates. Here is how an EMPLOYEES table Segment expands over time.',
     hwmTitle: 'HWM — High Water Mark',
     hwmDesc: 'The HWM (High Water Mark) is the boundary in a Segment beyond which blocks have never been written to. Blocks above the HWM are unformatted and never used; blocks below it are either holding data or are empty from DELETE operations.\n\nThe critical characteristic: the HWM only moves up, never down. Even if you DELETE every row in a table, the HWM stays where it was. A Full Table Scan (FTS) reads every block up to the HWM, so scan cost does not decrease after mass deletes.\n\nTo actually lower the HWM you need TRUNCATE TABLE, ALTER TABLE ... SHRINK SPACE, or a table rebuild (MOVE).\n\nUnder ASSM (Automatic Segment Space Management) there are two boundaries: HWM and Low HWM. Everything below Low HWM is guaranteed formatted; the zone between Low HWM and HWM is allocated but partially formatted. Full Table Scans use this to read contiguously up to Low HWM, then selectively read only formatted blocks up to HWM.',
     segmentTypes: [
@@ -281,8 +273,6 @@ const STORAGE_T = {
       ['Status', '✅ Default · recommended', '⚠️ Legacy — do not use in new code'],
     ],
     tablespaceNote: 'A DBA grows a Tablespace by adding a datafile (ALTER TABLESPACE ... ADD DATAFILE) or enabling AUTOEXTEND ON so it expands automatically. Even if a Tablespace spans multiple .dbf files, Oracle presents them as a single logical space.',
-
-    infoTitle: 'Key Takeaway',
     infoBody: 'Block is the I/O unit. Extent is the allocation unit (always within one file). Segment maps 1:1 to a database object and grows via HWM. Tablespace is the DBA\'s logical management unit. ROWID = object# + file# + block# + slot# pinpoints any row in O(1).',
   },
 }
@@ -377,8 +367,8 @@ const BLOCK_ZONES: BlockZoneDef[] = [
     activeRing: 'ring-2 ring-viz-blue/50',
     titleKo: 'Common Header (캐시 계층)',
     titleEn: 'Common Header (Cache Layer)',
-    descKo: '"캐시 계층"이라 불리는 이유는 이 헤더가 디스크가 아닌 Buffer Cache(메모리) 안에서만 유지되는 정보를 담기 때문이에요. 블록이 디스크에서 메모리로 올라오면 Oracle이 이 영역을 채우고, 블록이 다시 디스크로 내려갈 때는 일부 필드가 제거돼요.',
-    descEn: 'Called the "cache layer" because this header holds fields maintained only while the block lives in the Buffer Cache (memory). Oracle fills it when a block is read from disk and strips some fields when it is written back.',
+    descKo: '모든 종류의 블록에 똑같이 붙는 공통 헤더예요. 블록 종류·주소·마지막 변경 SCN·체크섬처럼 Buffer Cache가 블록을 알아보고 관리하는 데 필요한 정보가 들어 있어서 "캐시 계층"이라고 불러요.',
+    descEn: 'The common header present on every kind of block. It is called the "cache layer" because it carries what the Buffer Cache needs to identify and manage a block — block type, address, last-change SCN, and checksum.',
     rows: [
       { termKo: 'Block Type', termEn: 'Block Type', descKo: '블록 종류 식별자 (데이터·인덱스·언두 등)', descEn: 'Identifies data / index / undo block type' },
       { termKo: 'DBA', termEn: 'DBA', descKo: 'Data Block Address — 이 블록이 디스크의 어느 위치에 있는지 나타내는 주소예요. 파일 번호 + 블록 번호로 구성돼요.', descEn: 'Data Block Address — the on-disk location of this block, expressed as file# + block#.' },
@@ -400,7 +390,7 @@ const BLOCK_ZONES: BlockZoneDef[] = [
     rows: [
       { termKo: 'XID', termEn: 'XID', descKo: 'Transaction ID(트랜잭션 ID) — Undo Seg# · Slot# · Seq# 세 숫자의 조합으로 트랜잭션을 고유하게 식별해요.', descEn: 'Transaction ID — a three-part key (Undo Seg# · Slot# · Seq#) that uniquely identifies a transaction.' },
       { termKo: 'UBA', termEn: 'UBA', descKo: 'Undo Block Address — 이 트랜잭션이 변경하기 전 데이터(이전 이미지)가 기록된 Undo 블록의 디스크 주소예요. 이전 이미지란 UPDATE·DELETE 직전에 Oracle이 Undo Segment에 복사해 둔 원본 값으로, ROLLBACK 시 이 값으로 되돌리고, 다른 세션이 이전 시점의 데이터를 읽을 때(Read Consistency)도 이 값을 참조해요.', descEn: 'Undo Block Address — the on-disk address of the Undo block that holds the before-image for this transaction. A before-image is the original column value Oracle copies into the Undo Segment just before an UPDATE or DELETE. It is used to revert the row on ROLLBACK, and by other sessions that need to read an older consistent snapshot (Read Consistency).' },
-      { termKo: 'Flag', termEn: 'Flag', descKo: 'C = 커밋됨 / U = 행에 잠금 중 / T = 활성 트랜잭션 진행 중', descEn: 'C = committed / U = row locked / T = active transaction in progress' },
+      { termKo: 'Flag', termEn: 'Flag', descKo: '---- = 진행 중인 트랜잭션 / C = 커밋되고 정리(Cleanout)까지 끝남 / U = 커밋은 됐지만 정확한 커밋 SCN은 아직 정리 전(Upper Bound Commit)', descEn: '---- = active transaction / C = committed and cleaned out / U = committed, but the exact commit SCN is not yet cleaned out (upper bound commit)' },
       { termKo: 'INITRANS', termEn: 'INITRANS', descKo: '블록 생성 시 ITL 슬롯을 미리 확보하는 수예요. 기본값은 테이블 1, 인덱스 2예요. 슬롯이 부족하면 Free Space를 잠식하면서 동적으로 늘어나요.', descEn: 'Number of ITL slots pre-allocated when the block is created. Default: 1 for tables, 2 for indexes. If all slots are full, Oracle carves new ones from Free Space.' },
       { termKo: 'MAXTRANS', termEn: 'MAXTRANS', descKo: '한 블록에서 동시에 활성화할 수 있는 ITL 슬롯의 상한이에요. Oracle 10g 이후에는 사실상 255로 고정되어 사용자가 제어할 수 없어요. INITRANS와 달리 MAXTRANS를 DDL로 지정해도 무시돼요.', descEn: 'Upper bound on the number of active ITL slots in a block. Since Oracle 10g it is effectively fixed at 255 and cannot be controlled by the user. Unlike INITRANS, any MAXTRANS value set via DDL is silently ignored.' },
     ],
@@ -1381,7 +1371,7 @@ export function StorageSection() {
           <SubTitle>{lang === 'ko' ? 'Oracle 기본 Tablespace 목록' : 'Built-in Oracle Tablespaces'}</SubTitle>
           <Prose>{t.tablespaceFileDesc}</Prose>
           <Table
-            headers={[lang === 'ko' ? 'Tablespace' : 'Tablespace', lang === 'ko' ? '용도' : 'Purpose']}
+            headers={['Tablespace', lang === 'ko' ? '용도' : 'Purpose']}
             rows={t.tablespaceTable}
           />
         </div>

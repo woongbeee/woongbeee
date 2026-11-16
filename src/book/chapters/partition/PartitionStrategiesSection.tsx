@@ -12,7 +12,7 @@ import {
 const T = {
   ko: {
     title: '파티셔닝 전략',
-    subtitle: 'Oracle은 Range, Interval, List, Hash, Composite, Reference의 6가지 파티셔닝 전략을 제공합니다. 데이터 특성과 쿼리 패턴에 따라 전략을 선택합니다.',
+    subtitle: 'Oracle은 Range, Interval, List, Hash, Composite, Reference의 6가지 파티셔닝 전략을 제공해요. 데이터 특성과 쿼리 패턴에 따라 전략을 선택해요.',
 
     chooseTitle: '전략 선택 기준',
     chooseTable: [
@@ -24,7 +24,7 @@ const T = {
     ],
 
     summary:
-      '파티셔닝 전략마다 Pruning 방식과 적합한 쿼리 패턴이 다릅니다. 하위 페이지에서 각 전략의 작동 방식과 SQL 예시를 자세히 살펴봅니다.',
+      '파티셔닝 전략마다 Pruning 방식과 적합한 쿼리 패턴이 달라요. 하위 페이지에서 각 전략의 작동 방식과 SQL 예시를 자세히 살펴봐요.',
   },
   en: {
     title: 'Partitioning Strategies',

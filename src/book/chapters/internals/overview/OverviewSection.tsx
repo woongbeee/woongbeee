@@ -32,13 +32,13 @@ const TOUR: TourEntry[] = [
     labelEn: 'Server Process',
     titleKo: 'Server Process — 내 SQL을 대신 처리해 주는 담당자',
     titleEn: "Server Process — Your SQL's Personal Agent",
-    descKo: '내가 SQL을 보내면 Oracle은 그 요청만 전담하는 Server Process를 하나 만들어 줍니다. 마치 식당에서 "이 테이블만 담당하는 웨이터"가 배정되는 것처럼요. 이 프로세스가 SQL이 무슨 뜻인지 해석하고, 가장 빠른 방법을 찾아서, 실제로 데이터를 꺼내 돌려줍니다.',
+    descKo: '내가 SQL을 보내면 Oracle은 그 요청만 전담하는 Server Process를 하나 만들어 줘요. 마치 식당에서 "이 테이블만 담당하는 웨이터"가 배정되는 것처럼요. 이 프로세스가 SQL이 무슨 뜻인지 해석하고, 가장 빠른 방법을 찾아서, 실제로 데이터를 꺼내 돌려줘요.',
     descEn: 'When you send a SQL statement, Oracle creates a Server Process dedicated to your request — like a waiter assigned just to your table. It interprets your SQL, finds the fastest way to execute it, fetches the data, and returns the results.',
     details: [
       {
         termKo: 'Dedicated Server (전용 서버)',
         termEn: 'Dedicated Server',
-        descKo: '연결 1개당 프로세스 1개가 딱 붙습니다. 가장 흔한 방식이고, 항상 나만 전담하니 응답이 빠릅니다. 다만 접속자가 수천 명이면 프로세스도 수천 개 뜨기 때문에 메모리를 많이 잡아먹습니다.',
+        descKo: '연결 1개당 프로세스 1개가 딱 붙어요. 가장 흔한 방식이고, 항상 나만 전담하니 응답이 빨라요. 다만 접속자가 수천 명이면 프로세스도 수천 개 뜨기 때문에 메모리를 많이 잡아먹어요.',
         descEn: 'One process is assigned per connection — the most common setup. Your process is always yours, so response is fast. The downside: thousands of connections mean thousands of processes, consuming a lot of memory.',
       },
       {
@@ -134,7 +134,7 @@ const TOUR: TourEntry[] = [
     labelEn: 'Shared Pool',
     titleKo: 'Shared Pool — SQL 분석 결과와 테이블 구조 정보 캐시',
     titleEn: 'Shared Pool — Cache for SQL Analysis and Table Structure',
-    descKo: 'SQL을 실행하려면 Oracle이 먼저 두 가지를 알아야 해요. 첫째, "이 SQL의 뜻이 뭐고, 어떻게 실행하면 제일 빠를까(파싱·최적화)". 둘째, "이 테이블엔 어떤 컬럼이 있고 인덱스는 뭔가(딕셔너리 조회)". Shared Pool은 이 두 결과를 캐시해 두어, 같은 SQL이 다시 들어올 때 처음부터 다시 분석하는 수고를 덜어줍니다.',
+    descKo: 'SQL을 실행하려면 Oracle이 먼저 두 가지를 알아야 해요. 첫째, "이 SQL의 뜻이 뭐고, 어떻게 실행하면 제일 빠를까(파싱·최적화)". 둘째, "이 테이블엔 어떤 컬럼이 있고 인덱스는 뭔가(딕셔너리 조회)". Shared Pool은 이 두 결과를 캐시해 두어, 같은 SQL이 다시 들어올 때 처음부터 다시 분석하는 수고를 덜어줘요.',
     descEn: 'Before Oracle can run any SQL, it needs two things: first, "what does this SQL mean and what is the fastest execution plan?" (parsing and optimisation); second, "what columns and indexes does this table have?" (dictionary lookup). The Shared Pool caches both results so the same work is not repeated when the same SQL arrives again.',
     details: [
       {
@@ -240,8 +240,8 @@ const TOUR: TourEntry[] = [
       {
         termKo: 'Control File (.ctl) — 지도 파일',
         termEn: 'Control File (.ctl)',
-        descKo: 'Oracle Database의 구조 정보를 담은 파일이에요. "데이터 파일이 어디 있나", "마지막 체크포인트 SCN이 얼마인가", "DB 이름이 뭔가" 같은 정보가 여기에 있어요. Oracle은 시작할 때 이 파일을 제일 먼저 읽어서 나머지 파일 위치를 파악해요. 손상되면 복구가 매우 어렵기 때문에 여러 복사본을 유지하는 게 권장돼요.',
-        descEn: 'The file that holds Oracle\'s structural information: where the data files are, the latest checkpoint SCN, the database name, and more. Oracle reads this file first on startup to locate everything else. Corruption is very hard to recover from, so keeping multiple copies is strongly recommended.',
+        descKo: 'Oracle Database의 구조 정보를 담은 파일이에요. "데이터 파일이 어디 있나", "마지막 체크포인트 SCN이 얼마인가", "DB 이름이 뭔가" 같은 정보가 여기에 있어요. Oracle은 데이터베이스를 마운트(MOUNT)할 때 이 파일을 읽어서 데이터 파일과 Redo Log 파일의 위치를 파악해요. 손상되면 복구가 매우 어렵기 때문에 여러 복사본을 유지하는 게 권장돼요.',
+        descEn: 'The file that holds Oracle\'s structural information: where the data files are, the latest checkpoint SCN, the database name, and more. Oracle reads this file when it mounts the database to locate the data files and redo log files. Corruption is very hard to recover from, so keeping multiple copies is strongly recommended.',
       },
       {
         termKo: 'Archive Logs — 아카이브 로그',
@@ -313,8 +313,8 @@ const TOUR: TourEntry[] = [
     labelEn: 'Fixed SGA',
     titleKo: 'Fixed SGA — Oracle이 부팅할 때 쓰는 내부 부품',
     titleEn: 'Fixed SGA — Internal Bootstrap Data',
-    descKo: '인스턴스 상태, 백그라운드 프로세스가 서로를 찾는 데 필요한 포인터 등 Oracle 내부적으로만 쓰는 작은 고정 크기 영역이에요. 사용자가 직접 조절할 수 없고, 크기도 아주 작아요(보통 수백 KB 수준).',
-    descEn: 'A small, fixed-size area holding internal bookkeeping — instance state, pointers background processes use to locate each other, and similar bootstrap data. Users cannot resize it directly, and it typically stays only a few hundred KB.',
+    descKo: '인스턴스 상태, 백그라운드 프로세스가 서로를 찾는 데 필요한 포인터 등 Oracle 내부적으로만 쓰는 작은 고정 크기 영역이에요. 사용자가 직접 조절할 수 없고, 크기도 SGA 전체에 비하면 아주 작아요.',
+    descEn: 'A small, fixed-size area holding internal bookkeeping — instance state, pointers background processes use to locate each other, and similar bootstrap data. Users cannot resize it directly, and it is tiny compared with the rest of the SGA.',
     details: [],
     accentCls: 'border-line bg-paper-sunk',
     badgeCls: 'bg-ink-3',
@@ -499,8 +499,8 @@ const TOUR: TourEntry[] = [
     labelEn: 'Control Files',
     titleKo: 'Control File (.ctl) — DB의 지도 파일',
     titleEn: 'Control File (.ctl) — The Database\'s Map',
-    descKo: 'Oracle Database의 구조 정보를 담은 파일이에요. "데이터 파일이 어디 있나", "마지막 체크포인트 SCN이 얼마인가", "DB 이름이 뭔가" 같은 정보가 여기에 있어요. Oracle은 시작할 때 이 파일을 제일 먼저 읽어서 나머지 파일 위치를 파악해요. 손상되면 복구가 매우 어렵기 때문에 여러 복사본을 유지하는 게 권장돼요.',
-    descEn: 'The file that holds Oracle\'s structural information: where the data files are, the latest checkpoint SCN, the database name, and more. Oracle reads this file first on startup to locate everything else. Corruption is very hard to recover from, so keeping multiple copies is strongly recommended.',
+    descKo: 'Oracle Database의 구조 정보를 담은 파일이에요. "데이터 파일이 어디 있나", "마지막 체크포인트 SCN이 얼마인가", "DB 이름이 뭔가" 같은 정보가 여기에 있어요. Oracle은 데이터베이스를 마운트(MOUNT)할 때 이 파일을 읽어서 데이터 파일과 Redo Log 파일의 위치를 파악해요. 손상되면 복구가 매우 어렵기 때문에 여러 복사본을 유지하는 게 권장돼요.',
+    descEn: 'The file that holds Oracle\'s structural information: where the data files are, the latest checkpoint SCN, the database name, and more. Oracle reads this file when it mounts the database to locate the data files and redo log files. Corruption is very hard to recover from, so keeping multiple copies is strongly recommended.',
     details: [],
     accentCls: 'border-line bg-paper-sunk',
     badgeCls: 'bg-ink-3',
@@ -718,7 +718,7 @@ export function OverviewSection() {
               <br />
               Oracle이 SQL 실행 상태를 추적하려고 메모리(PGA)에 만드는 객체예요. SQL을 파싱하면 커서가 하나 생기고, 그 안에 실행 계획, 바인드 변수, 지금까지 읽은 위치 등이 담겨요.
               <br /><br />
-              같은 SQL이 다시 실행되면 Oracle은 Library Cache에서 <strong>공유 커서(Shared Cursor)</strong>를 찾아 파싱을 건너뜁니다. 커서의 생애 주기는 세 단계예요: <strong>OPEN</strong>(커서 생성·SQL 파싱) → <strong>FETCH</strong>(행 단위 데이터 읽기) → <strong>CLOSE</strong>(커서 반환·자원 해제).
+              같은 SQL이 다시 실행되면 Oracle은 Library Cache에서 <strong>공유 커서(Shared Cursor)</strong>를 찾아 비용이 큰 최적화 단계를 건너뛰어요. 커서의 생애 주기는 세 단계예요: <strong>OPEN</strong>(커서 생성·SQL 파싱) → <strong>FETCH</strong>(행 단위 데이터 읽기) → <strong>CLOSE</strong>(커서 반환·자원 해제).
             </>
           ) : (
             <>

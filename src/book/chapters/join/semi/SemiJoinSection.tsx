@@ -76,20 +76,20 @@ WHERE  e.emp_id NOT IN (
     ],
 
     hintTitle: '힌트로 제어하기',
-    hintSql: `-- Semi Join 강제
-SELECT /*+ SEMIJOIN(e) */ e.emp_id, e.first_name
+    hintSql: `-- Semi Join 강제 (힌트는 서브쿼리 안에 써요)
+SELECT e.emp_id, e.first_name
 FROM   employees e
-WHERE  EXISTS (SELECT 1 FROM orders o WHERE o.emp_id = e.emp_id);
+WHERE  EXISTS (SELECT /*+ SEMIJOIN */ 1 FROM orders o WHERE o.emp_id = e.emp_id);
 
--- Semi Join 방지 (일반 조인으로 처리)
-SELECT /*+ NO_SEMIJOIN(e) */ e.emp_id, e.first_name
+-- Semi Join 방지 (서브쿼리를 조인으로 풀지 않고 행마다 확인하는 FILTER 방식 등으로 처리)
+SELECT e.emp_id, e.first_name
 FROM   employees e
-WHERE  EXISTS (SELECT 1 FROM orders o WHERE o.emp_id = e.emp_id);
+WHERE  EXISTS (SELECT /*+ NO_SEMIJOIN */ 1 FROM orders o WHERE o.emp_id = e.emp_id);
 
 -- Anti Join 강제
-SELECT /*+ ANTIJOIN(e) */ e.emp_id, e.first_name
+SELECT e.emp_id, e.first_name
 FROM   employees e
-WHERE  NOT EXISTS (SELECT 1 FROM orders o WHERE o.emp_id = e.emp_id);`,
+WHERE  NOT EXISTS (SELECT /*+ ANTIJOIN */ 1 FROM orders o WHERE o.emp_id = e.emp_id);`,
 
     simTitle: 'Semi Join 시뮬레이션',
     simDesc: 'DEPARTMENTS 테이블의 각 부서마다 EMPLOYEES에 "해당 부서 소속 직원이 존재하는지"를 확인해요. 첫 번째 매칭 직원을 찾는 순간 해당 부서의 Inner 스캔을 즉시 중단해요.',
@@ -100,11 +100,8 @@ WHERE  NOT EXISTS (SELECT 1 FROM orders o WHERE o.emp_id = e.emp_id);`,
     labelSemiMode: 'Semi Join (EXISTS)',
     labelAntiMode: 'Anti Join (NOT EXISTS)',
     labelScanStop: '⏹ 즉시 중단',
-    labelScanAll: '전체 스캔',
     labelFound: '✓ 존재함 → 포함',
-    labelNotFound: '✗ 없음 → 제외',
     labelAntiFound: '✗ 존재함 → 제외',
-    labelAntiNotFound: '✓ 없음 → 포함',
     labelInnerProgress: (cur: number, total: number) => `스캔 ${cur} / ${total}`,
     labelEarlyStop: '첫 매칭 발견 → 스캔 중단',
     btnPlay: '▶ 자동 재생',
@@ -115,9 +112,7 @@ WHERE  NOT EXISTS (SELECT 1 FROM orders o WHERE o.emp_id = e.emp_id);`,
     statusDone: '완료',
 
     nullTitle: 'NULL 처리 주의사항',
-    nullDesc: 'NOT IN을 사용할 때 서브쿼리 결과에 NULL이 포함되면 전체 결과가 빈 집합이 될 수 있어요. SQL의 3값 논리(TRUE / FALSE / UNKNOWN)에서 x NOT IN (..., NULL)은 항상 UNKNOWN이 되기 때문이에요.\n\n안전하게 사용하려면 NOT EXISTS를 사용하거나, NOT IN 서브쿼리에 IS NOT NULL 조건을 추가하세요.',
-
-    summaryTitle: '핵심 정리',
+    nullDesc: 'NOT IN을 사용할 때 서브쿼리 결과에 NULL이 포함되면 전체 결과가 빈 집합이 될 수 있어요. SQL의 3값 논리(TRUE / FALSE / UNKNOWN)에서 x NOT IN (..., NULL)은 절대 TRUE가 될 수 없기 때문이에요(목록에 같은 값이 있으면 FALSE, 없으면 UNKNOWN).\n\n안전하게 사용하려면 NOT EXISTS를 사용하거나, NOT IN 서브쿼리에 IS NOT NULL 조건을 추가하세요.',
     summaryItems: [
       'Semi Join: EXISTS / IN 서브쿼리를 자동 변환. 첫 매칭 즉시 Inner 스캔 중단 — 불필요한 I/O 없음.',
       'Anti Join: NOT EXISTS / NOT IN 서브쿼리를 변환. 매칭 행이 없는 Outer 행만 반환.',
@@ -184,20 +179,20 @@ WHERE  e.emp_id NOT IN (
     ],
 
     hintTitle: 'Controlling with Hints',
-    hintSql: `-- Force Semi Join
-SELECT /*+ SEMIJOIN(e) */ e.emp_id, e.first_name
+    hintSql: `-- Force Semi Join (the hint goes inside the subquery)
+SELECT e.emp_id, e.first_name
 FROM   employees e
-WHERE  EXISTS (SELECT 1 FROM orders o WHERE o.emp_id = e.emp_id);
+WHERE  EXISTS (SELECT /*+ SEMIJOIN */ 1 FROM orders o WHERE o.emp_id = e.emp_id);
 
--- Suppress Semi Join (process as regular join)
-SELECT /*+ NO_SEMIJOIN(e) */ e.emp_id, e.first_name
+-- Suppress Semi Join (the subquery is not unnested into a join; e.g. evaluated per row as a FILTER)
+SELECT e.emp_id, e.first_name
 FROM   employees e
-WHERE  EXISTS (SELECT 1 FROM orders o WHERE o.emp_id = e.emp_id);
+WHERE  EXISTS (SELECT /*+ NO_SEMIJOIN */ 1 FROM orders o WHERE o.emp_id = e.emp_id);
 
 -- Force Anti Join
-SELECT /*+ ANTIJOIN(e) */ e.emp_id, e.first_name
+SELECT e.emp_id, e.first_name
 FROM   employees e
-WHERE  NOT EXISTS (SELECT 1 FROM orders o WHERE o.emp_id = e.emp_id);`,
+WHERE  NOT EXISTS (SELECT /*+ ANTIJOIN */ 1 FROM orders o WHERE o.emp_id = e.emp_id);`,
 
     simTitle: 'Semi Join Simulation',
     simDesc: 'For each department in DEPARTMENTS, check whether "an employee in that department exists" in EMPLOYEES. As soon as the first matching employee is found, the inner scan for that department stops immediately.',
@@ -208,11 +203,8 @@ WHERE  NOT EXISTS (SELECT 1 FROM orders o WHERE o.emp_id = e.emp_id);`,
     labelSemiMode: 'Semi Join (EXISTS)',
     labelAntiMode: 'Anti Join (NOT EXISTS)',
     labelScanStop: '⏹ Stop immediately',
-    labelScanAll: 'Full scan',
     labelFound: '✓ Found → include',
-    labelNotFound: '✗ Not found → exclude',
     labelAntiFound: '✗ Found → exclude',
-    labelAntiNotFound: '✓ Not found → include',
     labelInnerProgress: (cur: number, total: number) => `Scan ${cur} / ${total}`,
     labelEarlyStop: 'First match → stop scan',
     btnPlay: '▶ Auto Play',
@@ -223,9 +215,7 @@ WHERE  NOT EXISTS (SELECT 1 FROM orders o WHERE o.emp_id = e.emp_id);`,
     statusDone: 'Done',
 
     nullTitle: 'NULL Handling Caveat',
-    nullDesc: "With NOT IN, if the subquery result contains any NULL, the entire result may be empty. This is because x NOT IN (..., NULL) always evaluates to UNKNOWN in SQL's three-valued logic (TRUE / FALSE / UNKNOWN).\n\nTo be safe, use NOT EXISTS, or add an IS NOT NULL condition to the NOT IN subquery.",
-
-    summaryTitle: 'Key Takeaways',
+    nullDesc: "With NOT IN, if the subquery result contains any NULL, the entire result may be empty. This is because x NOT IN (..., NULL) can never be TRUE in SQL's three-valued logic (TRUE / FALSE / UNKNOWN) — it is FALSE if x matches a listed value and UNKNOWN otherwise.\n\nTo be safe, use NOT EXISTS, or add an IS NOT NULL condition to the NOT IN subquery.",
     summaryItems: [
       'Semi Join: auto-transforms EXISTS / IN subqueries. Stops inner scan at first match — no unnecessary I/O.',
       'Anti Join: auto-transforms NOT EXISTS / NOT IN. Returns only outer rows with no match.',
@@ -467,8 +457,7 @@ function SemiJoinSim({ lang }: { lang: 'ko' | 'en' }) {
                     'rounded-card border px-3 py-2 font-mono text-xs',
                     isActive            ? 'border-blue/50 font-bold text-blue'
                     : result === 'included' ? 'border-green/50 text-green'
-                    : result === 'excluded' ? 'border-line text-ink-2'
-                    :                         'border-line text-ink-2',
+                    : 'border-line text-ink-2',
                   )}
                 >
                   {isActive && <span className="mr-1 text-blue font-bold">▶</span>}
@@ -511,8 +500,7 @@ function SemiJoinSim({ lang }: { lang: 'ko' | 'en' }) {
                     'rounded-card border px-3 py-2 font-mono text-xs',
                     state === 'matched-stop' ? 'border-amber/50 font-bold text-amber'
                     : state === 'current'      ? 'border-amber/50 font-bold text-amber'
-                    : state === 'scanned'      ? 'border-line text-ink-2'
-                    :                            'border-line text-ink-2',
+                    : 'border-line text-ink-2',
                   )}
                 >
                   <span className="text-[10px] opacity-60 mr-1">dept_id=</span>

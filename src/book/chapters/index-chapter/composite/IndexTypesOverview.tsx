@@ -28,25 +28,25 @@ const T = {
       {
         ok: true,
         title: '해당 컬럼을 자주 조회하고, 결과 행이 전체의 일부일 때',
-        desc: '인덱스가 걸린 컬럼을 자주 찾는데 결과 행이 전체의 일부에 불과하다면, 인덱스 스캔이 Full Table Scan(테이블 전체 읽기)보다 훨씬 빨라요. 찾는 행이 적을수록(선택도가 낮을수록) 인덱스 효과가 더 크게 나타납니다.',
+        desc: '인덱스가 걸린 컬럼을 자주 찾는데 결과 행이 전체의 일부에 불과하다면, 인덱스 스캔이 Full Table Scan(테이블 전체 읽기)보다 훨씬 빨라요. 찾는 행이 적을수록(선택도가 낮을수록) 인덱스 효과가 더 크게 나타나요.',
         example: 'WHERE employee_id = 145  -- 1행만 반환',
       },
       {
         ok: true,
         title: 'FK(Foreign Key, 외래 키) 컬럼',
-        desc: '부모 테이블의 행이 삭제되거나 수정될 때, Oracle은 자식 테이블에 연결된 행이 있는지 확인해야 해요. FK 컬럼에 인덱스가 없으면 자식 테이블 전체에 자물쇠(Full Table Lock)가 걸려서 여러 사람이 동시에 작업하기가 어려워집니다. FK 컬럼에는 꼭 인덱스를 만들어 주세요!',
+        desc: '부모 테이블의 행이 삭제되거나 수정될 때, Oracle은 자식 테이블에 연결된 행이 있는지 확인해야 해요. FK 컬럼에 인덱스가 없으면 자식 테이블 전체에 자물쇠(Full Table Lock)가 걸려서 여러 사람이 동시에 작업하기가 어려워져요. FK 컬럼에는 꼭 인덱스를 만들어 주세요!',
         example: 'FOREIGN KEY (department_id) REFERENCES departments(department_id)',
       },
       {
         ok: false,
         title: '쿼리가 테이블 행 대부분을 가져올 때',
-        desc: '인덱스를 통해 블록을 하나하나 찾아가면 오히려 Full Table Scan(테이블 전체 읽기)보다 I/O가 더 많아질 수 있어요. 전체 행의 상당 부분을 읽어야 한다면 그냥 처음부터 끝까지 쭉 읽는 게 더 빠릅니다.',
+        desc: '인덱스를 통해 블록을 하나하나 찾아가면 오히려 Full Table Scan(테이블 전체 읽기)보다 I/O가 더 많아질 수 있어요. 전체 행의 상당 부분을 읽어야 한다면 그냥 처음부터 끝까지 쭉 읽는 게 더 빨라요.',
         example: 'WHERE salary > 1000  -- 대부분의 행이 해당',
       },
       {
         ok: false,
         title: 'DML(Data Manipulation Language, INSERT/UPDATE/DELETE)이 매우 잦은 테이블',
-        desc: '인덱스가 있으면 데이터를 추가·수정·삭제할 때마다 인덱스도 함께 업데이트해야 해서 속도가 느려져요. 인덱스가 많을수록 이 부담도 커집니다. 쓰기 작업이 굉장히 많은 테이블이라면 인덱스를 최대한 줄이는 게 좋아요.',
+        desc: '인덱스가 있으면 데이터를 추가·수정·삭제할 때마다 인덱스도 함께 업데이트해야 해서 속도가 느려져요. 인덱스가 많을수록 이 부담도 커져요. 쓰기 작업이 굉장히 많은 테이블이라면 인덱스를 최대한 줄이는 게 좋아요.',
         example: '수백 행 미만의 코드 테이블 또는 대량 INSERT가 잦은 로그 테이블',
       },
     ],
@@ -56,13 +56,13 @@ const T = {
     costTitle: '인덱스를 쓰면 드는 비용',
     costItems: [
       { icon: '💾', title: '디스크 공간', desc: '인덱스는 테이블과 별도로 저장 공간을 차지해요. 테이블과 다른 테이블스페이스에 저장할 수도 있어요.' },
-      { icon: '🔄', title: 'DML(Data Manipulation Language) 오버헤드', desc: 'INSERT, UPDATE, DELETE 할 때마다 인덱스도 함께 갱신해야 해요. 인덱스가 많을수록 쓰기 속도가 느려집니다.' },
+      { icon: '🔄', title: 'DML(Data Manipulation Language) 오버헤드', desc: 'INSERT, UPDATE, DELETE 할 때마다 인덱스도 함께 갱신해야 해요. 인덱스가 많을수록 쓰기 속도가 느려져요.' },
       { icon: '🧠', title: '옵티마이저(Optimizer) 부담', desc: '인덱스가 많아지면 옵티마이저가 최적의 실행 방법을 고르는 데 더 오래 걸려요.' },
     ],
-    optimizerNote: '옵티마이저(Optimizer)란 SQL을 실행하기 전에 "어떤 순서로, 어떤 방법으로 데이터를 읽을지" 를 결정해주는 Oracle의 핵심 엔진이에요. 인덱스가 많을수록 선택지도 늘어나서 결정하는 데 시간이 더 걸립니다. 옵티마이저에 대해서는 뒤에 나오는 챕터에서 자세히 다룰 거예요!',
+    optimizerNote: '옵티마이저(Optimizer)란 SQL을 실행하기 전에 "어떤 순서로, 어떤 방법으로 데이터를 읽을지" 를 결정해주는 Oracle의 핵심 엔진이에요. 인덱스가 많을수록 선택지도 늘어나서 결정하는 데 시간이 더 걸려요. 옵티마이저에 대해서는 뒤에 나오는 챕터에서 자세히 다룰 거예요!',
 
     stateTitle: '인덱스 상태',
-    stateDesc: '인덱스에는 두 가지 독립적인 상태가 있어요. 하나는 Usability(DML로 인덱스를 계속 갱신할지 여부)이고, 다른 하나는 Visibility(옵티마이저가 이 인덱스를 사용할지 여부)예요. Unusable 상태의 인덱스는 옵티마이저가 무시하고 DML 갱신도 하지 않아요. 대량 데이터를 빠르게 넣어야 할 때, 인덱스를 아예 지웠다가 다시 만드는 대신 Unusable로 바꿨다가 재구성하는 방법을 쓰기도 합니다.',
+    stateDesc: '인덱스에는 두 가지 독립적인 상태가 있어요. 하나는 Usability(DML로 인덱스를 계속 갱신할지 여부)이고, 다른 하나는 Visibility(옵티마이저가 이 인덱스를 사용할지 여부)예요. Unusable 상태의 인덱스는 옵티마이저가 무시하고 DML 갱신도 하지 않아요. 대량 데이터를 빠르게 넣어야 할 때, 인덱스를 아예 지웠다가 다시 만드는 대신 Unusable로 바꿨다가 재구성하는 방법을 쓰기도 해요.',
     usabilityRows: [
       { state: 'Usable', dml: '✓ 갱신', optimizer: '✓ 사용', space: '✓ 소비', badge: 'emerald', use: '정상 운영' },
       { state: 'Unusable', dml: '✗ 갱신 안 함', optimizer: '✗ 무시', space: '✗ 없음', badge: 'rose', use: '대량 데이터 로드 성능 향상용' },
@@ -79,11 +79,11 @@ const T = {
 
     typesTitle: '인덱스 종류 한눈에 보기',
     types: [
-      { name: 'B-Tree Index',           color: 'violet',  icon: '🌲', badge: '기본값', desc: '가장 흔하게 쓰이는 인덱스예요. Root → Branch → Leaf로 이어지는 균형 잡힌 트리 구조로, 웬만한 상황에서는 이걸 쓰면 됩니다.' },
+      { name: 'B-Tree Index',           color: 'violet',  icon: '🌲', badge: '기본값', desc: '가장 흔하게 쓰이는 인덱스예요. Root → Branch → Leaf로 이어지는 균형 잡힌 트리 구조로, 웬만한 상황에서는 이걸 쓰면 돼요.' },
       { name: 'Bitmap Index',           color: 'emerald', icon: '🗺️', badge: 'DW',    desc: '값의 종류가 아주 적은 컬럼에 어울려요. 비트(0/1) 연산으로 여러 조건을 한꺼번에 처리할 수 있어요.' },
-      { name: 'Function-Based Index',   color: 'orange',  icon: 'ƒ',  badge: 'FBI',   desc: '함수나 표현식의 결과값을 키로 저장해요. 대소문자 구분 없이 검색할 때 자주 활용됩니다.' },
+      { name: 'Function-Based Index',   color: 'orange',  icon: 'ƒ',  badge: 'FBI',   desc: '함수나 표현식의 결과값을 키로 저장해요. 대소문자 구분 없이 검색할 때 자주 활용돼요.' },
       { name: 'Composite Index',        color: 'purple',  icon: '⊕',  badge: '복합',  desc: '컬럼 2개 이상을 묶어서 하나의 인덱스로 만들어요. WHERE 조건에 첫 번째 컬럼이 꼭 포함되어야 효과가 있어요.' },
-      { name: 'Reverse Key Index',      color: 'rose',    icon: '↔',  badge: 'RAC',   desc: '키 값을 거꾸로 뒤집어서 저장해요. 숫자가 순서대로 증가하는 값들이 특정 블록에 몰리는 현상을 막아줍니다.' },
+      { name: 'Reverse Key Index',      color: 'rose',    icon: '↔',  badge: 'RAC',   desc: '키 값을 거꾸로 뒤집어서 저장해요. 숫자가 순서대로 증가하는 값들이 특정 블록에 몰리는 현상을 막아줘요.' },
       { name: 'Index-Organized Table',  color: 'amber',   icon: '⬡',  badge: 'IOT',   desc: '테이블 자체가 B-Tree 인덱스 구조로 이루어져 있어요. 기본 키로만 조회하는 테이블에 딱 맞아요.' },
     ],
 
@@ -388,7 +388,7 @@ export function IndexTypesOverview() {
 
       <InfoBox variant="tip">
         {lang === 'ko'
-          ? 'Invisible 인덱스는 DML(Data Manipulation Language)로 계속 갱신되지만 옵티마이저에게는 보이지 않아요. 실제 운영 중인 인덱스를 바로 삭제하기 전에 Invisible로 바꿔서 "이게 없어지면 성능이 어떻게 될까?" 를 미리 확인하는 용도로 쓰입니다.'
+          ? 'Invisible 인덱스는 DML(Data Manipulation Language)로 계속 갱신되지만 옵티마이저에게는 보이지 않아요. 실제 운영 중인 인덱스를 바로 삭제하기 전에 Invisible로 바꿔서 "이게 없어지면 성능이 어떻게 될까?" 를 미리 확인하는 용도로 쓰여요.'
           : 'An Invisible index is still maintained by DML but hidden from the optimizer. Use it to safely test the impact of dropping an index in production before actually removing it.'}
       </InfoBox>
 

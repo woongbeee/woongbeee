@@ -120,7 +120,7 @@ function MiniSimulatorTable({ sql }: { sql: string }) {
                   transition={{ duration: 0.2, delay: i * 0.05 }}
                   className={cn(
                     'border-b last:border-0',
-                    i % 2 === 0 ? 'bg-green/10' : 'bg-green/10'
+                    'bg-green/10'
                   )}
                 >
                   {(parsed.columns as Array<keyof Employee>).map((col) => (

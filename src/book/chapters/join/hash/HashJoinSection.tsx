@@ -64,7 +64,6 @@ WHERE  e.department_id = d.department_id;`,
     labelBucket: (n: number) => `버킷 ${n}`,
     labelPhase1: '1. Build Phase',
     labelPhase2: '2. Probe Phase',
-    labelCurrentRow: '현재 행',
     labelHashArrow: 'h(dept_id)',
     labelBucketJump: '→ 버킷 직접 점프',
     btnNext: '다음 →',
@@ -128,7 +127,6 @@ WHERE  e.department_id = d.department_id;`,
     labelBucket: (n: number) => `Bucket ${n}`,
     labelPhase1: '1. Build Phase',
     labelPhase2: '2. Probe Phase',
-    labelCurrentRow: 'Current row',
     labelHashArrow: 'h(dept_id)',
     labelBucketJump: '→ Jump to bucket',
     btnNext: 'Next →',
@@ -300,7 +298,6 @@ function HashJoinSim({ lang }: { lang: 'ko' | 'en' }) {
                 {BUILD_ROWS.map((row, i) => {
                   const isActive  = buildStep === i + 1
                   const isBuilt   = buildStep > i + 1
-                  const isCurrent = buildStep === i
                   return (
                     <motion.div
                       key={row.dept_id}
@@ -314,7 +311,6 @@ function HashJoinSim({ lang }: { lang: 'ko' | 'en' }) {
                         'rounded-card border px-3 py-2 font-mono text-xs',
                         isActive  ? 'border-blue/50 font-bold text-blue'
                         : isBuilt ? 'border-green/30 text-green'
-                        : isCurrent ? 'border-line text-ink-2'
                         : 'border-line text-ink-2',
                       )}
                     >

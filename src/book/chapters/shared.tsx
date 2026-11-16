@@ -52,7 +52,7 @@ export function WipBanner() {
         </p>
         <p className="font-read text-ink-2 mt-1 text-[12.5px] leading-[1.6]">
           {lang === 'ko'
-            ? '이 챕터는 아직 작성 중이에요. 내용이 불완전하거나 변경될 수 있습니다.'
+            ? '이 챕터는 아직 작성 중이에요. 내용이 불완전하거나 변경될 수 있어요.'
             : 'This chapter is still being written. Content may be incomplete or change.'}
         </p>
       </div>

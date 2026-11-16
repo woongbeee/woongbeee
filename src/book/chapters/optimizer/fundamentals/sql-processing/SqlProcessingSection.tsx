@@ -107,7 +107,7 @@ SELECT * FROM employees WHERE employee_id = :emp_id;`,
     ],
     executionTitle: '실행 (SQL Execution)',
     executionDesc:
-      'SQL 엔진이 드디어 행 소스 트리의 각 노드를 실행해요. DML에서 유일하게 반드시 거치는 단계예요. 실행 순서는 계획에 표시된 순서의 역순, 즉 아래에서 위로 올라가요.',
+      'SQL 엔진이 드디어 행 소스 트리의 각 노드를 실행해요. DML에서 유일하게 반드시 거치는 단계예요. 실행은 가장 안쪽(들여쓰기가 가장 깊은) 단계에서 시작해서 부모 단계로 올라가요. 같은 깊이의 형제끼리는 위에 있는 것부터 실행돼요.',
     executionPlanSql: `-- 실행 계획 예시
 SELECT e.last_name, j.job_title, d.department_name
 FROM   hr.employees e, hr.departments d, hr.jobs j
@@ -128,7 +128,7 @@ Plan hash value: 975837011
 | 6|   TABLE ACCESS FULL           | DEPARTMENTS| 27 | 432|  2  (0)|00:00:01|
 ---------------------------------------------------------------------------`,
     executionNote:
-      '실행 순서 (아래에서 위로): ① EMP_NAME_IX 인덱스 Range Scan → ② EMPLOYEES 테이블 접근 → ③ JOBS Full Scan → ④ Hash Join → ⑤ DEPARTMENTS Full Scan → ⑥ Hash Join.',
+      '실행 순서 (안쪽에서 바깥쪽으로): ① EMP_NAME_IX 인덱스 Range Scan → ② EMPLOYEES 테이블 접근 → ③ JOBS Full Scan → ④ Hash Join → ⑤ DEPARTMENTS Full Scan → ⑥ Hash Join.',
     executionSteps: [
       { title: '① EMP_NAME_IX 인덱스 Range Scan (Id 4)', desc: '이름이 A로 시작하는 인덱스 항목만 쭉 찾아요.' },
       { title: '② EMPLOYEES 테이블 접근 (Id 3)', desc: '인덱스로 찾은 ROWID로 실제 테이블 행을 가져와요.' },
@@ -269,7 +269,7 @@ Plan hash value: 975837011
 | 6|   TABLE ACCESS FULL           | DEPARTMENTS| 27 | 432|  2  (0)|00:00:01|
 ---------------------------------------------------------------------------`,
     executionNote:
-      'Execution order (bottom-up): ① INDEX RANGE SCAN on EMP_NAME_IX → ② TABLE ACCESS on EMPLOYEES → ③ JOBS Full Scan → ④ Hash Join → ⑤ DEPARTMENTS Full Scan → ⑥ Hash Join.',
+      'Execution order (innermost first): ① INDEX RANGE SCAN on EMP_NAME_IX → ② TABLE ACCESS on EMPLOYEES → ③ JOBS Full Scan → ④ Hash Join → ⑤ DEPARTMENTS Full Scan → ⑥ Hash Join.',
     executionSteps: [
       { title: '① INDEX RANGE SCAN on EMP_NAME_IX (Id 4)', desc: 'Scans only index entries where last_name starts with A.' },
       { title: '② TABLE ACCESS BY INDEX ROWID on EMPLOYEES (Id 3)', desc: 'Fetches actual rows using ROWIDs from the index.' },

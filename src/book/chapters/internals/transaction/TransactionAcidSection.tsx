@@ -18,7 +18,7 @@ const T = {
     subtitle: '트랜잭션이 데이터 무결성을 지키려면 반드시 만족해야 하는 네 가지 속성이 있어요.',
     atomicityDetailTitle: '문장 수준 원자성 vs 트랜잭션 수준 원자성',
     acidAtomicityDetail:
-      "Oracle에서는 문장 수준 원자성(Statement-Level Atomicity)과 트랜잭션 수준 원자성을 구별해요. 하나의 SQL 문장이 실패하면 그 문장의 변경만 자동으로 롤백되고, 그 앞에 성공한 문장들은 그대로 유지돼요. 단, 파싱(구문 분석) 오류는 문장 수준 롤백을 일으키지 않아요 — 데드락이나 제약 조건 위반일 때만 문장 수준 롤백이 발생해요. COMMIT 전에 장애가 생기면 Oracle이 자동으로 ROLLBACK을 수행해서 모든 변경을 취소해요. 이 역할을 Undo Segment가 담당해요.",
+      "Oracle에서는 문장 수준 원자성(Statement-Level Atomicity)과 트랜잭션 수준 원자성을 구별해요. 하나의 SQL 문장이 실패하면 그 문장의 변경만 자동으로 롤백되고, 그 앞에 성공한 문장들은 그대로 유지돼요. 단, 파싱(구문 분석) 오류는 문장 수준 롤백을 일으키지 않아요 — 문장이 아예 실행되지 않았으니까요. 제약 조건 위반이나 데드락처럼 실행 도중에 난 오류만 문장 수준 롤백을 일으켜요. COMMIT 전에 장애가 생기면 Oracle이 자동으로 ROLLBACK을 수행해서 모든 변경을 취소해요. 이 역할을 Undo Segment가 담당해요.",
     scnTitle: 'SCN (System Change Number, 시스템 변경 번호)',
     scnDesc:
       'SCN(System Change Number, 시스템 변경 번호)은 데이터베이스에서 일어나는 모든 사건의 순서를 기록하는 논리적 타임스탬프예요. 숫자가 계속 증가하기만 하고, SCN이 낮을수록 더 일찍 일어난 일이에요. 여러 사건이 동시에 발생하면 같은 SCN을 가질 수도 있어요.\n\nOracle은 트랜잭션이 데이터를 바꿀 때 SCN을 Undo Segment에 기록하고, COMMIT 시에는 LGWR(로그 라이터)이 SCN을 온라인 리두 로그에 기록해요. 이 SCN이 인스턴스 복구와 미디어 복구의 기준점이 돼요.',
@@ -40,7 +40,7 @@ const T = {
         name: '일관성 (Consistency)',
         desc: '트랜잭션 전후로 데이터베이스는 항상 제약 조건을 만족하는 유효한 상태를 유지해요.',
         detail:
-          'PRIMARY KEY, FOREIGN KEY, NOT NULL 같은 제약 조건은 COMMIT 시점에 검증돼요. 위반이 발견되면 트랜잭션 전체가 롤백돼요.',
+          'PRIMARY KEY, FOREIGN KEY, NOT NULL 같은 제약 조건은 기본적으로 SQL 문장 하나가 끝날 때마다 검증돼요. 위반하면 그 문장만 롤백돼요. 제약 조건을 DEFERRABLE로 만들어 두면 검증을 COMMIT 시점으로 미룰 수 있는데, 이때 위반이 발견되면 트랜잭션 전체가 롤백돼요.',
         color: 'emerald' as const,
         collapseLabel: '▼ Oracle의 구현 방식',
         expandLabel: '▲ 접기',
@@ -72,7 +72,7 @@ const T = {
     subtitle: 'The four properties that every transaction must satisfy to guarantee data integrity.',
     atomicityDetailTitle: 'Statement-Level vs Transaction-Level Atomicity',
     acidAtomicityDetail:
-      "Oracle distinguishes statement-level atomicity from transaction-level atomicity. If a single SQL statement fails, only that statement's changes are automatically rolled back — preceding statements in the same transaction are preserved. Note: parse (syntax) errors do NOT trigger a statement-level rollback, but deadlocks and constraint violations do. If a failure occurs before COMMIT, Oracle automatically rolls back the entire transaction via the Undo Segment.",
+      "Oracle distinguishes statement-level atomicity from transaction-level atomicity. If a single SQL statement fails, only that statement's changes are automatically rolled back — preceding statements in the same transaction are preserved. Note: parse (syntax) errors do NOT trigger a statement-level rollback because the statement never ran — only errors raised during execution, such as constraint violations or deadlocks, do. If a failure occurs before COMMIT, Oracle automatically rolls back the entire transaction via the Undo Segment.",
     scnTitle: 'SCN (System Change Number)',
     scnDesc:
       'SCN is a logical, internal timestamp used to order database events. It is a monotonically increasing number — a lower SCN means an earlier event. Multiple simultaneous events may share the same SCN.\n\nOracle writes the SCN to the Undo Segment when a transaction modifies data, and LGWR records the SCN in the online redo log on COMMIT. This SCN serves as the anchor point for instance recovery and media recovery.',
@@ -94,7 +94,7 @@ const T = {
         name: 'Consistency',
         desc: 'The database must remain in a valid state (satisfying all constraints) before and after the transaction.',
         detail:
-          'Constraints such as PRIMARY KEY, FOREIGN KEY, and NOT NULL are validated at COMMIT time. Any violation causes the transaction to roll back.',
+          'Constraints such as PRIMARY KEY, FOREIGN KEY, and NOT NULL are, by default, checked at the end of each SQL statement; a violation rolls back only that statement. A DEFERRABLE constraint can postpone the check until COMMIT, in which case a violation rolls back the whole transaction.',
         color: 'emerald' as const,
         collapseLabel: '▼ How Oracle implements this',
         expandLabel: '▲ Collapse',

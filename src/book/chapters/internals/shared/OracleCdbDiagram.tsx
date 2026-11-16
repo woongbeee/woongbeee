@@ -120,7 +120,7 @@ export function OracleCdbDiagram({ className }: { className?: string }) {
     <figure className={cn('my-5 flex flex-col gap-3 overflow-x-auto', className)}>
       <div className="min-w-[520px] rounded-panel border border-line-2 bg-paper-sunk p-3">
         <div className="mb-2 font-mono text-[9px] font-bold uppercase tracking-[0.14em] text-ink-3">
-          {isKo ? 'Database Server' : 'Database Server'}
+          {'Database Server'}
         </div>
 
         {/* CDB */}
@@ -144,10 +144,10 @@ export function OracleCdbDiagram({ className }: { className?: string }) {
 
           {/* PDBs row */}
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-            <Box id="seed" label={isKo ? 'Seed PDB' : 'Seed PDB'} sub="PDB$SEED" hue="green" active={active === 'seed'} onClick={() => pick('seed')} />
+            <Box id="seed" label={'Seed PDB'} sub="PDB$SEED" hue="green" active={active === 'seed'} onClick={() => pick('seed')} />
             <Box id="pdb" label={isKo ? '사용자 PDB 1' : 'User PDB 1'} hue="purple" active={active === 'pdb'} onClick={() => pick('pdb')} />
             <Box id="pdb" label={isKo ? '사용자 PDB 2' : 'User PDB 2'} hue="purple" active={active === 'pdb'} onClick={() => pick('pdb')} />
-            <Box id="app-container" label={isKo ? 'App Container' : 'App Container'} hue="amber" active={active === 'app-container'} onClick={() => pick('app-container')} />
+            <Box id="app-container" label={'App Container'} hue="amber" active={active === 'app-container'} onClick={() => pick('app-container')} />
           </div>
 
           <p className="mt-1.5 font-sans text-[9px] leading-tight text-ink-3">
@@ -161,7 +161,7 @@ export function OracleCdbDiagram({ className }: { className?: string }) {
         <Box
           id="system-files"
           label={isKo ? 'System Files — CDB 전체 공유' : 'System Files — shared by the whole CDB'}
-          sub={isKo ? 'Control File · Online Redo Log · Parameter File' : 'Control File · Online Redo Log · Parameter File'}
+          sub={'Control File · Online Redo Log · Parameter File'}
           hue="slate"
           active={active === 'system-files'}
           onClick={() => pick('system-files')}

@@ -42,7 +42,7 @@ const T = {
     ],
     selectivityTitle: '선택도(Selectivity)와 카디널리티(Cardinality)',
     selectivityDesc:
-      '선택도는 조건절(Predicate)이 걸러내는 행의 비율입니다. 0에 가까울수록 적은 행이 반환되어 인덱스 스캔이 유리하고, 1에 가까울수록 전체 읽기(FTS)가 효율적입니다.\n\n카디널리티 = NUM_ROWS × 선택도. CBO는 이 값을 바탕으로 각 연산의 출력 크기를 추정하고, 이어지는 연산의 비용을 계산합니다.',
+      '선택도는 조건절(Predicate)이 걸러내는 행의 비율이에요. 0에 가까울수록 적은 행이 반환되어 인덱스 스캔이 유리하고, 1에 가까울수록 전체 읽기(FTS)가 효율적이에요.\n\n카디널리티 = NUM_ROWS × 선택도. CBO는 이 값을 바탕으로 각 연산의 출력 크기를 추정하고, 이어지는 연산의 비용을 계산해요.',
     formulasTitle: '선택도 공식 정리',
     selectivityTable: [
       ['등치 (col = val)', '1 / NDV', '0.01 (NDV=100일 때)'],
@@ -53,9 +53,9 @@ const T = {
     ],
     histTitle: '히스토그램(Histogram)',
     histDesc:
-      '컬럼 값이 균등하지 않게 분포할 때(예: 특정 지역 주문이 90% 집중), 단순 NDV 기반 선택도는 부정확합니다. Oracle은 히스토그램을 수집해 왜곡된 분포를 반영합니다.\n\n히스토그램 종류: Frequency(모든 값 기록), Top-Frequency(상위 N개), Height-Balanced(버킷 균등 분배), Hybrid.',
+      '컬럼 값이 균등하지 않게 분포할 때(예: 특정 지역 주문이 90% 집중), 단순 NDV 기반 선택도는 부정확해요. Oracle은 히스토그램을 수집해 왜곡된 분포를 반영해요.\n\n히스토그램 종류: Frequency(모든 값 기록), Top-Frequency(상위 N개), Height-Balanced(버킷 균등 분배), Hybrid.',
     dbmsSql: `-- DBMS_STATS로 테이블 통계 수집\nBEGIN\n  DBMS_STATS.GATHER_TABLE_STATS(\n    ownname => 'HR',\n    tabname => 'EMPLOYEES',\n    estimate_percent => DBMS_STATS.AUTO_SAMPLE_SIZE,\n    method_opt => 'FOR ALL COLUMNS SIZE AUTO'\n  );\nEND;\n\n-- 현재 통계 확인\nSELECT num_rows, blocks, avg_row_len, last_analyzed\nFROM   all_tables\nWHERE  owner = 'HR' AND table_name = 'EMPLOYEES';`,
-    histSql: `-- 히스토그램 수집 (특정 컬럼)\nBEGIN\n  DBMS_STATS.GATHER_TABLE_STATS(\n    ownname => 'HR',\n    tabname => 'ORDERS',\n    method_opt => 'FOR COLUMNS REGION_ID SIZE 254' -- 최대 254 버킷\n  );\nEND;\n\n-- 히스토그램 확인\nSELECT column_name, histogram, num_buckets\nFROM   all_tab_col_statistics\nWHERE  owner = 'HR' AND table_name = 'ORDERS';`,
+    histSql: `-- 히스토그램 수집 (특정 컬럼)\nBEGIN\n  DBMS_STATS.GATHER_TABLE_STATS(\n    ownname => 'HR',\n    tabname => 'ORDERS',\n    method_opt => 'FOR COLUMNS REGION_ID SIZE 254' -- 버킷 254개 (기본 상한. 12c부터는 최대 2048까지 지정 가능)\n  );\nEND;\n\n-- 히스토그램 확인\nSELECT column_name, histogram, num_buckets\nFROM   all_tab_col_statistics\nWHERE  owner = 'HR' AND table_name = 'ORDERS';`,
   },
   en: {
     title: 'Statistics & Selectivity',
@@ -93,7 +93,7 @@ const T = {
     histDesc:
       'When column values are not uniformly distributed (e.g., 90% of orders come from one region), simple NDV-based selectivity is inaccurate. Oracle collects histograms to account for skewed distributions.\n\nHistogram types: Frequency (records every value), Top-Frequency (top N values), Height-Balanced (equal bucket distribution), Hybrid.',
     dbmsSql: `-- Gather table statistics with DBMS_STATS\nBEGIN\n  DBMS_STATS.GATHER_TABLE_STATS(\n    ownname => 'HR',\n    tabname => 'EMPLOYEES',\n    estimate_percent => DBMS_STATS.AUTO_SAMPLE_SIZE,\n    method_opt => 'FOR ALL COLUMNS SIZE AUTO'\n  );\nEND;\n\n-- Check current statistics\nSELECT num_rows, blocks, avg_row_len, last_analyzed\nFROM   all_tables\nWHERE  owner = 'HR' AND table_name = 'EMPLOYEES';`,
-    histSql: `-- Collect histogram for a specific column\nBEGIN\n  DBMS_STATS.GATHER_TABLE_STATS(\n    ownname => 'HR',\n    tabname => 'ORDERS',\n    method_opt => 'FOR COLUMNS REGION_ID SIZE 254' -- max 254 buckets\n  );\nEND;\n\n-- Check histogram info\nSELECT column_name, histogram, num_buckets\nFROM   all_tab_col_statistics\nWHERE  owner = 'HR' AND table_name = 'ORDERS';`,
+    histSql: `-- Collect histogram for a specific column\nBEGIN\n  DBMS_STATS.GATHER_TABLE_STATS(\n    ownname => 'HR',\n    tabname => 'ORDERS',\n    method_opt => 'FOR COLUMNS REGION_ID SIZE 254' -- 254 buckets (the default limit; up to 2048 can be requested since 12c)\n  );\nEND;\n\n-- Check histogram info\nSELECT column_name, histogram, num_buckets\nFROM   all_tab_col_statistics\nWHERE  owner = 'HR' AND table_name = 'ORDERS';`,
   },
 }
 

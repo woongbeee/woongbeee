@@ -60,7 +60,7 @@ const T = {
       },
       {
         title: '② 작업 분배',
-        desc: 'QC가 테이블(또는 파티션)을 DOP 수만큼의 블록 범위(Granule)로 나눠서 각 PX 서버에 배분해요.',
+        desc: 'QC가 테이블을 여러 개의 블록 범위(Granule)로 잘게 나눠요. 보통 PX 서버 수보다 훨씬 많이 만들어 두고, 일을 끝낸 PX 서버에게 다음 Granule을 하나씩 건네줘요.',
       },
       {
         title: '③ 병렬 실행',
@@ -156,7 +156,7 @@ GROUP BY c.name;`,
       },
       {
         title: '② Distribute Work',
-        desc: 'The QC partitions the table (or partitions) into block ranges called Granules — one per PX Server — and dispatches them.',
+        desc: 'The QC splits the table into block ranges called granules — usually many more than there are PX servers — and hands the next granule to whichever PX server finishes its current one.',
       },
       {
         title: '③ Parallel Execution',
@@ -378,7 +378,7 @@ function ParallelVsSerialDiagram({ lang }: { lang: 'ko' | 'en' }) {
                 width={BAR_AREA}
                 height={ROW_H}
                 rx={5}
-                fill={row.isSerial ? 'var(--color-rail)' : 'var(--color-rail)'}
+                fill={'var(--color-rail)'}
                 stroke={
                   row.isSerial ? 'var(--color-red)' : 'var(--color-green)'
                 }

@@ -94,7 +94,7 @@ VALUES (:sid, :ts, :val);
     params: [
       { name: 'LARGE_POOL_SIZE', desc: 'Large Pool 크기를 직접 지정해요. SGA_TARGET이 설정된 경우(ASMM) Oracle이 알아서 조정해 줘요.' },
       { name: 'PARALLEL_EXECUTION_MESSAGE_SIZE', desc: '병렬 실행 메시지 버퍼 하나의 크기예요. 기본값은 16 KB이며 Large Pool에서 할당돼요.' },
-      { name: 'MEMOPTIMIZE_POOL_SIZE', desc: '지연 삽입(MEMOPTIMIZE_WRITE) 전용으로 Large Pool 안에 예약해 둘 영역 크기예요.' },
+      { name: 'MEMOPTIMIZE_WRITE_AREA_SIZE', desc: '지연 삽입(MEMOPTIMIZE_WRITE)용 버퍼로 Large Pool 안에 잡아 둘 영역 크기예요. (이름이 비슷한 MEMOPTIMIZE_POOL_SIZE는 읽기 전용 Memoptimize Pool의 크기라서 다른 파라미터예요.)' },
     ],
 
     // ── Summary ──
@@ -181,7 +181,7 @@ VALUES (:sid, :ts, :val);
     params: [
       { name: 'LARGE_POOL_SIZE', desc: 'Sets the Large Pool size explicitly. Auto-tuned by Oracle when SGA_TARGET is set (ASMM).' },
       { name: 'PARALLEL_EXECUTION_MESSAGE_SIZE', desc: 'Size of a single parallel execution message buffer. Defaults to 16 KB; allocated from the Large Pool.' },
-      { name: 'MEMOPTIMIZE_POOL_SIZE', desc: 'Reserved portion of the Large Pool for deferred inserts (MEMOPTIMIZE_WRITE).' },
+      { name: 'MEMOPTIMIZE_WRITE_AREA_SIZE', desc: 'Size of the Large Pool area used to buffer deferred inserts (MEMOPTIMIZE_WRITE). Not to be confused with MEMOPTIMIZE_POOL_SIZE, which sizes the read-side memoptimize pool.' },
     ],
 
     summaryTitle: 'Large Pool — Key Takeaways',

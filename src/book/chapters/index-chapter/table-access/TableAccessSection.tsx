@@ -14,13 +14,12 @@ const T = {
     subtitle: 'ROWID(행 식별자)를 손에 넣었다고 바로 행 데이터가 오는 게 아니에요. Buffer Cache 해시 체인을 탐색하고, Latch를 잡고, Buffer를 Pin하고, 필요하면 디스크 I/O(Input/Output, 디스크 입출력)까지 — 생각보다 훨씬 긴 여정이 기다리고 있어요.',
     overviewTitle: '왜 이렇게 복잡한가요?',
     overviewDesc: 'Oracle은 디스크 I/O(Input/Output, 디스크 입출력)를 줄이기 위해 자주 쓰는 블록을 메모리(Buffer Cache)에 올려둬요. 그런데 수십만 개의 블록이 동시에 Buffer Cache에 올라와 있을 수 있기 때문에, "이 DBA(Data Block Address, 데이터 블록 주소)가 이미 캐시에 있는가?"를 빠르게 찾으려면 해시 테이블 구조가 필요해요. 거기다 여러 프로세스가 동시에 같은 버퍼를 건드릴 수 있어서, 접근 순서를 제어하는 Latch와 Lock도 꼭 필요하답니다.',
-    stepsTitle: '단계별 과정',
     walkthrough: [
       {
         step: 1,
         phase: 'ROWID → DBA 변환',
         color: 'violet',
-        detail: 'ROWID(행 식별자)에서 File# + Block# 를 꺼내 DBA(Data Block Address, 데이터 블록 주소)를 만들어요. DBA는 "파일 N번의 M번째 블록"을 가리키는 64비트 주소예요.',
+        detail: 'ROWID(행 식별자)에서 File# + Block# 를 꺼내 DBA(Data Block Address, 데이터 블록 주소)를 만들어요. DBA는 "파일 N번의 M번째 블록"을 가리키는 32비트 주소예요.',
         note: null,
       },
       {
@@ -74,14 +73,12 @@ const T = {
       },
     ],
     diagramTitle: '전체 흐름 다이어그램',
-    hitLabel: 'Cache Hit 경로',
-    missLabel: 'Cache Miss 경로',
     waitTitle: '주요 대기 이벤트',
     waits: [
       {
         event: 'latch: cache buffers chains',
         cause: '해시 체인 Latch 경합이에요. 같은 버킷에 핫 블록이 몰리거나, Latch를 오래 잡고 있는 작업이 있을 때 발생해요.',
-        fix: 'DB_BLOCK_SIZE 최적화, 핫 블록 분산(파티셔닝), CACHE 절로 자주 쓰는 블록을 Keep Pool에 배치해 보세요.',
+        fix: 'DB_BLOCK_SIZE 최적화, 핫 블록 분산(파티셔닝), 자주 쓰는 작은 테이블은 Keep Pool(STORAGE (BUFFER_POOL KEEP))에 배치해 보세요.',
       },
       {
         event: 'buffer busy waits',
@@ -96,7 +93,7 @@ const T = {
       {
         event: 'db file sequential read',
         cause: '단일 블록 랜덤 I/O(Input/Output, 디스크 입출력)예요. 인덱스를 타는 쿼리에서 ROWID(행 식별자)마다 발생할 수 있어요.',
-        fix: 'Covering Index(필요한 컬럼을 인덱스에 포함)로 테이블 접근 자체를 없애거나, 선택도가 낮은 컬럼 조회는 Full Scan을 고려해 보세요.',
+        fix: 'Covering Index(필요한 컬럼을 인덱스에 포함)로 테이블 접근 자체를 없애거나, 결과 행이 많은 조회는 Full Scan을 고려해 보세요.',
       },
     ],
     costTitle: '왜 인덱스가 항상 빠른 게 아닌가요?',
@@ -115,13 +112,12 @@ WHERE  employee_id = 145;
     subtitle: "Getting the ROWID is not the end. Oracle must hash the DBA, search a Buffer Cache hash chain, acquire a Latch, pin the buffer, and possibly read from disk — a much longer journey than it looks.",
     overviewTitle: 'Why so many steps?',
     overviewDesc: 'Oracle keeps frequently used blocks in memory (Buffer Cache) to avoid disk I/O. Because hundreds of thousands of blocks can reside in the cache simultaneously, Oracle uses a hash table to answer "is this DBA already cached?" in constant time. And because multiple processes can touch the same buffer at once, Latches and Locks control access ordering.',
-    stepsTitle: 'Step-by-step walkthrough',
     walkthrough: [
       {
         step: 1,
         phase: 'ROWID → DBA',
         color: 'violet',
-        detail: 'Extract File# and Block# from the ROWID to form the Data Block Address (DBA) — a 64-bit address pointing to "block M of file N".',
+        detail: 'Extract File# and Block# from the ROWID to form the Data Block Address (DBA) — a 32-bit address pointing to "block M of file N".',
         note: null,
       },
       {
@@ -175,8 +171,6 @@ WHERE  employee_id = 145;
       },
     ],
     diagramTitle: 'Full flow diagram',
-    hitLabel: 'Cache Hit path',
-    missLabel: 'Cache Miss path',
     waitTitle: 'Key wait events',
     waits: [
       {
@@ -197,7 +191,7 @@ WHERE  employee_id = 145;
       {
         event: 'db file sequential read',
         cause: 'Single-block random I/O. Can fire once per ROWID when an index scan returns many rows.',
-        fix: 'Use a Covering Index to eliminate table access entirely. For low-selectivity queries, Full Table Scan may be faster.',
+        fix: 'Use a Covering Index to eliminate table access entirely. For queries that return many rows, a Full Table Scan may be faster.',
       },
     ],
     costTitle: 'Why indexes are not always faster',
@@ -544,16 +538,16 @@ function BufferCacheAnatomyDiagram({ isKo }: { isKo: boolean }) {
               <line
                 x1={lineX1} y1={lineY1}
                 x2={lineX2} y2={lineY2}
-                stroke={isHlLatch ? 'var(--color-amber)' : 'var(--color-amber)'}
+                stroke={'var(--color-amber)'}
                 strokeWidth={1} strokeDasharray="3 2" opacity={0.7}
               />
               <rect
                 x={LATCH_X} y={LATCH_Y} width={LATCH_W} height={LATCH_H}
                 fill={isHlLatch ? 'var(--color-amber)' : 'var(--color-rail)'}
-                stroke={isHlLatch ? 'var(--color-amber)' : 'var(--color-amber)'}
+                stroke={'var(--color-amber)'}
                 strokeWidth={isHlLatch ? 2 : 1} rx={4}
               />
-              <text x={LATCH_X + LATCH_W / 2} y={LATCH_Y + 14} textAnchor="middle" fontSize={8} fontFamily="var(--font-mono)" fontWeight="bold" fill={isHlLatch ? 'var(--color-amber)' : 'var(--color-amber)'}>
+              <text x={LATCH_X + LATCH_W / 2} y={LATCH_Y + 14} textAnchor="middle" fontSize={8} fontFamily="var(--font-mono)" fontWeight="bold" fill={'var(--color-amber)'}>
                 Latch
               </text>
             </g>
@@ -585,7 +579,7 @@ function BufferCacheAnatomyDiagram({ isKo }: { isKo: boolean }) {
             className="mt-3 flex h-10 items-center justify-center rounded-panel border border-dashed border-line"
           >
             <p className="font-mono text-[10px] text-ink-3">
-              {isKo ? '위 뱃지를 클릭하면 용어 설명이 표시됩니다' : 'Click a badge above to see the term explained'}
+              {isKo ? '위 뱃지를 클릭하면 용어 설명이 표시돼요' : 'Click a badge above to see the term explained'}
             </p>
           </motion.div>
         )}
@@ -734,7 +728,7 @@ function BufferCacheDiagram({ isKo, activeStep }: { isKo: boolean; activeStep: n
       >
         {/* Section labels — SVG 안에서 비율 유지 */}
         <text x={GRID_X / 2} y={10} textAnchor="middle" fontSize={8} fontFamily="var(--font-mono)" fontWeight="bold" fill="var(--color-ink-3)" letterSpacing={1}>
-          {isKo ? 'HASH BUCKET + BUFFER HEADER' : 'HASH BUCKET + BUFFER HEADER'}
+          {'HASH BUCKET + BUFFER HEADER'}
         </text>
         <text x={GRID_X + (GRID_COLS * CELL_W) / 2} y={10} textAnchor="middle" fontSize={8} fontFamily="var(--font-mono)" fontWeight="bold" fill="var(--color-ink-3)" letterSpacing={1}>
           BUFFER BLOCK
@@ -973,10 +967,10 @@ function BufferCacheDiagram({ isKo, activeStep }: { isKo: boolean; activeStep: n
       {/* Legend */}
       <div className="mt-2 flex flex-wrap gap-3">
         {[
-          { color: 'var(--color-rail)', stroke: 'var(--color-blue)', label: isKo ? 'Clean' : 'Clean' },
-          { color: 'var(--color-amber)', stroke: 'var(--color-amber)', label: isKo ? 'Dirty' : 'Dirty' },
-          { color: 'var(--color-line)', stroke: 'var(--color-green)', label: isKo ? 'Target (Hit)' : 'Target (Hit)' },
-          { color: 'var(--color-paper-sunk)', stroke: 'var(--color-rail)', label: isKo ? 'Free' : 'Free' },
+          { color: 'var(--color-rail)', stroke: 'var(--color-blue)', label: 'Clean' },
+          { color: 'var(--color-amber)', stroke: 'var(--color-amber)', label: 'Dirty' },
+          { color: 'var(--color-line)', stroke: 'var(--color-green)', label: 'Target (Hit)' },
+          { color: 'var(--color-paper-sunk)', stroke: 'var(--color-rail)', label: 'Free' },
         ].map((item) => (
           <div key={item.label} className="flex items-center gap-1">
             <span
@@ -1165,7 +1159,7 @@ function FlowDiagram({
             className="mt-3 flex h-10 items-center justify-center rounded-panel border border-dashed border-line"
           >
             <p className="font-mono text-[10px] text-ink-3">
-              {isKo ? '단계를 클릭하면 설명이 표시됩니다' : 'Click a step to see details'}
+              {isKo ? '단계를 클릭하면 설명이 표시돼요' : 'Click a step to see details'}
             </p>
           </motion.div>
         )}
@@ -1233,8 +1227,8 @@ export function TableAccessSection() {
       <Prose>{t.costDesc}</Prose>
       <InfoBox variant="warning">
         {isKo
-          ? '선택도가 낮은 컬럼(결과 행 수가 전체의 10~20% 이상)에 인덱스를 쓰면 ROWID(행 식별자)마다 위 8단계가 반복돼요. Full Table Scan의 멀티블록 순차 읽기보다 훨씬 느려질 수 있어요.'
-          : 'Using an index on a low-selectivity column (returning 10–20%+ of rows) repeats all 8 steps per ROWID. This can be far slower than a sequential multi-block Full Table Scan.'}
+          ? '조건에 맞는 행이 많은 컬럼(결과 행 수가 전체의 10~20% 이상)에 인덱스를 쓰면 ROWID(행 식별자)마다 위 8단계가 반복돼요. Full Table Scan의 멀티블록 순차 읽기보다 훨씬 느려질 수 있어요.'
+          : 'Using an index for a predicate that matches many rows (10–20%+ of the table) repeats all 8 steps per ROWID. This can be far slower than a sequential multi-block Full Table Scan.'}
       </InfoBox>
 
       <Divider />

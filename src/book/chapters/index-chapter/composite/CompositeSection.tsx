@@ -23,7 +23,7 @@ const T = {
 
     compositeTitle: '복합 인덱스 (Composite Index)',
     compositeDesc:
-      '복합 인덱스(Concatenated Index라고도 불러요)는 테이블의 여러 컬럼을 묶어서 만드는 인덱스예요. WHERE 조건에 인덱스의 첫 번째 컬럼(선두 컬럼)이 포함된 쿼리라면 검색 속도를 확 높여줄 수 있어요. 그래서 인덱스를 만들 때 컬럼 순서가 굉장히 중요합니다. 보통은 가장 자주 검색에 쓰이는 컬럼을 맨 앞에 배치해요.',
+      '복합 인덱스(Concatenated Index라고도 불러요)는 테이블의 여러 컬럼을 묶어서 만드는 인덱스예요. WHERE 조건에 인덱스의 첫 번째 컬럼(선두 컬럼)이 포함된 쿼리라면 검색 속도를 확 높여줄 수 있어요. 그래서 인덱스를 만들 때 컬럼 순서가 굉장히 중요해요. 보통은 가장 자주 검색에 쓰이는 컬럼을 맨 앞에 배치해요.',
     orderTitle: '컬럼 순서 규칙',
     orderIndexExample: 'CREATE INDEX emp_dept_job_ix ON employees (dept_id, job_id)',
     orderRules: [
@@ -324,7 +324,7 @@ export function CompositeSection() {
             desc={lang === 'ko'
               ? '오라클이 블록마다 가장 좋은 압축 방식을 알아서 골라줘요. Unique 인덱스에도 쓸 수 있어요.'
               : 'Oracle selects optimal compression per block automatically. Works on unique indexes too.'}
-            sql={`-- Advanced High (Oracle 12.2+, 기본값)\nCREATE INDEX hr_emp_mgr_dept_ix\n  ON hr.employees(manager_id, department_id)\n  COMPRESS ADVANCED;\n\n-- 압축 상태 확인\nSELECT compression\nFROM   dba_indexes\nWHERE  index_name = 'HR_EMP_MGR_DEPT_IX';\n-- Result: ADVANCED HIGH`}
+            sql={`-- Advanced High (Oracle 12.2+). HIGH를 생략하면 ADVANCED LOW가 적용돼요\nCREATE INDEX hr_emp_mgr_dept_ix\n  ON hr.employees(manager_id, department_id)\n  COMPRESS ADVANCED HIGH;\n\n-- 압축 상태 확인\nSELECT compression\nFROM   dba_indexes\nWHERE  index_name = 'HR_EMP_MGR_DEPT_IX';\n-- Result: ADVANCED HIGH`}
           />
         </div>
       </div>
@@ -537,8 +537,8 @@ function IotStorageVisual({ lang }: { lang: 'ko' | 'en' }) {
         </div>
         <div className="divide-y">
           {iotLeaves.map((leaf, li) => (
-            <div key={li} className={cn('px-3 py-2', li === 0 ? 'bg-green/5' : 'bg-green/5')}>
-              <div className={`mb-1.5 font-mono text-[9px] font-bold uppercase tracking-wider ${li === 0 ? 'text-green' : 'text-green'}`}>
+            <div key={li} className={cn('px-3 py-2', 'bg-green/5')}>
+              <div className={`mb-1.5 font-mono text-[9px] font-bold uppercase tracking-wider ${'text-green'}`}>
                 {leaf.label}
               </div>
               <div className={`grid ${col} gap-0 font-mono text-[9px] font-semibold uppercase tracking-wider text-ink-2 border-b pb-1 mb-1`}>

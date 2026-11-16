@@ -74,7 +74,6 @@ const T = {
     exampleSql: `SELECT ROWID, employee_id, last_name
 FROM   employees
 WHERE  employee_id = 100;`,
-    exampleResult: 'AAASXJAAEAAAACXAAA',
     exampleBreakdown: [
       { part: 'AAASXJ', label: 'Object#', color: 'violet' as const },
       { part: 'AAE',    label: 'File#',   color: 'blue' as const },
@@ -109,7 +108,7 @@ WHERE  ROWID NOT IN (
     ],
     indexNote:
       '인덱스를 타더라도 Leaf에서 ROWID(행 식별자)를 꺼낸 뒤 테이블 블록을 읽는 단계(Table Access by Index ROWID)가 반드시 필요해요. ' +
-      '그래서 선택도가 낮은(=결과 행이 많은) 컬럼에 인덱스를 쓰면 오히려 Full Scan보다 느려질 수 있어요.',
+      '그래서 조건에 맞는 행이 많은 컬럼에 인덱스를 쓰면 오히려 Full Scan보다 느려질 수 있어요.',
   },
   en: {
     pageTitle: 'ROWID Structure',
@@ -169,7 +168,6 @@ WHERE  ROWID NOT IN (
     exampleSql: `SELECT ROWID, employee_id, last_name
 FROM   employees
 WHERE  employee_id = 100;`,
-    exampleResult: 'AAASXJAAEAAAACXAAA',
     exampleBreakdown: [
       { part: 'AAASXJ', label: 'Object#', color: 'violet' as const },
       { part: 'AAE',    label: 'File#',   color: 'blue' as const },
@@ -204,7 +202,7 @@ WHERE  ROWID NOT IN (
     ],
     indexNote:
       'Even when Oracle uses an index, it must still visit the table block after finding the ROWID in the Leaf (Table Access by Index ROWID). ' +
-      'This is why low-selectivity columns (many matching rows) can be slower with an index than with a full table scan.',
+      'This is why predicates that match many rows can be slower with an index than with a full table scan.',
   },
 }
 
@@ -249,7 +247,7 @@ function RowidVisualizer({ parts, breakdown, decodeNote, isKo }: {
               className={[
                 'rounded-card border-2 px-3 py-2 text-left transition-shadow',
                 c.bg, c.border,
-                isHovered ? '' : '',
+                '',
               ].join(' ')}
             >
               <div className={`font-mono text-lg font-bold tracking-widest ${c.text}`}>{part.label}</div>
@@ -281,7 +279,7 @@ function RowidVisualizer({ parts, breakdown, decodeNote, isKo }: {
           )
         })() : (
           <p className="font-mono text-[11px] text-ink-2">
-            {isKo ? '↑ 파트에 마우스를 올리면 설명이 표시됩니다' : '↑ Hover over a part to see its description'}
+            {isKo ? '↑ 파트에 마우스를 올리면 설명이 표시돼요' : '↑ Hover over a part to see its description'}
           </p>
         )}
       </div>

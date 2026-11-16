@@ -116,7 +116,9 @@ ALTER TABLE employees DROP CONSTRAINT chk_salary;`,
         '빈 테이블이 그대로 남음',
       ],
     ],
-    dropExample: `-- employees 테이블 완전 삭제 (데이터와 구조 모두 사라짐, 복구 불가)
+    dropExample: `-- employees 테이블 삭제 (데이터와 구조 모두 사라짐. ROLLBACK은 안 되지만,
+-- 휴지통이 켜져 있으면 FLASHBACK TABLE employees TO BEFORE DROP으로 되살릴 수 있어요.
+-- 뒤에 PURGE를 붙이면 휴지통 없이 바로 지워요)
 DROP TABLE employees;
 
 -- departments 테이블 삭제 — 이 테이블을 참조하는 외래키 제약 조건도 함께 제거
@@ -161,7 +163,8 @@ SELECT * FROM v_high_earners;`,
 CREATE SEQUENCE emp_seq
   START WITH 1
   INCREMENT BY 1
-  NOCACHE; -- NOCACHE: 값을 미리 캐시하지 않아 번호 공백 없이 순서 보장
+  NOCACHE; -- NOCACHE: 번호를 미리 메모리에 받아 두지 않아요. 인스턴스가 꺼질 때 버려지는 번호는 없지만,
+           -- ROLLBACK된 번호는 다시 쓰지 않아서 번호가 빠질 수 있고 속도도 느려요
 
 -- NEXTVAL로 다음 시퀀스 값을 가져와 emp_id에 자동 채번
 INSERT INTO employees (emp_id, name)
@@ -286,7 +289,9 @@ ALTER TABLE employees DROP CONSTRAINT chk_salary;`,
         'Empty table remains',
       ],
     ],
-    dropExample: `-- Permanently delete the employees table (data + structure both gone)
+    dropExample: `-- Drop the employees table (data + structure both gone. It cannot be rolled back, but with the
+-- recycle bin enabled it can be restored with FLASHBACK TABLE employees TO BEFORE DROP.
+-- Add PURGE to skip the recycle bin)
 DROP TABLE employees;
 
 -- Delete departments table — also removes any FK constraints pointing to it
@@ -331,7 +336,8 @@ SELECT * FROM v_high_earners;`,
 CREATE SEQUENCE emp_seq
   START WITH 1
   INCREMENT BY 1
-  NOCACHE; -- NOCACHE: don't pre-allocate values, safer for gap-free numbering
+  NOCACHE; -- NOCACHE: values are not pre-allocated in memory. Nothing is lost at instance shutdown,
+           -- but rolled-back numbers are still skipped (gaps remain possible) and it is slower
 
 -- Use NEXTVAL to get the next sequence value when inserting a new row
 INSERT INTO employees (emp_id, name)

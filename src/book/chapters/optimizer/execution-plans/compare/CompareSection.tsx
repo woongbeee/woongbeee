@@ -16,7 +16,7 @@ const T = {
   ko: {
     title: '실행 계획 비교하기',
     subtitle:
-      '계획 비교 도구는 기준 계획(reference plan)과 임의의 테스트 계획 목록을 받아 차이점을 강조 표시합니다. 비교는 라인 단위가 아닌 논리적 비교입니다.',
+      '계획 비교 도구는 기준 계획(reference plan)과 임의의 테스트 계획 목록을 받아 차이점을 강조 표시해요. 비교는 라인 단위가 아닌 논리적 비교예요.',
     purposeTitle: '계획 비교의 목적',
     purposeDesc:
       '계획 비교 보고서는 차이점의 원인을 식별해서 사용자가 계획 재현성 문제를 분류할 수 있게 도와줘요.',
@@ -61,7 +61,7 @@ Comparison Results (1):
 RETURN CLOB;`,
     tutorialTitle: '튜토리얼: Join Elimination 비교 (Example 6-8 ~ 6-11)',
     tutorialDesc:
-      '이 튜토리얼에서는 두 개의 서로 다른 쿼리를 비교합니다. 계획 비교 보고서는 옵티마이저가 한 쿼리에서는 Join Elimination 변환을 적용했지만 다른 쿼리에서는 적용하지 않았음을 보여줍니다.',
+      '이 튜토리얼에서는 두 개의 서로 다른 쿼리를 비교해요. 계획 비교 보고서는 옵티마이저가 한 쿼리에서는 Join Elimination 변환을 적용했지만 다른 쿼리에서는 적용하지 않았음을 보여줘요.',
     tutorialSql: `-- user sh가 실행한 두 쿼리
 SELECT count(*)
 FROM   products p, sales s

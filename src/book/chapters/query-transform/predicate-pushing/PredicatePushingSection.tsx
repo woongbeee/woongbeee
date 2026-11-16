@@ -101,8 +101,6 @@ FROM   employees e,
         FROM   departments
         WHERE  location_id = 1700) v
 WHERE  e.department_id = v.department_id;`,
-
-    summaryTitle: 'Predicate Pushing 핵심 정리',
     summaryItems: [
       'View Merging이 불가능한 뷰에서 외부 WHERE 조건을 뷰 내부로 이동시켜 처리 행 수를 줄여요.',
       'UNION 뷰에서 특히 효과적 — 각 브랜치에 조건이 적용돼요.',
@@ -198,8 +196,6 @@ FROM   employees e,
         FROM   departments
         WHERE  location_id = 1700) v
 WHERE  e.department_id = v.department_id;`,
-
-    summaryTitle: 'Predicate Pushing Key Takeaways',
     summaryItems: [
       'Moves outer WHERE predicates into unmerged views, reducing rows the view must process.',
       'Especially effective for UNION views — the predicate is applied in each branch.',

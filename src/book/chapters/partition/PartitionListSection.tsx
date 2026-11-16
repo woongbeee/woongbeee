@@ -38,8 +38,9 @@ PARTITION BY LIST (region) (
 -- 파티션 조회
 SELECT * FROM customers PARTITION (p_north);
 
--- 파티션 추가 (DEFAULT가 있으면 특정 값만 추가 가능)
-ALTER TABLE customers ADD PARTITION p_jeju VALUES ('JEJU');
+-- 파티션 추가 (DEFAULT 파티션이 없을 때만 가능해요.
+-- 이 테이블처럼 DEFAULT가 있으면 ORA-14323이 나니까 아래 SPLIT을 써야 해요)
+-- ALTER TABLE customers ADD PARTITION p_jeju VALUES ('JEJU');
 
 -- 파티션 병합 (MERGE)
 ALTER TABLE customers MERGE PARTITIONS p_east, p_other
@@ -107,8 +108,9 @@ PARTITION BY LIST (region) (
 -- Query a specific partition
 SELECT * FROM customers PARTITION (p_west);
 
--- Add a new partition (DEFAULT must have remaining values)
-ALTER TABLE customers ADD PARTITION p_midwest VALUES ('IL', 'OH');
+-- Add a new partition (only possible when there is no DEFAULT partition.
+-- With a DEFAULT partition, as here, this raises ORA-14323 — use SPLIT instead)
+-- ALTER TABLE customers ADD PARTITION p_midwest VALUES ('IL', 'OH');
 
 -- Merge two partitions
 ALTER TABLE customers MERGE PARTITIONS p_east, p_other

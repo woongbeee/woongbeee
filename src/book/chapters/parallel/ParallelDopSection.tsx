@@ -34,21 +34,21 @@ const T = {
       ],
       [
         '2순위',
-        '테이블 속성',
-        'ALTER TABLE t PARALLEL 8',
-        '테이블에 기본 DOP를 지정해요. 힌트가 없으면 이 값이 쓰여요.',
+        '세션 수준',
+        'ALTER SESSION FORCE PARALLEL QUERY PARALLEL 4',
+        '이 세션의 쿼리를 지정한 DOP로 강제해요. 힌트가 없는 문장에 적용돼요.',
       ],
       [
         '3순위',
-        '세션 수준',
-        'ALTER SESSION ENABLE PARALLEL QUERY',
-        '세션의 모든 쿼리에 자동 병렬을 적용해요. DOP는 옵티마이저가 결정해요.',
+        '테이블 속성',
+        'ALTER TABLE t PARALLEL 8',
+        '테이블에 기본 DOP를 지정해요. 힌트도 세션 강제 설정도 없으면 이 값이 쓰여요.',
       ],
       [
         '4순위',
         '자동 DOP',
         'PARALLEL_DEGREE_POLICY = AUTO',
-        'Oracle 12c+. 옵티마이저가 쿼리 비용 기반으로 DOP를 자동 결정해요.',
+        'Oracle 11g Release 2부터. 힌트·세션·테이블 설정이 없어도 옵티마이저가 쿼리 비용을 보고 병렬 여부와 DOP를 스스로 정해요.',
       ],
     ],
 
@@ -108,15 +108,15 @@ SELECT /*+ PARALLEL */ COUNT(*) FROM large_table;`,
       ],
       [
         'PARALLEL_SERVERS_TARGET',
-        'Auto DOP 모드에서의 목표 PX 서버 수',
-        'AUTO 정책 사용 시 참조',
+        '이 수만큼 PX 서버가 이미 쓰이고 있으면 새 병렬 문장을 대기열에 세워요 (Statement Queuing)',
+        'PARALLEL_DEGREE_POLICY = AUTO일 때 적용',
       ],
     ],
     limitWarning:
       '사용 가능한 PX 서버가 부족하면 Oracle은 요청한 DOP를 낮추거나, 심한 경우 병렬 실행을 직렬로 다운그레이드해요. V$PX_PROCESS_SYSSTAT 뷰로 현재 PX 서버 사용 현황을 확인할 수 있어요.',
 
     summary:
-      'DOP는 SQL 힌트 > 테이블 속성 > 세션 설정 > 자동 DOP 순으로 결정돼요. 운영 환경에서는 SQL 힌트로 명시적으로 지정하는 것이 가장 예측 가능하고 안전해요. DOP 값은 CPU 코어 수와 동시 실행 쿼리 수를 함께 고려해서 설정하세요.',
+      'DOP는 SQL 힌트 > 세션 강제 설정(ALTER SESSION FORCE PARALLEL) > 테이블 속성 순으로 결정되고, 아무것도 없으면 자동 DOP 정책을 따라요. 운영 환경에서는 SQL 힌트로 명시적으로 지정하는 것이 가장 예측 가능하고 안전해요. DOP 값은 CPU 코어 수와 동시 실행 쿼리 수를 함께 고려해서 설정하세요.',
   },
 
   en: {
@@ -140,21 +140,21 @@ SELECT /*+ PARALLEL */ COUNT(*) FROM large_table;`,
       ],
       [
         'Priority 2',
-        'Table Attribute',
-        'ALTER TABLE t PARALLEL 8',
-        'Sets a default DOP on the table. Used when no hint is present.',
+        'Session Level',
+        'ALTER SESSION FORCE PARALLEL QUERY PARALLEL 4',
+        'Forces the given DOP for the session. Applies to statements without a hint.',
       ],
       [
         'Priority 3',
-        'Session Level',
-        'ALTER SESSION ENABLE PARALLEL QUERY',
-        'Applies auto-parallelism to all session queries. DOP is chosen by the optimizer.',
+        'Table Attribute',
+        'ALTER TABLE t PARALLEL 8',
+        'Sets a default DOP on the table. Used when there is neither a hint nor a session-level FORCE.',
       ],
       [
         'Priority 4',
         'Auto DOP',
         'PARALLEL_DEGREE_POLICY = AUTO',
-        'Oracle 12c+. Optimizer automatically determines DOP based on query cost.',
+        'Since Oracle 11g Release 2. With no hint, session, or table setting, the optimizer decides whether to parallelize and which DOP to use from the query cost.',
       ],
     ],
 
@@ -214,15 +214,15 @@ SELECT /*+ PARALLEL */ COUNT(*) FROM large_table;`,
       ],
       [
         'PARALLEL_SERVERS_TARGET',
-        'Target PX Server count for Auto DOP',
-        'Referenced when AUTO policy is used',
+        'Once this many PX servers are in use, new parallel statements are queued (statement queuing)',
+        'Applies when PARALLEL_DEGREE_POLICY = AUTO',
       ],
     ],
     limitWarning:
       'If available PX Servers are insufficient, Oracle reduces the requested DOP or, in severe cases, downgrades parallel execution to serial. Check V$PX_PROCESS_SYSSTAT for current PX Server utilization.',
 
     summary:
-      'DOP priority order: SQL hint > Table attribute > Session setting > Auto DOP. In production, explicitly specifying DOP via SQL hints is the most predictable and safe approach. Always factor in both CPU core count and concurrent query load when choosing a DOP value.',
+      'DOP priority order: SQL hint > session-level FORCE (ALTER SESSION FORCE PARALLEL) > table attribute; when none is set, the Auto DOP policy applies. In production, explicitly specifying DOP via SQL hints is the most predictable and safe approach. Always factor in both CPU core count and concurrent query load when choosing a DOP value.',
   },
 }
 

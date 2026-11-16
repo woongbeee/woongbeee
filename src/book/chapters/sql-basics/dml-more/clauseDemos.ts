@@ -2,7 +2,7 @@
 // commands/DMLSection 과 dml-more/ClausesSection 두 곳이 공유한다.
 // (MiniSimulator 는 여기 ClauseDemo 타입만 가져다 씀)
 
-export interface ClauseVariant {
+interface ClauseVariant {
   op: string
   sql: string
   type: 'SELECT' | 'UPDATE' | 'DELETE'
@@ -81,7 +81,7 @@ export const CLAUSE_DEMOS: ClauseDemo[] = [
         sql: 'SELECT DISTINCT job_title, dept_id\nFROM   employees',
         type: 'SELECT',
         desc: {
-          ko: 'job_title + dept_id 조합이 동일한 행을 중복으로 처리합니다.',
+          ko: 'job_title + dept_id 조합이 동일한 행을 중복으로 처리해요.',
           en: 'Rows with the same job_title + dept_id combination are treated as duplicates.',
         },
       },
@@ -90,7 +90,7 @@ export const CLAUSE_DEMOS: ClauseDemo[] = [
         sql: 'SELECT DISTINCT dept_id, job_title\nFROM   employees',
         type: 'SELECT',
         desc: {
-          ko: "dept_id + job_title 조합이 동일한 행을 중복으로 처리합니다. 예를 들어 dept_id=10, job_title='Engineer'인 행이 2개라면 1개만 반환됩니다.",
+          ko: "dept_id + job_title 조합이 동일한 행을 중복으로 처리해요. 예를 들어 dept_id=10, job_title='Engineer'인 행이 2개라면 1개만 반환돼요.",
           en: "Rows with the same dept_id + job_title combination are treated as duplicates. For example, if two rows have dept_id=10 and job_title='Engineer', only one is returned.",
         },
       },
@@ -134,8 +134,8 @@ export const CLAUSE_DEMOS: ClauseDemo[] = [
         sql: 'SELECT *\nFROM   employees\nWHERE  salary BETWEEN 5000 AND 7500',
         type: 'SELECT',
         desc: {
-          ko: 'salary가 5000보다 크고 7500보다 작은 행, 5000 <= salary AND salary <= 7500',
-          en: 'Rows where salary is between 5000 and 7500, 5000 <= salary AND salary <= 7500',
+          ko: 'salary가 5000 이상 7500 이하인 행 (양쪽 끝 값 포함), 5000 <= salary AND salary <= 7500',
+          en: 'Rows where salary is between 5000 and 7500 inclusive, 5000 <= salary AND salary <= 7500',
         },
       },
       {
@@ -143,7 +143,7 @@ export const CLAUSE_DEMOS: ClauseDemo[] = [
         sql: 'SELECT *\nFROM   employees\nWHERE  salary NOT BETWEEN 5000 AND 7500',
         type: 'SELECT',
         desc: {
-          ko: 'salary가 5000 미만이거나 7500 초과인 행, BETWEEN의 반대 범위를 선택합니다.',
+          ko: 'salary가 5000 미만이거나 7500 초과인 행, BETWEEN의 반대 범위를 선택해요.',
           en: 'Rows where salary is less than 5000 or greater than 7500 — the inverse of BETWEEN.',
         },
       },
@@ -222,7 +222,7 @@ export const CLAUSE_DEMOS: ClauseDemo[] = [
         sql: 'DELETE FROM employees\nWHERE  salary < 4500',
         type: 'DELETE',
         desc: {
-          ko: 'salary가 4500보다 작은 행을 삭제합니다.',
+          ko: 'salary가 4500보다 작은 행을 삭제해요.',
           en: 'Delete the rows where salary is less than 4500.',
         },
       },
@@ -275,8 +275,8 @@ export const CLAUSE_DEMOS: ClauseDemo[] = [
         sql: 'SELECT emp_id, first_name, manager_id\nFROM   employees\nORDER BY manager_id NULLS LAST',
         type: 'SELECT',
         desc: {
-          ko: 'manager_id 오름차순 정렬 시 NULL 값을 맨 마지막으로 보냅니다. Oracle 기본값은 ASC일 때 NULL을 맨 뒤에 두지 않으므로, 명시적으로 NULLS LAST를 지정해야 합니다.',
-          en: "Sort manager_id ascending, placing NULL values at the end. Oracle's default does not put NULLs last for ASC — specify NULLS LAST explicitly.",
+          ko: 'manager_id 오름차순 정렬 시 NULL 값을 맨 마지막으로 보내요. Oracle은 NULL을 가장 큰 값처럼 다뤄서 ASC 정렬에서는 원래 NULL이 맨 뒤에 와요. 그래서 여기서는 써도 결과가 같지만, DESC 정렬에서 NULL을 뒤로 보내고 싶을 때는 꼭 NULLS LAST를 적어야 해요.',
+          en: "Sort manager_id ascending, placing NULL values at the end. Oracle treats NULL as the largest value, so NULLS LAST is already the default for ASC — it is redundant here, but required when you want NULLs at the end of a DESC sort.",
         },
       },
       {
@@ -284,8 +284,8 @@ export const CLAUSE_DEMOS: ClauseDemo[] = [
         sql: 'SELECT emp_id, first_name, manager_id\nFROM   employees\nORDER BY manager_id NULLS FIRST',
         type: 'SELECT',
         desc: {
-          ko: 'manager_id 오름차순 정렬 시 NULL 값을 맨 처음으로 보냅니다. Oracle 기본값은 DESC일 때 NULL을 맨 앞에 두므로, ASC에서 NULL을 앞으로 보내려면 NULLS FIRST를 명시해야 합니다.',
-          en: 'Sort manager_id ascending, placing NULL values at the beginning. Specify NULLS FIRST explicitly when you want NULLs first in an ASC sort.',
+          ko: 'manager_id 오름차순 정렬 시 NULL 값을 맨 처음으로 보내요. Oracle 기본값은 ASC일 때 NULL이 맨 뒤, DESC일 때 맨 앞이에요. 그래서 ASC에서 NULL을 앞으로 보내려면 NULLS FIRST를 꼭 적어야 해요.',
+          en: 'Sort manager_id ascending, placing NULL values at the beginning. By default NULLs come last for ASC and first for DESC, so NULLS FIRST must be written explicitly to get NULLs first in an ASC sort.',
         },
       },
     ],

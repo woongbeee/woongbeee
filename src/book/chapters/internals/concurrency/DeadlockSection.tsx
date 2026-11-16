@@ -24,14 +24,6 @@ const T = {
     officialExampleTitle: '공식 문서 예시 — EMP 100, EMP 200',
     officialExampleDesc:
       'Oracle 공식 문서의 교착상태 예시예요. 두 트랜잭션이 같은 행에 반대 순서로 접근할 때 교착상태가 발생해요.',
-    exampleSteps: [
-      'T1: employees(emp=100) UPDATE → 락 획득',
-      'T2: employees(emp=200) UPDATE → 락 획득',
-      'T1: employees(emp=200) UPDATE 시도 → T2가 끝날 때까지 대기 ⏳',
-      'T2: employees(emp=100) UPDATE 시도 → T1이 끝날 때까지 대기 ⏳',
-      '→ 교착상태 감지! T1의 마지막 문장이 롤백되고 ORA-00060 반환',
-      'T2는 이제 T1의 락이 풀려서 정상 진행 가능',
-    ],
     detectionTitle: 'Oracle의 자동 감지 및 해결',
     detectionDesc:
       'Oracle은 교착상태를 자동으로 감지해요. 교착상태가 감지되면 관여한 트랜잭션 중 하나의 가장 마지막 SQL 문장만 롤백하고 ORA-00060 오류를 반환해요. 트랜잭션 전체가 롤백되는 게 아니에요 — 오류를 받은 트랜잭션의 이전 변경사항은 그대로 유지돼요.',
@@ -62,14 +54,6 @@ const T = {
     officialExampleTitle: 'Oracle Docs Example — EMP 100, EMP 200',
     officialExampleDesc:
       'This is the deadlock example from the Oracle documentation. A deadlock occurs when two transactions access the same rows in opposite order.',
-    exampleSteps: [
-      'T1: UPDATE employees(emp=100) → acquires lock',
-      'T2: UPDATE employees(emp=200) → acquires lock',
-      'T1: attempts UPDATE employees(emp=200) → waits for T2 ⏳',
-      'T2: attempts UPDATE employees(emp=100) → waits for T1 ⏳',
-      '→ Deadlock detected! T1\'s last statement is rolled back; ORA-00060 returned',
-      'T2 can now proceed — T1\'s lock on emp=100 is released',
-    ],
     detectionTitle: "Oracle's Automatic Detection & Resolution",
     detectionDesc:
       "Oracle automatically detects deadlocks. When detected, it rolls back only the most recent SQL statement in one of the involved transactions and returns ORA-00060. The entire transaction is NOT rolled back — earlier changes within the same transaction remain in effect.",

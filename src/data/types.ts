@@ -1,4 +1,4 @@
-export interface ColumnDef {
+interface ColumnDef {
   name: string
   type: string
   nullable: boolean
@@ -7,7 +7,7 @@ export interface ColumnDef {
   references?: { table: string; column: string }
 }
 
-export interface ForeignKey {
+interface ForeignKey {
   column: string
   refTable: string
   refColumn: string

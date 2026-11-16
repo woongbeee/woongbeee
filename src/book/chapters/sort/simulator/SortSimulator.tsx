@@ -17,8 +17,6 @@ const T = {
 
     dataLabel: '정렬할 데이터 크기',
     pgaLabel: 'PGA 작업 영역 크기 (이 정렬에 배정된 몫)',
-
-    modeLabel: '실행 모드',
     modes: {
       optimal: {
         name: 'OPTIMAL',
@@ -62,8 +60,6 @@ const T = {
 
     dataLabel: 'Data Volume to Sort',
     pgaLabel: 'PGA Work Area Size (allotted to this sort)',
-
-    modeLabel: 'Execution Mode',
     modes: {
       optimal: {
         name: 'OPTIMAL',

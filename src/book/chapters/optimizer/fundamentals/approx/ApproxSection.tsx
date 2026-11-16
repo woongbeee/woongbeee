@@ -41,7 +41,7 @@ const T = {
       ['APPROX_COUNT', 'APPROX_RANK와 함께 써서 가장 자주 나타나는 상위 n개 값의 개수를 구해요.'],
       ['APPROX_COUNT_DISTINCT', '특정 표현식의 고유 값이 몇 개인지 근사값으로 반환해요.'],
       ['APPROX_COUNT_DISTINCT_AGG', '미리 계산해둔 근사 COUNT DISTINCT 시놉시스를 더 높은 수준으로 집계해요.'],
-      ['APPROX_COUNT_DISTINCT_DETAIL', 'APPROX_COUNT_DISTINCT의 시놉시스를 BLOB으로 반환해요. 나중에 더 집계할 때 씁니다.'],
+      ['APPROX_COUNT_DISTINCT_DETAIL', 'APPROX_COUNT_DISTINCT의 시놉시스를 BLOB으로 반환해요. 나중에 더 집계할 때 써요.'],
       ['APPROX_MEDIAN', '숫자 또는 날짜-시간 값의 근사 중앙값을 반환해요. MEDIAN의 빠른 대안이에요.'],
       ['APPROX_PERCENTILE', '지정한 퍼센타일에 해당하는 근사 보간값을 반환해요. PERCENTILE_CONT의 빠른 대안이에요.'],
       ['APPROX_RANK', '값 그룹에서 근사 순위를 반환해요.'],

@@ -5,8 +5,8 @@
 
 import type { L, OptimizerResult } from '@/lib/optimizer/types'
 
-export type BufferState = 'free' | 'clean' | 'dirty'
-export type BlockKind = 'table' | 'index' | 'undo'
+type BufferState = 'free' | 'clean' | 'dirty'
+type BlockKind = 'table' | 'index' | 'undo'
 
 export interface BlockRef {
   key: string        // 고유 키: 'EMPLOYEES#3' · 'EMP_PK#R'
@@ -35,7 +35,7 @@ export interface CursorEntry {
   lastUsed: number
 }
 
-export interface Transaction {
+interface Transaction {
   xid: string
   startScn: number
   undoRecords: number

@@ -10,7 +10,7 @@ export interface L {
 
 export type StatementType = 'SELECT' | 'INSERT' | 'UPDATE' | 'DELETE' | 'COMMIT' | 'ROLLBACK'
 
-export type AccessPathType =
+type AccessPathType =
   | 'FULL_TABLE_SCAN'
   | 'INDEX_UNIQUE_SCAN'
   | 'INDEX_RANGE_SCAN'

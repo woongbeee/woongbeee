@@ -86,14 +86,14 @@ const T = {
 function ReadCommittedConflictDiagram({ lang }: { lang: 'ko' | 'en' }) {
   const isKo = lang === 'ko'
   const sessions: TxSession[] = [
-    { id: isKo ? 'Session A (READ COMMITTED)' : 'Session A (READ COMMITTED)', color: 'var(--color-blue)', bgColor: 'var(--color-rail)', borderColor: 'var(--color-blue)' },
-    { id: isKo ? 'Session B (READ COMMITTED)' : 'Session B (READ COMMITTED)', color: 'var(--color-purple)', bgColor: 'var(--color-paper-sunk)', borderColor: 'var(--color-rail)' },
+    { id: 'Session A (READ COMMITTED)', color: 'var(--color-blue)', bgColor: 'var(--color-rail)', borderColor: 'var(--color-blue)' },
+    { id: 'Session B (READ COMMITTED)', color: 'var(--color-purple)', bgColor: 'var(--color-paper-sunk)', borderColor: 'var(--color-rail)' },
   ]
   const sA = sessions[0].id
   const sB = sessions[1].id
   const steps: TxStep[] = [
     { kind: 'banner', label: isKo ? '초기 상태: Banda.salary = 6200' : 'Initial state: Banda.salary = 6200' },
-    { kind: 'single', session: sA, label: isKo ? 'UPDATE salary → 7000' : 'UPDATE salary → 7000', sub: isKo ? '(미커밋)' : '(uncommitted)' },
+    { kind: 'single', session: sA, label: 'UPDATE salary → 7000', sub: isKo ? '(미커밋)' : '(uncommitted)' },
     { kind: 'single', session: sB, label: 'SELECT salary', sub: isKo ? '→ 6200 반환 (읽기 일관성)' : '→ returns 6200 (read consistency)' },
     { kind: 'single', session: sB, label: isKo ? 'UPDATE salary → 6300 시도' : 'UPDATE salary → 6300 (attempt)', sub: isKo ? '→ Session A 완료까지 대기 ⏳' : '→ blocks until Session A finishes ⏳', highlight: 'warn' },
     { kind: 'single', session: sA, label: 'COMMIT', sub: isKo ? '(salary = 7000 확정)' : '(salary = 7000 committed)', highlight: 'success' },
@@ -112,14 +112,14 @@ function ReadCommittedConflictDiagram({ lang }: { lang: 'ko' | 'en' }) {
 function SerializableConflictDiagram({ lang }: { lang: 'ko' | 'en' }) {
   const isKo = lang === 'ko'
   const sessions: TxSession[] = [
-    { id: isKo ? 'Transaction 3 (READ COMMITTED)' : 'Transaction 3 (READ COMMITTED)', color: 'var(--color-amber)', bgColor: 'var(--color-rail)', borderColor: 'var(--color-amber)' },
-    { id: isKo ? 'Transaction 4 (SERIALIZABLE)' : 'Transaction 4 (SERIALIZABLE)', color: 'var(--color-purple)', bgColor: 'var(--color-paper-sunk)', borderColor: 'var(--color-rail)' },
+    { id: 'Transaction 3 (READ COMMITTED)', color: 'var(--color-amber)', bgColor: 'var(--color-rail)', borderColor: 'var(--color-amber)' },
+    { id: 'Transaction 4 (SERIALIZABLE)', color: 'var(--color-purple)', bgColor: 'var(--color-paper-sunk)', borderColor: 'var(--color-rail)' },
   ]
   const s3 = sessions[0].id
   const s4 = sessions[1].id
   const steps: TxStep[] = [
     { kind: 'single', session: s4, label: isKo ? 'T4 시작 (SCN 기록)' : 'T4 begins (SCN recorded)' },
-    { kind: 'single', session: s3, label: isKo ? 'Hintz.salary → 7100' : 'Hintz.salary → 7100', sub: isKo ? '(T4 시작 이후 커밋)' : '(commits after T4 began)' },
+    { kind: 'single', session: s3, label: 'Hintz.salary → 7100', sub: isKo ? '(T4 시작 이후 커밋)' : '(commits after T4 began)' },
     { kind: 'single', session: s3, label: 'COMMIT', highlight: 'success' },
     { kind: 'single', session: s4, label: isKo ? 'Hintz.salary UPDATE 시도' : 'Attempts Hintz.salary UPDATE', sub: isKo ? '→ ORA-08177 발생!' : '→ ORA-08177 raised!', highlight: 'error' },
   ]

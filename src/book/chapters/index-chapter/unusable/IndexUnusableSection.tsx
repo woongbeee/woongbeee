@@ -22,8 +22,6 @@ const T = {
     casesTitle: '케이스별 분석',
     badLabel: '인덱스 미사용 (Bad)',
     goodLabel: '인덱스 사용 (Good)',
-    whyLabel: '왜 못 쓰나요?',
-    fixLabel: '어떻게 고치나요?',
     cases: [
       {
         title: '1. 인덱스 컬럼에 함수 적용',
@@ -41,9 +39,9 @@ const T = {
       },
       {
         title: '3. 암묵적 형변환 (Implicit Type Conversion)',
-        reason: '컬럼 타입이 NUMBER인데 문자열 리터럴과 비교하면, Oracle이 내부적으로 TO_NUMBER()를 컬럼에 적용해요. 이건 함수를 씌운 것과 같아서 인덱스를 쓸 수 없어요.',
-        bad: "SELECT * FROM employees\nWHERE employee_id = '100'; -- NUMBER 컬럼을 VARCHAR와 비교 → 인덱스 무시",
-        good: "SELECT * FROM employees\nWHERE employee_id = 100; -- 타입 일치 → 인덱스 사용",
+        reason: '문자와 숫자를 비교하면 Oracle은 항상 문자 쪽을 숫자로 바꿔요. 그래서 컬럼 타입이 VARCHAR2인데 숫자와 비교하면, Oracle이 내부적으로 컬럼에 TO_NUMBER()를 씌워요. 함수를 씌운 것과 같아서 인덱스를 쓸 수 없어요. (반대로 NUMBER 컬럼을 문자열과 비교하면 문자열 쪽이 변환되니까 인덱스는 그대로 쓸 수 있어요.)',
+        bad: "-- zip_code는 VARCHAR2 컬럼\nSELECT * FROM customers\nWHERE zip_code = 12345; -- TO_NUMBER(zip_code) = 12345 로 바뀜 → 인덱스 무시",
+        good: "SELECT * FROM customers\nWHERE zip_code = '12345'; -- 타입 일치 → 인덱스 사용",
         goodDesc: '컬럼 타입에 맞는 값을 그대로 써야 해요. VARCHAR2 컬럼엔 문자열, NUMBER 컬럼엔 숫자를 쓰세요.',
       },
       {
@@ -69,9 +67,9 @@ const T = {
       },
       {
         title: '7. NULL(빈 값) 비교 (IS NULL)',
-        reason: 'B-Tree 인덱스는 NULL(빈 값)을 저장하지 않아요. IS NULL 조건은 인덱스에서 찾을 수 없기 때문에 Full Scan이 발생해요.',
+        reason: 'B-Tree 인덱스는 인덱스 컬럼이 전부 NULL(빈 값)인 행을 저장하지 않아요. 그래서 단일 컬럼 인덱스로는 IS NULL 조건을 찾을 수 없고 Full Scan이 발생해요.',
         bad: "SELECT * FROM employees\nWHERE commission_pct IS NULL; -- 인덱스 미사용",
-        good: "-- 방법 1: NOT NULL 기본값으로 대체 설계\nUPDATE employees SET commission_pct = 0 WHERE commission_pct IS NULL;\n\n-- 방법 2: Bitmap 인덱스 (OLAP 환경)\n-- 방법 3: 함수 기반 인덱스\nCREATE INDEX idx_comm_null ON employees(NVL(commission_pct, -1));",
+        good: "-- 방법 1: NOT NULL 기본값으로 대체 설계\nUPDATE employees SET commission_pct = 0 WHERE commission_pct IS NULL;\n\n-- 방법 2: 상수를 붙인 복합 인덱스 (NULL 행도 인덱스에 들어가요)\nCREATE INDEX idx_comm_null ON employees(commission_pct, 0);\n\n-- 방법 3: Bitmap 인덱스 (OLAP 환경, NULL도 저장)\n-- 방법 4: 함수 기반 인덱스\nCREATE INDEX idx_comm_nvl ON employees(NVL(commission_pct, -1));",
         goodDesc: 'NULL(빈 값) 조회가 자주 필요하다면, 기본값 정책을 쓰거나 FBI(Function-Based Index, 함수 기반 인덱스)를 만들어 보세요.',
       },
       {
@@ -92,12 +90,10 @@ const T = {
     title: 'When Indexes Are Not Used',
     subtitle: 'Even with an index in place, a poorly written query can force a Full Table Scan. Learn these patterns to write SQL that makes full use of your indexes.',
     introTitle: 'Why does Oracle ignore an index?',
-    introDesc: 'The optimizer skips an index when it cannot compare the stored key values directly. The most common causes are: applying a function or arithmetic to the indexed column, implicit type conversion, and negative predicates (NOT, !=).\n\nSelectivity also matters. The selectivity is the percentage of rows in the table that the query selects, with 0 meaning no rows and 1 meaning all rows. When an index has low selectivity — meaning the query must visit a large fraction of the table — the optimizer may decide that a Full Table Scan reading large blocks sequentially is more efficient than following thousands of individual index rowids.',
+    introDesc: 'The optimizer skips an index when it cannot compare the stored key values directly. The most common causes are: applying a function or arithmetic to the indexed column, implicit type conversion, and negative predicates (NOT, !=).\n\nSelectivity also matters. The selectivity is the percentage of rows in the table that the query selects, with 0 meaning no rows and 1 meaning all rows. When the predicate is not selective — meaning the query must visit a large fraction of the table — the optimizer may decide that a Full Table Scan reading large blocks sequentially is more efficient than following thousands of individual index rowids.',
     casesTitle: 'Case-by-Case Analysis',
     badLabel: 'No Index (Bad)',
     goodLabel: 'Index Used (Good)',
-    whyLabel: 'Why is the index skipped?',
-    fixLabel: 'How to fix it?',
     cases: [
       {
         title: '1. Function applied to the indexed column',
@@ -115,9 +111,9 @@ const T = {
       },
       {
         title: '3. Implicit type conversion',
-        reason: "If the column is NUMBER but you compare it to a string literal, Oracle internally applies TO_NUMBER() to the column — equivalent to wrapping it in a function. The index is skipped.",
-        bad: "SELECT * FROM employees\nWHERE employee_id = '100'; -- NUMBER vs VARCHAR → index ignored",
-        good: "SELECT * FROM employees\nWHERE employee_id = 100; -- matching types → index used",
+        reason: "When a character value is compared with a number, Oracle always converts the character side. So if the column is VARCHAR2 and you compare it to a number, Oracle applies TO_NUMBER() to the column — equivalent to wrapping it in a function — and the index is skipped. (The reverse, a NUMBER column compared to a string literal, converts the literal and can still use the index.)",
+        bad: "-- zip_code is a VARCHAR2 column\nSELECT * FROM customers\nWHERE zip_code = 12345; -- becomes TO_NUMBER(zip_code) = 12345 → index ignored",
+        good: "SELECT * FROM customers\nWHERE zip_code = '12345'; -- matching types → index used",
         goodDesc: "Always use a literal that matches the column's data type. NUMBER columns need numeric literals; VARCHAR2 columns need string literals.",
       },
       {
@@ -125,7 +121,7 @@ const T = {
         reason: 'An index points to where a value IS, not where it is NOT. "Everything except X" has no single starting position in the B-Tree, so Oracle resorts to a full scan.',
         bad: "SELECT * FROM employees\nWHERE department_id != 10; -- index on department_id is ignored",
         good: "SELECT * FROM employees\nWHERE department_id < 10\n   OR department_id > 10; -- two Range Scans\n-- or use an explicit IN list\nWHERE department_id IN (20, 30, 40, 50, 60, 70, 80, 90);",
-        goodDesc: 'Splitting into range conditions or an IN list allows Range Scan. Note: if selectivity is low, a Full Table Scan may still be faster.',
+        goodDesc: 'Splitting into range conditions or an IN list allows Range Scan. Note: if the query still returns a large share of the rows, a Full Table Scan may be faster.',
       },
       {
         title: '5. OR across different indexed columns',
@@ -143,9 +139,9 @@ const T = {
       },
       {
         title: '7. IS NULL comparison',
-        reason: 'B-Tree indexes do not store NULL entries. IS NULL cannot be resolved from the index and forces a Full Scan.',
+        reason: 'A B-Tree index does not store rows whose indexed columns are all NULL. A single-column index therefore cannot resolve IS NULL, which forces a Full Scan.',
         bad: "SELECT * FROM employees\nWHERE commission_pct IS NULL; -- no index hit",
-        good: "-- Option 1: replace NULL with a sentinel value\nUPDATE employees SET commission_pct = 0 WHERE commission_pct IS NULL;\n\n-- Option 2: Bitmap index (OLAP)\n-- Option 3: Function-Based Index\nCREATE INDEX idx_comm_null ON employees(NVL(commission_pct, -1));",
+        good: "-- Option 1: replace NULL with a sentinel value\nUPDATE employees SET commission_pct = 0 WHERE commission_pct IS NULL;\n\n-- Option 2: composite index with a constant (NULL rows are now indexed)\nCREATE INDEX idx_comm_null ON employees(commission_pct, 0);\n\n-- Option 3: Bitmap index (OLAP; stores NULLs)\n-- Option 4: Function-Based Index\nCREATE INDEX idx_comm_nvl ON employees(NVL(commission_pct, -1));",
         goodDesc: 'If IS NULL queries are frequent, consider a default-value policy or a Function-Based Index.',
       },
       {

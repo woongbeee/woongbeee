@@ -29,7 +29,7 @@ const T = {
       { icon: '🔄', title: '데이터가 바뀌어도 튼튼해요', desc: 'INSERT·UPDATE·DELETE가 발생해도 트리 구조를 자동으로 재조정해서 균형을 유지해요. 따로 신경 쓰지 않아도 항상 빠르게 동작해요.' },
     ],
     structureTitle: 'B-Tree 내부 구조',
-    structureDesc: '오라클 B-Tree 인덱스는 Root → Branch → Leaf, 이렇게 3개 층으로 이루어져 있어요. Branch 블록은 검색할 때 길을 안내하는 역할을 해요. 아래 레벨 블록의 위치를 가리키는 정보가 담겨 있거든요. Leaf 블록에는 실제로 인덱싱된 데이터 값과 그 행의 위치 정보인 ROWID(행 식별자)가 저장돼요. 각 항목은 (키, ROWID) 순서로 정렬되어 있고, Leaf 블록끼리는 앞뒤로 연결되어 있어서 범위 탐색도 쉽게 할 수 있어요.',
+    structureDesc: '오라클 B-Tree 인덱스는 Root → Branch → Leaf 순서로 내려가는 구조예요. (인덱스가 작으면 Root 하나가 곧 Leaf이고, 커질수록 Branch 층이 늘어나요.) Branch 블록은 검색할 때 길을 안내하는 역할을 해요. 아래 레벨 블록의 위치를 가리키는 정보가 담겨 있거든요. Leaf 블록에는 실제로 인덱싱된 데이터 값과 그 행의 위치 정보인 ROWID(행 식별자)가 저장돼요. 각 항목은 (키, ROWID) 순서로 정렬되어 있고, Leaf 블록끼리는 앞뒤로 연결되어 있어서 범위 탐색도 쉽게 할 수 있어요.',
     nodeDescs: [
       {
         label: 'Root 노드',
@@ -64,17 +64,12 @@ const T = {
     tabCompositeDesc: '(DEPARTMENT_ID, SALARY) 두 컬럼을 묶은 복합 인덱스예요. 첫 번째 컬럼을 먼저 비교하고, 첫 번째 값이 같을 때만 두 번째 컬럼을 추가로 비교해요.',
     searchLabel: 'EMPLOYEE_ID 선택',
     compositeLabel: '(DEPT_ID, SALARY) 선택',
-    stepRoot: 'Root 블록 읽기 — 어느 Branch로 갈지 결정',
-    stepBranch: (b: string) => `Branch ${b} 읽기 — 어느 Leaf로 갈지 결정`,
-    stepLeaf: (l: string) => `Leaf ${l} 읽기 — 키값 비교 후 ROWID 획득`,
-    found: (key: number, rowid: string) => `EMPLOYEE_ID = ${key} 발견 → ROWID: ${rowid}`,
-    compositeNote: '복합 인덱스에서는 첫 번째 컬럼(선두 컬럼)을 항상 먼저 비교해요. 두 번째 컬럼은 첫 번째 값이 같을 때만 추가로 비교하고요. WHERE 절에 선두 컬럼 없이 두 번째 컬럼만 쓰면 이 인덱스를 사용할 수 없으니 꼭 기억해 두세요!',
+    compositeNote: '복합 인덱스에서는 첫 번째 컬럼(선두 컬럼)을 항상 먼저 비교해요. 두 번째 컬럼은 첫 번째 값이 같을 때만 추가로 비교하고요. WHERE 절에 선두 컬럼 없이 두 번째 컬럼만 쓰면 이 인덱스로 원하는 범위만 골라 읽는 Range Scan을 할 수 없으니 꼭 기억해 두세요!',
 
     cfTitle: 'Clustering Factor(클러스터링 팩터)',
     cfDesc: 'Clustering Factor(클러스터링 팩터)는 테이블 안의 행들이 인덱스 순서와 얼마나 비슷하게 저장되어 있는지를 나타내는 수치예요. 행의 저장 순서가 인덱스 순서에 가까울수록 이 값이 낮아져요. 값이 낮을수록 좋은데, 인접한 인덱스 엔트리들이 같은 테이블 블록을 가리키기 때문에 범위 스캔을 할 때 읽어야 하는 블록 수(I/O)가 줄어들거든요.',
     cfHowTitle: '어떻게 계산해요?',
     cfHowDesc: '오라클이 인덱스 Leaf 블록을 순서대로 읽어 나가면서, 각 ROWID(행 식별자)가 가리키는 테이블 블록 번호가 이전 엔트리와 달라질 때마다 카운터를 1씩 올려요. 같은 블록이면 카운터는 그대로 유지돼요. 다 읽고 나서 최종 카운터 값이 바로 Clustering Factor(클러스터링 팩터)예요.',
-    cfRangeTitle: '값의 범위',
     cfRangeLow: '블록 수에 가까울수록 좋아요 → 넓은 범위를 스캔해도 I/O가 적어요. 인덱스 키의 범위가 같은 데이터 블록을 가리키는 경향이 있어서, 데이터베이스가 같은 블록을 반복해서 읽을 필요가 없어요.',
     cfRangeHigh: '행 수에 가까울수록 안 좋아요 → 넓은 범위를 스캔하면 I/O가 많아져요. 인덱스 엔트리들이 이곳저곳 다른 테이블 블록을 가리키기 때문에, 데이터베이스가 같은 블록을 여러 번 다시 읽는 상황이 생겨요.',
     cfExampleTitle: '예시 — EMPLOYEES 테이블',
@@ -101,7 +96,7 @@ const T = {
       { icon: '🔄', title: 'Resilient to changes', desc: 'INSERT, UPDATE, and DELETE are handled automatically — Oracle rebalances the tree on the fly, so no manual maintenance is needed.' },
     ],
     structureTitle: 'B-Tree Internal Structure',
-    structureDesc: 'An Oracle B-Tree index has three levels: Root → Branch → Leaf. Branch blocks are upper-level blocks used for searching; they contain index data pointing to lower-level blocks. Leaf blocks contain every indexed data value and a corresponding rowid used to locate the actual row. Each entry is sorted by (key, rowid). Leaf blocks are doubly linked for efficient range traversal.',
+    structureDesc: 'An Oracle B-Tree index is traversed Root → Branch → Leaf. (A tiny index is a single root block that is also the leaf; more branch levels appear as it grows.) Branch blocks are upper-level blocks used for searching; they contain index data pointing to lower-level blocks. Leaf blocks contain every indexed data value and a corresponding rowid used to locate the actual row. Each entry is sorted by (key, rowid). Leaf blocks are doubly linked for efficient range traversal.',
     nodeDescs: [
       {
         label: 'Root Node',
@@ -136,17 +131,12 @@ const T = {
     tabCompositeDesc: 'A composite index on (DEPARTMENT_ID, SALARY). The first column is compared first; the second column is only compared when the first values are equal.',
     searchLabel: 'Select EMPLOYEE_ID',
     compositeLabel: 'Select (DEPT_ID, SALARY)',
-    stepRoot: 'Read Root block — decide which Branch to follow',
-    stepBranch: (b: string) => `Read Branch ${b} — decide which Leaf to follow`,
-    stepLeaf: (l: string) => `Read Leaf ${l} — compare keys and retrieve ROWID`,
-    found: (key: number, rowid: string) => `EMPLOYEE_ID = ${key} found → ROWID: ${rowid}`,
-    compositeNote: 'In a composite index the leading column is always compared first. The second column is only used when the first column values are equal. Queries that omit the leading column cannot use this index.',
+    compositeNote: 'In a composite index the leading column is always compared first. The second column is only used when the first column values are equal. Queries that omit the leading column cannot range-scan this index.',
 
     cfTitle: 'Clustering Factor',
     cfDesc: 'The index clustering factor measures row order in relation to an indexed value such as employee last name. As the degree of order increases, the clustering factor decreases. The lower the value, the better — adjacent index entries point to the same table block, so Oracle performs relatively few I/Os during a large index range scan.',
     cfHowTitle: 'How it is calculated',
     cfHowDesc: 'Oracle counts how many times the table block number changes as it walks the index leaf blocks in order. If block X and the next entry also point to block X, the counter stays. If it points to a different block, the counter increments. The final count is the Clustering Factor.',
-    cfRangeTitle: 'Value range',
     cfRangeLow: 'Near num_blocks → low I/O for large range scans. Index keys in a range tend to point to the same data block, so Oracle does not have to re-read blocks repeatedly.',
     cfRangeHigh: 'Near num_rows → high I/O for large range scans. Index entries point to random table blocks, so Oracle may have to read and reread the same blocks over and over again.',
     cfExampleTitle: 'Example — EMPLOYEES table',
@@ -847,7 +837,7 @@ function SearchStepPanel({
     return (
       <div className="flex h-full items-center justify-center rounded-panel border border-dashed border-line bg-paper-sunk px-6 py-10 text-center">
         <p className="font-mono text-[11px] text-ink-2">
-          {isKo ? '← EMPLOYEE_ID를 선택하면\n탐색 경로가 여기에 표시됩니다' : '← Select an EMPLOYEE_ID\nto see the search path here'}
+          {isKo ? '← EMPLOYEE_ID를 선택하면\n탐색 경로가 여기에 표시돼요' : '← Select an EMPLOYEE_ID\nto see the search path here'}
         </p>
       </div>
     )
@@ -899,21 +889,21 @@ function SearchStepPanel({
       dotColor: 'bg-amber',
       label: isKo ? 'Root 블록' : 'Root Block',
       reason: rootReason(),
-      detail: isKo ? 'Root의 키값과 비교해 어느 Branch로 내려갈지 결정합니다.' : 'Compare the search key against Root entries to decide which Branch to visit.',
+      detail: isKo ? 'Root의 키값과 비교해 어느 Branch로 내려갈지 결정해요.' : 'Compare the search key against Root entries to decide which Branch to visit.',
     },
     {
       step: 2,
       dotColor: 'bg-blue',
       label: isKo ? `Branch ${p.branchId}` : `Branch ${p.branchId}`,
       reason: branchReason(),
-      detail: isKo ? 'Branch의 키값과 비교해 어느 Leaf로 내려갈지 결정합니다.' : 'Compare against Branch entries to decide which Leaf to visit.',
+      detail: isKo ? 'Branch의 키값과 비교해 어느 Leaf로 내려갈지 결정해요.' : 'Compare against Branch entries to decide which Leaf to visit.',
     },
     {
       step: 3,
       dotColor: 'bg-line-2',
       label: isKo ? `Leaf ${p.leafId}` : `Leaf ${p.leafId}`,
       reason: isKo ? `키값 ${p.matchKey} 발견 → ROWID 획득` : `Key ${p.matchKey} found → ROWID retrieved`,
-      detail: isKo ? `ROWID(${p.rowid})로 테이블 블록을 직접 읽어 해당 행을 반환합니다.` : `Oracle uses ROWID (${p.rowid}) to jump directly to the table block and return the row.`,
+      detail: isKo ? `ROWID(${p.rowid})로 테이블 블록을 직접 읽어 해당 행을 반환해요.` : `Oracle uses ROWID (${p.rowid}) to jump directly to the table block and return the row.`,
     },
   ]
 
@@ -1179,7 +1169,7 @@ function CompositeSearchStepPanel({ lang, path, visibleStep }: {
     return (
       <div className="flex h-full items-center justify-center rounded-panel border border-dashed border-line bg-paper-sunk px-6 py-10 text-center">
         <p className="font-mono text-[11px] text-ink-2">
-          {isKo ? '← (DEPT_ID, SALARY)를\n선택하면 경로가 표시됩니다' : '← Select a (DEPT_ID, SALARY)\nto see the path'}
+          {isKo ? '← (DEPT_ID, SALARY)를\n선택하면 경로가 표시돼요' : '← Select a (DEPT_ID, SALARY)\nto see the path'}
         </p>
       </div>
     )
@@ -1247,14 +1237,14 @@ function CompositeSearchStepPanel({ lang, path, visibleStep }: {
       dotColor: 'bg-blue',
       label: `Branch ${p.branchId}`,
       reason: branchReason(),
-      detail: isKo ? 'Branch의 복합 키값과 순서대로 비교해 Leaf를 결정합니다.' : 'Compare composite keys in order to determine the Leaf.',
+      detail: isKo ? 'Branch의 복합 키값과 순서대로 비교해 Leaf를 결정해요.' : 'Compare composite keys in order to determine the Leaf.',
     },
     {
       step: 3,
       dotColor: 'bg-line-2',
       label: `Leaf ${p.leafId}`,
       reason: isKo ? `${fmt(p.matchKey)} 발견 → ROWID 획득` : `${fmt(p.matchKey)} found → ROWID retrieved`,
-      detail: isKo ? `ROWID(${p.rowid})로 테이블 블록을 직접 읽습니다.` : `Oracle uses ROWID (${p.rowid}) to jump directly to the table block.`,
+      detail: isKo ? `ROWID(${p.rowid})로 테이블 블록을 직접 읽어요.` : `Oracle uses ROWID (${p.rowid}) to jump directly to the table block.`,
     },
   ]
 
@@ -1352,7 +1342,7 @@ function ClusteringFactorDiagram({ lang }: { lang: 'ko' | 'en' }) {
         <rect x={leafX} y={LEAF_Y + HEADER_H / 2} width={LEAF_W} height={HEADER_H / 2} fill="var(--color-rail)" />
         <text x={leafX + LEAF_W / 2} y={LEAF_Y + 16}
           textAnchor="middle" fontSize={9} fontWeight="bold" fill="var(--color-ink-2)">
-          {isKo ? 'Index Leaf' : 'Index Leaf'}
+          {'Index Leaf'}
         </text>
         {/* 헤더 구분선 */}
         <line x1={leafX} y1={LEAF_Y + HEADER_H}

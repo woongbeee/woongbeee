@@ -103,8 +103,6 @@ WHERE  cust_id IN (SELECT cust_id FROM customers);
 SELECT /*+ NO_UNNEST */ *
 FROM   sales
 WHERE  cust_id IN (SELECT cust_id FROM customers);`,
-
-    summaryTitle: 'Subquery Unnesting 핵심 정리',
     summaryItems: [
       '중첩 서브쿼리를 조인으로 변환해서 CBO가 전체적으로 최적화할 수 있게 해요.',
       '결과가 동일하다고 보장될 때만 변환을 수행해요.',
@@ -203,8 +201,6 @@ WHERE  cust_id IN (SELECT cust_id FROM customers);
 SELECT /*+ NO_UNNEST */ *
 FROM   sales
 WHERE  cust_id IN (SELECT cust_id FROM customers);`,
-
-    summaryTitle: 'Subquery Unnesting Key Takeaways',
     summaryItems: [
       'Converts nested subqueries into joins so the CBO can optimize holistically.',
       'Applied only when the resulting join is guaranteed to return identical rows.',

@@ -90,7 +90,7 @@ FROM   cal_month_sales_mv;
       'QUERY_REWRITE_ENABLED 파라미터가 TRUE여야 해요.',
       'Materialized View에 ENABLE QUERY REWRITE 옵션이 설정되어 있어야 해요.',
       'MV의 데이터가 신선하거나 STALE_TOLERATED 수준이어야 해요.',
-      '사용자에게 QUERY REWRITE 시스템 권한 또는 해당 MV에 대한 QUERY REWRITE 객체 권한이 있어야 해요.',
+      '쿼리를 실행하는 사용자에게는 따로 권한이 필요 없어요. 다만 MV가 다른 스키마의 테이블을 참조한다면, MV 소유자에게 GLOBAL QUERY REWRITE 권한이 있어야 ENABLE QUERY REWRITE로 만들 수 있어요.',
     ],
     prereqSql: `-- Query Rewrite를 허용하는 MV 생성
 CREATE MATERIALIZED VIEW cal_month_sales_mv
@@ -122,8 +122,6 @@ SELECT /*+ NO_REWRITE */
 FROM   sales s, times t
 WHERE  s.time_id = t.time_id
 GROUP BY t.calendar_month_desc;`,
-
-    summaryTitle: 'Query Rewrite with MVs 핵심 정리',
     summaryItems: [
       '원본 쿼리를 그대로 작성해도 Oracle이 자동으로 Materialized View를 활용하도록 재작성해요.',
       'QUERY_REWRITE_ENABLED=TRUE, MV에 ENABLE QUERY REWRITE가 필요해요.',
@@ -209,7 +207,7 @@ FROM   cal_month_sales_mv;
       'The QUERY_REWRITE_ENABLED initialization parameter must be TRUE.',
       'The materialized view must be created with the ENABLE QUERY REWRITE option.',
       "The view's data must be fresh, or QUERY_REWRITE_INTEGRITY must be STALE_TOLERATED.",
-      'The user must have the QUERY REWRITE system privilege, or the QUERY REWRITE object privilege on the specific materialized view.',
+      'The user running the query needs no extra privilege. However, if the MV references tables in another schema, the MV owner needs the GLOBAL QUERY REWRITE privilege to create it with ENABLE QUERY REWRITE.',
     ],
     prereqSql: `-- Create an MV with Query Rewrite enabled
 CREATE MATERIALIZED VIEW cal_month_sales_mv
@@ -241,8 +239,6 @@ SELECT /*+ NO_REWRITE */
 FROM   sales s, times t
 WHERE  s.time_id = t.time_id
 GROUP BY t.calendar_month_desc;`,
-
-    summaryTitle: 'Query Rewrite with MVs Key Takeaways',
     summaryItems: [
       'Write queries against base tables as usual — Oracle automatically rewrites them to use materialized views.',
       'Requires QUERY_REWRITE_ENABLED=TRUE and ENABLE QUERY REWRITE on the materialized view.',

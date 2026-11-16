@@ -186,7 +186,7 @@ const LockDiagram = ({ lang }: { lang: 'ko' | 'en' }) => (
     <rect x="260" y="15" width="155" height="70" rx="6" fill="var(--color-rail)" stroke="var(--color-blue)" strokeWidth="1.5" />
     <text x="337" y="34" fontSize="10" fill="var(--color-blue)" textAnchor="middle" fontWeight="bold">Session A</text>
     <text x="337" y="50" fontSize="9" fill="var(--color-blue)" textAnchor="middle">
-      {lang === 'ko' ? 'UPDATE EMP 101' : 'UPDATE EMP 101'}
+      {'UPDATE EMP 101'}
     </text>
     <text x="337" y="65" fontSize="9" fill="var(--color-blue)" textAnchor="middle">
       {lang === 'ko' ? '→ 행 락 획득 ✓' : '→ acquires row lock ✓'}

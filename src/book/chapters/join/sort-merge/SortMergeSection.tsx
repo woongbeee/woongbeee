@@ -55,8 +55,6 @@ END LOOP`,
     labelAdvLeft: '← 왼쪽 전진 (key1 < key2)',
     labelAdvRight: '오른쪽 전진 (key1 > key2) →',
     labelAdvBoth: '양쪽 전진 + 결과 추가 (key1 = key2)',
-    labelSkipped: '건너뜀',
-    labelPointer: (side: string) => `${side} 포인터`,
     btnPrev: '← 이전',
     btnNext: '다음 →',
     btnReset: '↺ 리셋',
@@ -107,8 +105,6 @@ END LOOP`,
     labelAdvLeft: '← Advance left (key1 < key2)',
     labelAdvRight: 'Advance right (key1 > key2) →',
     labelAdvBoth: 'Advance both + emit row (key1 = key2)',
-    labelSkipped: 'skipped',
-    labelPointer: (side: string) => `${side} pointer`,
     btnPrev: '← Prev',
     btnNext: 'Next →',
     btnReset: '↺ Reset',
@@ -137,7 +133,6 @@ WHERE  e.department_id = d.department_id;
 SELECT e.last_name, s.grade
 FROM   employees e, salary_grades s
 WHERE  e.salary BETWEEN s.low_sal AND s.high_sal;`,
-    summaryTitle: 'Sort Merge Join 핵심 정리',
     summaryItems: [
       '두 집합을 조인 키로 정렬한 뒤 병합해요. 병합 시 처음부터 다시 스캔하지 않아요.',
       '비등치(범위) 조인에서 Hash Join을 대신해요 — <, <=, >, >=, BETWEEN 조건에서 사용 가능해요.',
@@ -161,7 +156,6 @@ WHERE  e.department_id = d.department_id;
 SELECT e.last_name, s.grade
 FROM   employees e, salary_grades s
 WHERE  e.salary BETWEEN s.low_sal AND s.high_sal;`,
-    summaryTitle: 'Sort Merge Join Key Takeaways',
     summaryItems: [
       'Sorts both datasets on the join key, then merges — no restart from the beginning during merge.',
       'Handles non-equijoin conditions (<, <=, >, >=, BETWEEN) where Hash Join cannot be used.',
@@ -328,8 +322,7 @@ function SortMergeSim({ lang }: { lang: 'ko' | 'en' }) {
                     'rounded-card border px-3 py-2 font-mono text-xs',
                     isActive    ? 'border-blue/50 font-bold text-blue'
                     : wasMatched  ? 'border-green/30 text-green'
-                    : isPassed    ? 'border-line text-ink-2'
-                    :               'border-line text-ink-2',
+                    : 'border-line text-ink-2',
                   )}
                 >
                   {isActive && <span className="mr-1 text-blue font-bold">{t.labelPtr}</span>}
@@ -372,8 +365,7 @@ function SortMergeSim({ lang }: { lang: 'ko' | 'en' }) {
                     'rounded-card border px-3 py-2 font-mono text-xs',
                     isActive    ? 'border-amber/50 font-bold text-amber'
                     : wasMatched  ? 'border-green/30 text-green'
-                    : isPassed    ? 'border-line text-ink-2'
-                    :               'border-line text-ink-2',
+                    : 'border-line text-ink-2',
                   )}
                 >
                   {isActive && <span className="mr-1 text-amber font-bold">{t.labelPtr}</span>}

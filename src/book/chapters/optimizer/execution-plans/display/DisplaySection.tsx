@@ -45,7 +45,7 @@ SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY_CURSOR(FORMAT=>'+ALLSTATS'));
 -- ADAPTIVE 포맷: 적응형 계획에서 비활성 서브플랜까지 모두 표시
 SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY_CURSOR(FORMAT=>'+ADAPTIVE'));`,
     adaptiveNote:
-      '+ADAPTIVE 포맷을 쓰면 옵티마이저가 고려했지만 최종 선택하지 않은 서브플랜(대시 - 표시)까지 볼 수 있어요. 적응형 쿼리 최적화의 작동 원리는 Query Optimizer Fundamentals → Adaptive Query Optimization 섹션에서 자세히 설명합니다.',
+      '+ADAPTIVE 포맷을 쓰면 옵티마이저가 고려했지만 최종 선택하지 않은 서브플랜(대시 - 표시)까지 볼 수 있어요. 적응형 쿼리 최적화의 작동 원리는 Query Optimizer Fundamentals → Adaptive Query Optimization 섹션에서 자세히 설명해요.',
     viewsTitle: '실행 계획 관련 V$ 뷰',
     viewsRows: [
       ['V$SQL', 'SQL 커서 통계. 자식 커서마다 한 행. 19c부터 V$SQL.QUARANTINED로 Resource Manager 강제종료 여부 확인 가능.'],

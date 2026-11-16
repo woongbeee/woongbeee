@@ -64,7 +64,7 @@ WHERE  c.region = 'NORTH';
 
     planTitle: '실행 계획에서 Pruning 확인',
     planDesc:
-      '실행 계획의 Pstart, Pstop 컬럼이 접근하는 파티션 범위를 나타냅니다. DBMS_XPLAN.DISPLAY(format => \'BASIC +PARTITION\')으로 확인합니다.',
+      '실행 계획의 Pstart, Pstop 컬럼이 접근하는 파티션 범위를 나타내요. DBMS_XPLAN.DISPLAY(format => \'BASIC +PARTITION\')으로 확인해요.',
     planTable: [
       ['숫자 (예: 3)', '3', '3', '파티션 번호 3 하나만 접근 (Static Pruning)'],
       ['KEY', 'KEY', 'KEY', '바인드 변수 기반 Dynamic Pruning'],
@@ -80,7 +80,7 @@ WHERE  c.region = 'NORTH';
       ["TO_CHAR(sale_date, 'YYYY') = '2024'", '파티션 키에 함수 적용 → Pruning 불가. sale_date BETWEEN 조건으로 변경.'],
       ["TRUNC(sale_date) = TRUNC(SYSDATE)", 'TRUNC 함수 적용 → Pruning 불가. sale_date >= DATE 조건으로 변경.'],
       ['WHERE 1=1 (파티션 키 조건 없음)', '파티션 키가 WHERE에 없으면 전체 파티션 스캔.'],
-      ["암묵적 형 변환: sale_date = '2024-01-01'", '문자열과 날짜 비교 시 형 변환 발생 → Pruning 불가. TO_DATE 명시.'],
+      ["암묵적 형 변환: sale_date = '2024-01-01'", '문자열을 날짜로 바꾸는 방식이 세션의 NLS 설정에 따라 달라져서, 컴파일 시점에 파티션을 정하지 못하고 실행 시점(Pstart=KEY)으로 미뤄져요. DATE 리터럴이나 TO_DATE로 형식을 명시하세요.'],
     ],
 
     summary:
@@ -155,7 +155,7 @@ WHERE  c.region = 'NORTH';
       ["TO_CHAR(sale_date, 'YYYY') = '2024'", 'Function applied to partition key → no pruning. Use BETWEEN on sale_date instead.'],
       ['TRUNC(sale_date) = TRUNC(SYSDATE)', 'TRUNC applied → no pruning. Use sale_date >= DATE condition instead.'],
       ['No partition key in WHERE', 'Without a partition key condition, all partitions are scanned.'],
-      ["Implicit conversion: sale_date = '2024-01-01'", 'String-to-date conversion prevents pruning. Use explicit TO_DATE.'],
+      ["Implicit conversion: sale_date = '2024-01-01'", 'How the string becomes a date depends on the session NLS settings, so the partitions cannot be fixed at compile time and pruning is deferred to run time (Pstart=KEY). Use a DATE literal or an explicit TO_DATE with a format.'],
     ],
 
     summary:

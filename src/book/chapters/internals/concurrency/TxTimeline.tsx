@@ -149,7 +149,7 @@ export function TxTimeline({
       {resultLabel && (
         <g>
           <rect x={TOP_PAD} y={contentTop + contentH + 3} width={W - TOP_PAD * 2} height={20} rx="4"
-            fill={resultIsGood ? 'var(--color-rail)' : 'var(--color-rail)'}
+            fill={'var(--color-rail)'}
             stroke={resultIsGood ? 'var(--color-green)' : 'var(--color-red)'}
             strokeWidth="1.5" />
           <text x={W / 2} y={contentTop + contentH + 16} fontSize="8"

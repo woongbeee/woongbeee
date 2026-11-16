@@ -28,14 +28,16 @@ FROM   employees
 WHERE  hire_date >= DATE '2024-01-01'
 ORDER  BY hire_date;              -- SORT ORDER BY 없이 INDEX RANGE SCAN만으로 순서 보장
 
--- 내림차순도 마찬가지로 DESC 인덱스로 회피 가능
-CREATE INDEX emp_hire_date_desc_ix ON employees(hire_date DESC);`,
+-- 내림차순(ORDER BY hire_date DESC)도 같은 인덱스를 거꾸로 읽어서 회피해요
+--   → INDEX RANGE SCAN DESCENDING
+-- DESC 인덱스는 (dept_id ASC, hire_date DESC)처럼 방향이 섞일 때만 필요해요
+CREATE INDEX emp_dept_hire_ix ON employees(department_id, hire_date DESC);`,
     idxNote:
       'WHERE 조건과 ORDER BY가 같은 인덱스를 함께 쓸 수 있어야 해요. 조건에는 안 쓰이고 ORDER BY에만 쓰이는 컬럼이면 인덱스 선두 컬럼 설계를 다시 검토하세요.',
 
     hashTitle: '전략 2 — GROUP BY를 Hash Aggregate로',
     hashDesc:
-      'Oracle 11g 이후 GROUP BY는 기본적으로 Hash Aggregate(SORT 없는 그룹화)로 처리돼요. 다만 이미 정렬된 인덱스를 스캔 중이거나, 결과를 특정 순서로 반환해야 하는 경우엔 여전히 SORT GROUP BY가 나올 수 있어요.',
+      'Oracle 10g Release 2부터 GROUP BY는 기본적으로 Hash Aggregate(SORT 없는 그룹화)로 처리돼요. 다만 이미 정렬된 인덱스를 스캔 중이거나, 결과를 특정 순서로 반환해야 하는 경우엔 여전히 SORT GROUP BY가 나올 수 있어요.',
     hashSql: `-- 일반적으로 HASH GROUP BY로 처리됨 (소트 없음)
 SELECT department_id, AVG(salary)
 FROM   employees
@@ -81,7 +83,7 @@ FROM   employees;`,
       [
         'Hash GROUP BY',
         'GROUP BY를 Hash Aggregate로 처리',
-        '11g 이후 기본 동작. 정렬된 인덱스 스캔 시엔 예외',
+        '10g Release 2 이후 기본 동작. 정렬된 인덱스 스캔 시엔 예외',
       ],
       [
         'UNION → UNION ALL',
@@ -120,14 +122,16 @@ FROM   employees
 WHERE  hire_date >= DATE '2024-01-01'
 ORDER  BY hire_date;              -- order guaranteed by INDEX RANGE SCAN alone, no SORT ORDER BY
 
--- Descending order can be avoided the same way with a DESC index
-CREATE INDEX emp_hire_date_desc_ix ON employees(hire_date DESC);`,
+-- ORDER BY hire_date DESC is avoided with the same index, read backwards
+--   → INDEX RANGE SCAN DESCENDING
+-- A DESC index is only needed for mixed directions such as (dept_id ASC, hire_date DESC)
+CREATE INDEX emp_dept_hire_ix ON employees(department_id, hire_date DESC);`,
     idxNote:
       'The WHERE predicate and ORDER BY must be able to share the same index. If a column is used only in ORDER BY and never in a predicate, revisit which column should lead the index.',
 
     hashTitle: 'Strategy 2 — Let GROUP BY Use Hash Aggregate',
     hashDesc:
-      'Since Oracle 11g, GROUP BY defaults to Hash Aggregate (grouping with no sort). However, SORT GROUP BY can still appear when Oracle is already scanning a sorted index, or when the result must be returned in a specific order.',
+      'Since Oracle 10g Release 2, GROUP BY defaults to Hash Aggregate (grouping with no sort). However, SORT GROUP BY can still appear when Oracle is already scanning a sorted index, or when the result must be returned in a specific order.',
     hashSql: `-- Typically processed with HASH GROUP BY (no sort)
 SELECT department_id, AVG(salary)
 FROM   employees
@@ -173,7 +177,7 @@ FROM   employees;`,
       [
         'Hash GROUP BY',
         'Process GROUP BY via Hash Aggregate',
-        'Default since 11g; exception when scanning an already-sorted index',
+        'Default since 10g Release 2; exception when scanning an already-sorted index',
       ],
       [
         'UNION → UNION ALL',

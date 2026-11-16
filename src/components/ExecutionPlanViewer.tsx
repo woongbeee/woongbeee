@@ -40,7 +40,7 @@ export interface PlanNode {
   note?: string
 }
 
-export interface CallStat {
+interface CallStat {
   name: 'Parse' | 'Execute' | 'Fetch' | string
   count: number
   cpuMs: number
@@ -51,7 +51,7 @@ export interface CallStat {
   rowsProcessed: number
 }
 
-export interface WaitEvent {
+interface WaitEvent {
   event: string
   waits: number
   timeoutCount: number
@@ -310,7 +310,7 @@ function PlanTreeTab({ nodes, stats, compact }: { nodes: PlanNode[]; stats?: Pla
         )}
 
         {/* Tree rows */}
-        <div className={cn('py-1', compact ? 'px-2' : 'px-2')}>
+        <div className={cn('py-1', 'px-2')}>
           {roots.map((root, i) => (
             <PlanTreeNode key={root.id} node={root} depth={0} isLast={i === roots.length - 1} />
           ))}

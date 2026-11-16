@@ -49,10 +49,6 @@ const T = {
     dispatcherNote:
       'V$DISPATCHER 뷰로 디스패처의 현재 상태와 부하를 확인할 수 있어요. 디스패처가 병목이면 DISPATCHERS 파라미터로 수를 늘리면 돼요.',
 
-    pgaPosTitle: 'PGA 위치 비교 (세션별 메모리)',
-    pgaPosNote:
-      'Dedicated Server에서는 서버 프로세스마다 OS로부터 PGA를 독립적으로 받아요. Shared Server에서는 세션 컨텍스트(UGA)를 Large Pool에 저장하기 때문에, Large Pool 크기를 넉넉하게 잡아야 해요.',
-
     paramsTitle: '관련 파라미터',
     params: [
       { name: 'DISPATCHERS',       desc: "Shared Server의 디스패처 수와 프로토콜을 설정해요. 예: \"(PROTOCOL=TCP)(DISPATCHERS=3)\"" },
@@ -106,10 +102,6 @@ const T = {
       'In Shared Server mode, dispatchers communicate directly with clients. They receive connection requests from multiple clients and place each request into the SGA Request Queue. Once a server process completes processing, it writes the response to the Response Queue, and the dispatcher returns it to the client.',
     dispatcherNote:
       'Monitor dispatcher status and load with the V$DISPATCHER view. If dispatchers are a bottleneck, increase their count using the DISPATCHERS parameter.',
-
-    pgaPosTitle: 'PGA Location Comparison (per-session memory)',
-    pgaPosNote:
-      'In Dedicated Server, PGA is independently allocated from the OS for each server process. In Shared Server, session context (UGA) is stored in the Large Pool, so the Large Pool must be sized sufficiently.',
 
     paramsTitle: 'Related Parameters',
     params: [
@@ -419,7 +411,7 @@ function SharedDiagram({ isKo }: { isKo: boolean }) {
         Request Queue
       </text>
       <text x={INNER_X + INNER_W / 2} y={RQ_Y + 27} textAnchor="middle" fill="var(--color-green)" fontSize={8.5}>
-        {isKo ? '(Large Pool)' : '(Large Pool)'}
+        {'(Large Pool)'}
       </text>
 
       {/* RQ → 서버 프로세스 화살표 + 라벨 (화살표 사이 중앙에 라벨) */}
@@ -475,7 +467,7 @@ function SharedDiagram({ isKo }: { isKo: boolean }) {
         Response Queue
       </text>
       <text x={INNER_X + INNER_W / 2} y={RSQ_Y + 27} textAnchor="middle" fill="var(--color-amber)" fontSize={8.5}>
-        {isKo ? '(Large Pool)' : '(Large Pool)'}
+        {'(Large Pool)'}
       </text>
 
       {/* Large Pool */}

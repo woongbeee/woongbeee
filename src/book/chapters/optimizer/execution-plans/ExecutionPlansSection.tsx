@@ -22,17 +22,17 @@ const LANDING_ITEMS = {
     {
       icon: <IconLayoutList size={20} stroke={1.5} />,
       title: '실행 계획 확인하기',
-      desc: 'DISPLAY, DISPLAY_CURSOR, DISPLAY_AWR 등 DBMS_XPLAN 함수와 V$ 뷰로 계획을 조회합니다.',
+      desc: 'DISPLAY, DISPLAY_CURSOR, DISPLAY_AWR 등 DBMS_XPLAN 함수와 V$ 뷰로 계획을 조회해요.',
     },
     {
       icon: <IconListSearch size={20} stroke={1.5} />,
       title: '실행 계획 읽는 법',
-      desc: '5가지 정보 영역(Call Statistics, Row Source Operation, Predicate, Projection, Statistics)을 읽어 성능 병목을 진단합니다.',
+      desc: '5가지 정보 영역(Call Statistics, Row Source Operation, Predicate, Projection, Statistics)을 읽어 성능 병목을 진단해요.',
     },
     {
       icon: <IconArrowsShuffle size={20} stroke={1.5} />,
       title: '실행 계획 비교하기',
-      desc: '기준 계획과 테스트 계획의 차이를 논리적으로 비교해 성능 회귀 원인을 파악합니다.',
+      desc: '기준 계획과 테스트 계획의 차이를 논리적으로 비교해 성능 회귀 원인을 파악해요.',
     },
   ],
   en: [
@@ -63,7 +63,7 @@ const LANDING_TEXT = {
   ko: {
     title: 'Query Execution Plans',
     subtitle:
-      '쿼리 성능이 좋지 않다면 실행 계획(execution plan)이 문제를 이해하고 해결책을 찾는 핵심 도구입니다. SQL 문장을 설명(explain)하고 실행 계획을 표시하는 방법을 아는 것은 SQL 튜닝의 필수 지식입니다.',
+      '쿼리 성능이 좋지 않다면 실행 계획(execution plan)이 문제를 이해하고 해결책을 찾는 핵심 도구예요. SQL 문장을 설명(explain)하고 실행 계획을 표시하는 방법을 아는 것은 SQL 튜닝의 필수 지식이에요.',
     concepts: '핵심 도구',
   },
   en: {

@@ -21,7 +21,6 @@ const T = {
     overviewTitle: '읽기 일관성이 뭐예요?',
     overviewDesc:
       'Oracle은 다중 버전 일관성 모델(multiversion consistency model)을 사용해요. 여러 사람이 동시에 접속해도 각자 특정 시점에 일관된 데이터 뷰를 볼 수 있어요. 같은 블록의 여러 버전이 동시에 존재할 수 있기 때문에, 트랜잭션은 쿼리가 요구하는 시점에 커밋된 버전의 데이터를 읽을 수 있어요.',
-    guarantees: '읽기 일관성의 세 가지 보장',
     guaranteeItems: [
       {
         num: '1',
@@ -66,7 +65,6 @@ const T = {
     overviewTitle: 'What is Read Consistency?',
     overviewDesc:
       "Oracle uses a multiversion consistency model. The database can present a view of data to multiple concurrent users, with each view consistent to a point in time. Because different versions of data blocks can exist simultaneously, transactions can read the version of data committed at the point in time required by a query.",
-    guarantees: 'Three Guarantees of Read Consistency',
     guaranteeItems: [
       {
         num: '1',

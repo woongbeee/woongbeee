@@ -19,7 +19,7 @@ const round1 = (n: number) => Math.round(n * 10) / 10
 
 // ── Selectivity ─────────────────────────────────────────────────────────
 
-export function predicateSelectivity(pred: Predicate, ts: TableStats, cs: ColumnStats | null): { sel: number; note: L } {
+function predicateSelectivity(pred: Predicate, ts: TableStats, cs: ColumnStats | null): { sel: number; note: L } {
   const mk = (sel: number, ko: string, en: string) => ({
     sel: Math.min(1, Math.max(0, sel)),
     note: { ko: `${pred.text} → ${ko} = ${pct(sel)}`, en: `${pred.text} → ${en} = ${pct(sel)}` },
@@ -107,12 +107,12 @@ export function estimateTable(ref: TableRef, predicates: Predicate[]): TableEsti
 
 // ── Access path costing ──────────────────────────────────────────────────
 
-export function fullScanCost(ts: TableStats): { io: number; cpu: number } {
+function fullScanCost(ts: TableStats): { io: number; cpu: number } {
   return { io: 1 + Math.ceil((ts.numBlocks / MBRC) * MREAD_OVER_SREAD), cpu: ts.numRows * CPU_PER_ROW }
 }
 
 /** 인덱스로 key 선택도 `sel` 만큼 읽을 때의 비용. tableAccess=false 면 인덱스만 읽는다. */
-export function indexScanCost(index: IndexStats, sel: number, tableAccess: boolean): { io: number; cpu: number } {
+function indexScanCost(index: IndexStats, sel: number, tableAccess: boolean): { io: number; cpu: number } {
   const leaf = Math.max(1, Math.ceil(index.leafBlocks * sel))
   const table = tableAccess ? Math.max(1, Math.ceil(index.clusteringFactor * sel)) : 0
   return { io: index.blevel + leaf + table, cpu: Math.max(1, index.distinctKeys * sel) * CPU_PER_ROW }

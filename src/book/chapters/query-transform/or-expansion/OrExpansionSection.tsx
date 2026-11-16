@@ -61,7 +61,7 @@ SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY(format => 'BASIC'));`,
 
     hintTitle: '힌트로 제어하기',
     hintDesc:
-      'OR Expansion은 비용 기반으로 결정돼요. 옵티마이저가 변환하지 않을 때 강제하려면 USE_CONCAT 힌트를, 변환을 방지하려면 NO_EXPAND 힌트를 사용해요.',
+      'OR Expansion은 비용 기반으로 결정돼요. 옵티마이저가 변환하지 않을 때 강제하려면 USE_CONCAT 힌트를, 변환을 방지하려면 NO_EXPAND 힌트를 사용해요. Oracle 12.2 이상에서 UNION-ALL 방식의 새 OR Expansion을 제어할 때는 OR_EXPAND / NO_OR_EXPAND 힌트를 써요.',
     hintSql: `-- OR Expansion 강제 적용
 SELECT /*+ USE_CONCAT */ *
 FROM   employees e, departments d
@@ -73,13 +73,11 @@ SELECT /*+ NO_EXPAND */ *
 FROM   employees e, departments d
 WHERE  (e.email = 'SSTILES' OR d.department_name = 'Treasury')
 AND    e.department_id = d.department_id;`,
-
-    summaryTitle: 'OR Expansion 핵심 정리',
     summaryItems: [
       'OR 조건이 있는 쿼리를 UNION ALL로 분리해서 각 브랜치마다 인덱스 활용 기회를 줘요.',
       '비용 기반 결정 — 옵티마이저가 변환 전후 비용을 비교해서 더 낮은 쪽을 선택해요.',
       'Oracle 12.2+: CONCATENATION 대신 UNION-ALL 오퍼레이터 사용.',
-      '힌트: USE_CONCAT (강제), NO_EXPAND (방지).',
+      '힌트: USE_CONCAT · OR_EXPAND (강제), NO_EXPAND · NO_OR_EXPAND (방지).',
     ],
   },
   en: {
@@ -130,7 +128,7 @@ SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY(format => 'BASIC'));`,
 
     hintTitle: 'Controlling with Hints',
     hintDesc:
-      'OR Expansion is a cost-based decision. Use the USE_CONCAT hint to force the transformation, or NO_EXPAND to suppress it.',
+      'OR Expansion is a cost-based decision. Use the USE_CONCAT hint to force the transformation, or NO_EXPAND to suppress it. From Oracle 12.2, the new UNION-ALL based OR expansion is controlled with OR_EXPAND / NO_OR_EXPAND.',
     hintSql: `-- Force OR Expansion
 SELECT /*+ USE_CONCAT */ *
 FROM   employees e, departments d
@@ -142,13 +140,11 @@ SELECT /*+ NO_EXPAND */ *
 FROM   employees e, departments d
 WHERE  (e.email = 'SSTILES' OR d.department_name = 'Treasury')
 AND    e.department_id = d.department_id;`,
-
-    summaryTitle: 'OR Expansion Key Takeaways',
     summaryItems: [
       'Splits OR conditions into UNION ALL branches, giving each branch its own index access opportunity.',
       'Cost-based decision — the optimizer compares costs before and after transformation.',
       'Oracle 12.2+: uses UNION-ALL operator instead of CONCATENATION.',
-      'Hints: USE_CONCAT (force), NO_EXPAND (suppress).',
+      'Hints: USE_CONCAT · OR_EXPAND (force), NO_EXPAND · NO_OR_EXPAND (suppress).',
     ],
   },
 }

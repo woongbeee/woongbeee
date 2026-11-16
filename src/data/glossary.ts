@@ -79,7 +79,7 @@ export const GLOSSARY: GlossaryTerm[] = [
   {
     term: 'Bitmap Index',
     definition: {
-      ko: '컬럼 값별로 비트맵(0/1 배열)을 저장하는 인덱스. 선택도가 낮은(Cardinality 낮은) 컬럼에 유리. AND/OR 연산이 빠름.',
+      ko: '컬럼 값별로 비트맵(0/1 배열)을 저장하는 인덱스. 값의 종류가 적은(Cardinality가 낮은) 컬럼에 유리. AND/OR 연산이 빠름.',
       en: 'An index storing bitmaps per column value. Efficient for low-cardinality columns and fast for AND/OR operations.',
     },
     sectionIds: ['index-bitmap', 'index-overview'],
@@ -897,7 +897,7 @@ export const GLOSSARY: GlossaryTerm[] = [
   {
     term: 'Selectivity',
     definition: {
-      ko: '전체 행 중 조건을 만족하는 행의 비율(0~1). CBO가 액세스 패스 비용을 추정할 때 핵심 지표. NDV가 높을수록 선택도가 낮아짐.',
+      ko: '전체 행 중 조건을 만족하는 행의 비율(0~1). CBO가 액세스 패스 비용을 추정할 때 핵심 지표. 값이 0에 가까울수록 조건에 맞는 행이 적다는 뜻. NDV가 클수록 등치 조건의 선택도 값은 작아짐(1/NDV).',
       en: 'The fraction of rows satisfying a condition (0–1). A key metric CBO uses to estimate access path cost. Higher NDV means lower selectivity.',
     },
     sectionIds: ['optimizer-stats'],

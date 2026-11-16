@@ -562,7 +562,7 @@ export function FullPlanDisplay({ lang }: { lang: 'ko' | 'en' }) {
       ],
     },
     {
-      label: isKo ? '② Row Source Operation  (ALLSTATS LAST)' : '② Row Source Operation  (ALLSTATS LAST)',
+      label: '② Row Source Operation  (ALLSTATS LAST)',
       color: 'var(--color-green)',
       lines: [
         { text: '| Id | Operation          | Name        | Starts | E-Rows | A-Rows |   A-Time   |  CR |  PR |', color: 'var(--color-ink-3)' },
@@ -575,7 +575,7 @@ export function FullPlanDisplay({ lang }: { lang: 'ko' | 'en' }) {
       ],
     },
     {
-      label: isKo ? '③ Predicate Information' : '③ Predicate Information',
+      label: '③ Predicate Information',
       color: 'var(--color-amber)',
       lines: [
         { text: 'Predicate Information (identified by operation id):', color: 'var(--color-amber)' },
@@ -585,7 +585,7 @@ export function FullPlanDisplay({ lang }: { lang: 'ko' | 'en' }) {
       ],
     },
     {
-      label: isKo ? '④ Column Projection' : '④ Column Projection',
+      label: '④ Column Projection',
       color: 'var(--color-purple)',
       lines: [
         { text: 'Column Projection Information (identified by operation id):', color: 'var(--color-purple)' },
@@ -597,7 +597,7 @@ export function FullPlanDisplay({ lang }: { lang: 'ko' | 'en' }) {
       ],
     },
     {
-      label: isKo ? '⑤ Statistics  (SET AUTOTRACE)' : '⑤ Statistics  (SET AUTOTRACE)',
+      label: '⑤ Statistics  (SET AUTOTRACE)',
       color: 'var(--color-red)',
       lines: [
         { text: '         0  recursive calls', color: 'var(--color-red)' },

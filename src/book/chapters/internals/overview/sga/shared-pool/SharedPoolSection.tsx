@@ -55,7 +55,7 @@ const T = {
     ],
 
     softTitle: 'Soft Parse — 이미 캐시된 SQL',
-    softDesc: 'Library Cache에 똑같은 SQL이 있으면 1~3단계를 건너뛰고 저장된 커서를 바로 재사용해요. CPU 비용이 거의 없어요.',
+    softDesc: 'Library Cache에 똑같은 SQL이 있으면 문법·의미 검사만 가볍게 하고, 가장 비싼 3단계(실행 계획 생성)를 건너뛴 채 저장된 커서를 재사용해요. CPU 비용이 훨씬 적어요.',
     softNote: 'Soft Parse가 되려면 SQL 문자열이 대소문자·공백·줄바꿈까지 완전히 똑같아야 해요. "SELECT * FROM EMP"와 "select * from emp"는 Oracle 눈에 서로 다른 SQL이라 각각 따로 Hard Parse돼요.',
 
     // ── Shared vs Private ──
@@ -75,7 +75,7 @@ const T = {
       { label: 'Child Cursor #0', desc: '첫 번째 Hard Parse로 만들어진 실행 계획이에요. 대부분은 여기서 끝나요.' },
       { label: 'Child Cursor #N', desc: '스키마·파라미터·바인드 타입 등이 달라서 실행 계획이 바뀔 때 추가로 붙어요.' },
     ],
-    childCursorNote: 'Child Cursor가 너무 많이 생기는 현상(Version Count 급증)은 Hard Parse가 폭증하고 있다는 신호예요. V$SQL의 VERSION_COUNT 컬럼으로 확인할 수 있어요.',
+    childCursorNote: 'Child Cursor가 너무 많이 생기는 현상(Version Count 급증)은 커서가 제대로 공유되지 못하고 있다는 신호예요. V$SQLAREA의 VERSION_COUNT 컬럼으로 개수를, V$SQL_SHARED_CURSOR로 공유되지 못한 이유를 확인할 수 있어요.',
 
     // ── Bind variables ──
     bindTitle: '바인드 변수와 Shared Pool',
@@ -84,9 +84,9 @@ const T = {
 SELECT * FROM employees WHERE employee_id = 100;
 SELECT * FROM employees WHERE employee_id = 101;
 SELECT * FROM employees WHERE employee_id = 102;`,
-    bindGoodSql: `-- Soft Parse 2번 재사용 (바인드 변수로 통일)
+    bindGoodSql: `-- Hard Parse는 처음 1번뿐 (바인드 변수로 통일)
 SELECT * FROM employees WHERE employee_id = :id;
--- :id = 100 → Soft Parse
+-- :id = 100 → Hard Parse (처음 한 번만)
 -- :id = 101 → Soft Parse
 -- :id = 102 → Soft Parse`,
     bindNote: '리터럴 값(100, 101, 102)이 SQL 안에 그대로 들어가면 Oracle은 각각을 완전히 다른 SQL로 보고 매번 Hard Parse해요. 바인드 변수로 바꾸면 SQL 텍스트가 항상 같아지니까 처음 한 번만 Hard Parse하고 그 이후는 전부 Soft Parse로 재사용할 수 있어요.',
@@ -99,14 +99,14 @@ SELECT * FROM employees WHERE employee_id = :id;
 SELECT /*+ RESULT_CACHE */ dept_id, COUNT(*) AS cnt
 FROM   employees
 GROUP  BY dept_id;`,
-    resultCacheNote: 'RESULT_CACHE_MODE = FORCE로 설정하면 모든 쿼리에 자동으로 적용돼요. V$RESULT_CACHE_OBJECTS 뷰에서 캐시 현황을 확인할 수 있어요.',
+    resultCacheNote: '기본값(RESULT_CACHE_MODE = MANUAL)에서는 힌트를 준 쿼리만 캐시돼요. FORCE로 바꾸면 가능한 모든 쿼리에 자동으로 적용돼요. V$RESULT_CACHE_OBJECTS 뷰에서 캐시 현황을 확인할 수 있어요.',
 
     // ── Parameters ──
     paramsTitle: '주요 파라미터',
     params: [
       { name: 'SHARED_POOL_SIZE', desc: 'Shared Pool 전체 크기예요. ASMM(SGA_TARGET 설정) 환경에서는 Oracle이 자동으로 조정해 줘요.' },
-      { name: 'SHARED_POOL_RESERVED_SIZE', desc: '예약 풀 크기예요. 보통 SHARED_POOL_SIZE의 10~30% 정도로 설정해요.' },
-      { name: 'RESULT_CACHE_MODE', desc: 'Result Cache 동작 방식이에요. OFF(기본) / MANUAL(힌트 사용) / FORCE(항상 캐시) 중 하나를 고를 수 있어요.' },
+      { name: 'SHARED_POOL_RESERVED_SIZE', desc: '예약 풀 크기예요. 기본값은 SHARED_POOL_SIZE의 5%예요.' },
+      { name: 'RESULT_CACHE_MODE', desc: 'Result Cache 동작 방식이에요. MANUAL(기본값 — RESULT_CACHE 힌트를 준 쿼리만 캐시)과 FORCE(가능한 모든 쿼리를 캐시) 중 하나를 골라요.' },
     ],
 
     // ── Summary ──
@@ -156,7 +156,7 @@ GROUP  BY dept_id;`,
     ],
 
     softTitle: 'Soft Parse — SQL already in the cache',
-    softDesc: 'When the Library Cache contains a matching SQL, Oracle skips steps 1–3 and reuses the stored cursor directly. CPU cost is negligible.',
+    softDesc: 'When the Library Cache contains a matching SQL, Oracle still performs the lightweight syntax and semantic checks but skips the expensive step 3 (optimization) and reuses the stored cursor. CPU cost is far lower.',
     softNote: 'For a Soft Parse to occur, the SQL text must match exactly — including case, whitespace, and line breaks. "SELECT * FROM EMP" and "select * from emp" are treated as different statements, each triggering its own Hard Parse.',
 
     sharedPrivateTitle: 'Shared SQL Area vs Private SQL Area',
@@ -175,7 +175,7 @@ GROUP  BY dept_id;`,
       { label: 'Child Cursor #0', desc: 'The execution plan created by the first Hard Parse. In most cases this is the only child.' },
       { label: 'Child Cursor #N', desc: 'Added when schema, parameters, or bind types differ enough to require a separate execution plan.' },
     ],
-    childCursorNote: 'A rapidly growing child cursor count (high Version Count) is a signal of Hard Parse storms. Check V$SQL.VERSION_COUNT to diagnose.',
+    childCursorNote: 'A rapidly growing child cursor count (high Version Count) is a signal that cursors are not being shared. Check V$SQLAREA.VERSION_COUNT for the count and V$SQL_SHARED_CURSOR for the reason.',
 
     bindTitle: 'Bind Variables and the Shared Pool',
     bindDesc: 'To use the Shared Pool efficiently, use bind variables (:v1, :p1, etc.).',
@@ -185,7 +185,7 @@ SELECT * FROM employees WHERE employee_id = 101;
 SELECT * FROM employees WHERE employee_id = 102;`,
     bindGoodSql: `-- 1 Hard Parse, then Soft Parse for every subsequent call
 SELECT * FROM employees WHERE employee_id = :id;
--- :id = 100 → Soft Parse
+-- :id = 100 → Hard Parse (first time only)
 -- :id = 101 → Soft Parse
 -- :id = 102 → Soft Parse`,
     bindNote: 'Literal values embedded in SQL (100, 101, 102) cause Oracle to treat each as a distinct statement, triggering a Hard Parse every time. Switching to a bind variable makes the SQL text identical, so only the first execution Hard Parses — all subsequent calls are Soft Parses.',
@@ -202,8 +202,8 @@ GROUP  BY dept_id;`,
     paramsTitle: 'Key Parameters',
     params: [
       { name: 'SHARED_POOL_SIZE', desc: 'Total Shared Pool size. Auto-tuned when ASMM is active (SGA_TARGET set).' },
-      { name: 'SHARED_POOL_RESERVED_SIZE', desc: 'Reserved Pool size. Typically 10–30% of SHARED_POOL_SIZE.' },
-      { name: 'RESULT_CACHE_MODE', desc: 'Result Cache behavior: OFF (default) / MANUAL (use hint) / FORCE (always cache).' },
+      { name: 'SHARED_POOL_RESERVED_SIZE', desc: 'Reserved Pool size. Defaults to 5% of SHARED_POOL_SIZE.' },
+      { name: 'RESULT_CACHE_MODE', desc: 'Result Cache behavior: MANUAL (default — only queries with the RESULT_CACHE hint) or FORCE (cache every eligible query).' },
     ],
 
     summaryTitle: 'Shared Pool — Key Takeaways',
@@ -424,7 +424,7 @@ function SharedPrivateSection({ lang }: { lang: 'ko' | 'en' }) {
             fill="var(--color-rail)" stroke="var(--color-purple)" strokeWidth={1} />
           <text x={BLOCK_X + BLOCK_W / 2} y={BLOCK_Y3 + 17} fontFamily="var(--font-sans-active)" fontSize={8}
             fontWeight="bold" fill="var(--color-purple)" textAnchor="middle">
-            {isKo ? 'Optimization Info' : 'Optimization Info'}
+            {'Optimization Info'}
           </text>
 
           {/* ── PGA boxes + Private SQL Areas ── */}
@@ -460,7 +460,7 @@ function SharedPrivateSection({ lang }: { lang: 'ko' | 'en' }) {
                   fontWeight="bold" fill="var(--color-blue)" textAnchor="middle">{t.privateAreaLabel}</text>
                 <text x={PRIV_X + PRIV_W / 2} y={privY + 25} fontFamily="var(--font-sans-active)" fontSize={7}
                   fill="var(--color-blue)" textAnchor="middle">
-                  {isKo ? 'bind vars · exec state' : 'bind vars · exec state'}
+                  {'bind vars · exec state'}
                 </text>
 
                 {/* Arrow from Private → Shared */}
@@ -544,7 +544,7 @@ function ChildCursorSection({ lang }: { lang: 'ko' | 'en' }) {
     { x: 24,  label: 'Child #0', color: 'var(--color-purple)', bg: 'var(--color-rail)', border: 'var(--color-purple)', desc: isKo ? '기본 실행 계획' : 'default plan' },
     { x: 200, label: 'Child #1', color: 'var(--color-blue)', bg: 'var(--color-rail)', border: 'var(--color-blue)', desc: isKo ? '다른 스키마' : 'diff schema' },
     { x: 376, label: 'Child #2', color: 'var(--color-green)', bg: 'var(--color-line)', border: 'var(--color-green)', desc: isKo ? '다른 파라미터' : 'diff params' },
-    { x: 490, label: 'Child #N', color: 'var(--color-red)', bg: 'var(--color-rail)', border: 'var(--color-red)', desc: isKo ? '…' : '…' },
+    { x: 490, label: 'Child #N', color: 'var(--color-red)', bg: 'var(--color-rail)', border: 'var(--color-red)', desc: '…' },
   ]
 
   return (
@@ -572,7 +572,7 @@ function ChildCursorSection({ lang }: { lang: 'ko' | 'en' }) {
             fontWeight="bold" fill="var(--color-purple)" textAnchor="middle">Parent Cursor</text>
           <text x={PAR_X + PAR_W / 2} y={PAR_Y + 32} fontFamily="var(--font-sans-active)" fontSize={7.5}
             fill="var(--color-purple)" textAnchor="middle">
-            {isKo ? '"SELECT * FROM emp WHERE …"' : '"SELECT * FROM emp WHERE …"'}
+            {'"SELECT * FROM emp WHERE …"'}
           </text>
 
           {/* Lines from parent to each child */}
@@ -610,7 +610,7 @@ function ChildCursorSection({ lang }: { lang: 'ko' | 'en' }) {
           {/* VERSION_COUNT label */}
           <text x={W - 12} y={CHILD_Y + CHILD_H / 2 + 4} fontFamily="var(--font-sans-active)" fontSize={7.5}
             fill="var(--color-ink-2)" textAnchor="end">
-            {isKo ? '→ VERSION_COUNT (V$SQL)' : '→ VERSION_COUNT (V$SQL)'}
+            → VERSION_COUNT (V$SQLAREA)
           </text>
         </svg>
       </div>

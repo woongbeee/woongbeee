@@ -14,9 +14,9 @@ import { OptimizerSimulator } from './simulator/OptimizerSimulator'
 
 const LANDING_ITEMS = {
   ko: [
-    { icon: <IconBolt size={20} stroke={1.5} />, title: 'Query Transformer', desc: '의미는 같지만 더 효율적인 형태로 쿼리를 변환합니다.' },
-    { icon: <IconBolt size={20} stroke={1.5} />, title: 'Estimator', desc: '통계 기반으로 선택도·카디널리티·비용을 수치로 추정합니다.' },
-    { icon: <IconBolt size={20} stroke={1.5} />, title: 'Plan Generator', desc: '가능한 모든 조합을 탐색해 최저 비용 실행 계획을 선택합니다.' },
+    { icon: <IconBolt size={20} stroke={1.5} />, title: 'Query Transformer', desc: '의미는 같지만 더 효율적인 형태로 쿼리를 변환해요.' },
+    { icon: <IconBolt size={20} stroke={1.5} />, title: 'Estimator', desc: '통계 기반으로 선택도·카디널리티·비용을 수치로 추정해요.' },
+    { icon: <IconBolt size={20} stroke={1.5} />, title: 'Plan Generator', desc: '여러 조합을 탐색해 최저 비용 실행 계획을 선택해요.' },
   ],
   en: [
     { icon: <IconBolt size={20} stroke={1.5} />, title: 'Query Transformer', desc: 'Rewrites queries into a semantically equivalent but more efficient form.' },
@@ -47,7 +47,7 @@ export function OptimizerChapterPage({ sectionId }: { sectionId: string }) {
         icon={<IconBolt size={36} stroke={1.5} className="text-amber" />}
         title={isKo ? '옵티마이저 원리' : 'Optimizer Principles'}
         subtitle={isKo
-          ? 'Oracle CBO가 어떻게 통계를 수집하고 최적의 실행 계획을 생성하는지 학습합니다. 왼쪽 목차에서 섹션을 선택하세요.'
+          ? 'Oracle CBO가 어떻게 통계를 수집하고 최적의 실행 계획을 생성하는지 학습해요. 왼쪽 목차에서 섹션을 선택하세요.'
           : "Learn how Oracle's CBO collects statistics and generates optimal execution plans. Select a section from the left TOC."}
       />
       <div className="mt-4">

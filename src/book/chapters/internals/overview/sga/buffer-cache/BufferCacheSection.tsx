@@ -43,7 +43,7 @@ const T = {
     modesTitle: '버퍼 액세스 모드',
     modesDesc: 'Oracle은 두 가지 방식으로 버퍼에 접근해요.',
     scnNote:
-      'SCN(System Change Number, 시스템 변경 번호)은 Oracle이 트랜잭션 순서를 기록하는 타임스탬프 같은 번호예요. 변경이 일어날 때마다 1씩 올라가며, "이 시점에 커밋된 데이터"를 정확히 특정하는 데 써요. 자세한 내용은 뒤에서 다뤄요.',
+      'SCN(System Change Number, 시스템 변경 번호)은 Oracle이 트랜잭션 순서를 기록하는 타임스탬프 같은 번호예요. 계속 커지기만 하는 숫자라서, "이 시점에 커밋된 데이터"를 정확히 특정하는 데 써요. 자세한 내용은 뒤에서 다뤄요.',
     modeCurrent: 'Current Mode (db block get)',
     modeCurrentDesc:
       'DML이 블록을 직접 수정하기 위해 Buffer Cache에서 블록을 가져오는 방식이에요. "현재 버전"이라는 뜻은 미커밋 데이터를 반환한다는 의미가 아니라, 물리적 블록 자체를 잠그고 그 위에 변경을 쓴다는 의미예요. Dirty Read와는 전혀 달라요.',
@@ -75,20 +75,17 @@ const T = {
       'LRU 리스트는 Hot End(자주 접근)와 Cold End(드물게 접근) 두 쪽으로 나뉘어요. 새로 올라온 블록은 Hot End와 Cold End 사이의 경계인 midpoint에 삽입돼요. 접근할 때마다 Touch Count가 올라가고, 임계값(기본 2)을 넘으면 Hot End로 승격돼요. 3초 이내 재접근은 카운트하지 않으며, 전체 테이블 스캔 시에도 동일하게 midpoint에 삽입해서 Hot End의 중요 블록이 밀려나지 않도록 해요.',
     touchTitle: 'Touch Count 규칙',
     touchRule1: '동일 블록 접근 시 Touch Count +1',
-    touchRule2: '단, 3초 이내 재접근은 카운트 안 해요 (Pin 상태)',
+    touchRule2: '단, 3초 이내 재접근은 카운트 안 해요',
     touchRule3: 'Touch Count ≥ 임계값 → Hot End로 이동',
     touchRule4: 'Full Table Scan → Cold End 중간 삽입 (중요 블록 보호)',
 
     poolsTitle: 'Buffer Pool 구성',
     poolsDesc:
       'Database Buffer Cache는 하나 이상의 Buffer Pool로 구성돼요. 각 Pool은 독립된 LRU 리스트를 가져요.',
-    poolDefault: 'Default Pool',
     poolDefaultDesc:
       '모든 버퍼가 기본으로 올라오는 Pool이에요. DB_CACHE_SIZE 파라미터로 크기를 설정해요.',
-    poolKeep: 'Keep Pool',
     poolKeepDesc:
       '자주 접근하는 작은 테이블·인덱스를 상주시키는 Pool이에요. LRU에 의해 밀려나지 않게 보호해요. DB_KEEP_CACHE_SIZE로 설정해요.',
-    poolRecycle: 'Recycle Pool',
     poolRecycleDesc:
       '크고 거의 재사용되지 않는 세그먼트를 위한 Pool이에요. 빠르게 재활용해서 Default Pool을 보호해요. DB_RECYCLE_CACHE_SIZE로 설정해요.',
     poolNonStd: '비표준 블록 크기 Pool',
@@ -102,9 +99,9 @@ const T = {
     fullScanP1:
       '작은 테이블의 Full Scan: Cold End 중간에 삽입해요. 빠르게 재접근할 가능성이 있어서 Cache에 올려둬요.',
     fullScanP2:
-      '큰 테이블의 Full Scan: Oracle이 임계값(DB_FILE_MULTIBLOCK_READ_COUNT × Block size)을 초과하는 세그먼트에 대해 Direct Path Read를 수행해요. Buffer Cache를 완전히 건너뛰고 PGA로 직접 읽어서 캐시를 오염시키지 않아요.',
+      '큰 테이블의 Full Scan: 세그먼트가 Buffer Cache 크기에 비해 충분히 크다고 판단되면 Oracle이 Direct Path Read를 선택할 수 있어요(기준은 버전마다 다른 내부 임계값이에요). Buffer Cache를 완전히 건너뛰고 PGA로 직접 읽어서 캐시를 오염시키지 않아요.',
     fullScanNote:
-      'Direct Path Read는 11g부터 직렬 Full Scan에도 자동으로 적용돼요. V$SQL_PLAN의 access 항목에서 direct path read 이벤트를 확인할 수 있어요.',
+      'Direct Path Read는 11g부터 직렬 Full Scan에도 자동으로 적용될 수 있어요. V$SESSION_EVENT나 V$SYSTEM_EVENT에서 direct path read 대기 이벤트로 확인할 수 있어요.',
 
     paramsTitle: '주요 파라미터',
     param1: 'DB_CACHE_SIZE',
@@ -130,7 +127,7 @@ const T = {
       {
         ids: ['redo-buffer'] as ArchComponentId[],
         title: 'Redo 항목 생성',
-        desc: '블록 수정과 동시에 변경 내용(Before/After Image)을 담은 Redo 항목이 Redo Log Buffer에 기록돼요. 이 기록이 있어야 장애 시 복구가 가능해요.',
+        desc: '블록 수정과 동시에 변경 내용(Change Vector, 변경 벡터)을 담은 Redo 항목이 Redo Log Buffer에 기록돼요. 이 기록이 있어야 장애 시 복구가 가능해요.',
       },
       {
         ids: ['ckpt', 'dbwr'] as ArchComponentId[],
@@ -234,13 +231,10 @@ const T = {
     poolsTitle: 'Buffer Pool Structure',
     poolsDesc:
       'The Database Buffer Cache can consist of one or more Buffer Pools, each with its own independent LRU list.',
-    poolDefault: 'Default Pool',
     poolDefaultDesc:
       'The pool where all buffers land by default. Sized with DB_CACHE_SIZE. Auto-managed under ASMM.',
-    poolKeep: 'Keep Pool',
     poolKeepDesc:
       'Keeps frequently accessed small tables and indexes in memory, protecting them from LRU eviction. Sized with DB_KEEP_CACHE_SIZE.',
-    poolRecycle: 'Recycle Pool',
     poolRecycleDesc:
       'For large segments that are rarely reused. Recycles quickly to protect the Default Pool. Sized with DB_RECYCLE_CACHE_SIZE.',
     poolNonStd: 'Non-Standard Block Size Pools',
@@ -254,9 +248,9 @@ const T = {
     fullScanP1:
       'Small table full scan: blocks are inserted at the Cold End midpoint — they may be accessed again soon, so they stay in cache.',
     fullScanP2:
-      'Large table full scan: for segments exceeding a threshold (DB_FILE_MULTIBLOCK_READ_COUNT × block size), Oracle performs a Direct Path Read. It reads directly into the PGA, bypassing the Buffer Cache entirely — no cache pollution.',
+      'Large table full scan: when the segment is large relative to the Buffer Cache, Oracle may choose a Direct Path Read (the cut-off is an internal, version-dependent threshold). It reads directly into the PGA, bypassing the Buffer Cache entirely — no cache pollution.',
     fullScanNote:
-      'Since 11g, Direct Path Read can be applied automatically to serial full scans. Check V$SQL_PLAN for "direct path read" wait events.',
+      'Since 11g, Direct Path Read can be applied automatically to serial full scans. Look for the "direct path read" wait event in V$SESSION_EVENT or V$SYSTEM_EVENT.',
 
     paramsTitle: 'Key Parameters',
     param1: 'DB_CACHE_SIZE',

@@ -39,7 +39,7 @@ const USER_TONES: (keyof typeof TONE)[] = ['blue', 'green', 'amber', 'purple']
 const T = {
   ko: {
     hero: '오라클이란?',
-    heroSub: '세계에서 가장 널리 쓰이는 관계형 데이터베이스, Oracle을 소개합니다.',
+    heroSub: '세계에서 가장 널리 쓰이는 관계형 데이터베이스, Oracle을 소개해요.',
 
     whatIsDbTitle: '데이터베이스란 무엇인가?',
     whatIsDb:
@@ -105,7 +105,7 @@ const T = {
     ],
 
     usersTitle: '어떤 회사들이 Oracle을 쓰고 있을까?',
-    usersSub: '글로벌 Fortune 500 기업의 98%가 Oracle 제품을 사용합니다.',
+    usersSub: '글로벌 Fortune 500 기업의 98%가 Oracle 제품을 사용해요.',
     userCards: [
       {
         org: '삼성·현대·LG',

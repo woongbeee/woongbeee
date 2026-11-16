@@ -79,8 +79,6 @@ AND    t1.c1 > 1;`,
       'Antijoin (안티조인) — NOT EXISTS / NOT IN 변환에서 오른쪽 테이블이 공통인 경우',
       'Semijoin (세미조인) — EXISTS / IN 변환에서 오른쪽 테이블이 공통인 경우',
     ],
-
-    summaryTitle: 'Join Factorization 핵심 정리',
     summaryItems: [
       'UNION ALL 브랜치에서 공통 테이블을 인수분해해서 반복 스캔을 없애요.',
       '비용 기반 결정 — 변환이 유리할 때만 적용해요.',
@@ -154,8 +152,6 @@ AND    t1.c1 > 1;`,
       'Antijoins — right-side tables in NOT EXISTS / NOT IN rewrites',
       'Semijoins — right-side tables in EXISTS / IN rewrites',
     ],
-
-    summaryTitle: 'Join Factorization Key Takeaways',
     summaryItems: [
       'Factors out common tables from UNION ALL branches, eliminating repetitive large table scans.',
       'Cost-based decision — applied only when it reduces the overall cost.',

@@ -23,7 +23,6 @@ const T = {
     chapterTitle: 'DML — Data Manipulation Language',
     chapterSubtitle:
       '데이터를 조회·삽입·수정·삭제하는 가장 기본적인 명령어인 SELECT, FROM, WHERE, INSERT, UPDATE, DELETE를 알아봐요.',
-    clauseTitle: '핵심 절(Clause) 정리',
     clauses: [
       {
         kw: 'SELECT',
@@ -104,7 +103,7 @@ const T = {
       ['OR', '적힌 조건들 중 하나라도 참', 'dept_id = 10 OR dept_id = 30'],
     ],
     whereNullTip:
-      "NULL은 값이 없음을 나타내는 특수한 상태예요. 0이나 빈 문자열('')과는 달라요. NULL과의 비교는 항상 UNKNOWN이 되기 때문에 = NULL이나 != NULL은 동작하지 않아요. NULL 여부를 확인할 때는 반드시 IS NULL / IS NOT NULL을 사용하세요.",
+      "NULL은 값이 없음을 나타내는 특수한 상태예요. 숫자 0과는 달라요. 다만 Oracle에서는 길이가 0인 빈 문자열('')도 NULL로 취급해요. NULL과의 비교는 항상 UNKNOWN이 되기 때문에 = NULL이나 != NULL은 동작하지 않아요. NULL 여부를 확인할 때는 반드시 IS NULL / IS NOT NULL을 사용하세요.",
     insertTitle: 'INSERT — 데이터 삽입',
     insertDesc:
       'INSERT는 테이블에 새 행을 추가해요. 모든 컬럼에 값을 채울 수도 있고, 컬럼명을 지정해서 일부만 채울 수도 있어요.',
@@ -142,7 +141,6 @@ VALUES (2, 'Bob', 20);`,
     chapterTitle: 'Core Syntax — SELECT / FROM / WHERE',
     chapterSubtitle:
       'Learn the most fundamental commands for querying, modifying, and deleting data — SELECT, FROM, WHERE, UPDATE, and DELETE.',
-    clauseTitle: 'Key Clause Reference',
     clauses: [
       {
         kw: 'SELECT',
@@ -234,7 +232,7 @@ VALUES (2, 'Bob', 20);`,
       ],
     ],
     whereNullTip:
-      "What is NULL? — NULL represents the absence of a value. It is not the same as 0 or an empty string (''). Any comparison with NULL evaluates to UNKNOWN, so = NULL and != NULL do not work. Always use IS NULL / IS NOT NULL to check for NULL.",
+      "What is NULL? — NULL represents the absence of a value. It is not the same as 0. Note that Oracle treats a zero-length string ('') as NULL. Any comparison with NULL evaluates to UNKNOWN, so = NULL and != NULL do not work. Always use IS NULL / IS NOT NULL to check for NULL.",
     insertTitle: 'INSERT — Adding Data',
     insertDesc:
       'INSERT adds a new row to a table. You can supply values for every column, or specify column names to fill in only some of them.',

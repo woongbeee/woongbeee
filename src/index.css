@@ -1,8 +1,5 @@
 @import "tailwindcss";
 @import "./styles/tokens.css";
-@import "tw-animate-css";
-
-@custom-variant dark (&:is(.dark *));
 
 /* ============================================================================
    구조 규칙만.  색·폰트 값은 전부 src/styles/tokens.css 에 있다.

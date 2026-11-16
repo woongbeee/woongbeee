@@ -360,7 +360,6 @@ SVG 레이아웃 상수는 **의존 관계 순서대로** 선언한다 — 버�
 - `framer-motion` — 시뮬레이션 애니메이션 (화살표, 컴포넌트 하이라이트 전환)
 - `@tabler/icons-react` — **기본 아이콘 라이브러리**. `ChapterTitle`은 `size={36}`, `ConceptGrid`·데이터 배열 내 아이콘은 `size={20}`, 인라인 소형 아이콘은 `size={16}`. 모두 `stroke={1.5}` 기본값 사용
 - `lucide-react` — 일부 구형 컴포넌트에서 잔존. **새 코드에서는 Tabler 사용**
-- `@base-ui/react` + `shadcn` — UI 컴포넌트 기반
 - `tailwindcss` v4 — CSS-first 설정 방식 (`@import "tailwindcss"` in `index.css`)
 - `react-scan` — 개발 전용 렌더링 성능 모니터. `main.tsx`에서 `import.meta.env.DEV`일 때만 동적 import → 프로덕션 번들 미포함. 정적 import로 되돌리지 말 것
 
@@ -374,13 +373,13 @@ SVG 레이아웃 상수는 **의존 관계 순서대로** 선언한다 — 버�
   - **§2c** — 목표 디자인 시스템(Claude Design 캔버스 "Database Learning Book", **다크 우선**): `--color-accent`, `--color-ok|warn|danger|info|coral`, `--color-data-1..8`, `--color-code-*`, `--radius-chip|btn|card|hero`(Tailwind 기본 `--radius-*` 안 건드림), 테마 종속 `--color-canvas|surface|chrome|ink|ink-muted|line|line-strong|chip|field|hover|track|thead`. **아직 소비처 없음** — Phase 2에서 연결.
   - **§3** — `:root[data-theme="light"]`가 §2c 서피스 토큰을 라이트로 override.
 - **`src/lib/theme.tsx`** (구 `theme.ts` — JSX 아이콘 때문에 `.tsx`) — 색을 다루는 **유일한 TS 매핑 모듈**: `AccentColor`(챕터 색 키 타입), `INFOBOX_VARIANT`+`INFOBOX_LEGACY_COLOR`, `DIAGRAM`/`DATA_PALETTE`/`CODE`(SVG용 `var(--color-*)` 문자열 — Phase 3 이관용, 아직 소비처 없음). importer: `shared.tsx`, `bookStructure.tsx`.
-- **`src/index.css`** — `@import` 3줄(tailwindcss, `./styles/tokens.css`, tw-animate-css) + 구조 규칙(`body`, `#root`, `.react-flow__*` 오버라이드)만. React Flow 커스텀은 여기 `.react-flow__*` 셀렉터에만.
+- **`src/index.css`** — `@import` 2줄(tailwindcss, `./styles/tokens.css`) + 구조 규칙(`body`, `#root`, `.react-flow__*` 오버라이드)만. React Flow 커스텀은 여기 `.react-flow__*` 셀렉터에만.
 - **폰트** — UI/제목/라벨: KO=`Noto Sans KR`, EN=`Inter`. 장문 본문: KO=`Noto Sans KR`, EN=`Newsreader`(세리프). 코드·수치·표·뱃지: `JetBrains Mono`. `index.html`의 Google Fonts `<link>`로 로드. 원본 스택은 `tokens.css`의 `--font-ui-ko`/`--font-ui-en`/`--font-read-ko`/`--font-read-en`/`--font-mono-stack`(`:root`, `@theme` 밖)에 정의되고, `@theme` 블록 안의 `--font-sans`/`--font-read`/`--font-mono`가 그 값을 재참조해서 Tailwind `font-sans`/`font-read`/`font-mono` 유틸을 생성한다. `App.tsx`가 `<html lang>`을 `useLangStore`와 동기화 → `:root:lang(en)`이 `--font-sans-active`/`--font-read-active` 스왑.
   - **폰트가 중첩으로 덮이지 않게:** `InfoBox`·`Prose`처럼 `font-read`를 가진 컨테이너 안에 `<pre className="font-mono">` 등으로 문장을 감싸지 말 것 (본문 폰트가 mono로 덮임). 줄바꿈이 필요하면 `<div className="whitespace-pre-line">`. `font-mono`는 코드·수치·뱃지 전용 — 설명 문장은 `font-sans`/`font-read`.
   - SVG `fontFamily`는 `"var(--font-mono)"`/`"var(--font-sans-active)"`만. 일반 `"monospace"` 금지 (JetBrains Mono가 적용되지 않음).
   - mono 스택은 `'JetBrains Mono', 'Noto Sans KR', …` — JetBrains Mono에 한글이 없어 한글은 Noto Sans KR로 폴백된다.
   - ⚠ **`@theme` 안에서 변수를 자기 자신으로 참조하지 말 것** (`--font-mono: var(--font-mono);` 같은 패턴) — CSS 커스텀 프로퍼티 순환으로 간주되어 guaranteed-invalid 처리되고, 해당 Tailwind 유틸 전체가 조용히 브라우저 기본값으로 폴백된다. 실제 값은 항상 다른 이름의 변수(`-active`/`-stack` 접미사 등)에 두고 `@theme`에서는 그 이름을 참조한다.
-- shadcn 스타일 프리셋: `base-nova` (`components.json`).
+- shadcn 컴포넌트(`src/components/ui/`)와 `@base-ui/react`·`class-variance-authority`·`tw-animate-css`는 쓰는 곳이 없어 제거됨. `components.json`만 남아 있다(다시 쓸 때는 의존성부터 설치). `dark:` variant도 없음 — 테마는 `[data-theme]` 토큰으로만 바뀐다.
 
 **진행 상태:** 디자인 리팩터링 Phase 0/1 완료(토큰 구조·`shared.tsx` 배선·폰트 교체). **앱 화면은 아직 라이트로 렌더**되고(`body`가 shadcn HSL 참조), 다크 우선 전환·`body`↔`--color-*` 연결·2,500여 클래스 이관·테마 토글은 **Phase 2+** (`DESIGN.md §7·§9`).
 

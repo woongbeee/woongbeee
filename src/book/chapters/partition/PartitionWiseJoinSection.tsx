@@ -19,12 +19,12 @@ const T = {
 
     whatTitle: 'Partition-Wise Join이란?',
     whatDesc:
-      '일반 조인은 두 테이블 전체를 대상으로 조인 연산을 수행해요. Partition-Wise Join은 두 테이블이 동일한 파티션 키로 파티셔닝되어 있을 때, 대응하는 파티션 1번끼리, 2번끼리만 독립적으로 조인해요.\n\n예를 들어 orders 테이블과 order_items 테이블이 모두 order_date로 Range 파티셔닝되어 있으면, 2024년 파티션끼리만, 2023년 파티션끼리만 조인해요. 다른 파티션은 전혀 접근하지 않아요.\n\nPartition-Wise Join의 가장 큰 장점은 대용량 Hash Join에서 Sort/Merge에 필요한 메모리와 temp 공간을 파티션 크기만큼만 사용한다는 점이에요.',
+      '일반 조인은 두 테이블 전체를 대상으로 조인 연산을 수행해요. Partition-Wise Join은 두 테이블이 동일한 파티션 키로 파티셔닝되어 있을 때, 대응하는 파티션 1번끼리, 2번끼리만 독립적으로 조인해요.\n\n예를 들어 orders 테이블과 order_items 테이블이 모두 order_date로 Range 파티셔닝되어 있으면, 2024년 파티션끼리만, 2023년 파티션끼리만 조인해요. 다른 파티션은 전혀 접근하지 않아요.\n\nPartition-Wise Join의 가장 큰 장점은 대용량 Hash Join이나 Sort Merge Join에 필요한 메모리와 temp 공간을 파티션 크기만큼만 사용한다는 점이에요.',
 
     typesTitle: 'Full vs Partial Partition-Wise Join',
     typesTable: [
       ['Full PWJ', '두 테이블 모두 동일한 파티션 키와 파티션 수로 파티셔닝', '가장 효율적. 파티션 단위로 독립 조인.'],
-      ['Partial PWJ', '한 테이블만 파티셔닝되거나 키가 다른 경우', '파티셔닝된 쪽을 기준으로 드라이빙 조인. Full보다 효율 낮음.'],
+      ['Partial PWJ', '한 테이블만 파티셔닝되거나 키가 다른 경우', '파티셔닝되지 않은(또는 키가 다른) 쪽의 행을 조인 키 기준으로 실행 중에 다시 나눠서 상대 파티션에 맞춰요. 병렬 실행에서만 동작하고 Full보다 효율이 낮아요.'],
     ],
 
     condTitle: 'Full PWJ 성립 조건',
@@ -72,7 +72,7 @@ PARTITION BY RANGE (order_date) (
 -- 조인 쿼리 (Partition-Wise Join 자동 적용)
 SELECT o.order_id, o.customer_id, SUM(i.quantity * i.unit_price)
 FROM   orders      o
-JOIN   order_items i ON o.order_id = o.order_id
+JOIN   order_items i ON o.order_id = i.order_id
                     AND o.order_date = i.order_date  -- 파티션 키 조인 조건 포함
 GROUP BY o.order_id, o.customer_id;`,
 
@@ -99,7 +99,7 @@ GROUP BY o.order_id, o.customer_id;`,
 
     planTitle: '실행 계획에서 PWJ 확인',
     planDesc:
-      'Partition-Wise Join은 실행 계획에 PARTITION HASH JOIN 또는 PARTITION RANGE JOIN으로 표시돼요.',
+      'Partition-Wise Join이면 실행 계획에서 PARTITION RANGE ALL(또는 PARTITION HASH ALL) 같은 파티션 반복 오퍼레이션이 조인 위에 나타나요. 조인이 파티션 반복 안쪽에 들어 있으면 파티션 쌍끼리 조인한다는 뜻이에요.',
     planSql: `-- 실행 계획 확인
 EXPLAIN PLAN FOR
 SELECT o.order_id, SUM(i.quantity * i.unit_price)
@@ -158,7 +158,7 @@ GROUP BY o.order_id;`,
     typesTitle: 'Full vs Partial Partition-Wise Join',
     typesTable: [
       ['Full PWJ', 'Both tables have the same partition key and partition count', 'Most efficient. Each partition pair joins independently.'],
-      ['Partial PWJ', 'Only one table is partitioned, or partition keys differ', 'The partitioned table drives the join. Less efficient than Full PWJ.'],
+      ['Partial PWJ', 'Only one table is partitioned, or partition keys differ', 'Rows of the non-partitioned (or differently partitioned) table are redistributed at run time on the join key to match the other table. Parallel execution only; less efficient than Full PWJ.'],
     ],
 
     condTitle: 'Full PWJ Requirements',
@@ -233,7 +233,7 @@ GROUP BY o.order_id, o.customer_id;`,
 
     planTitle: 'Verifying PWJ in the Execution Plan',
     planDesc:
-      'Partition-Wise Join appears in execution plans as PARTITION HASH JOIN or PARTITION RANGE JOIN.',
+      'With a Partition-Wise Join, a partition iterator such as PARTITION RANGE ALL (or PARTITION HASH ALL) appears above the join in the plan. A join nested inside the iterator means partition pairs are joined one by one.',
     planSql: `-- Check execution plan
 EXPLAIN PLAN FOR
 SELECT o.order_id, SUM(i.quantity * i.unit_price)

@@ -44,8 +44,8 @@ PARTITION BY HASH (order_id) (
   PARTITION p4 TABLESPACE ts4
 );
 
--- Hash 파티션 추가 (파티션 전체 재배분 발생)
-ALTER TABLE products ADD PARTITIONS 4;  -- 4개 추가하여 8개로
+-- Hash 파티션 추가 (한 번에 1개씩. 기존 파티션 하나의 행을 새 파티션과 나눠 담아요)
+ALTER TABLE products ADD PARTITION;
 
 -- 파티션 병합 (COALESCE — 파티션 수 줄이기)
 ALTER TABLE products COALESCE PARTITION;`,
@@ -112,8 +112,8 @@ PARTITION BY HASH (order_id) (
   PARTITION p4 TABLESPACE ts4
 );
 
--- Add partitions (triggers full redistribution)
-ALTER TABLE products ADD PARTITIONS 4;  -- adds 4, total becomes 8
+-- Add a hash partition (one at a time; rows of one existing partition are split with the new one)
+ALTER TABLE products ADD PARTITION;
 
 -- Coalesce (reduce partition count)
 ALTER TABLE products COALESCE PARTITION;`,

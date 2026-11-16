@@ -22,7 +22,7 @@ const T = {
     whatTitle: 'SGA가 뭐예요?',
     whatP1: 'Oracle 인스턴스를 시작하면 OS가 메모리의 한 영역을 통째로 Oracle에 넘겨줘요. 이 영역이 SGA(System Global Area)예요. 서버에 접속한 모든 세션과 모든 백그라운드 프로세스가 이 메모리를 함께 써요.',
     whatP2: 'PGA가 "나만 쓰는 방(세션 전용)"이라면 SGA는 "모두가 쓰는 공용 라운지"예요. Buffer Cache, Shared Pool, Redo Log Buffer 같은 Oracle의 핵심 캐시 구조가 모두 SGA 안에 자리잡고 있어요. SGA 크기와 구성 방식은 성능과 직결되기 때문에 DBA가 가장 먼저 튜닝하는 영역이기도 해요.',
-    whatP3: 'Oracle 10g부터는 ASMM(Automatic Shared Memory Management, 자동 공유 메모리 관리)으로 SGA 내부 구성 요소 크기를 자동으로 조정할 수 있고, 12c부터는 SGA와 PGA를 합쳐서 관리하는 AMM(Automatic Memory Management, 자동 메모리 관리)도 지원해요.',
+    whatP3: 'Oracle 10g부터는 ASMM(Automatic Shared Memory Management, 자동 공유 메모리 관리)으로 SGA 내부 구성 요소 크기를 자동으로 조정할 수 있고, 11g부터는 SGA와 PGA를 합쳐서 관리하는 AMM(Automatic Memory Management, 자동 메모리 관리)도 지원해요.',
 
     serverModeTitle: 'Dedicated Server vs RAC — SGA가 달라지는 방식',
     serverModeDesc: '같은 SGA 개념이 서버 구성 방식에 따라 어떻게 달라지는지 살펴봐요.',
@@ -34,7 +34,6 @@ const T = {
     racDesc: '여러 서버(노드)가 동일한 데이터베이스 파일을 공유하는 고가용성 구조예요. 각 노드는 독립적인 인스턴스와 독립적인 SGA를 가져요. 노드 간 데이터 일관성은 GCS/GES 레이어(Cache Fusion)가 네트워크를 통해 유지해요.',
 
     tableHeaders: ['항목', 'Dedicated Server', 'RAC'],
-    tableHeadersEn: ['Item', 'Dedicated Server', 'RAC'],
 
     clickHint: '항목을 클릭하세요',
   },
@@ -45,7 +44,7 @@ const T = {
     whatTitle: 'What is the SGA?',
     whatP1: 'When Oracle starts an instance, the OS hands over a contiguous region of memory entirely to Oracle. That region is the SGA (System Global Area). Every session connected to the server and every background process share this same memory.',
     whatP2: "If PGA is \"your private room,\" then SGA is the \"shared lounge.\" The Buffer Cache, Shared Pool, Redo Log Buffer, and other core Oracle caches all live inside the SGA. Its size and layout directly impact performance — it is typically the first place a DBA tunes.",
-    whatP3: 'Since Oracle 10g, ASMM (Automatic Shared Memory Management) can auto-resize SGA components. From 12c onward, AMM (Automatic Memory Management) can manage the combined SGA + PGA budget automatically.',
+    whatP3: 'Since Oracle 10g, ASMM (Automatic Shared Memory Management) can auto-resize SGA components. From 11g onward, AMM (Automatic Memory Management) can manage the combined SGA + PGA budget automatically.',
 
     serverModeTitle: 'Dedicated Server vs RAC — How the SGA Differs',
     serverModeDesc: 'The same SGA concept behaves differently depending on how the server is configured.',
@@ -57,7 +56,6 @@ const T = {
     racDesc: 'A high-availability architecture where multiple servers (nodes) share the same database files. Each node has its own independent instance and its own SGA. Cross-node data consistency is maintained by the GCS/GES layer (Cache Fusion) over the interconnect network.',
 
     tableHeaders: ['Item', 'Dedicated Server', 'RAC'],
-    tableHeadersEn: ['Item', 'Dedicated Server', 'RAC'],
 
     clickHint: 'Click a component',
   },
@@ -108,8 +106,8 @@ const SGA_COMPONENTS: SgaComponent[] = [
     descKo: '디스크에서 읽어온 데이터 블록(기본 8KB)을 메모리에 보관하는 캐시예요. 같은 블록이 다시 필요할 때 디스크에 가지 않고 메모리에서 바로 꺼내 써요. SGA 안에서 가장 큰 비중을 차지하고, Oracle 성능의 핵심 지표인 Buffer Cache Hit Ratio에 직접 영향을 줘요.',
     descEn: 'A cache that holds data blocks (8 KB by default) read from disk. When the same block is needed again, Oracle serves it from memory instead of hitting disk. It is the largest component in the SGA and directly determines the Buffer Cache Hit Ratio — Oracle\'s most watched performance metric.',
     detailsKo: [
-      { term: 'LRU 알고리즘', desc: '가장 오랫동안 쓰이지 않은 블록을 밀어내고 새 블록이 들어올 공간을 만듭니다.' },
-      { term: 'Dirty Buffer', desc: '메모리에서 수정됐지만 아직 디스크에 쓰이지 않은 블록. DBWn(데이터베이스 라이터)이 이걸 주기적으로 디스크에 씁니다.' },
+      { term: 'LRU 알고리즘', desc: '가장 오랫동안 쓰이지 않은 블록을 밀어내고 새 블록이 들어올 공간을 만들어요.' },
+      { term: 'Dirty Buffer', desc: '메모리에서 수정됐지만 아직 디스크에 쓰이지 않은 블록이에요. DBWn(데이터베이스 라이터)이 적절한 시점에 모아서 디스크에 써요.' },
       { term: 'DB_CACHE_SIZE', desc: 'SGA 내 Buffer Cache 크기를 지정하는 파라미터예요. ASMM을 쓰면 자동으로 조정돼요.', isParam: true },
     ],
     detailsEn: [
@@ -145,12 +143,12 @@ const SGA_COMPONENTS: SgaComponent[] = [
     descEn: 'A circular memory buffer that records data change vectors ("change this value in this block to that value") in sequence. LGWR periodically flushes it to disk, and always flushes it immediately at COMMIT. It is intentionally small and designed for fast sequential writes.',
     detailsKo: [
       { term: 'WAL 원칙', desc: 'Redo Log Buffer가 디스크에 먼저 기록돼야 Buffer Cache의 변경이 유효해요. 로그가 먼저, 데이터가 나중이에요.' },
-      { term: 'Redo Log Buffer Allocation Latch', desc: '버퍼에 항목을 쓸 때 보호하는 래치예요. 경합이 심하면 log buffer space 대기 이벤트가 발생해요.' },
-      { term: 'LOG_BUFFER', desc: 'Redo Log Buffer 크기를 지정하는 파라미터예요. 보통 4MB~16MB. 너무 크면 LGWR(로그 라이터) 지연이 생겨요.', isParam: true },
+      { term: 'Redo Log Buffer Allocation Latch', desc: '버퍼에 Redo 항목이 들어갈 자리를 잡을 때 보호하는 래치예요. 경합이 심하면 "latch: redo allocation" 대기가 늘어나요. (버퍼가 꽉 차서 기다리는 log buffer space와는 다른 대기예요.)' },
+      { term: 'LOG_BUFFER', desc: 'Redo Log Buffer 크기를 지정하는 파라미터예요. 기본값은 플랫폼과 CPU 수에 따라 Oracle이 알아서 정해요.', isParam: true },
     ],
     detailsEn: [
       { term: 'WAL principle', desc: 'The Redo Log Buffer must be flushed to disk before a Buffer Cache change is considered durable.' },
-      { term: 'Redo Log Buffer Allocation Latch', desc: 'Protects writes to the buffer. Contention causes the "log buffer space" wait event.' },
+      { term: 'Redo Log Buffer Allocation Latch', desc: 'Protects space allocation in the buffer. Heavy contention shows up as "latch: redo allocation" waits — not to be confused with "log buffer space", which means the buffer itself is full.' },
       { term: 'LOG_BUFFER', desc: 'Parameter for Redo Log Buffer size. Typically 4–16 MB. Too large delays LGWR flushes.', isParam: true },
     ],
   },
@@ -164,7 +162,7 @@ const SGA_COMPONENTS: SgaComponent[] = [
     detailsKo: [
       { term: 'RMAN(Recovery Manager)', desc: '백업·복구 I/O 버퍼를 Large Pool에서 할당해요. Shared Pool이 오염되는 걸 막아줘요.' },
       { term: '병렬 쿼리 메시지 버퍼', desc: '병렬 실행 서버들끼리 통신할 때 쓰는 메시지 버퍼를 Large Pool에서 할당해요.' },
-      { term: 'LARGE_POOL_SIZE', desc: 'Large Pool 크기를 지정하는 파라미터예요. 설정하지 않으면 Large Pool 자체가 생성되지 않아요.', isParam: true },
+      { term: 'LARGE_POOL_SIZE', desc: 'Large Pool 크기를 지정하는 파라미터예요. 자동 메모리 관리(ASMM)를 쓰지 않는데 이 값을 0으로 두면 Large Pool 자체가 만들어지지 않아요.', isParam: true },
     ],
     detailsEn: [
       { term: 'RMAN', desc: 'Backup and recovery I/O buffers are allocated from the Large Pool, keeping the Shared Pool uncontaminated.' },
@@ -195,8 +193,8 @@ const SGA_COMPONENTS: SgaComponent[] = [
     labelKo: 'Fixed SGA',
     labelEn: 'Fixed SGA',
     tagColor: 'bg-ink-3',
-    descKo: '인스턴스 상태, 백그라운드 프로세스가 서로를 찾는 데 필요한 포인터 등 Oracle 내부적으로만 쓰는 작은 고정 크기 영역이에요. 사용자가 직접 조절할 수 없고, 크기도 아주 작아요(보통 수백 KB 수준).',
-    descEn: 'A small, fixed-size area holding internal bookkeeping — instance state, pointers background processes use to locate each other, and similar bootstrap data. Users cannot resize it directly, and it typically stays only a few hundred KB.',
+    descKo: '인스턴스 상태, 백그라운드 프로세스가 서로를 찾는 데 필요한 포인터 등 Oracle 내부적으로만 쓰는 작은 고정 크기 영역이에요. 사용자가 직접 조절할 수 없고, 크기도 SGA 전체에 비하면 아주 작아요.',
+    descEn: 'A small, fixed-size area holding internal bookkeeping — instance state, pointers background processes use to locate each other, and similar bootstrap data. Users cannot resize it directly, and it is tiny compared with the rest of the SGA.',
     detailsKo: [
       { term: '인스턴스 부팅 정보', desc: '인스턴스가 시작될 때 필요한 내부 상태 값들을 담고 있어요.' },
       { term: '프로세스 간 포인터', desc: '백그라운드 프로세스들이 SGA의 다른 영역을 찾아가는 데 쓰는 내부 포인터가 여기 있어요.' },

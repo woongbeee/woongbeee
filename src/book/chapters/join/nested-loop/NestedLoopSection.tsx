@@ -16,7 +16,7 @@ import { cn } from '@/lib/utils'
 const T = {
   ko: {
     title: 'Nested Loop Join',
-    subtitle: 'Outer 테이블의 각 행마다 Inner 테이블을 반복 탐색하는 조인이에요. Inner 테이블에 선택도 높은 인덱스가 있을 때 가장 효율적이에요.',
+    subtitle: 'Outer 테이블의 각 행마다 Inner 테이블을 반복 탐색하는 조인이에요. Inner 테이블에 조인 키로 소수의 행만 바로 찾아 주는 인덱스가 있을 때 가장 효율적이에요.',
 
     whatTitle: 'Nested Loop Join이란?',
     whatDesc:
@@ -36,9 +36,6 @@ END LOOP`,
     labelOuter: 'OUTER (DEPARTMENTS)',
     labelInner: 'INNER (EMPLOYEES)',
     labelResult: '결과',
-    labelInnerScan: 'Inner 전체 스캔',
-    labelMatch: '매칭',
-    labelNoMatch: '불일치',
     labelSelectOuter: '← Outer 행 선택',
     labelInnerLoop: (cur: number, total: number) => `Inner 스캔 ${cur} / ${total}`,
     btnPrev: '← 이전',
@@ -73,9 +70,6 @@ END LOOP`,
     labelOuter: 'OUTER (DEPARTMENTS)',
     labelInner: 'INNER (EMPLOYEES)',
     labelResult: 'Result',
-    labelInnerScan: 'Full Inner Scan',
-    labelMatch: 'Match',
-    labelNoMatch: 'No match',
     labelSelectOuter: '← Select outer row',
     labelInnerLoop: (cur: number, total: number) => `Inner scan ${cur} / ${total}`,
     btnPrev: '← Prev',
@@ -93,8 +87,8 @@ END LOOP`,
 const hintT = {
   ko: {
     hintTitle: '힌트로 제어하기',
-    hintSql: `-- Nested Loop Join 강제 (d를 inner로)
-SELECT /*+ USE_NL(e d) */ e.last_name, d.department_name
+    hintSql: `-- Nested Loop Join 강제 (LEADING으로 e를 Outer로 정하고, d를 Inner로 NL 조인)
+SELECT /*+ LEADING(e) USE_NL(d) */ e.last_name, d.department_name
 FROM   employees e, departments d
 WHERE  e.department_id = d.department_id;
 
@@ -107,17 +101,16 @@ WHERE  e.department_id = d.department_id;
 SELECT /*+ NO_USE_NL(d) */ e.last_name, d.department_name
 FROM   employees e, departments d
 WHERE  e.department_id = d.department_id;`,
-    summaryTitle: 'Nested Loop Join 핵심 정리',
     summaryItems: [
       'Outer 행마다 Inner 테이블을 처음부터 전체 스캔(또는 인덱스 탐색)해요.',
-      'Inner 테이블에 선택도 높은 인덱스가 있을 때 가장 효율적이에요.',
+      'Inner 테이블에 조인 키로 소수의 행만 바로 찾아 주는 인덱스가 있을 때 가장 효율적이에요.',
       '힌트: USE_NL(테이블) (강제), USE_NL_WITH_INDEX(테이블 인덱스), NO_USE_NL(테이블) (방지).',
     ],
   },
   en: {
     hintTitle: 'Controlling with Hints',
-    hintSql: `-- Force Nested Loop Join (d as inner table)
-SELECT /*+ USE_NL(e d) */ e.last_name, d.department_name
+    hintSql: `-- Force Nested Loop Join (LEADING makes e the outer table; d is joined as the inner table)
+SELECT /*+ LEADING(e) USE_NL(d) */ e.last_name, d.department_name
 FROM   employees e, departments d
 WHERE  e.department_id = d.department_id;
 
@@ -130,7 +123,6 @@ WHERE  e.department_id = d.department_id;
 SELECT /*+ NO_USE_NL(d) */ e.last_name, d.department_name
 FROM   employees e, departments d
 WHERE  e.department_id = d.department_id;`,
-    summaryTitle: 'Nested Loop Join Key Takeaways',
     summaryItems: [
       'For every outer row, the inner table is fully scanned (or probed via index) from the start.',
       'Most efficient when the inner table has a highly selective index on the join column.',
@@ -373,9 +365,7 @@ function NLSimulation({ lang }: { lang: 'ko' | 'en' }) {
                       ? 'border-amber/50 font-bold text-amber'
                       : matched
                         ? 'border-green/50 text-green'
-                        : isPassed
-                          ? 'border-line text-ink-2'
-                          : 'border-line text-ink-2',
+                        : 'border-line text-ink-2',
                   )}
                 >
                   <span className="text-[10px] opacity-60 mr-1">dept_id=</span>

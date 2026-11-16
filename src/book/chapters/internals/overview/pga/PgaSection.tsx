@@ -31,7 +31,7 @@ const T = {
         icon: 'stack',
         color: 'violet' as const,
         label: 'Private SQL Area',
-        desc: '파싱된 SQL과 세션별 실행 정보를 저장하는 영역이에요. Persistent Area(바인드 변수 값)와 Runtime Area(실행 상태)로 나뉩니다.',
+        desc: '파싱된 SQL과 세션별 실행 정보를 저장하는 영역이에요. Persistent Area(바인드 변수 값)와 Runtime Area(실행 상태)로 나뉘어요.',
       },
       {
         icon: 'sort',
@@ -48,10 +48,8 @@ const T = {
     ],
 
     privateSqlTitle: 'Private SQL Area 구조',
-    privateSqlDesc: 'Private SQL Area는 커서(Cursor) 하나가 쓰는 개인 공간으로, 두 부분으로 나뉩니다.',
-    persistentLabel: 'Persistent Area',
+    privateSqlDesc: 'Private SQL Area는 커서(Cursor) 하나가 쓰는 개인 공간으로, 두 부분으로 나뉘어요.',
     persistentDesc: '바인드 변수 값을 저장해요. 커서가 닫혀야 비로소 해제돼요.',
-    runtimeLabel: 'Runtime Area',
     runtimeDesc: '쿼리 실행 상태(지금까지 읽은 행 수, 페치 위치 등)를 저장해요. DML의 경우 실행 첫 단계에서 생성되고, SQL이 닫히면 해제돼요.',
     privateSqlNote: '같은 SQL을 20개 세션이 각각 실행하면, SGA의 Shared SQL Area(실행 계획)는 딱 1개지만 Private SQL Area는 세션마다 1개씩 총 20개가 생겨요. OPEN_CURSORS 파라미터로 클라이언트 하나가 동시에 열 수 있는 Private SQL Area 수를 제한할 수 있어요.',
 
@@ -64,7 +62,7 @@ const T = {
     ],
     workAreaNote: 'PGA_AGGREGATE_TARGET을 설정하면 Work Area 크기를 Oracle이 자동으로 관리해요(자동 PGA 관리). V$SQL_WORKAREA_ACTIVE 뷰로 현재 활성 Work Area 목록을 확인할 수 있어요.',
     spillTitle: 'Work Area 스필(Spill)',
-    spillDesc: 'Work Area가 필요한 메모리보다 작으면 Oracle은 중간 결과를 임시 테이블스페이스(Temp)에 씁니다. 이걸 "디스크로 스필"이라고 하는데, 성능이 크게 떨어집니다.',
+    spillDesc: 'Work Area가 필요한 메모리보다 작으면 Oracle은 중간 결과를 임시 테이블스페이스(Temp)에 써요. 이걸 "디스크로 스필"이라고 하는데, 성능이 크게 떨어져요.',
     spillModes: [
       { label: 'Optimal',    color: 'emerald' as const, desc: 'Work Area가 충분해요 → 모든 처리가 메모리에서 끝나요. 제일 빠른 모드예요.' },
       { label: 'One-Pass',   color: 'amber' as const,   desc: 'Work Area가 부족해요 → 데이터를 Temp에 딱 한 번만 써요. 중간 성능이에요.' },
@@ -72,7 +70,7 @@ const T = {
     ],
 
     dedicatedSharedTitle: 'Dedicated Server vs Shared Server',
-    dedicatedSharedDesc: '서버 연결 모드에 따라 PGA 구조와 메모리 위치가 달라집니다.',
+    dedicatedSharedDesc: '서버 연결 모드에 따라 PGA 구조와 메모리 위치가 달라져요.',
 
     paramsTitle: '주요 파라미터',
     params: [
@@ -132,9 +130,7 @@ const T = {
 
     privateSqlTitle: 'Private SQL Area Structure',
     privateSqlDesc: 'A Private SQL Area is the personal space used by one cursor, divided into two parts.',
-    persistentLabel: 'Persistent Area',
     persistentDesc: 'Holds bind variable values. Released only when the cursor is closed.',
-    runtimeLabel: 'Runtime Area',
     runtimeDesc: 'Holds query execution state (rows fetched so far, fetch position, etc.). For DML, created at the first execute step and freed when the SQL statement is closed.',
     privateSqlNote: 'If 20 sessions each execute the same SQL, there is 1 Shared SQL Area (execution plan) in the SGA, but 20 Private SQL Areas — one per session. The OPEN_CURSORS parameter limits how many Private SQL Areas a single client can open at once.',
 
@@ -260,11 +256,11 @@ function DedicatedSharedDiagram({ lang }: { lang: 'ko' | 'en' }) {
         {/* column headers */}
         <text x={DED_X + HALF_W / 2} y={PAD + 16} fontFamily="var(--font-sans-active)" fontSize={11}
           fontWeight="bold" fill="var(--color-blue)" textAnchor="middle">
-          {isKo ? 'Dedicated Server' : 'Dedicated Server'}
+          {'Dedicated Server'}
         </text>
         <text x={SHR_X + HALF_W / 2} y={PAD + 16} fontFamily="var(--font-sans-active)" fontSize={11}
           fontWeight="bold" fill="var(--color-green)" textAnchor="middle">
-          {isKo ? 'Shared Server' : 'Shared Server'}
+          {'Shared Server'}
         </text>
 
         {/* divider */}

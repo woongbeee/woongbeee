@@ -25,11 +25,10 @@ const T = {
     structureTitle: '기본 구조',
     matchedTitle: 'WHEN MATCHED — 일치하는 행이 있을 때',
     matchedDesc:
-      '대상 테이블에서 ON 조건에 맞는 행이 있으면 실행됩니다. 보통 UPDATE로 기존 값을 갱신합니다.',
+      '대상 테이블에서 ON 조건에 맞는 행이 있으면 실행돼요. 보통 UPDATE로 기존 값을 갱신해요.',
     notMatchedTitle: 'WHEN NOT MATCHED — 일치하는 행이 없을 때',
     notMatchedDesc:
-      'ON 조건에 맞는 행이 대상 테이블에 없으면 이 절이 실행됩니다. 보통 INSERT로 새 행을 추가합니다.',
-    deleteTitle: 'WHEN MATCHED THEN DELETE',
+      'ON 조건에 맞는 행이 대상 테이블에 없으면 이 절이 실행돼요. 보통 INSERT로 새 행을 추가해요.',
     exampleTitle: '예시 쿼리 1 — UPDATE + INSERT',
     example2Title: '예시 쿼리 2 — UPDATE + DELETE (WHEN MATCHED만)',
     example2Desc:
@@ -42,7 +41,6 @@ const T = {
     resultTable: 'MERGE 결과',
     matched: '일치 → UPDATE',
     notMatched: '불일치 → INSERT',
-    usecaseTitle: '언제 쓰나요?',
     usecases: [
       {
         icon: <IconRefresh size={16} color="var(--color-blue)" stroke={1.5} />,
@@ -67,16 +65,15 @@ const T = {
       },
     ],
     targetLabel: '변경 대상',
-    onColumnTitle: 'ON 절 컬럼은 UPDATE/DELETE 할 수 없어요',
+    onColumnTitle: 'ON 절 컬럼은 UPDATE할 수 없어요',
     onColumnDesc:
-      'ON 절에서 두 테이블을 연결하는 데 쓰인 컬럼은 WHEN MATCHED THEN UPDATE나 DELETE의 대상이 될 수 없어요. Oracle이 행을 식별하는 기준 자체를 바꾸는 것이기 때문이에요.',
+      'ON 절에서 두 테이블을 연결하는 데 쓰인 컬럼은 WHEN MATCHED THEN UPDATE SET의 대상이 될 수 없어요(ORA-38104). Oracle이 행을 식별하는 기준 자체를 바꾸는 것이기 때문이에요.',
     onColumnWhy:
       '왜 그럴까요? ON 절은 "이 행이 원본과 같은 행인지" 판별하는 키예요. 이 값을 UPDATE로 바꾸면 Oracle이 같은 행을 다시 찾을 수 없게 되므로 허용하지 않아요.',
     onColumnBadLabel: '오류 — ON 절 컬럼(emp_id)을 UPDATE 시도',
     onColumnGoodLabel: '올바른 방법 — ON 절 컬럼이 아닌 컬럼만 UPDATE',
     sqlError: 'SQL — 오류',
     sqlCorrect: 'SQL — 올바른 예',
-    noteTitle: '주의사항',
     noteItems: ['Oracle 9i 이상에서 지원해요.'],
   },
   en: {
@@ -90,7 +87,6 @@ const T = {
     notMatchedTitle: 'WHEN NOT MATCHED — No matching row',
     notMatchedDesc:
       'When the ON condition finds no match in the target table, this clause executes. Typically used to INSERT a new row.',
-    deleteTitle: 'WHEN MATCHED THEN DELETE',
     exampleTitle: 'Example Query 1 — UPDATE + INSERT',
     example2Title: 'Example Query 2 — UPDATE + DELETE (WHEN MATCHED only)',
     example2Desc:
@@ -103,7 +99,6 @@ const T = {
     resultTable: 'MERGE Result',
     matched: 'Matched → UPDATE',
     notMatched: 'Not matched → INSERT',
-    usecaseTitle: 'When to use it?',
     usecases: [
       {
         icon: <IconRefresh size={16} color="var(--color-blue)" stroke={1.5} />,
@@ -128,16 +123,15 @@ const T = {
       },
     ],
     targetLabel: 'modified',
-    onColumnTitle: 'ON clause columns cannot be UPDATE-d or DELETE-d',
+    onColumnTitle: 'ON clause columns cannot be updated',
     onColumnDesc:
-      'Columns used in the ON clause to join the two tables cannot be the target of WHEN MATCHED THEN UPDATE or DELETE. They are the key Oracle uses to identify the row.',
+      'Columns used in the ON clause to join the two tables cannot be the target of WHEN MATCHED THEN UPDATE SET (ORA-38104). They are the key Oracle uses to identify the row.',
     onColumnWhy:
       'Why? The ON clause is how Oracle decides "is this the same row as the source?" If you update that key, Oracle can no longer find the row again — so it simply disallows it.',
     onColumnBadLabel: 'Error — trying to UPDATE the ON clause column (emp_id)',
     onColumnGoodLabel: 'Correct — only UPDATE columns not used in ON',
     sqlError: 'SQL — Error',
     sqlCorrect: 'SQL — Correct',
-    noteTitle: 'Important notes',
     noteItems: ['Supported in Oracle 9i and above.'],
   },
 }
@@ -207,7 +201,7 @@ WHEN NOT MATCHED THEN
   INSERT (col1, col2, col3)
   VALUES (s.col1, s.col2, s.col3)`
 
-const ON_COLUMN_BAD_SQL = `-- ❌ ORA-38104: ON 절에서 참조된 컬럼은 업데이트할 수 없습니다
+const ON_COLUMN_BAD_SQL = `-- ❌ ORA-38104: ON 절에서 참조된 컬럼은 업데이트할 수 없어요
 MERGE INTO employees t
 USING new_data s
   ON (t.emp_id = s.emp_id)   -- emp_id 가 ON 절 컬럼

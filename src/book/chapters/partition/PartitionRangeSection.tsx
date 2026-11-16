@@ -33,13 +33,14 @@ PARTITION BY RANGE (sale_date) (
   PARTITION sales_future VALUES LESS THAN (MAXVALUE)
 );
 
--- 특정 파티션만 조회 (Partition Pruning)
+-- 파티션 이름을 직접 지정해서 조회 (Partition-Extended Table Name)
 SELECT * FROM sales PARTITION (sales_2023)
 WHERE amount > 10000;
 
--- 파티션 추가
-ALTER TABLE sales ADD PARTITION sales_2025
-  VALUES LESS THAN (DATE '2026-01-01');
+-- 파티션 추가: MAXVALUE 파티션이 있으면 ADD는 ORA-14074가 나요. 대신 SPLIT으로 쪼개요
+ALTER TABLE sales SPLIT PARTITION sales_future
+  AT (DATE '2026-01-01')
+  INTO (PARTITION sales_2025, PARTITION sales_future);
 
 -- 파티션 삭제 (데이터도 함께 삭제)
 ALTER TABLE sales DROP PARTITION sales_2022;`,
@@ -122,13 +123,14 @@ PARTITION BY RANGE (sale_date) (
   PARTITION sales_future VALUES LESS THAN (MAXVALUE)
 );
 
--- Query a specific partition (Partition Pruning)
+-- Query one partition by name (partition-extended table name)
 SELECT * FROM sales PARTITION (sales_2023)
 WHERE amount > 10000;
 
--- Add a new partition
-ALTER TABLE sales ADD PARTITION sales_2025
-  VALUES LESS THAN (DATE '2026-01-01');
+-- Add a partition: with a MAXVALUE partition, ADD raises ORA-14074 — SPLIT it instead
+ALTER TABLE sales SPLIT PARTITION sales_future
+  AT (DATE '2026-01-01')
+  INTO (PARTITION sales_2025, PARTITION sales_future);
 
 -- Drop a partition (data is also deleted)
 ALTER TABLE sales DROP PARTITION sales_2022;`,

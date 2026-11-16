@@ -29,7 +29,7 @@ const T = {
         detail: [
           'Buffer Cache에서 수정된(더티) 블록을 데이터 파일(.dbf)에 기록해요.',
           '쓰기 전에 LGWR(로그 라이터)가 해당 변경사항의 Redo 레코드를 로그 파일에 먼저 기록해야 해요(Write-Ahead Logging). DBWn은 LGWR가 확인해 준 로그만 대상으로 기록해요.',
-          'DBW0 ~ DBW9, DBWa ~ DBWj 최대 36개까지 설정 가능해요 (DB_WRITER_PROCESSES 파라미터).',
+          'DB_WRITER_PROCESSES 파라미터로 최대 100개까지 늘릴 수 있어요. 처음 36개는 DBW0~DBW9·DBWa~DBWz, 37번째부터는 BW36~BW99라는 이름이 붙어요.',
           '쓰기 시작 조건: ① 버퍼 캐시가 꽉 차서 새 버퍼를 올릴 수 없을 때 ② 체크포인트 신호를 받았을 때 ③ 타임아웃 ④ RAC 핑.',
           'DBWn의 쓰기가 너무 많이 발생하면 I/O 병목을 의심해 봐야 해요.',
         ],
@@ -75,7 +75,7 @@ const T = {
           '인스턴스가 비정상 종료됐다가 재시작하면 자동으로 인스턴스 복구(Instance Recovery)를 수행해요. Redo를 앞으로 적용(Roll Forward)하고 커밋되지 않은 트랜잭션은 롤백(Roll Back)해요.',
           '임시 세그먼트(Temp Segment) 정리: 정렬 등에 쓰이다 세션이 비정상 종료되어 남겨진 Temp 세그먼트를 회수해요.',
           '딕셔너리 관리 테이블스페이스(DMT)에서 인접한 빈 Extent를 하나로 합쳐요(Coalesce).',
-          'RAC 환경에서 장애가 생긴 인스턴스의 블록을 복구하는 Affinity 복구도 담당해요.',
+          'RAC 환경에서는 한 인스턴스의 SMON이 장애가 난 다른 인스턴스의 인스턴스 복구를 대신 해 줄 수 있어요.',
         ],
       },
       {
@@ -86,11 +86,11 @@ const T = {
         mandatory: true,
         summary: '문제가 생긴 프로세스를 감지하고 롤백·잠금 해제·리소스 반환을 해요.',
         detail: [
-          '클라이언트나 서버 프로세스가 비정상 종료되면 PMON(Oracle 21c 이하) 또는 CLMN/CLnn(Oracle 21c 이상)이 감지해요.',
+          '클라이언트나 서버 프로세스가 비정상 종료되면 PMON(프로세스 모니터)이 가장 먼저 알아채요.',
           '그 세션이 갖고 있던 커밋 안 된 트랜잭션을 롤백해요.',
           '행 잠금(Row Lock), 테이블 잠금 등을 풀어줘요.',
           'SGA 리소스와 PGA 메모리를 돌려줘요.',
-          'Oracle 21c부터는 PMON 역할이 CLMN(Cleanup Main Process)과 CLnn(Cleanup Helper)으로 나뉘어 병렬로 처리할 수 있게 됐어요.',
+          'PMON은 감지만 맡고, 실제 정리 작업은 CLMN(Cleanup Main Process)에 넘겨요. CLMN은 다시 CLnn(Cleanup Helper)들에게 일을 나눠 줘서 여러 세션을 동시에 정리할 수 있어요.',
         ],
       },
       {
@@ -160,7 +160,7 @@ const T = {
         detail: [
           'Writes changed (dirty) blocks from the Buffer Cache to data files (.dbf).',
           'Before writing, LGWR must first record the redo records for those changes in the log file (Write-Ahead Logging). DBWn only writes blocks whose redo has been confirmed by LGWR.',
-          'Up to 36 DBW processes can be configured: DBW0–DBW9, DBWa–DBWj (DB_WRITER_PROCESSES parameter).',
+          'Up to 100 can be configured with DB_WRITER_PROCESSES. The first 36 are named DBW0–DBW9 and DBWa–DBWz; the 37th through 100th are BW36–BW99.',
           'Write triggers: ① Buffer Cache is full and cannot load new buffers ② Checkpoint signal received ③ Timeout ④ RAC ping.',
           'Excessive DBWn writes indicate an I/O bottleneck.',
         ],
@@ -206,7 +206,7 @@ const T = {
           'Automatically performs Instance Recovery on restart after an instance crash. Applies redo forward (Roll Forward) and rolls back uncommitted transactions (Roll Back).',
           'Temporary segment cleanup: reclaims temp segments left by abnormally terminated sessions that used sorting, etc.',
           'Coalesces adjacent free extents in Dictionary-Managed Tablespaces (DMT).',
-          'In RAC environments, also handles Affinity recovery for failed instance blocks.',
+          'In Oracle RAC, the SMON of one instance can perform instance recovery for another, failed instance.',
         ],
       },
       {
@@ -217,11 +217,11 @@ const T = {
         mandatory: true,
         summary: 'Detects failed processes and performs rollback, lock release, and resource return.',
         detail: [
-          'When a client process or server process terminates abnormally, PMON (Oracle 21c and below) or CLMN/CLnn (Oracle 21c+) detects it.',
+          'When a client or server process terminates abnormally, PMON (Process Monitor) is the one that detects it.',
           'Rolls back uncommitted transactions held by that session.',
           'Releases row locks, table locks, etc.',
           'Returns SGA resources and PGA memory.',
-          'Starting in Oracle 21c, the PMON role is split into CLMN (Cleanup Main Process) and CLnn (Cleanup Helper) processes for parallel processing.',
+          'PMON only detects the failure and delegates the cleanup to CLMN (Cleanup Main Process), which in turn hands work to CLnn (Cleanup Helper) processes so several sessions can be cleaned up in parallel.',
         ],
       },
       {

@@ -14,7 +14,7 @@ import { getTableColumns } from './stats'
 
 // ── Errors ────────────────────────────────────────────────────────────────
 
-export class SqlException extends Error {
+class SqlException extends Error {
   detail: SqlError
   constructor(detail: SqlError) {
     super(detail.code)

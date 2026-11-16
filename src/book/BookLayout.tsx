@@ -8,27 +8,13 @@ import { GlossaryPanel } from './GlossaryPanel'
 import { SchemaPanel } from './SchemaPanel'
 import { IconLanguage, IconSettings, IconChevronRight, IconDatabase, IconSun, IconMoon } from '@tabler/icons-react'
 
-const T: Record<
-  'ko' | 'en',
-  {
-    title: string
-    subtitle: string
-    langToggle: string
-    tocLabel: string
-    openTitle: string
-    closeTitle: string
-    simulator: string
-    themeLight: string
-    themeDark: string
-  }
-> = {
+const T = {
   ko: {
     title: 'Oracle DB',
     subtitle: 'Interactive Learning Book',
     langToggle: 'EN',
     tocLabel: '목차',
     openTitle: '목차 열기',
-    closeTitle: '목차 닫기',
     simulator: 'Internals Simulator',
     themeLight: '라이트 모드',
     themeDark: '다크 모드',
@@ -39,7 +25,6 @@ const T: Record<
     langToggle: '한국어',
     tocLabel: 'TOC',
     openTitle: 'Open TOC',
-    closeTitle: 'Close TOC',
     simulator: 'Internals Simulator',
     themeLight: 'Light mode',
     themeDark: 'Dark mode',

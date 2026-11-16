@@ -73,7 +73,7 @@ const FUNC_ITEMS: FuncItem[] = [
       en: 'DUAL is a special one-row, one-column dummy table provided by Oracle. Use FROM DUAL when you only need to evaluate a function or expression without querying a real table — e.g., SELECT SYSDATE FROM DUAL.',
     },
     nlsNote: {
-      ko: "예시의 결과값이 실제 실행 결과와 다를 수 있습니다. SYSDATE는 쿼리를 실행하는 시점의 DB 서버 시각을 반환하기 때문에 실행할 때마다 값이 달라집니다. 또한 NLS_DATE_FORMAT 설정에 따라 날짜의 표시 형식도 환경마다 다르게 보일 수 있습니다.\n\nNLS(National Language Support)란 Oracle이 날짜·숫자·문자 표기 방식을 각 나라의 언어 및 지역 설정에 맞게 자동으로 처리하는 기능입니다. SYSDATE를 화면에 표시할 때 어떤 형식으로 보여줄지는 세션의 NLS_DATE_FORMAT 값이 결정합니다.\n\nV$NLS_PARAMETERS 뷰에서 현재 적용된 NLS 설정을 확인할 수 있습니다.\n\n  SELECT parameter, value\n  FROM   V$NLS_PARAMETERS\n  WHERE  parameter = 'NLS_DATE_FORMAT';\n\n결과 예시: NLS_DATE_FORMAT = 'RR/MM/DD'\n\n세션 단위로 바꾸려면 ALTER SESSION SET NLS_DATE_FORMAT = 'YYYY-MM-DD HH24:MI:SS' 명령을 사용합니다. 이 설정은 현재 접속에만 적용되며, SYSDATE를 조회하면 지정한 형식으로 출력됩니다.",
+      ko: "예시의 결과값이 실제 실행 결과와 다를 수 있어요. SYSDATE는 쿼리를 실행하는 시점의 DB 서버 시각을 반환하기 때문에 실행할 때마다 값이 달라져요. 또한 NLS_DATE_FORMAT 설정에 따라 날짜의 표시 형식도 환경마다 다르게 보일 수 있어요.\n\nNLS(National Language Support)란 Oracle이 날짜·숫자·문자 표기 방식을 각 나라의 언어 및 지역 설정에 맞게 자동으로 처리하는 기능이에요. SYSDATE를 화면에 표시할 때 어떤 형식으로 보여줄지는 세션의 NLS_DATE_FORMAT 값이 결정해요.\n\nV$NLS_PARAMETERS 뷰에서 현재 적용된 NLS 설정을 확인할 수 있어요.\n\n  SELECT parameter, value\n  FROM   V$NLS_PARAMETERS\n  WHERE  parameter = 'NLS_DATE_FORMAT';\n\n결과 예시: NLS_DATE_FORMAT = 'RR/MM/DD'\n\n세션 단위로 바꾸려면 ALTER SESSION SET NLS_DATE_FORMAT = 'YYYY-MM-DD HH24:MI:SS' 명령을 사용해요. 이 설정은 현재 접속에만 적용되며, SYSDATE를 조회하면 지정한 형식으로 출력돼요.",
       en: "The example result above may differ from what you see when you run it. SYSDATE returns the DB server's current date and time at the moment the query executes, so the value changes every time. The display format may also vary depending on your session's NLS_DATE_FORMAT setting.\n\nNLS (National Language Support) is Oracle's mechanism for automatically adapting date, number, and character display to each country's language and regional settings. When SYSDATE is displayed, the session's NLS_DATE_FORMAT value controls how it appears.\n\nCheck the current NLS settings via the V$NLS_PARAMETERS view:\n\n  SELECT parameter, value\n  FROM   V$NLS_PARAMETERS\n  WHERE  parameter = 'NLS_DATE_FORMAT';\n\nSample result: NLS_DATE_FORMAT = 'RR/MM/DD'\n\nTo change it for the current session: ALTER SESSION SET NLS_DATE_FORMAT = 'YYYY-MM-DD HH24:MI:SS'. This applies only to the current connection — SYSDATE output will then appear in the specified format.",
     },
     example:
@@ -143,7 +143,7 @@ const FUNC_ITEMS: FuncItem[] = [
     name: 'SYSTIMESTAMP',
     signature: 'SYSTIMESTAMP',
     tzInfo: {
-      ko: "타임존(Timezone)이란 지구를 경도에 따라 나눈 시간 구역입니다. 같은 순간이라도 지역마다 현지 시각이 다르기 때문에 국제 시스템에서는 타임존을 명시해 시각의 기준을 맞춥니다.\n\n타임존을 표현하는 방법은 두 가지입니다.\n\n① 고정 오프셋: '+09:00', '-05:00' 처럼 UTC(협정 세계시)와의 시간 차이를 직접 숫자로 표기합니다.\n② 지역 이름(IANA 데이터베이스): 'Asia/Seoul', 'America/New_York', 'Europe/London', 'UTC' 처럼 도시·지역 이름을 사용합니다. 이 방식은 일광절약시간(DST) 전환을 자동으로 반영합니다.\n\nOracle에서 사용 가능한 전체 타임존 목록은 SELECT * FROM V$TIMEZONE_NAMES 로 조회할 수 있습니다.",
+      ko: "타임존(Timezone)이란 지구를 경도에 따라 나눈 시간 구역이에요. 같은 순간이라도 지역마다 현지 시각이 다르기 때문에 국제 시스템에서는 타임존을 명시해 시각의 기준을 맞춰요.\n\n타임존을 표현하는 방법은 두 가지예요.\n\n① 고정 오프셋: '+09:00', '-05:00' 처럼 UTC(협정 세계시)와의 시간 차이를 직접 숫자로 표기해요.\n② 지역 이름(IANA 데이터베이스): 'Asia/Seoul', 'America/New_York', 'Europe/London', 'UTC' 처럼 도시·지역 이름을 사용해요. 이 방식은 일광절약시간(DST) 전환을 자동으로 반영해요.\n\nOracle에서 사용 가능한 전체 타임존 목록은 SELECT * FROM V$TIMEZONE_NAMES 로 조회할 수 있어요.",
       en: "A timezone is a region of the globe that observes the same standard time. Because the same moment corresponds to different local times in different places, international systems attach timezone information to timestamps so everyone agrees on when something happened.\n\nTimezones are expressed in two ways:\n\n① Fixed offset: '+09:00', '-05:00' — the numeric difference from UTC (Coordinated Universal Time).\n② Region name (IANA database): 'Asia/Seoul', 'America/New_York', 'Europe/London', 'UTC'. This form automatically handles Daylight Saving Time (DST) transitions.\n\nQuery the full list of timezones Oracle supports: SELECT * FROM V$TIMEZONE_NAMES.",
     },
     desc: {
@@ -468,10 +468,10 @@ const FUNC_ITEMS: FuncItem[] = [
         },
         {
           mask: 'WW',
-          example: '2025-04-20 00:00:00',
+          example: '2025-04-23 00:00:00',
           desc: {
-            ko: '연도 시작 기준 해당 주의 첫날(일요일)',
-            en: 'first day of the week from year start (Sunday)',
+            ko: '연도 기준 주의 시작일 — 그 해 1월 1일과 같은 요일 (2025년은 수요일)',
+            en: 'start of the year-based week — same weekday as January 1 (a Wednesday in 2025)',
           },
         },
         {
@@ -519,8 +519,8 @@ const FUNC_ITEMS: FuncItem[] = [
     resultHeaders: ['d1', 'd2'],
     resultRows: [['2025-01-15 00:00:00', '2025-06-30 18:00:00']],
     note: {
-      ko: 'NLS_DATE_FORMAT 세션 설정과 다른 형식의 문자열을 비교하면 암묵적 변환이 발생해서 인덱스를 사용하지 못할 수 있어요. 명시적으로 TO_DATE를 사용하는 게 안전해요.',
-      en: "Comparing a string whose format differs from the session's NLS_DATE_FORMAT triggers implicit conversion, which can prevent index use. Explicitly using TO_DATE is safer.",
+      ko: 'DATE 컬럼을 문자열과 그대로 비교하면 Oracle이 세션의 NLS_DATE_FORMAT에 맞춰 문자열을 날짜로 바꿔요. 형식이 다르면 오류(ORA-01861)가 나거나 엉뚱한 날짜로 해석될 수 있으니, TO_DATE로 형식을 명시하는 게 안전해요.',
+      en: "When a DATE column is compared with a plain string, Oracle converts the string using the session's NLS_DATE_FORMAT. If the format differs you get an error (ORA-01861) or a wrongly interpreted date, so spell the format out with TO_DATE.",
     },
   },
   {
@@ -812,9 +812,6 @@ const T = {
     categoryLabel: '날짜 / 시간 함수',
     exampleQuery: '예시 쿼리',
     result: '실행 결과',
-    dualBoxTitle: 'DUAL 이란?',
-    vsTitle: 'SYSDATE vs SYSTIMESTAMP',
-    nlsBoxTitle: 'SYSDATE의 실행 결과가 다르게 보인다면?',
     tzConvertTitle: '타임존 변환',
     arith2Title: 'SYSTIMESTAMP 끼리의 연산',
   },
@@ -825,9 +822,6 @@ const T = {
     categoryLabel: 'Date / Time Functions',
     exampleQuery: 'Example Query',
     result: 'Result',
-    dualBoxTitle: 'What is DUAL?',
-    vsTitle: 'SYSDATE vs SYSTIMESTAMP',
-    nlsBoxTitle: 'Why Does Your SYSDATE Result Look Different?',
     tzConvertTitle: 'Timezone Conversion',
     arith2Title: 'SYSTIMESTAMP Subtraction',
   },

@@ -60,7 +60,6 @@ const T = {
     step1Desc: '트리를 내려가면서 키값이 담긴 Leaf 블록을 정확히 찾아가요. 트리 깊이만큼(보통 3~4번) 블록을 읽으면 돼요.',
     step2Title: '② Leaf에서 키값을 찾으면 즉시 종료',
     step2Desc: '정렬된 Leaf 안에서 키값을 찾는 즉시 ROWID(행 주소)를 반환하고 스캔을 완전히 멈춰요. 중복이 없다는 게 보장되어 있으니, 더 이상 뒤를 볼 필요가 없는 거예요.',
-    diagramTitle: 'Unique Scan 시각화',
     keyLabel: 'EMPLOYEE_ID 선택',
     traitTitle: '특징',
     traits: [
@@ -96,7 +95,6 @@ const T = {
     step1Desc: 'Walk down the tree to find the exact Leaf block. This takes exactly tree-depth block reads — typically 3 to 4.',
     step2Title: '② Locate key in Leaf and stop immediately',
     step2Desc: 'Once the key is found in the Leaf, Oracle retrieves the ROWID and halts the scan entirely. No further traversal is needed because duplicates are guaranteed not to exist.',
-    diagramTitle: 'Unique Scan Visualization',
     keyLabel: 'Select EMPLOYEE_ID',
     traitTitle: 'Characteristics',
     traits: [

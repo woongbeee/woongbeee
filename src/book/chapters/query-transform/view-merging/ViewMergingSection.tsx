@@ -72,9 +72,9 @@ AND    e.last_name = 'Smith';`,
 
     hintTitle: '힌트로 제어하기',
     hintDesc:
-      'View Merging은 기본적으로 비용 기반으로 결정돼요. 힌트로 강제하거나 방지할 수 있어요.',
-    hintSql: `-- 모든 뷰 병합 강제
-SELECT /*+ MERGE_ANY_VIEW */ e.first_name, dept_locs_v.street_address
+      'Simple View Merging은 가능하면 항상 적용되고, Complex View Merging은 비용을 비교해서 결정돼요. 힌트로 강제하거나 방지할 수도 있어요.',
+    hintSql: `-- 뷰 병합 강제
+SELECT /*+ MERGE(dept_locs_v) */ e.first_name, dept_locs_v.street_address
 FROM   employees e,
        (SELECT d.department_id, l.street_address
         FROM   departments d, locations l
@@ -88,13 +88,11 @@ FROM   employees e,
         FROM   departments d, locations l
         WHERE  d.location_id = l.location_id) dept_locs_v
 WHERE  dept_locs_v.department_id = e.department_id;`,
-
-    summaryTitle: 'View Merging 핵심 정리',
     summaryItems: [
       'Simple View Merging: GROUP BY·DISTINCT 없는 뷰에 적용, 조인 순서 자유도 증가.',
       'Complex View Merging: GROUP BY·DISTINCT 있는 뷰에 비용 기반으로 적용.',
       'GROUP BY, DISTINCT, ROWNUM, 외부 조인, 집합 연산자가 있으면 Simple Merging 불가.',
-      '힌트: MERGE_ANY_VIEW (강제), NO_MERGE(뷰별칭) (방지).',
+      '힌트: MERGE(뷰별칭) (강제), NO_MERGE(뷰별칭) (방지).',
     ],
   },
   en: {
@@ -162,9 +160,9 @@ AND    e.last_name = 'Smith';`,
 
     hintTitle: 'Controlling with Hints',
     hintDesc:
-      'View Merging is cost-based by default. You can force or suppress it with hints.',
-    hintSql: `-- Force merging of all views
-SELECT /*+ MERGE_ANY_VIEW */ e.first_name, dept_locs_v.street_address
+      'Simple view merging is applied whenever it is legal; complex view merging is a cost-based decision. Either can be forced or suppressed with hints.',
+    hintSql: `-- Force the view to be merged
+SELECT /*+ MERGE(dept_locs_v) */ e.first_name, dept_locs_v.street_address
 FROM   employees e,
        (SELECT d.department_id, l.street_address
         FROM   departments d, locations l
@@ -178,13 +176,11 @@ FROM   employees e,
         FROM   departments d, locations l
         WHERE  d.location_id = l.location_id) dept_locs_v
 WHERE  dept_locs_v.department_id = e.department_id;`,
-
-    summaryTitle: 'View Merging Key Takeaways',
     summaryItems: [
       'Simple View Merging: applies to views without GROUP BY or DISTINCT; increases join order flexibility.',
       'Complex View Merging: cost-based; delays GROUP BY/DISTINCT until after joins.',
       'Blocked by: GROUP BY, DISTINCT, ROWNUM, outer joins, set operators.',
-      'Hints: MERGE_ANY_VIEW (force), NO_MERGE(alias) (suppress).',
+      'Hints: MERGE(alias) (force), NO_MERGE(alias) (suppress).',
     ],
   },
 }

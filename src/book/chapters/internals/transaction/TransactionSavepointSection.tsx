@@ -30,7 +30,7 @@ const T = {
     lockNote:
       '다른 세션이 ROLLBACK TO SAVEPOINT로 해제된 행 락을 즉시 획득하는 건 아니에요. 차단된 세션은 메인 트랜잭션 전체가 COMMIT 또는 ROLLBACK될 때까지 기다려요.',
     note:
-      'SAVEPOINT를 같은 이름으로 다시 만들면 이전 SAVEPOINT가 덮어씌워져요. RELEASE SAVEPOINT 명령으로 명시적으로 해제할 수도 있어요.',
+      'SAVEPOINT를 같은 이름으로 다시 만들면 이전 SAVEPOINT가 덮어씌워져요. Oracle에는 RELEASE SAVEPOINT 명령이 없어서, SAVEPOINT는 COMMIT이나 ROLLBACK으로 트랜잭션이 끝날 때 함께 사라져요.',
     summary:
       'COMMIT은 변경을 영구적으로 확정하고, ROLLBACK은 Undo Segment로 이전 상태를 복원하며, SAVEPOINT는 부분 롤백을 가능하게 해줘요. ACID 속성은 트랜잭션이 데이터 무결성을 지키는 방식의 이론적 토대예요.',
     diagramSteps: [
@@ -60,7 +60,7 @@ const T = {
     lockNote:
       "Sessions blocked by a lock do not immediately proceed when ROLLBACK TO SAVEPOINT releases that specific lock. Blocked sessions wait for the entire blocking transaction (not just a lock) to COMMIT or ROLLBACK.",
     note:
-      'Redefining a SAVEPOINT with the same name overwrites the previous one. You can also release a savepoint explicitly with RELEASE SAVEPOINT.',
+      'Redefining a SAVEPOINT with the same name overwrites the previous one. Oracle has no RELEASE SAVEPOINT statement — savepoints simply disappear when the transaction ends with COMMIT or ROLLBACK.',
     summary:
       'COMMIT makes changes permanent; ROLLBACK uses the Undo Segment to restore the previous state; SAVEPOINT enables partial rollback. The ACID properties are the theoretical foundation for how transactions guarantee data integrity.',
     diagramSteps: [

@@ -38,7 +38,7 @@ const T = {
         color: 'border-blue/30 bg-blue/5',
         badge: 'bg-blue/10 text-blue',
         title: 'Nested Loop Join',
-        desc: 'Outer 테이블의 각 행마다 Inner 테이블을 반복 탐색해요. Inner 테이블에 선택도 높은 인덱스가 있을 때 가장 효율적이에요.',
+        desc: 'Outer 테이블의 각 행마다 Inner 테이블을 반복 탐색해요. Inner 테이블에 조인 키로 소수의 행만 바로 찾아 주는 인덱스가 있을 때 가장 효율적이에요.',
       },
       {
         id: 'Hash Join',

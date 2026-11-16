@@ -115,7 +115,7 @@ const T = {
       'LGWR는 COMMIT·버퍼 1/3 차거나·3초 타임아웃·DBWn 요청·Checkpoint 발생 시 디스크에 기록해요',
       'WAL 원칙: Redo Log 먼저, Data File 나중 — 장애 복구의 토대예요',
       'Append(Sequential) I/O는 Random I/O보다 훨씬 빠르기 때문에 COMMIT 지연을 최소화할 수 있어요',
-      'Redo Entry = SCN + 작업 코드 + Before/After Image + 블록 주소',
+      'Redo Entry = SCN + 작업 코드 + 변경 전·후 값(Change Vector) + 블록 주소',
     ],
   },
 
@@ -216,7 +216,7 @@ const T = {
       'LGWR flushes on: COMMIT · buffer 1/3 full · 3-second timeout · DBWn request · Checkpoint',
       'WAL principle: Redo Log first, Data File second — the foundation of Oracle crash recovery',
       'Append (Sequential) I/O is far faster than Random I/O — keeps COMMIT latency minimal',
-      'Redo Entry = SCN + operation code + Before/After Image + block address',
+      'Redo Entry = SCN + operation code + before/after values (change vectors) + block address',
     ],
   },
 }
@@ -531,9 +531,7 @@ function IoComparisonSection({ lang }: { lang: 'ko' | 'en' }) {
             className={cn(
               'rounded-card border px-4 py-2 text-xs font-bold transition-all',
               activeIo === m.id
-                ? m.id === 'random'
-                  ? 'border-amber/50 bg-amber text-paper '
-                  : 'border-amber/50 bg-amber text-paper '
+                ? 'border-amber/50 bg-amber text-paper '
                 : 'border-line bg-paper text-ink-2 hover:border-line-2 hover:text-ink',
             )}
           >
@@ -550,8 +548,8 @@ function IoComparisonSection({ lang }: { lang: 'ko' | 'en' }) {
           transition={{ duration: 0.18 }}
           className="overflow-hidden rounded-panel border border-line bg-paper"
         >
-          <div className={cn('flex items-center gap-2.5 border-b border-line px-5 py-3', activeIo === 'random' ? 'bg-amber/5' : 'bg-amber/5')}>
-            <span className={cn('rounded px-2.5 py-0.5 text-xs font-bold text-paper', activeIo === 'random' ? 'bg-amber' : 'bg-amber')}>
+          <div className={cn('flex items-center gap-2.5 border-b border-line px-5 py-3', 'bg-amber/5')}>
+            <span className={cn('rounded px-2.5 py-0.5 text-xs font-bold text-paper', 'bg-amber')}>
               {active.badge}
             </span>
             <span className="text-sm font-bold text-ink">{active.title}</span>

@@ -44,7 +44,7 @@ function OptimizerComponentDiagram({ lang }: { lang: 'ko' | 'en' }) {
           phase: 'Phase 3',
           name: 'Plan Generator',
           color: 'var(--color-purple)', bg: 'var(--color-paper-sunk)', border: 'var(--color-purple)',
-          desc: '가능한 모든 조합(액세스 경로 · 조인 방법 · 조인 순서)을 탐색해 최저 비용 계획을 골라요.',
+          desc: '여러 조합(액세스 경로 · 조인 방법 · 조인 순서)을 탐색해 최저 비용 계획을 골라요.',
         },
       ]
     : [

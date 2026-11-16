@@ -26,7 +26,7 @@ const T = {
     selectTitle: 'CBO 선택 조건',
     selectItems: [
       'Outer 테이블의 결과 행 수가 소량일 때 — 내부 루프 반복 횟수가 적어요.',
-      'Inner 테이블에 선택도 높은 인덱스가 있을 때 — 각 반복마다 소수의 블록만 읽어요.',
+      'Inner 테이블에 조인 키로 소수의 행만 바로 찾아 주는 인덱스가 있을 때 — 각 반복마다 소수의 블록만 읽어요.',
       'OPTIMIZER_MODE = FIRST_ROWS 또는 FIRST_ROWS_n — 첫 행을 빨리 반환해야 할 때.',
       'Outer 결과의 한쪽이 단일 행(1 row)일 때 — 기본 키 등치 조건 등.',
     ],
@@ -51,7 +51,7 @@ const T = {
     ],
 
     hintTitle: '힌트',
-    hintSql: `SELECT /*+ USE_NL(e d) */ e.last_name, d.department_name
+    hintSql: `SELECT /*+ LEADING(e) USE_NL(d) */ e.last_name, d.department_name
 FROM   employees e, departments d
 WHERE  e.department_id = d.department_id;
 
@@ -102,7 +102,7 @@ WHERE  e.department_id = d.department_id;`,
     ],
 
     hintTitle: 'Hints',
-    hintSql: `SELECT /*+ USE_NL(e d) */ e.last_name, d.department_name
+    hintSql: `SELECT /*+ LEADING(e) USE_NL(d) */ e.last_name, d.department_name
 FROM   employees e, departments d
 WHERE  e.department_id = d.department_id;
 

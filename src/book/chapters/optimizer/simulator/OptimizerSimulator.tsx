@@ -54,16 +54,16 @@ function AnnotationPanel({ annotations, lang }: { annotations: AnnotatedLine[]; 
   const rows = annotations.filter((a) => (lang === 'ko' ? a.noteKo : a.noteEn))
   if (rows.length === 0) return null
   return (
-    <div className="mt-3 overflow-hidden rounded-panel border border-blue/30 bg-blue/5 dark:border-blue dark:bg-blue">
-      <div className="border-b border-blue/30 bg-blue/10 px-4 py-2 dark:border-blue dark:bg-blue">
-        <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-blue dark:text-blue">
+    <div className="mt-3 overflow-hidden rounded-panel border border-blue/30 bg-blue/5">
+      <div className="border-b border-blue/30 bg-blue/10 px-4 py-2">
+        <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-blue">
           {lang === 'ko' ? '라인별 설명' : 'Line-by-line Notes'}
         </span>
       </div>
-      <div className="divide-y divide-blue/30 dark:divide-blue">
+      <div className="divide-y divide-blue/30">
         {rows.map((a, i) => (
           <div key={i} className="flex gap-3 px-4 py-2.5">
-            <code className="mt-0.5 shrink-0 max-w-[180px] truncate rounded bg-blue/10 px-1.5 py-0.5 font-mono text-[10px] text-blue dark:bg-blue dark:text-blue">
+            <code className="mt-0.5 shrink-0 max-w-[180px] truncate rounded bg-blue/10 px-1.5 py-0.5 font-mono text-[10px] text-blue">
               {a.line}
             </code>
             <span className="text-xs leading-relaxed text-ink/70">
@@ -90,10 +90,10 @@ function PlanAreaBlock({
   children: React.ReactNode
 }) {
   return (
-    <div className="rounded-panel border border-line bg-paper-sunk dark:border-line-2 dark:bg-ink">
-      <div className="flex items-center gap-2 border-b border-line px-4 py-2.5 dark:border-line-2">
-        <span className="text-base font-bold text-ink dark:text-ink-3">{num}</span>
-        <span className="text-sm font-semibold text-ink dark:text-ink-3">
+    <div className="rounded-panel border border-line bg-paper-sunk">
+      <div className="flex items-center gap-2 border-b border-line px-4 py-2.5">
+        <span className="text-base font-bold text-ink">{num}</span>
+        <span className="text-sm font-semibold text-ink">
           {lang === 'ko' ? labelKo : labelEn}
         </span>
       </div>
@@ -205,12 +205,12 @@ This is the most efficient single-row lookup pattern in Oracle.`,
     ],
     projectionAnnotations: [
       { line: '1 - output: [EMPLOYEE_ID, FIRST_NAME, LAST_NAME, SALARY]', noteKo: 'Op 1(TABLE ACCESS)이 최종적으로 SELECT 절에 필요한 4개 컬럼을 출력해요. Oracle은 필요한 컬럼만 프로젝션하므로 테이블에서 모든 컬럼을 읽지 않아요.', noteEn: 'Op 1 (TABLE ACCESS) projects exactly the 4 columns needed by the SELECT clause. Oracle reads only what is needed — this is column pruning in action.' },
-      { line: '2 - output: [ROWID, EMPLOYEE_ID]', noteKo: 'Op 2(INDEX UNIQUE SCAN)는 ROWID(테이블 블록 주소)와 인덱스 키(EMPLOYEE_ID)만 출력합니다. FIRST_NAME, SALARY 등은 인덱스에 없으므로 상위 Op 1이 ROWID로 테이블을 직접 읽어 나머지 컬럼을 가져옵니다.', noteEn: 'Op 2 (INDEX UNIQUE SCAN) outputs only ROWID (block address) and the index key EMPLOYEE_ID. FIRST_NAME, SALARY, etc. are not in the index, so parent Op 1 uses the ROWID to fetch the full row from the table.' },
+      { line: '2 - output: [ROWID, EMPLOYEE_ID]', noteKo: 'Op 2(INDEX UNIQUE SCAN)는 ROWID(테이블 블록 주소)와 인덱스 키(EMPLOYEE_ID)만 출력해요. FIRST_NAME, SALARY 등은 인덱스에 없으므로 상위 Op 1이 ROWID로 테이블을 직접 읽어 나머지 컬럼을 가져와요.', noteEn: 'Op 2 (INDEX UNIQUE SCAN) outputs only ROWID (block address) and the index key EMPLOYEE_ID. FIRST_NAME, SALARY, etc. are not in the index, so parent Op 1 uses the ROWID to fetch the full row from the table.' },
     ],
     statsAnnotations: [
       { line: 'consistent gets      =  2', noteKo: '논리 읽기 2블록. 인덱스 1블록 + 테이블 1블록. PK 단건 조회의 이론적 최솟값이에요.', noteEn: '2 logical block reads: 1 index block + 1 table block. This is the theoretical minimum for a PK single-row lookup.' },
       { line: 'physical reads       =  0', noteKo: '물리 읽기 0. 2개 블록 모두 Buffer Cache에서 즉시 찾았어요. 자주 조회하는 작은 테이블은 이처럼 항상 PR=0을 기대할 수 있어요.', noteEn: 'No physical reads. Both blocks were found in the Buffer Cache immediately. For small frequently-accessed tables, PR=0 is the expected steady-state.' },
-      { line: 'rows processed       =  1', noteKo: '최종 반환 행 수 = 1. PK 등치 조건은 항상 0 또는 1행만 반환합니다.', noteEn: '1 row returned to the client. A PK equality predicate always returns 0 or 1 row.' },
+      { line: 'rows processed       =  1', noteKo: '최종 반환 행 수 = 1. PK 등치 조건은 항상 0 또는 1행만 반환해요.', noteEn: '1 row returned to the client. A PK equality predicate always returns 0 or 1 row.' },
     ],
   },
 
@@ -286,7 +286,7 @@ access가 아닌 filter인 이유: 인덱스 탐색 범위를 결정하는 것�
 
 설령 SALARY 인덱스가 있더라도, 전체 15행 중 6행(40%)이 조건을 만족하면
 CBO는 FTS가 인덱스보다 저렴하다고 판단할 수 있어요(소규모 테이블).
-선택도가 낮은(많은 행이 반환되는) 범위 조건에서는 FTS가 정상적인 선택이에요.`,
+많은 행이 반환되는 범위 조건에서는 FTS가 정상적인 선택이에요.`,
     reasonEn: `There is no index on the SALARY column.
 Without an index, evaluating WHERE SALARY > 10000 requires
 reading every block of the table → TABLE ACCESS FULL.
@@ -297,7 +297,7 @@ an index scan range; instead, all rows are read first and then tested.
 
 Even if a SALARY index existed, with 6 of 15 rows (40%) matching,
 the CBO might still choose FTS over the index (especially for a small table).
-Range predicates with low selectivity (many rows returned) often make FTS the cheaper choice.`,
+Range predicates that return many rows often make FTS the cheaper choice.`,
     callStatsAnnotations: [
       { line: 'Fetch  1  0.00  0.00  3  8  0  6', noteKo: 'Disk=3 → 8개 논리 블록 중 3개가 Buffer Cache에 없어 디스크에서 읽었어요. FTS는 처음 실행 시 PR이 높고, 재실행하면 블록이 캐시에 올라와 PR=0이 되는 것이 정상이에요.', noteEn: 'Disk=3 → 3 of the 8 logical blocks were not in the Buffer Cache and required disk reads. FTS typically has high PR on first run; a second run usually sees PR=0 as all blocks are now cached.' },
     ],
@@ -334,11 +334,9 @@ WHERE  department_id = 80;`,
     ],
     showStats: true,
     predicatesKo: [
-      '   1 - filter("DEPARTMENT_ID"=80)',
       '   2 - access("DEPARTMENT_ID"=80)',
     ],
     predicatesEn: [
-      '   1 - filter("DEPARTMENT_ID"=80)',
       '   2 - access("DEPARTMENT_ID"=80)',
     ],
     projectionKo: [
@@ -391,9 +389,9 @@ DEPARTMENT_ID = 80 등치 조건이지만 Unique 인덱스가 아니므로
 (한 부서에 여러 직원이 있을 수 있음) INDEX RANGE SCAN이 선택돼요.
 UNIQUE SCAN은 Unique 인덱스에서만 사용해요.
 
-Predicate Information에서 2번 오퍼레이션에 access와 filter가 모두 있어요:
+Predicate Information에는 2번 오퍼레이션의 access만 나와요:
   access("DEPARTMENT_ID"=80) — 인덱스 탐색 범위를 80으로 고정
-  1번의 filter("DEPARTMENT_ID"=80) — 테이블 접근 후 재확인 (안전 장치)
+  조건이 인덱스에서 이미 다 걸러졌기 때문에, 1번(테이블 접근)에는 따로 filter가 붙지 않아요.
 
 BATCHED 방식: ROWID를 모아 블록 단위로 테이블을 읽어 Random I/O를 줄여요.`,
     reasonEn: `DEPARTMENT_ID is a foreign key column.
@@ -405,9 +403,9 @@ not INDEX UNIQUE SCAN — because the index is not Unique
 (multiple employees can belong to the same department).
 INDEX UNIQUE SCAN is only available on Unique indexes.
 
-Predicate Information shows both access and filter on operation 2:
+Predicate Information shows only an access predicate, on operation 2:
   access("DEPARTMENT_ID"=80) — pins the index scan range to 80
-  filter on op 1 ("DEPARTMENT_ID"=80) — re-checked after table access (safety net)
+  The index already resolved the condition completely, so op 1 (the table access) carries no filter.
 
 BATCHED mode: ROWIDs are collected in a batch before hitting the table,
 reducing random I/O by reading table blocks more efficiently.`,
@@ -416,15 +414,14 @@ reducing random I/O by reading table blocks more efficiently.`,
     ],
     predicateAnnotations: [
       { line: '2 - access("DEPARTMENT_ID"=80)', noteKo: 'Op 2(INDEX RANGE SCAN)에서 DEPARTMENT_ID=80이 access — 인덱스의 탐색 시작점과 끝점을 모두 80으로 고정해요. B-Tree 인덱스에서 DEPARTMENT_ID=80인 리프 블록 범위만 읽어요.', noteEn: 'Op 2 (INDEX RANGE SCAN): DEPARTMENT_ID=80 is an access predicate — it pins both the start and end of the B-tree scan range to 80. Only leaf blocks containing DEPARTMENT_ID=80 entries are read.' },
-      { line: '1 - filter("DEPARTMENT_ID"=80)', noteKo: 'Op 1(TABLE ACCESS)에서 동일 조건이 filter로 다시 나와요. 인덱스 스캔 후 테이블 행을 읽어올 때 Oracle이 한 번 더 값을 확인하는 안전 장치예요. Unique 인덱스가 아닌 경우 이 패턴이 흔해요.', noteEn: 'Op 1 (TABLE ACCESS) re-checks the same condition as a filter. After reading a table row via ROWID, Oracle verifies DEPARTMENT_ID=80 once more as a safety net. This double-check pattern is common with non-unique indexes.' },
     ],
     projectionAnnotations: [
       { line: '1 - output: [EMPLOYEE_ID, LAST_NAME, JOB_ID, SALARY]', noteKo: 'TABLE ACCESS 단계에서 SELECT 절에 필요한 4개 컬럼을 출력해요. DEPARTMENT_ID는 이미 인덱스에서 확인했으므로 여기선 포함되지 않아요.', noteEn: 'TABLE ACCESS projects the 4 columns required by SELECT. DEPARTMENT_ID was already verified by the index and is not passed up again.' },
-      { line: '2 - output: [ROWID, DEPARTMENT_ID]', noteKo: 'INDEX RANGE SCAN은 ROWID와 인덱스 키(DEPARTMENT_ID)만 출력합니다. 상위 TABLE ACCESS가 ROWID를 받아 테이블에서 나머지 컬럼을 조회합니다.', noteEn: 'INDEX RANGE SCAN outputs only ROWID and the index key DEPARTMENT_ID. The parent TABLE ACCESS uses ROWID to fetch the remaining columns from the table.' },
+      { line: '2 - output: [ROWID, DEPARTMENT_ID]', noteKo: 'INDEX RANGE SCAN은 ROWID와 인덱스 키(DEPARTMENT_ID)만 출력해요. 상위 TABLE ACCESS가 ROWID를 받아 테이블에서 나머지 컬럼을 조회해요.', noteEn: 'INDEX RANGE SCAN outputs only ROWID and the index key DEPARTMENT_ID. The parent TABLE ACCESS uses ROWID to fetch the remaining columns from the table.' },
     ],
     statsAnnotations: [
       { line: 'consistent gets      =  4', noteKo: '논리 블록 4개: 인덱스 2(루트→리프) + 테이블 2(배치된 2개 ROWID). Q1의 2블록보다 많지만 FTS의 8블록보다 훨씬 적어요.', noteEn: '4 logical blocks: 2 index (root→leaf) + 2 table (batched ROWID lookups). More than Q1\'s 2 blocks, but far less than FTS\'s 8 blocks.' },
-      { line: 'physical reads       =  1', noteKo: '인덱스 블록 1개가 처음으로 읽혀 디스크 I/O 1회 발생. 재실행하면 0이 됩니다.', noteEn: '1 index block was read from disk on this first run. PR will be 0 on subsequent executions.' },
+      { line: 'physical reads       =  1', noteKo: '인덱스 블록 1개가 처음으로 읽혀 디스크 I/O 1회 발생. 재실행하면 0이 돼요.', noteEn: '1 index block was read from disk on this first run. PR will be 0 on subsequent executions.' },
     ],
   },
 
@@ -660,7 +657,7 @@ total        4  0.01     0.08     5     18        0    14`,
 실행 순서: ④ → ⑤ → ③ → ② → ① → ⓪
 
 Hash Join — Build Input 선택 이유:
-  DEPARTMENTS(20행) < EMPLOYEES(15행)이지만 DEPARTMENTS의 BLOCKS가 더 적어요.
+  행 수는 DEPARTMENTS(20행)가 EMPLOYEES(15행)보다 많지만, 행이 짧아서 전체 크기(BLOCKS·Bytes)는 DEPARTMENTS가 더 작아요.
   CBO는 더 작은 테이블을 Build Input(해시 테이블 구성)으로 써요 → ④ DEPARTMENTS.
   EMPLOYEES는 Probe Input으로 한 줄씩 읽으며 해시 테이블을 탐색해요 → ⑤.
 
@@ -680,7 +677,7 @@ Since there is no predicate to narrow the scan range, both tables use TABLE ACCE
 Execution order: ④ → ⑤ → ③ → ② → ① → ⓪
 
 Hash Join — why DEPARTMENTS is the Build Input:
-  DEPARTMENTS (20 rows) has fewer blocks than EMPLOYEES (15 rows but more data).
+  DEPARTMENTS has more rows (20) than EMPLOYEES (15), but its rows are shorter, so it is smaller in blocks and bytes.
   CBO picks the smaller table as the Build Input → ④ DEPARTMENTS builds the hash table.
   EMPLOYEES is the Probe Input → ⑤ each row probes the hash table.
 
@@ -898,13 +895,13 @@ Execute      1  0.00     0.00     0      0        0     0
 Fetch        1  0.00     0.00     2     14        0     5
 ------- ------  ----  -------  ----  -----  -------  ----
 total        3  0.00     0.00     2     14        0     5`,
-    reasonKo: `EXISTS 서브쿼리는 CBO에 의해 Semi Join으로 변환됩니다.
+    reasonKo: `EXISTS 서브쿼리는 CBO에 의해 Semi Join으로 변환돼요.
 "EXISTS (SELECT 1 FROM job_history WHERE ...)" → NESTED LOOPS SEMI.
 
 NESTED LOOPS SEMI의 특징:
-  일반 Nested Loop와 달리, 매칭되는 첫 번째 행을 찾으면 즉시 다음 외부 행으로 넘어갑니다.
-  즉, JOB_HISTORY에서 같은 employee_id가 여러 번 나와도 첫 번째만 확인합니다.
-  이 덕분에 EMPLOYEES 15행 × JOB_HISTORY 전체 스캔을 방지합니다.
+  일반 Nested Loop와 달리, 매칭되는 첫 번째 행을 찾으면 즉시 다음 외부 행으로 넘어가요.
+  즉, JOB_HISTORY에서 같은 employee_id가 여러 번 나와도 첫 번째만 확인해요.
+  이 덕분에 EMPLOYEES 15행 × JOB_HISTORY 전체 스캔을 방지해요.
 
 실행 순서: ② → ③(최대 15회) → ① → ⓪
 
@@ -973,7 +970,7 @@ ORDER BY e.last_name;`,
         note: '두 번째 실행. LOCATIONS(미국 4개)를 Build Input, DEPARTMENTS를 Probe로 조인.' },
       { id: 4, depth: 4, operation: 'TABLE ACCESS BY INDEX ROWID BATCHED', name: 'LOCATIONS',  rows: 4, cost: 3, time: '00:00:01',
         actualRows: 4, cr: 6, pr: 3, pw: 0, elapsed: '00:00:00.04',
-        note: '가장 먼저 실행. country_id=\'US\' filter 후 4개 미국 위치 반환.' },
+        note: '두 번째 실행. 인덱스가 건네준 ROWID로 미국 위치 4개를 읽음.' },
       { id: 5, depth: 5, operation: 'INDEX RANGE SCAN',                    name: 'LOC_COUNTRY_IX', rows: 4, cost: 1, time: '00:00:01',
         actualRows: 4, cr: 2, pr: 1, pw: 0, elapsed: '00:00:00.01',
         note: '가장 먼저 실행. COUNTRY_ID=\'US\' 인덱스 탐색.' },
@@ -988,13 +985,11 @@ ORDER BY e.last_name;`,
     predicatesKo: [
       '   2 - access("E"."DEPARTMENT_ID"="D"."DEPARTMENT_ID")',
       '   3 - access("D"."LOCATION_ID"="L"."LOCATION_ID")',
-      '   4 - filter("L"."COUNTRY_ID"=\'US\')',
       '   5 - access("L"."COUNTRY_ID"=\'US\')',
     ],
     predicatesEn: [
       '   2 - access("E"."DEPARTMENT_ID"="D"."DEPARTMENT_ID")',
       '   3 - access("D"."LOCATION_ID"="L"."LOCATION_ID")',
-      '   4 - filter("L"."COUNTRY_ID"=\'US\')',
       '   5 - access("L"."COUNTRY_ID"=\'US\')',
     ],
     projectionKo: [
@@ -1061,9 +1056,9 @@ total        3  0.01     0.12     8     28        0     7`,
   DEPARTMENTS(20행)를 Probe로 읽어 LOCATION_ID로 조인 → 미국 부서 4개만 남음 (③⑥).
   마지막으로 EMPLOYEES를 읽어 DEPARTMENT_ID로 조인 → 7명의 미국 근무 직원 (②⑦).
 
-4번 Predicate: access와 filter가 동시에 있어요.
+LOCATIONS 쪽 Predicate는 5번에만 있어요.
   5번 INDEX RANGE SCAN: access("COUNTRY_ID"='US') → 인덱스로 범위 결정
-  4번 TABLE ACCESS: filter("COUNTRY_ID"='US') → 테이블에서 재확인 (방어적 검사)
+  4번 TABLE ACCESS는 인덱스가 건네준 ROWID로 행을 읽기만 해요 (조건을 다시 검사하지 않아요).
 
 ORDER BY e.last_name → ① SORT ORDER BY: sorts(memory)=1.
   조인 완료 후 7행을 메모리에서 정렬해요.`,
@@ -1079,15 +1074,14 @@ Why this join order?
   DEPARTMENTS (20 rows) probes the hash table on LOCATION_ID → only 4 US departments remain (③⑥).
   EMPLOYEES is read last and joins on DEPARTMENT_ID → 7 employees in US offices (②⑦).
 
-Op 4 shows both access and filter for COUNTRY_ID='US':
+The LOCATIONS predicate appears only on Op 5:
   Op 5 INDEX RANGE SCAN: access("COUNTRY_ID"='US') — index determines scan range
-  Op 4 TABLE ACCESS: filter("COUNTRY_ID"='US') — table re-checks the value (safety net)
+  Op 4 TABLE ACCESS simply fetches the rows by the ROWIDs it is given (the condition is not re-checked).
 
 ORDER BY e.last_name triggers ① SORT ORDER BY: sorts(memory)=1.
   7 rows sorted entirely in PGA memory — no disk spill.`,
     predicateAnnotations: [
       { line: '5 - access("L"."COUNTRY_ID"=\'US\')', noteKo: 'LOC_COUNTRY_IX 인덱스로 COUNTRY_ID=\'US\' 범위를 결정해요. 22개 위치 중 미국 4개만 ROWID로 반환돼요.', noteEn: 'LOC_COUNTRY_IX determines the scan range for COUNTRY_ID=\'US\'. Of 22 locations, only the 4 US ones are returned as ROWIDs.' },
-      { line: '4 - filter("L"."COUNTRY_ID"=\'US\')', noteKo: '테이블 접근 후 같은 조건을 재확인해요. 인덱스 탐색 결과와 테이블 데이터가 일치하는지 방어적으로 검사하는 Oracle의 패턴이에요.', noteEn: 'After reading the table row, the same predicate is re-checked as a defensive safety net. This double-check is a common Oracle pattern when using non-unique indexes.' },
       { line: '3 - access("D"."LOCATION_ID"="L"."LOCATION_ID")', noteKo: 'LOCATIONS 결과(미국 4개)로 해시 테이블을 구성한 뒤, DEPARTMENTS의 LOCATION_ID로 해시 버킷을 탐색해요. Hash Join 조인 키 → access.', noteEn: 'Hash table built from LOCATIONS (4 US rows). DEPARTMENTS rows probe the hash table using LOCATION_ID. Hash Join join key → always access.' },
       { line: '2 - access("E"."DEPARTMENT_ID"="D"."DEPARTMENT_ID")', noteKo: '미국 부서 4개와 EMPLOYEES를 DEPARTMENT_ID로 Hash Join. 결과 7명의 미국 근무 직원이 추출돼요.', noteEn: 'Hash Join between the 4 US departments and EMPLOYEES on DEPARTMENT_ID. Result: 7 employees working in US offices.' },
     ],
@@ -1169,8 +1163,9 @@ Fetch        2  0.00     0.05     3      8        0    14
 ------- ------  ----  -------  ----  -----  -------  ----
 total        4  0.00     0.05     3      8        0    14`,
     reasonKo: `RANK() OVER (PARTITION BY ... ORDER BY ...)는 윈도우 함수예요.
-윈도우 함수는 반드시 전체 데이터를 메모리에 올려 정렬 후 계산해야 해요.
-이 때문에 WINDOW SORT 오퍼레이션이 항상 등장해요.
+순위를 매기려면 PARTITION BY · ORDER BY 기준으로 데이터가 정렬되어 있어야 해요.
+그래서 이 쿼리처럼 정렬된 입력이 없으면 WINDOW SORT 오퍼레이션이 등장해요.
+(인덱스로 이미 정렬된 순서로 읽으면 정렬 없는 WINDOW NOSORT / WINDOW BUFFER가 나올 수도 있어요.)
 
 실행 순서: ② → ① → ⓪
 
@@ -1189,8 +1184,9 @@ RANK vs DENSE_RANK:
   DENSE_RANK는 건너뛰지 않아요 (1,1,2).
   두 함수 모두 WINDOW SORT 오퍼레이션을 사용해요.`,
     reasonEn: `RANK() OVER (PARTITION BY ... ORDER BY ...) is a window function.
-Window functions require all data to be sorted in memory before the rank is computed —
-this is why WINDOW SORT always appears in the plan.
+Ranking needs the rows ordered by the PARTITION BY / ORDER BY keys —
+so when the input is not already sorted, as here, WINDOW SORT appears in the plan.
+(If an index delivers the rows in order, a sort-free WINDOW NOSORT / WINDOW BUFFER can appear instead.)
 
 Execution order: ② → ① → ⓪
 
@@ -1209,7 +1205,7 @@ RANK vs DENSE_RANK:
   DENSE_RANK does not skip (1, 1, 2).
   Both functions use the WINDOW SORT operation.`,
     predicateAnnotations: [
-      { line: '2 - filter("E"."DEPARTMENT_ID" IS NOT NULL)', noteKo: 'TABLE ACCESS FULL에서 DEPARTMENT_ID IS NOT NULL이 filter예요. IS NOT NULL은 인덱스를 사용할 수 없는 조건 중 하나이며(NULL 값은 B-Tree 인덱스에 저장되지 않음), 전체 테이블을 읽은 후 NULL인 행을 제거해요.', noteEn: 'DEPARTMENT_ID IS NOT NULL is a filter on the TABLE ACCESS FULL. IS NOT NULL cannot use a B-tree index (NULL values are not stored in B-tree indexes), so every row is read and then filtered.' },
+      { line: '2 - filter("E"."DEPARTMENT_ID" IS NOT NULL)', noteKo: 'TABLE ACCESS FULL에서 DEPARTMENT_ID IS NOT NULL이 filter예요. 15행 중 14행이 조건에 맞으니까 인덱스를 거치는 것보다 테이블을 통째로 읽는 게 더 싸요. 그래서 전체를 읽은 뒤 NULL인 행만 걸러내요.', noteEn: 'DEPARTMENT_ID IS NOT NULL is a filter on the TABLE ACCESS FULL. 14 of the 15 rows qualify, so reading the whole table is cheaper than going through an index; the NULL row is simply filtered out after the scan.' },
     ],
     projectionAnnotations: [
       { line: '1 - output: [E.EMPLOYEE_ID, E.LAST_NAME, E.DEPARTMENT_ID, E.SALARY, RANK() OVER (...)]', noteKo: 'WINDOW SORT 완료 후 RANK() 계산 결과가 추가되어 최종 5개 컬럼을 출력해요. RANK()는 이 시점(정렬 후)에만 계산 가능해요.', noteEn: 'After WINDOW SORT completes, the RANK() value is computed and appended, producing 5 output columns. RANK() can only be calculated after all rows are sorted.' },
@@ -1395,7 +1391,7 @@ Why EMPLOYEES is scanned twice (⑤ and ⑧):
       { line: '5 - output: [SALARY, DEPARTMENT_ID]', noteKo: '인라인 뷰 내부 EMPLOYEES FTS는 AVG 계산에 필요한 SALARY와 GROUP BY 키인 DEPARTMENT_ID만 꺼내요. EMPLOYEE_ID, LAST_NAME 등은 이 단계에서 필요하지 않아요.', noteEn: 'The inline view\'s internal EMPLOYEES FTS projects only SALARY (for AVG) and DEPARTMENT_ID (for GROUP BY). EMPLOYEE_ID, LAST_NAME, etc. are not needed at this stage.' },
     ],
     statsAnnotations: [
-      { line: 'consistent gets      = 30', noteKo: '논리 블록 30개: 인라인 뷰 EMPLOYEES FTS 8 + DEPARTMENTS FTS 8 + 메인쿼리 EMPLOYEES FTS 8 + LOCATIONS 6. EMPLOYEES 이중 스캔이 CR을 높여요.', noteEn: '30 logical blocks: inline view EMPLOYEES FTS (8) + DEPARTMENTS FTS (8) + main query EMPLOYEES FTS (8) + overhead (6). The double EMPLOYEES scan inflates the CR.' },
+      { line: 'consistent gets      = 30', noteKo: '논리 블록 30개: 인라인 뷰 EMPLOYEES FTS 8 + DEPARTMENTS FTS 8 + 메인쿼리 EMPLOYEES FTS 8 + 그 밖의 읽기 6. EMPLOYEES 이중 스캔이 CR을 높여요.', noteEn: '30 logical blocks: inline view EMPLOYEES FTS (8) + DEPARTMENTS FTS (8) + main query EMPLOYEES FTS (8) + overhead (6). The double EMPLOYEES scan inflates the CR.' },
       { line: 'rows processed       =  8', noteKo: '8명이 자신의 부서 평균 급여 이상을 받는 직원이에요. 나머지 7명은 filter("SALARY">="AVG_SAL")에서 제거돼요.', noteEn: '8 employees earn at or above their department\'s average salary. The remaining 7 are removed by the filter("SALARY">="AVG_SAL") step.' },
     ],
   },
@@ -1425,7 +1421,7 @@ export function OptimizerSimulator() {
   return (
     <div className="flex h-full min-h-0 overflow-hidden">
       {/* ── 좌측 쿼리 목록 ── */}
-      <aside className="flex w-64 shrink-0 flex-col gap-1 overflow-y-auto border-r border-line p-3 dark:border-line-2">
+      <aside className="flex w-64 shrink-0 flex-col gap-1 overflow-y-auto border-r border-line p-3">
         <p className="mb-2 px-2 text-[11px] font-bold uppercase tracking-widest text-ink-2">
           {isKo ? '예제 쿼리' : 'Example Queries'}
         </p>
@@ -1435,8 +1431,8 @@ export function OptimizerSimulator() {
             onClick={() => setSelected(qry.id)}
             className={`flex w-full flex-col items-start gap-1 rounded-card px-3 py-2.5 text-left transition-colors ${
               selected === qry.id
-                ? 'bg-amber/5 ring-1 ring-amber/50 dark:bg-amber'
-                : 'hover:bg-paper-sunk dark:hover:bg-ink'
+                ? 'bg-amber/5 ring-1 ring-amber/50'
+                : 'hover:bg-paper-sunk'
             }`}
           >
             <span className="text-xs font-semibold text-ink">
@@ -1462,8 +1458,8 @@ export function OptimizerSimulator() {
           </div>
 
           {/* 왜 이런 실행 계획인가 */}
-          <div className="rounded-panel border border-amber/30 bg-amber/5 px-5 py-4 dark:border-amber dark:bg-amber">
-            <p className="mb-2 flex items-center gap-2 text-xs font-bold text-amber dark:text-amber">
+          <div className="rounded-panel border border-amber/30 bg-amber/5 px-5 py-4">
+            <p className="mb-2 flex items-center gap-2 text-xs font-bold text-amber">
               <IconPlayerPlay size={13} />
               {isKo ? '왜 이런 실행 계획인가?' : 'Why this execution plan?'}
             </p>

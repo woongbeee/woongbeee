@@ -121,19 +121,15 @@ const T = {
     tabUnpivot: 'UNPIVOT',
     pivotCategoryLabel: '행 → 열 변환',
     unpivotCategoryLabel: '열 → 행 변환',
-
-    pivotTitle: 'PIVOT — 행을 열로 전환',
     pivotDesc:
       'PIVOT은 특정 컬럼의 값을 열 헤더로 바꿔서 가로 방향으로 펼쳐요. 예를 들어 job_title 값(Engineer, Analyst …)을 열로 변환하면 부서별 직무별 급여 합계를 한눈에 볼 수 있어요.',
     pivotInfo:
-      'FOR job_title IN (...)에 나열한 값이 열 이름이 됩니다. 목록에 없는 값은 결과에서 제외됩니다.',
+      'FOR job_title IN (...)에 나열한 값이 열 이름이 돼요. 목록에 없는 값은 결과에서 제외돼요.',
     animTitle: '애니메이션으로 보기',
-
-    unpivotTitle: 'UNPIVOT — 열을 행으로 전환',
     unpivotDesc:
       'UNPIVOT은 PIVOT의 반대예요. 여러 열에 흩어진 값을 하나의 컬럼으로 세로로 쌓아요. 가로로 넓게 펼쳐진 피벗 결과를 다시 정규화된 행 구조로 되돌릴 때 사용해요.',
     unpivotInfo:
-      'UNPIVOT 절의 total_sal은 값이 담길 컬럼 이름, FOR job_title은 원래 열 이름이 들어갈 컬럼 이름, IN (...)에는 펼칠 열 목록을 나열합니다. NULL 값을 가진 열은 기본적으로 결과에서 제외됩니다.',
+      'UNPIVOT 절의 total_sal은 값이 담길 컬럼 이름, FOR job_title은 원래 열 이름이 들어갈 컬럼 이름, IN (...)에는 펼칠 열 목록을 나열해요. NULL 값을 가진 열은 기본적으로 결과에서 제외돼요.',
     unpivotNullTip:
       'NULL 열은 기본으로 제외돼요. INCLUDE NULLS 옵션을 추가하면 NULL인 행도 포함할 수 있어요.',
 
@@ -147,15 +143,11 @@ const T = {
     tabUnpivot: 'UNPIVOT',
     pivotCategoryLabel: 'Rows → Columns',
     unpivotCategoryLabel: 'Columns → Rows',
-
-    pivotTitle: 'PIVOT — Rows to columns',
     pivotDesc:
       'PIVOT turns distinct values of a column into column headers. For example, turning job_title values (Engineer, Analyst …) into columns lets you see salary totals by dept and job side by side.',
     pivotInfo:
       'Values listed in FOR job_title IN (...) become column names. Values not in the list are excluded from the result.',
     animTitle: 'Watch the Animation',
-
-    unpivotTitle: 'UNPIVOT — Columns to rows',
     unpivotDesc:
       'UNPIVOT is the reverse of PIVOT. It folds multiple columns back into a single value column, stacking each as a separate row. Use it to normalize a wide pivoted result back into a row-oriented structure.',
     unpivotInfo:

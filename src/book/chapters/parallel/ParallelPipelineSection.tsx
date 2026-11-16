@@ -25,7 +25,7 @@ const T = {
 
     exampleTitle: '예시 쿼리로 흐름 보기',
     exampleDesc:
-      '아래 쿼리는 SALES를 부서별로 조인해서 부서당 매출 합계를 구해요. 조인 한 번 + 집계 한 번이라 Table Queue가 2개 등장해요.',
+      '아래 쿼리는 SALES를 부서별로 조인해서 부서당 매출 합계를 구해요. 흐름을 한눈에 보려고 그림에서는 Table Queue를 2개(조인 키 재분배, 집계 키 재분배)로 단순하게 그렸어요. 실제 실행 계획에서는 테이블마다 TQ가 따로 생기고 QC로 보내는 TQ도 하나 더 있어서 4개가 나와요 — 다음 페이지에서 실제 계획으로 확인해요.',
     exampleSql: `SELECT /*+ PARALLEL(s, 4) PARALLEL(d, 4) */
        d.dept_name, SUM(s.amount) AS total_amount
 FROM   sales s
@@ -56,8 +56,6 @@ GROUP BY d.dept_name;`,
     ],
 
     legendProducer: 'Producer PX (스캔)',
-    legendConsumer: 'Consumer PX (조인/집계)',
-    legendTq: 'Table Queue',
     legendPacketSales: 'SALES 행',
     legendPacketDept: 'DEPARTMENTS 행',
     legendPacketJoined: '조인된 행',
@@ -85,7 +83,7 @@ GROUP BY d.dept_name;`,
 
     exampleTitle: 'Following an Example Query',
     exampleDesc:
-      'The query below joins SALES to DEPARTMENTS and totals revenue per department. One join plus one aggregation means two Table Queues appear.',
+      'The query below joins SALES to DEPARTMENTS and totals revenue per department. To keep the flow readable, the animation draws just two Table Queues (join-key redistribution and group-key redistribution). A real plan has one TQ per scanned table plus one more to the QC — four in total, as the next page shows with an actual plan.',
     exampleSql: `SELECT /*+ PARALLEL(s, 4) PARALLEL(d, 4) */
        d.dept_name, SUM(s.amount) AS total_amount
 FROM   sales s
@@ -116,8 +114,6 @@ GROUP BY d.dept_name;`,
     ],
 
     legendProducer: 'Producer PX (scan)',
-    legendConsumer: 'Consumer PX (join/aggregate)',
-    legendTq: 'Table Queue',
     legendPacketSales: 'SALES row',
     legendPacketDept: 'DEPARTMENTS row',
     legendPacketJoined: 'Joined row',

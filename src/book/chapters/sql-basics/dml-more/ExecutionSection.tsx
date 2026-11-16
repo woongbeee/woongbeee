@@ -20,8 +20,8 @@ const T = {
   ko: {
     chapterTitle: 'SQL 실행 순서',
     chapterSubtitle:
-      'Oracle이 SQL을 처리하는 논리적 순서를 예제 쿼리별로 확인합니다.',
-    pickQuery: '예제 쿼리를 선택하면 실행 순서가 바로 표시됩니다.',
+      'Oracle이 SQL을 처리하는 논리적 순서를 예제 쿼리별로 확인해요.',
+    pickQuery: '예제 쿼리를 선택하면 실행 순서가 바로 표시돼요.',
     stepsTitle: '실행 순서',
     tableTitle: 'EMPLOYEES 테이블',
     resultTitle: '쿼리 결과',

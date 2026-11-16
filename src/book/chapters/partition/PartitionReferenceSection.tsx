@@ -47,9 +47,11 @@ CREATE TABLE order_items (
 PARTITION BY REFERENCE (fk_order_items);
 -- order_items는 orders와 동일한 3개 파티션으로 자동 분할됨
 
--- 부모 파티션 추가 시 자식 파티션도 자동 생성
-ALTER TABLE orders ADD PARTITION p2025
-  VALUES LESS THAN (DATE '2026-01-01');
+-- 부모 파티션을 나누면 자식 파티션도 자동으로 따라 나뉘어요
+-- (MAXVALUE 파티션이 있어서 ADD 대신 SPLIT을 써요)
+ALTER TABLE orders SPLIT PARTITION p_future
+  AT (DATE '2026-01-01')
+  INTO (PARTITION p2025, PARTITION p_future);
 -- order_items.p2025 파티션도 자동 생성됨`,
 
     benefitsTitle: 'Reference 파티션의 장점',
@@ -63,7 +65,7 @@ ALTER TABLE orders ADD PARTITION p2025
     constraintTitle: '제약 사항',
     constraintTable: [
       ['FK NOT NULL', 'Reference 파티션의 FK 컬럼은 NOT NULL이어야 함. NULL 허용 FK는 사용 불가.'],
-      ['단일 수준', 'Reference 파티션은 한 단계만 상속 가능. 자식의 자식(손자 테이블)은 직접 조부모를 참조해야 함.'],
+      ['FK 상태 조건', '참조하는 FK 제약은 ENABLE VALIDATE NOT DEFERRABLE(기본 상태)여야 함. 손자 테이블도 자식 테이블의 FK를 따라 여러 단계로 이어서 상속할 수 있음.'],
       ['FK 비활성화 불가', 'Reference 파티셔닝이 활성화된 동안 FK를 DISABLE 할 수 없음.'],
       ['파티션 키 변경 불가', '부모 테이블의 파티셔닝 전략(키)을 변경하면 자식도 함께 재정의해야 함.'],
     ],
@@ -125,9 +127,11 @@ CREATE TABLE order_items (
 PARTITION BY REFERENCE (fk_order_items);
 -- order_items automatically gets the same 3 partitions as orders
 
--- Adding a partition to parent auto-creates child partition
-ALTER TABLE orders ADD PARTITION p2025
-  VALUES LESS THAN (DATE '2026-01-01');
+-- Splitting a parent partition automatically splits the child partition too
+-- (SPLIT instead of ADD because a MAXVALUE partition exists)
+ALTER TABLE orders SPLIT PARTITION p_future
+  AT (DATE '2026-01-01')
+  INTO (PARTITION p2025, PARTITION p_future);
 -- order_items.p2025 is automatically created`,
 
     benefitsTitle: 'Benefits of Reference Partitioning',
@@ -141,7 +145,7 @@ ALTER TABLE orders ADD PARTITION p2025
     constraintTitle: 'Constraints',
     constraintTable: [
       ['FK must be NOT NULL', 'The FK column used for reference partitioning must be NOT NULL. Nullable FKs are not supported.'],
-      ['Single level only', 'Reference partitioning inherits one level only. Grandchild tables must reference the grandparent directly.'],
+      ['FK state', 'The referenced FK constraint must be ENABLE VALIDATE NOT DEFERRABLE (the default). A grandchild table can in turn be reference-partitioned on the child, so inheritance can span several levels.'],
       ['FK cannot be disabled', 'The FK constraint cannot be DISABLED while reference partitioning is active.'],
       ['Cannot change partition key', "Changing the parent table's partitioning strategy requires redefining the child table as well."],
     ],

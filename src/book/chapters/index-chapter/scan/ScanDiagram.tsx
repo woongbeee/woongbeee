@@ -5,18 +5,18 @@ import { motion } from 'framer-motion'
 
 // ── 타입 ─────────────────────────────────────────────────────────────────────
 
-export interface LeafEntry {
+interface LeafEntry {
   key: number | string   // 인덱스 키 값
   rowid: string
 }
 
-export interface LeafBlock {
+interface LeafBlock {
   id: string
   entries: LeafEntry[]
 }
 
 // 각 항목이 어떻게 표시될지
-export type EntryState =
+type EntryState =
   | 'idle'       // 기본 (회색)
   | 'visited'    // 방문했지만 조건 미충족 (흐린 파란색)
   | 'matched'    // 조건 충족 (초록)

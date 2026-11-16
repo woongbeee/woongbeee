@@ -165,7 +165,7 @@ GROUP BY GROUPING SETS (
 )
 ORDER BY dept_id NULLS LAST, job_title NULLS LAST`
 
-const GROUPING_SETS_EQ_SQL = `-- GROUPING SETS는 여러 GROUP BY를 UNION ALL한 것과 같습니다
+const GROUPING_SETS_EQ_SQL = `-- GROUPING SETS는 여러 GROUP BY를 UNION ALL한 것과 같아요
 SELECT dept_id, NULL AS job_title, SUM(salary), COUNT(*) FROM employees GROUP BY dept_id
 UNION ALL
 SELECT NULL, job_title, SUM(salary), COUNT(*) FROM employees GROUP BY job_title`
@@ -233,41 +233,15 @@ const T = {
       {
         icon: '⚡',
         title: '성능',
-        desc: '테이블을 한 번만 스캔하고 집계 수준별 행을 동시에 만들어냅니다. 같은 결과를 UNION ALL로 작성하면 테이블을 여러 번 읽어야 해서 훨씬 느립니다.',
+        desc: '테이블을 한 번만 스캔하고 집계 수준별 행을 동시에 만들어내요. 같은 결과를 UNION ALL로 작성하면 테이블을 여러 번 읽어야 해서 훨씬 느려요.',
       },
     ],
 
     cubeTitle: 'CUBE — 모든 조합의 소계',
     cubeDesc:
-      'CUBE(A, B)는 가능한 모든 컬럼 조합의 집계를 한꺼번에 만듭니다. (A, B) · (A) · (B) · () 네 가지 집계가 생깁니다. ROLLUP보다 더 많은 행이 생기고, BI 리포트처럼 행·열 모두 소계가 필요할 때 씁니다.',
+      'CUBE(A, B)는 가능한 모든 컬럼 조합의 집계를 한꺼번에 만들어요. (A, B) · (A) · (B) · () 네 가지 집계가 생겨요. ROLLUP보다 더 많은 행이 생기고, BI 리포트처럼 행·열 모두 소계가 필요할 때 써요.',
     cubeInfo:
       'CUBE(dept_id, job_title)이 만드는 4가지 집계: ① dept+job (상세) ② dept만 (부서별 합계) ③ job만 (직무별 합계) ④ 전체 총계',
-    cubeEtymTitle: 'CUBE란 단어는 어디서 왔을까?',
-    cubeEtym:
-      '"Cube"는 정육면체예요. 2개 컬럼이면 사각형, 3개 컬럼이면 정육면체처럼 모든 면(조합)을 빠짐없이 집계한다는 뜻에서 유래했어요. 데이터 분석에서 "OLAP 큐브"라는 개념이 여기서 나왔으며, 다차원 집계를 한 번에 계산한다는 이미지예요.',
-    cubeUsageTitle: '실무에서 언제 쓸까?',
-    cubeUsages: [
-      {
-        icon: '📊',
-        title: 'BI 크로스탭 리포트',
-        desc: '행은 부서별, 열은 직무별 합계가 동시에 필요한 피벗형 보고서. CUBE 하나로 행 방향·열 방향 소계를 모두 산출.',
-      },
-      {
-        icon: '🗂️',
-        title: '다차원 분석',
-        desc: '연도·분기·월처럼 계층 없이 모든 조합의 소계가 필요할 때. ROLLUP은 한 방향 계층만 지원하지만 CUBE는 모든 축 조합 지원.',
-      },
-      {
-        icon: '⚖️',
-        title: 'ROLLUP과의 선택 기준',
-        desc: '계층 방향이 한 방향이면 ROLLUP, 행·열 모두 소계가 필요하면 CUBE. CUBE는 행이 많이 생기므로 컬럼이 3개 이상이면 신중하게 사용.',
-      },
-      {
-        icon: '⚡',
-        title: '성능 주의',
-        desc: 'N개 컬럼이면 2ᴺ가지 조합을 만들어냅니다. 컬럼이 4개면 16가지 집계가 발생해 결과 행이 급격히 늘어납니다.',
-      },
-    ],
 
     groupingSetsTitle: 'GROUPING SETS — 원하는 집계 조합만 선택',
     groupingSetsDesc:
@@ -277,81 +251,17 @@ const T = {
     groupingSetsEqTitle: 'GROUPING SETS = 여러 GROUP BY의 UNION ALL',
     groupingSetsEqDesc:
       'GROUPING SETS는 내부적으로 각 집합을 개별 GROUP BY로 실행한 뒤 결과를 UNION ALL로 합친 것과 동일해요. 단, GROUPING SETS는 테이블을 한 번만 스캔하기 때문에 성능이 더 좋아요.',
-    groupingSetsEtymTitle: 'GROUPING SETS란 단어는 어디서 왔을까?',
-    groupingSetsEtym:
-      '"Grouping Sets"는 말 그대로 "집계할 집합들의 묶음"이에요. ROLLUP·CUBE가 규칙에 따라 자동으로 집합을 생성하는 것과 달리, GROUPING SETS는 집계할 집합 목록을 개발자가 직접 지정해요. 원하는 집합만 정확히 골라 실행하는 수동 방식이에요.',
-    groupingSetsUsageTitle: '실무에서 언제 쓸까?',
-    groupingSetsUsages: [
-      {
-        icon: '🎯',
-        title: '필요한 집계만 정확히',
-        desc: '부서별 합계와 직무별 합계는 필요하지만, 부서+직무 상세나 전체 총계는 불필요할 때. ROLLUP·CUBE 대신 GROUPING SETS로 딱 필요한 것만 뽑음.',
-      },
-      {
-        icon: '🔧',
-        title: 'ROLLUP/CUBE 대체',
-        desc: 'ROLLUP(A,B)는 GROUPING SETS((A,B),(A),())로, CUBE(A,B)는 GROUPING SETS((A,B),(A),(B),())로 완전히 표현 가능합니다. 더 명시적인 쿼리가 필요할 때 사용.',
-      },
-      {
-        icon: '📋',
-        title: '복합 리포트',
-        desc: '한 쿼리에서 "지역별 합계"와 "담당자별 합계"를 동시에 뽑아야 하는 복합 보고서. UNION ALL보다 간결하고 테이블 스캔도 1회.',
-      },
-      {
-        icon: '⚡',
-        title: '성능',
-        desc: '테이블을 한 번만 스캔합니다. UNION ALL로 각 집계를 따로 쓰면 테이블을 N번 읽어야 하지만 GROUPING SETS는 한 번에 처리합니다.',
-      },
-    ],
 
     groupingTitle: 'GROUPING() — 소계 행 식별 함수',
     groupingDesc:
       'ROLLUP·CUBE·GROUPING SETS로 생성된 소계/총계 행에서 NULL은 "집계 기준에서 제외된 컬럼"을 나타내요. 하지만 원본 데이터에도 NULL이 있을 수 있어서, NULL만 보고는 소계 행인지 실제 NULL인지 구분할 수 없어요. GROUPING() 함수가 이 문제를 해결해줘요.',
     groupingInfo:
-      'GROUPING(col)은 해당 컬럼이 집계에서 제외된(소계/총계) 경우 1, 실제 그룹 기준으로 사용된 경우 0을 반환합니다.',
+      'GROUPING(col)은 해당 컬럼이 집계에서 제외된(소계/총계) 경우 1, 실제 그룹 기준으로 사용된 경우 0을 반환해요.',
     groupingCaseTitle: 'CASE와 결합해 레이블 표시',
     groupingCaseDesc:
       'GROUPING()을 CASE 식과 함께 쓰면 NULL 대신 "전체"·"소계" 같은 의미 있는 레이블로 바꿀 수 있어요.',
-    groupingEtymTitle: 'GROUPING()이란 함수는 왜 필요할까요?',
-    groupingEtym:
-      'ROLLUP/CUBE가 만드는 소계 행에서 집계 제외된 컬럼은 NULL로 표시돼요. 그런데 원본 데이터에도 실제 NULL 값이 있을 수 있어서 "이 NULL이 소계를 뜻하는지, 데이터가 원래 NULL인지" 구분이 불가능해요. GROUPING()은 이 모호함을 숫자(0/1)로 명확히 해결해주는 함수예요.',
-    groupingUsageTitle: '실무에서 언제 쓸까?',
-    groupingUsages: [
-      {
-        icon: '🏷️',
-        title: '레이블 치환',
-        desc: 'NULL 대신 "전체", "소계", "합계" 같은 의미 있는 텍스트로 표시. CASE GROUPING(col) WHEN 1 THEN \'합계\' ELSE col END',
-      },
-      {
-        icon: '🔍',
-        title: '소계 행 필터링',
-        desc: 'WHERE GROUPING(dept_id) = 1로 소계 행만 골라내거나, = 0으로 상세 행만 가져오는 필터링. NULL 비교로는 안 되는 작업을 정확하게 처리.',
-      },
-      {
-        icon: '📊',
-        title: '리포트 서식',
-        desc: '소계/총계 행에 굵은 글씨·배경색을 적용하는 프론트엔드 처리. GROUPING() 값을 컬럼으로 함께 SELECT해 UI에서 활용.',
-      },
-      {
-        icon: '🛡️',
-        title: 'NULL 데이터 보호',
-        desc: '원본 데이터에 NULL이 있는 컬럼을 ROLLUP 키로 쓸 때 필수. GROUPING() 없이는 실제 NULL과 소계 NULL을 구분할 방법이 없음.',
-      },
-    ],
 
-    nullMeaning: 'NULL = 해당 집계 수준에서 "모든 값"을 의미합니다',
-    levelDetail: '상세',
-    levelSubtotal: '소계',
-    levelGrand: '총계',
-    setBadgeDept: '부서별',
-    setBadgeJob: '직무별',
-    groupingLabel: (g: string) => {
-      if (g === 'dept+job') return '상세 (dept+job)'
-      if (g === 'dept') return '부서 소계'
-      if (g === 'job') return '직무 소계'
-      return '전체 총계'
-    },
-    result: '결과',
+    nullMeaning: 'NULL = 해당 집계 수준에서 "모든 값"을 의미해요',
     comparisonTitle: 'ROLLUP vs CUBE',
   },
   en: {
@@ -400,32 +310,6 @@ const T = {
       'CUBE(A, B) generates aggregates for every possible column combination: (A, B) · (A) · (B) · (). More rows than ROLLUP, useful when you need subtotals in both row and column directions, like a BI report.',
     cubeInfo:
       'CUBE(dept_id, job_title) produces 4 aggregation levels: ① dept+job (detail) ② dept only ③ job only ④ grand total',
-    cubeEtymTitle: 'Where does the word "CUBE" come from?',
-    cubeEtym:
-      'A cube has six faces — every combination of dimensions visible at once. With 2 columns you get a square (4 corners), with 3 columns a cube (8 corners). CUBE in SQL generates all 2ᴺ combinations of N columns, like seeing every face of a data cube simultaneously. This is the foundation of OLAP (Online Analytical Processing) cube analysis.',
-    cubeUsageTitle: 'When is CUBE used in practice?',
-    cubeUsages: [
-      {
-        icon: '📊',
-        title: 'BI cross-tab reports',
-        desc: 'When you need both row-direction (by dept) and column-direction (by job) subtotals simultaneously — a pivot-style report. CUBE produces both in one query.',
-      },
-      {
-        icon: '🗂️',
-        title: 'Multi-dimensional analysis',
-        desc: 'When all combinations of year/quarter/month are needed without a strict hierarchy. ROLLUP only supports one-directional hierarchy; CUBE covers all axis combinations.',
-      },
-      {
-        icon: '⚖️',
-        title: 'ROLLUP vs CUBE decision',
-        desc: 'Use ROLLUP when aggregation flows in one hierarchical direction. Use CUBE when subtotals are needed in all directions. CUBE generates many more rows, so use with caution beyond 3 columns.',
-      },
-      {
-        icon: '⚡',
-        title: 'Performance note',
-        desc: 'N columns produce 2ᴺ grouping combinations. 4 columns = 16 aggregations. Result sets grow exponentially, so profile before using CUBE on wide column lists.',
-      },
-    ],
 
     groupingSetsTitle: 'GROUPING SETS — Pick only the groupings you need',
     groupingSetsDesc:
@@ -435,32 +319,6 @@ const T = {
     groupingSetsEqTitle: 'GROUPING SETS = UNION ALL of GROUP BYs',
     groupingSetsEqDesc:
       'GROUPING SETS is logically equivalent to running each grouping as a separate GROUP BY and combining with UNION ALL. However, GROUPING SETS scans the table only once, making it more efficient.',
-    groupingSetsEtymTitle: 'Where does "GROUPING SETS" come from?',
-    groupingSetsEtym:
-      '"Grouping Sets" literally means "a collection of grouping sets." While ROLLUP and CUBE auto-generate grouping combinations by rule, GROUPING SETS lets you enumerate exactly which sets to group by. It is the manual, explicit version — you specify precisely the grouping combinations you want, and nothing more.',
-    groupingSetsUsageTitle: 'When is GROUPING SETS used in practice?',
-    groupingSetsUsages: [
-      {
-        icon: '🎯',
-        title: 'Exact aggregations only',
-        desc: 'When you need dept subtotals and job subtotals but not dept+job detail rows or a grand total. GROUPING SETS gives you exactly what you ask for.',
-      },
-      {
-        icon: '🔧',
-        title: 'Replacing ROLLUP / CUBE explicitly',
-        desc: 'ROLLUP(A,B) = GROUPING SETS((A,B),(A),()); CUBE(A,B) = GROUPING SETS((A,B),(A),(B),()). Use GROUPING SETS when you want the query intent to be crystal clear.',
-      },
-      {
-        icon: '📋',
-        title: 'Composite reports',
-        desc: 'Pull "by-region totals" and "by-rep totals" simultaneously in one query without UNION ALL — a single table scan, cleaner code.',
-      },
-      {
-        icon: '⚡',
-        title: 'Performance',
-        desc: 'Scans the table once regardless of how many sets are listed. UNION ALL equivalents read the table N times — once per GROUP BY block.',
-      },
-    ],
 
     groupingTitle: 'GROUPING() — Identify subtotal rows',
     groupingDesc:
@@ -470,46 +328,8 @@ const T = {
     groupingCaseTitle: 'Combine with CASE for readable labels',
     groupingCaseDesc:
       'Use GROUPING() inside a CASE expression to replace NULL with meaningful labels like "All" or "Subtotal."',
-    groupingEtymTitle: 'Why does GROUPING() need to exist?',
-    groupingEtym:
-      'ROLLUP/CUBE mark excluded columns with NULL in subtotal rows. But source data can also have genuine NULLs — so a NULL in the result could mean "subtotal for all values" or "this row had no value." There is no way to distinguish them without extra information. GROUPING() provides that information: it is a flag (0 or 1) that unambiguously identifies whether a NULL was injected by the aggregation engine or came from the data itself.',
-    groupingUsageTitle: 'When is GROUPING() used in practice?',
-    groupingUsages: [
-      {
-        icon: '🏷️',
-        title: 'Label substitution',
-        desc: "Replace NULL with readable text like 'Total', 'Subtotal', 'All'. Pattern: CASE GROUPING(col) WHEN 1 THEN 'Total' ELSE col END",
-      },
-      {
-        icon: '🔍',
-        title: 'Filtering subtotal rows',
-        desc: 'Use WHERE GROUPING(dept_id) = 1 to select only subtotal rows, or = 0 for detail rows only. NULL comparison (= NULL) would never match anything.',
-      },
-      {
-        icon: '📊',
-        title: 'Report formatting',
-        desc: 'SELECT the GROUPING() value as a column and use it in the frontend to apply bold text or background color to subtotal/grand-total rows.',
-      },
-      {
-        icon: '🛡️',
-        title: 'Nullable key columns',
-        desc: 'Essential when a ROLLUP key column contains real NULLs in source data. Without GROUPING(), subtotal NULLs and data NULLs are indistinguishable.',
-      },
-    ],
 
     nullMeaning: 'NULL = "all values" at that aggregation level',
-    levelDetail: 'Detail',
-    levelSubtotal: 'Subtotal',
-    levelGrand: 'Grand total',
-    setBadgeDept: 'By dept',
-    setBadgeJob: 'By job',
-    groupingLabel: (g: string) => {
-      if (g === 'dept+job') return 'Detail (dept+job)'
-      if (g === 'dept') return 'Dept subtotal'
-      if (g === 'job') return 'Job subtotal'
-      return 'Grand total'
-    },
-    result: 'Result',
     comparisonTitle: 'ROLLUP vs CUBE',
   },
 }

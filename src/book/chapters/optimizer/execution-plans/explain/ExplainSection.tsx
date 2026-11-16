@@ -16,7 +16,7 @@ const T = {
   ko: {
     title: 'EXPLAIN PLAN으로 실행 계획 생성하기',
     subtitle:
-      'EXPLAIN PLAN 문장은 SQL 문장에 대해 옵티마이저가 선택한 실행 계획을 확인하게 해줍니다.',
+      'EXPLAIN PLAN 문장은 SQL 문장에 대해 옵티마이저가 선택한 실행 계획을 확인하게 해줘요.',
     aboutTitle: 'EXPLAIN PLAN이란?',
     aboutDesc:
       'EXPLAIN PLAN 문장은 SELECT, UPDATE, INSERT, DELETE 문장에 대해 옵티마이저가 선택하는 실행 계획을 표시해요. EXPLAIN PLAN 출력은 문장이 설명(explain)되었을 때 데이터베이스가 SQL 문장을 어떻게 실행했을지 보여줘요. 실행 환경과 설명 환경의 차이로 인해 설명된 계획이 실제 실행 계획과 다를 수 있어요.\n\nEXPLAIN PLAN 문장은 DDL이 아닌 DML 문장이에요. 따라서 Oracle 데이터베이스는 EXPLAIN PLAN 문장이 수행한 변경 사항을 암묵적으로 커밋하지 않아요.',
@@ -32,7 +32,7 @@ const T = {
       'TKPROF는 SQL 문장의 텍스트에서 바인드 변수의 타입을 결정할 수 없어요. VARCHAR로 가정하며, 그렇지 않으면 오류 메시지를 출력해요.',
     ],
     basicStepsTitle: 'EXPLAIN PLAN 기본 사용법',
-    basicStepsDesc: 'PLAN_TABLE에 SQL 문장의 계획을 저장하려면 EXPLAIN PLAN을 사용합니다.',
+    basicStepsDesc: 'PLAN_TABLE에 SQL 문장의 계획을 저장하려면 EXPLAIN PLAN을 사용해요.',
     basicStepsSql: `-- 1단계: EXPLAIN PLAN 실행
 EXPLAIN PLAN FOR
   SELECT e.last_name, d.department_name, e.salary
@@ -145,7 +145,7 @@ Plan hash value: 891225627
 |   8 |         CONTAINERS FULL          | DBA_TABLES |   234K|  2970K|   139 (100)| 00:00:01 |       |       |
 ---------------------------------------------------------------------------------------------------------------`,
     containersNote:
-      'CONTAINERS 절을 사용하는 쿼리는 기본적으로 파티셔닝됩니다. 행 7의 PX PARTITION LIST ITERATOR가 이를 나타냅니다. Pstart=1, Pstop=9는 con_id < 10 조건에서 도출됩니다.',
+      'CONTAINERS 절을 사용하는 쿼리는 기본적으로 파티셔닝돼요. 행 7의 PX PARTITION LIST ITERATOR가 이를 나타내요. Pstart=1, Pstop=9는 con_id < 10 조건에서 도출돼요.',
     customQueryTitle: 'PLAN_TABLE 직접 쿼리하기',
     customQueryDesc:
       'STATEMENT_ID를 지정했다면 직접 SQL 스크립트를 작성해 PLAN_TABLE을 쿼리할 수 있어요.',
@@ -183,7 +183,7 @@ EXPLAIN PLAN FOR
   WHERE  hire_date >= TO_DATE('1-JAN-1996','DD-MON-YYYY');
 -- PARTITION RANGE ITERATOR: Pstart=4, Pstop=5 → 파티션 4~5만 접근`,
     partitionNote:
-      '파티션 번호를 컴파일 시점에 알 수 없을 때(바인드 변수 사용 등) PARTITION_START와 PARTITION_STOP이 KEY로 표시되며, 런타임에 결정됩니다.',
+      '파티션 번호를 컴파일 시점에 알 수 없을 때(바인드 변수 사용 등) PARTITION_START와 PARTITION_STOP이 KEY로 표시되며, 런타임에 결정돼요.',
     parallelTitle: '병렬 쿼리 EXPLAIN PLAN',
     parallelDesc:
       '병렬 쿼리 계획은 직렬 쿼리 계획과 중요한 차이가 있어요. 병렬 계획에서는 PX 관련 행 소스들이 추가돼요.',
@@ -231,7 +231,7 @@ SELECT STATEMENT
         BITMAP MERGE
           BITMAP INDEX C3_IND RANGE SCAN`,
     bitmapNote:
-      'c1=2 조건에서 비트맵을 얻고, c2=6인 비트를 빼고, c2 IS NULL인 비트를 뺍니다. NULL 제거는 컬럼에 NOT NULL 제약이 없으면 의미적 정확성을 위해 필요합니다.',
+      'c1=2 조건에서 비트맵을 얻고, c2=6인 비트를 빼고, c2 IS NULL인 비트를 빼요. NULL 제거는 컬럼에 NOT NULL 제약이 없으면 의미적 정확성을 위해 필요해요.',
     resultCacheTitle: 'Result Cache 계획',
     resultCacheSql: `EXPLAIN PLAN FOR
 SELECT /*+ result_cache(TEMP=TRUE) */ department_id, AVG(salary)

@@ -9,7 +9,7 @@ import type { BlockRef } from './types'
 
 // ── Block addressing ──────────────────────────────────────────────────────
 
-export const tableBlock = (ts: TableStats, n: number): BlockRef => ({
+const tableBlock = (ts: TableStats, n: number): BlockRef => ({
   key: `${ts.tableName}#${n}`, object: ts.tableName, abbr: ts.abbr, sub: String(n), kind: 'table',
 })
 
@@ -86,7 +86,7 @@ function likeToRegex(pattern: string): RegExp {
 }
 
 /** true/false, 또는 값을 몰라 판단할 수 없으면 null */
-export function evalPredicate(row: RowData, pred: Predicate): boolean | null {
+function evalPredicate(row: RowData, pred: Predicate): boolean | null {
   const v = row[pred.column]
   if (pred.operator === 'IS NULL' && !pred.wrapped) return v === null || v === undefined
   if (pred.operator === 'IS NOT NULL' && !pred.wrapped) return v !== null && v !== undefined

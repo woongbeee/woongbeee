@@ -29,9 +29,6 @@ const T = {
     whatTitle: '실행 계획이란?',
     whatDesc:
       'SQL을 실행하기 전, CBO(Cost-Based Optimizer)는 가능한 실행 방법을 탐색하고 가장 비용이 낮은 방법을 선택해요. 이 선택 결과를 트리 형태로 기록한 것이 실행 계획이에요.\n\n실행 계획의 각 줄은 하나의 Row Source Operation이에요. 트리 구조이며, 들여쓰기가 가장 깊은 자식 노드부터 실행되어 결과를 부모에게 전달해요.',
-    readOrderTitle: '읽는 순서',
-    readOrderDesc:
-      '자식이 여럿이면 위에서 아래 순서로 실행돼요. 아래 예시의 실행 순서는 ③ → ② → ① → ⓪ 이에요.',
 
     areasTitle: '실행 계획에서 볼 수 있는 5가지 정보 영역',
     areasDesc:
@@ -79,7 +76,7 @@ ALTER SESSION SET sql_trace = FALSE;
     ],
     sqlTraceAnalysis: 'Call Statistics로 성능 분석하기',
     sqlTraceAnalysisDesc:
-      'Parse cpu가 높으면 바인드 변수 미사용으로 Hard Parse가 반복되는 신호예요. elapsed가 cpu보다 훨씬 크면 Lock 대기나 I/O 대기 등 Wait Event가 발생하고 있음을 의미해요. Fetch disk가 높으면 Buffer Cache에서 처리되지 못하고 디스크 읽기가 발생한 거이므로 인덱스 활용이나 캐시 크기를 검토해요.',
+      'Parse cpu가 높으면 바인드 변수 미사용으로 Hard Parse가 반복되는 신호예요. elapsed가 cpu보다 훨씬 크면 Lock 대기나 I/O 대기 등 Wait Event가 발생하고 있음을 의미해요. Fetch disk가 높으면 Buffer Cache에서 처리되지 못하고 디스크 읽기가 발생한 것이므로 인덱스 활용이나 캐시 크기를 검토해요.',
 
     rsoTitle: '② Row Source Operation',
     rsoDesc:
@@ -101,7 +98,7 @@ SELECT * FROM TABLE(
     rsoColHeaders: ['컬럼', '설명'],
     rsoCols: [
       ['Id', '오퍼레이션 고유 번호. * 표시가 붙은 Id는 조건절(Predicate Information)이 있음을 의미.'],
-      ['Operation', '실제 수행된 오퍼레이션 이름.\n\n읽는 순서: 들여쓰기가 깊을수록 먼저 실행되어 결과를 부모 오퍼레이션에 전달합니다. 같은 깊이의 형제는 위에서 아래 순서로 실행됩니다. 아래 예시에서는 ④ → ③ → ② → ① → ⓪ 순으로 실행됩니다.'],
+      ['Operation', '실제 수행된 오퍼레이션 이름.\n\n읽는 순서: 들여쓰기가 깊을수록 먼저 실행되어 결과를 부모 오퍼레이션에 전달해요. 같은 깊이의 형제는 위에서 아래 순서로 실행돼요. 아래 예시에서는 ④ → ③ → ② → ① → ⓪ 순으로 실행돼요.'],
       ['Name', '오퍼레이션이 대상으로 한 테이블 또는 인덱스 이름.'],
       ['Rows', 'E-Rows — CBO가 반환될 것으로 추정한 행 수.'],
       ['Cost', 'CBO가 계산한 이 오퍼레이션의 상대적 비용.'],
@@ -142,7 +139,7 @@ SELECT * FROM TABLE(
 
     projTitle: '④ Column Projection',
     projDesc:
-      '각 오퍼레이션이 처리 후 다음 단계로 전달하는 컬럼 목록과 데이터 타입·길이를 보여줍니다. +PROJECTION 포맷을 사용합니다.\n\nSELECT에서 실제로 필요한 컬럼만 전달되는지 확인하는 데 사용합니다. 불필요한 컬럼이 많으면 데이터 전달 비용이 늘어납니다.',
+      '각 오퍼레이션이 처리 후 다음 단계로 전달하는 컬럼 목록과 데이터 타입·길이를 보여줘요. +PROJECTION 포맷을 사용해요.\n\nSELECT에서 실제로 필요한 컬럼만 전달되는지 확인하는 데 사용해요. 불필요한 컬럼이 많으면 데이터 전달 비용이 늘어나요.',
     projSql: `SELECT * FROM TABLE(DBMS_XPLAN.DISPLAY(
   format => 'BASIC +PROJECTION'
 ));`,
@@ -214,9 +211,6 @@ SET AUTOTRACE TRACEONLY STATISTICS`,
     whatTitle: 'What is an Execution Plan?',
     whatDesc:
       "Before executing SQL, the CBO explores all valid execution methods and selects the one with the lowest estimated cost. The result — recorded as a tree of operations — is the execution plan.\n\nEach line in the plan is a Row Source Operation. Execution proceeds from the most-indented child node up to the root, with each node passing its result set to its parent.",
-    readOrderTitle: 'Reading Order',
-    readOrderDesc:
-      'When a node has multiple children, they run top-to-bottom. In the example below, the execution order is ③ → ② → ① → ⓪.',
 
     areasTitle: 'Five Information Areas in an Execution Plan',
     areasDesc:
@@ -508,7 +502,7 @@ export function ReadSection() {
       </div>
       <InfoBox variant="tip">
         {isKo
-          ? 'Row Source Operation은 트리 구조를 표현합니다. 들여쓰기가 깊을수록 먼저 실행됩니다. 가장 안쪽 오퍼레이션부터 시작해 결과를 부모에게 전달하며 루트(Id 0)까지 올라갑니다. 같은 깊이의 형제는 위에서 아래 순서로 실행됩니다.'
+          ? 'Row Source Operation은 트리 구조를 표현해요. 들여쓰기가 깊을수록 먼저 실행돼요. 가장 안쪽 오퍼레이션부터 시작해 결과를 부모에게 전달하며 루트(Id 0)까지 올라가요. 같은 깊이의 형제는 위에서 아래 순서로 실행돼요.'
           : 'How to read — the plan is a tree. The most-indented (deepest) operation runs first and passes its result up to its parent, continuing to the root (Id 0). Siblings at the same depth run top-to-bottom.'}
       </InfoBox>
       <div className="mt-6">
@@ -544,7 +538,7 @@ export function ReadSection() {
       </InfoBox>
       <InfoBox variant="tip">
         {isKo
-          ? '/*+ gather_plan_statistics */ 힌트가 없으면 A-Rows, CR, PR 컬럼이 표시되지 않습니다. 힌트 없이 실행했다면 ALTER SESSION SET statistics_level = ALL을 먼저 설정하세요.'
+          ? '/*+ gather_plan_statistics */ 힌트가 없으면 A-Rows, CR, PR 컬럼이 표시되지 않아요. 힌트 없이 실행했다면 ALTER SESSION SET statistics_level = ALL을 먼저 설정하세요.'
           : 'Without /*+ gather_plan_statistics */, A-Rows, CR, and PR columns will not appear. If you ran the SQL without the hint, first run: ALTER SESSION SET statistics_level = ALL.'}
       </InfoBox>
 

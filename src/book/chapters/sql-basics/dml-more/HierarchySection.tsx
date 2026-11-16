@@ -392,7 +392,7 @@ export function HierarchySection() {
                       className={cn(
                         'border-b last:border-0',
                         resultIds.has(emp.emp_id)
-                          ? 'bg-green/5 dark:bg-green'
+                          ? 'bg-green/5'
                           : 'opacity-40'
                       )}
                     >

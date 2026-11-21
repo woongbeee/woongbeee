@@ -6,6 +6,7 @@ import {
   Prose,
   Divider,
   IndexedContent,
+  ResultTable,
 } from '../../shared'
 import { IconMathOff } from '@tabler/icons-react'
 import { SqlHighlight } from '../../SqlHighlight'
@@ -167,67 +168,6 @@ const C = {
   active: 'bg-blue/10 text-blue',
 }
 
-// ── MiniTable ───────────────────────────────────────────────────────────────
-
-function MiniTable({
-  headers,
-  rows,
-  highlightLast,
-}: {
-  headers: string[]
-  rows: (string | null)[][]
-  highlightLast?: boolean
-}) {
-  return (
-    <div className="rounded-card overflow-hidden border text-xs">
-      <table className="w-full">
-        <thead>
-          <tr className="bg-rail border-b">
-            {headers.map((h, i) => (
-              <th
-                key={h}
-                className={cn(
-                  'px-2.5 py-1.5 text-left font-mono text-[10px] font-bold',
-                  highlightLast && i === headers.length - 1
-                    ? 'text-blue'
-                    : 'text-ink-2'
-                )}
-              >
-                {h}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row, ri) => (
-            <tr key={ri} className="border-b last:border-0">
-              {row.map((cell, ci) => {
-                const isNull = cell === 'null'
-                const isHighlight = highlightLast && ci === row.length - 1
-                return (
-                  <td
-                    key={ci}
-                    className={cn(
-                      'px-2.5 py-1 font-mono text-[11px]',
-                      isNull
-                        ? 'text-ink-2/40 italic'
-                        : isHighlight
-                          ? 'text-blue font-bold'
-                          : 'text-ink/80'
-                    )}
-                  >
-                    {isNull ? 'NULL' : cell}
-                  </td>
-                )
-              })}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  )
-}
-
 const T = {
   ko: {
     chapterTitle: 'NULL을 다루는 법',
@@ -322,10 +262,19 @@ export function NullSection() {
               <p className="text-ink-2 mb-2 font-mono text-[11px] font-bold tracking-wider uppercase">
                 {t.result}
               </p>
-              <MiniTable
-                headers={item.tables.resultHeaders}
-                rows={item.tables.resultRows}
-                highlightLast
+              <ResultTable
+                dense
+                numbered={false}
+                columns={item.tables.resultHeaders}
+                rows={item.tables.resultRows.map((row) =>
+                  row.map((cell, ci) =>
+                    cell === null || cell === 'null'
+                      ? null
+                      : ci === row.length - 1
+                        ? { v: cell, tone: 'blue' as const, strong: true }
+                        : cell
+                  )
+                )}
               />
             </div>
 

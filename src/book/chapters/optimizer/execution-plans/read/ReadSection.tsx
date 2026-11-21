@@ -386,35 +386,6 @@ SET AUTOTRACE TRACEONLY STATISTICS`,
   },
 }
 
-function MultilineTable({ headers, rows }: { headers: string[]; rows: string[][] }) {
-  return (
-    <div className="mb-6 overflow-hidden rounded-card border">
-      <table className="w-full text-xs">
-        <thead>
-          <tr className="border-b bg-rail">
-            {headers.map((h, i) => (
-              <th key={i} className="px-4 py-2.5 text-left font-mono font-bold text-ink-2">
-                {h}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row, ri) => (
-            <tr key={ri} className={`border-b last:border-0 ${ri % 2 === 0 ? 'bg-paper' : 'bg-rail'}`}>
-              {row.map((cell, ci) => (
-                <td key={ci} className={`px-4 py-3 font-mono text-[11px] text-ink/80 align-top whitespace-pre-line${ci === 0 ? ' font-semibold text-ink w-36' : ci === 1 && row.length > 2 ? ' w-36 text-ink-2' : ' leading-relaxed'}`}>
-                  {cell}
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  )
-}
-
 export function ReadSection() {
   const lang = useLangStore((s) => s.lang)
   const t = T[lang]
@@ -437,26 +408,10 @@ export function ReadSection() {
       {/* ── 5가지 정보 영역 개요 ── */}
       <SectionTitle>{t.areasTitle}</SectionTitle>
       <Prose>{t.areasDesc}</Prose>
-      <div className="mb-6 overflow-hidden rounded-card border">
-        <table className="w-full text-xs">
-          <thead>
-            <tr className="border-b bg-rail">
-              {(isKo ? ['번호', '영역', '내용'] : ['#', 'Area', 'Description']).map((h, i) => (
-                <th key={i} className="px-4 py-2.5 text-left font-mono font-bold text-ink-2">{h}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {t.areasTable.map((row, ri) => (
-              <tr key={ri} className={`border-b last:border-0 ${ri % 2 === 0 ? 'bg-paper' : 'bg-rail'}`}>
-                <td className="px-4 py-2 font-mono text-base font-bold text-ink/80">{row[0]}</td>
-                <td className="px-4 py-2 font-mono text-[11px] text-ink/80">{row[1]}</td>
-                <td className="px-4 py-2 font-mono text-[11px] text-ink/80">{row[2]}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <Table
+        headers={isKo ? ['번호', '영역', '내용'] : ['#', 'Area', 'Description']}
+        rows={t.areasTable}
+      />
 
       <Divider />
 
@@ -471,14 +426,14 @@ export function ReadSection() {
       </div>
       <div className="mt-6">
         <SubTitle>{isKo ? 'Call Statistics 컬럼 설명' : 'Call Statistics Column Reference'}</SubTitle>
-        <MultilineTable
+        <Table
           headers={isKo ? ['컬럼', '설명'] : ['Column', 'Description']}
           rows={t.sqlTraceCols}
         />
       </div>
       <div className="mt-6">
         <SubTitle>{t.sqlTraceExtraTitle}</SubTitle>
-        <MultilineTable
+        <Table
           headers={isKo ? ['항목', '설명'] : ['Field', 'Description']}
           rows={t.sqlTraceExtraCols}
         />
@@ -507,7 +462,7 @@ export function ReadSection() {
       </InfoBox>
       <div className="mt-6">
         <SubTitle>{isKo ? 'Row Source Operation 컬럼 설명' : 'Row Source Operation Column Reference'}</SubTitle>
-        <MultilineTable
+        <Table
           headers={t.rsoColHeaders}
           rows={t.rsoCols}
         />
@@ -516,24 +471,10 @@ export function ReadSection() {
         <strong>{t.rsoAnalysis}</strong>
         <br />
         <div className="mt-2">
-          <table className="w-full text-[11px]">
-            <thead>
-              <tr>
-                {(isKo ? ['상황', '의미', '대처'] : ['Situation', 'Meaning', 'Action']).map(h => (
-                  <th key={h} className="text-left font-bold pb-1 pr-3">{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {t.rsoAnalysisTable.map((row, i) => (
-                <tr key={i} className="border-t border-current/10">
-                  {row.map((cell, j) => (
-                    <td key={j} className="py-1 pr-3 align-top">{cell}</td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <Table
+            headers={isKo ? ['상황', '의미', '대처'] : ['Situation', 'Meaning', 'Action']}
+            rows={t.rsoAnalysisTable}
+          />
         </div>
       </InfoBox>
       <InfoBox variant="tip">

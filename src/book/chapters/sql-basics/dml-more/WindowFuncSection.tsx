@@ -7,6 +7,8 @@ import {
   Prose,
   Divider,
   IndexedContent,
+  Table,
+  ResultTable,
 } from '../../shared'
 import { IconChartBar } from '@tabler/icons-react'
 import { SqlHighlight } from '../../SqlHighlight'
@@ -584,63 +586,6 @@ const C = {
   active: 'bg-blue/10 text-blue',
 }
 
-// ── ResultTable ──────────────────────────────────────────────────────────────
-
-function ResultTable({
-  headers,
-  rows,
-}: {
-  headers: string[]
-  rows: (string | null)[][]
-}) {
-  return (
-    <div className="rounded-card overflow-x-auto border text-xs">
-      <table className="w-full">
-        <thead>
-          <tr className="bg-rail border-b">
-            {headers.map((h, i) => (
-              <th
-                key={h}
-                className={cn(
-                  'px-2.5 py-1.5 text-left font-mono text-[10px] font-bold whitespace-nowrap',
-                  i === headers.length - 1 ? 'text-green' : 'text-ink-2'
-                )}
-              >
-                {h}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row, ri) => (
-            <tr key={ri} className="border-b last:border-0">
-              {row.map((cell, ci) => {
-                const isNull = cell === null
-                const isLast = ci === row.length - 1
-                return (
-                  <td
-                    key={ci}
-                    className={cn(
-                      'px-2.5 py-1 font-mono text-[11px] whitespace-nowrap',
-                      isNull
-                        ? 'text-ink-2/40 italic'
-                        : isLast
-                          ? 'text-green font-bold'
-                          : 'text-ink/80'
-                    )}
-                  >
-                    {isNull ? 'NULL' : cell}
-                  </td>
-                )
-              })}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  )
-}
-
 // ── FrameSummaryDesc ─────────────────────────────────────────────────────────
 
 const FRAME_SUMMARY = {
@@ -688,54 +633,16 @@ function FrameSummaryDesc({ lang }: { lang: 'ko' | 'en' }) {
   const d = FRAME_SUMMARY[lang]
   return (
     <div className="flex flex-col gap-3">
-      {/* Frame 적용 */}
-      <div className="rounded-panel border-green/30 overflow-hidden border">
-        <div className="bg-green/5 px-4 py-2">
-          <span className="text-green font-mono text-[11px] font-bold">
-            ✓ {d.applied}
-          </span>
-        </div>
-        <table className="w-full">
-          <tbody>
-            {d.appliedRows.map((r) => (
-              <tr
-                key={r.name}
-                className="border-green/30 border-t last:border-0"
-              >
-                <td className="text-green px-4 py-2 font-mono text-[12px] font-bold">
-                  {r.name}
-                </td>
-                <td className="text-green px-4 py-2 text-right text-[11px]">
-                  {r.type}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Frame 무시 */}
-      <div className="rounded-panel border-red/30 overflow-hidden border">
-        <div className="bg-red/5 px-4 py-2">
-          <span className="text-red font-mono text-[11px] font-bold">
-            ✗ {d.ignored}
-          </span>
-        </div>
-        <table className="w-full">
-          <tbody>
-            {d.ignoredRows.map((r) => (
-              <tr key={r.name} className="border-red/30 border-t last:border-0">
-                <td className="text-red px-4 py-2 font-mono text-[12px] font-bold">
-                  {r.name}
-                </td>
-                <td className="text-red px-4 py-2 text-right text-[11px]">
-                  {r.type}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <Table
+        dense
+        headers={
+          lang === 'ko' ? ['구분', '함수', '종류'] : ['Group', 'Functions', 'Type']
+        }
+        rows={[
+          ...d.appliedRows.map((r) => [`✓ ${d.applied}`, r.name, r.type]),
+          ...d.ignoredRows.map((r) => [`✗ ${d.ignored}`, r.name, r.type]),
+        ]}
+      />
 
       <p className="text-ink-2 font-read text-xs leading-relaxed">{d.note}</p>
     </div>
@@ -794,7 +701,17 @@ function DetailPanel({
         <p className="text-ink-2 mb-2 font-mono text-[11px] font-bold tracking-wider uppercase">
           {labels.result}
         </p>
-        <ResultTable headers={item.resultHeaders} rows={item.resultRows} />
+        <ResultTable
+          dense
+          columns={item.resultHeaders}
+          rows={item.resultRows.map((row) =>
+            row.map((cell, ci) =>
+              cell !== null && ci === row.length - 1
+                ? { v: cell, tone: 'green' as const, strong: true }
+                : cell
+            )
+          )}
+        />
       </div>
 
       {item.note && (

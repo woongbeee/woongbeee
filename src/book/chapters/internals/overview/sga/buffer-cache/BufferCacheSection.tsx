@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useLangStore } from '@/store/simulationStore'
-import { ChapterTitle, SectionTitle, Prose, InfoBox, Divider, SubTitle, SqlBlock, StepList } from '../../../../shared'
+import { ChapterTitle, SectionTitle, Prose, InfoBox, Divider, SubTitle, SqlBlock, StepList, Table } from '../../../../shared'
 import { cn } from '@/lib/utils'
 import { OracleArchitectureDiagram } from '@/book/chapters/internals/shared/OracleArchitectureDiagram'
 import type { ArchComponentId } from '@/book/chapters/internals/shared/OracleArchitectureDiagram'
@@ -794,33 +794,15 @@ export function SgaBufferCacheSection() {
       {/* ── 11. Key Parameters ── */}
       <SectionTitle>{t.paramsTitle}</SectionTitle>
 
-      <div className="overflow-hidden rounded-panel border">
-        <table className="w-full text-xs">
-          <thead>
-            <tr className="border-b bg-rail">
-              <th className="w-[220px] px-4 py-2.5 text-left font-mono font-bold text-ink-2">
-                {lang === 'ko' ? '파라미터' : 'Parameter'}
-              </th>
-              <th className="px-4 py-2.5 text-left font-mono font-bold text-ink-2">
-                {lang === 'ko' ? '설명' : 'Description'}
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {([
-              { p: t.param1, d: t.param1Desc },
-              { p: t.param2, d: t.param2Desc },
-              { p: t.param3, d: t.param3Desc },
-              { p: t.param4, d: t.param4Desc },
-            ] as const).map((row, i) => (
-              <tr key={i} className={cn('border-b last:border-0', i % 2 === 0 ? 'bg-paper' : 'bg-rail')}>
-                <td className="px-4 py-2.5 font-mono font-bold text-ink/80">{row.p}</td>
-                <td className="px-4 py-2.5 text-ink-2">{row.d}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <Table
+        headers={lang === 'ko' ? ['파라미터', '설명'] : ['Parameter', 'Description']}
+        rows={[
+          [t.param1, t.param1Desc],
+          [t.param2, t.param2Desc],
+          [t.param3, t.param3Desc],
+          [t.param4, t.param4Desc],
+        ]}
+      />
 
       <Divider />
 

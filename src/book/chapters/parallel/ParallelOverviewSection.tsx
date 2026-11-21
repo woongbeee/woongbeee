@@ -10,6 +10,7 @@ import {
   SqlBlock,
   Divider,
   StepList,
+  Table,
 } from '../shared'
 
 const T = {
@@ -259,38 +260,14 @@ export function ParallelOverviewSection() {
       <SectionTitle>{t.whenTitle}</SectionTitle>
       <Prose>{t.whenDesc}</Prose>
       <ParallelVsSerialDiagram lang={lang} />
-      <table className="rounded-card mb-6 w-full overflow-hidden border text-xs">
-        <thead>
-          <tr className="bg-rail border-b">
-            <th className="text-ink-2 px-4 py-2.5 text-left font-mono font-bold">
-              {isKo ? '상황' : 'Situation'}
-            </th>
-            <th className="text-ink-2 px-4 py-2.5 text-left font-mono font-bold">
-              {isKo ? '예시' : 'Example'}
-            </th>
-            <th className="text-ink-2 px-4 py-2.5 text-left font-mono font-bold">
-              {isKo ? '권장' : 'Recommendation'}
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {t.whenTable.map((row, i) => (
-            <tr
-              key={i}
-              className={`border-b last:border-0 ${i % 2 === 0 ? 'bg-paper' : 'bg-rail'}`}
-            >
-              {row.map((cell, ci) => (
-                <td
-                  key={ci}
-                  className="text-ink/80 px-4 py-2 font-mono text-[11px]"
-                >
-                  {cell}
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <Table
+        headers={
+          isKo
+            ? ['상황', '예시', '권장']
+            : ['Situation', 'Example', 'Recommendation']
+        }
+        rows={t.whenTable}
+      />
 
       <div className="mt-8">
         <InfoBox variant="summary">{t.summary}</InfoBox>

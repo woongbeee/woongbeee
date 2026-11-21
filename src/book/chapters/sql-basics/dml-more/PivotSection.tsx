@@ -9,6 +9,7 @@ import {
   Divider,
   SqlBlock,
   IndexedContent,
+  Table,
 } from '../../shared'
 import { IconLayoutColumns } from '@tabler/icons-react'
 import { useLangStore } from '@/store/simulationStore'
@@ -240,22 +241,9 @@ function PivotTabContent({
           <Divider />
 
           <SubTitle>{t.comparisonTitle}</SubTitle>
-          <div className="rounded-card mb-5 overflow-hidden border">
-            <table className="w-full text-xs">
-              <thead>
-                <tr className="bg-rail border-b">
-                  {['', 'PIVOT', 'UNPIVOT'].map((h, i) => (
-                    <th
-                      key={i}
-                      className="text-ink-2 px-4 py-2 text-left font-mono font-bold"
-                    >
-                      {h}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {(lang === 'ko'
+          <Table
+            headers={['', 'PIVOT', 'UNPIVOT']}
+            rows={(lang === 'ko'
                   ? [
                       [
                         '방향',
@@ -296,27 +284,8 @@ function PivotTabContent({
                         'Excluded by default; use INCLUDE NULLS',
                       ],
                     ]
-                ).map((row, i) => (
-                  <tr
-                    key={i}
-                    className={cn(
-                      'border-b last:border-0',
-                      i % 2 === 0 ? 'bg-paper' : 'bg-rail'
-                    )}
-                  >
-                    {row.map((cell, j) => (
-                      <td
-                        key={j}
-                        className="text-ink/80 px-4 py-2 font-mono text-[11px]"
-                      >
-                        {cell}
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+            )}
+          />
 
           <InfoBox variant="tip">{t.unpivotNullTip}</InfoBox>
         </>

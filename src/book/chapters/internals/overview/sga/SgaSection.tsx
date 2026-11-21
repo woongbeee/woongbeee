@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useLangStore } from '@/store/simulationStore'
-import { ChapterTitle, SectionTitle, Prose, InfoBox, Divider } from '../../../shared'
+import { ChapterTitle, SectionTitle, Prose, InfoBox, Divider, Table } from '../../../shared'
 import { cn } from '@/lib/utils'
 import {
   IconCpu,
@@ -491,30 +491,7 @@ export function SgaSection() {
       </AnimatePresence>
 
       {/* Comparison table */}
-      <div className="overflow-hidden rounded-panel border mb-2">
-        <table className="w-full text-xs">
-          <thead>
-            <tr className="border-b bg-rail">
-              {t.tableHeaders.map((h, i) => (
-                <th key={i} className={cn('px-4 py-2.5 text-left font-mono font-bold text-ink-2', i === 0 ? 'w-[160px]' : '')}>
-                  {h}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {comparisonRows.map((row, ri) => (
-              <tr key={ri} className={cn('border-b last:border-0', ri % 2 === 0 ? 'bg-paper' : 'bg-rail')}>
-                {row.map((cell, ci) => (
-                  <td key={ci} className={cn('px-4 py-2 font-mono text-[11px]', ci === 0 ? 'font-bold text-ink/80' : 'text-ink-2')}>
-                    {cell}
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <Table headers={[...t.tableHeaders]} rows={comparisonRows.map((row) => [...row])} />
 
       <InfoBox variant="note">
         {lang === 'ko' ? (

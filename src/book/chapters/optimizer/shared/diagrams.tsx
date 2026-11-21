@@ -6,6 +6,9 @@ import { ExplainPlanTable, type PlanRow } from '../../ExplainPlanTable'
 
 export type AccessMode = 'fts' | 'unique' | 'range'
 
+// 글자가 올라가는 강조 배경은 원색이 아니라 연한 틴트로 (같은 색 글자가 묻히지 않게)
+const tint = (color: string) => `color-mix(in srgb, ${color} 24%, transparent)`
+
 export function AccessPathDiagram({ mode, lang }: { mode: AccessMode; lang: 'ko' | 'en' }) {
   const isKo = lang === 'ko'
 
@@ -17,26 +20,25 @@ export function AccessPathDiagram({ mode, lang }: { mode: AccessMode; lang: 'ko'
   const LEAF_START = IDX_X + (IDX_W - LEAF_TOTAL) / 2
   const rootCx = IDX_X + IDX_W / 2
 
-  const blockFills = Array.from({ length: BLOCKS }, (_, bi) => {
-    if (mode === 'fts') return 'var(--color-green)'
-    if (mode === 'unique') return bi === 2 ? 'var(--color-amber)' : 'var(--color-rail)'
-    if (mode === 'range') return bi >= 1 && bi <= 3 ? 'var(--color-blue)' : 'var(--color-rail)'
-    return 'var(--color-rail)'
+  // 강조할 블록·리프의 색(hue). null = 읽지 않는 블록
+  const HUE = mode === 'fts' ? 'var(--color-green)' : mode === 'unique' ? 'var(--color-amber)' : 'var(--color-blue)'
+  const blockHues = Array.from({ length: BLOCKS }, (_, bi) => {
+    if (mode === 'fts') return HUE
+    if (mode === 'unique') return bi === 2 ? HUE : null
+    return bi >= 1 && bi <= 3 ? HUE : null
+  })
+  const leafHues = Array.from({ length: LEAVES }, (_, li) => {
+    if (mode === 'fts') return null
+    if (mode === 'unique') return li === 1 ? HUE : null
+    return li >= 0 && li <= 2 ? HUE : null
   })
 
-  const leafFills = Array.from({ length: LEAVES }, (_, li) => {
-    if (mode === 'fts') return 'var(--color-rail)'
-    if (mode === 'unique') return li === 1 ? 'var(--color-amber)' : 'var(--color-rail)'
-    if (mode === 'range') return li >= 0 && li <= 2 ? 'var(--color-blue)' : 'var(--color-rail)'
-    return 'var(--color-rail)'
-  })
-
-  const legendItems =
+  const legendItems: { hue: string | null; label: string }[] =
     mode === 'fts'
-      ? [{ color: 'var(--color-green)', label: isKo ? '읽는 블록 (전체)' : 'Read blocks (all)' }]
+      ? [{ hue: HUE, label: isKo ? '읽는 블록 (전체)' : 'Read blocks (all)' }]
       : mode === 'unique'
-        ? [{ color: 'var(--color-amber)', label: isKo ? '매칭 리프/블록 (1개)' : 'Matched leaf/block (1)' }, { color: 'var(--color-rail)', label: isKo ? '스캔 안 함' : 'Not scanned' }]
-        : [{ color: 'var(--color-blue)', label: isKo ? '범위 내 리프/블록' : 'In-range leaf/blocks' }, { color: 'var(--color-rail)', label: isKo ? '범위 외' : 'Out of range' }]
+        ? [{ hue: HUE, label: isKo ? '매칭 리프/블록 (1개)' : 'Matched leaf/block (1)' }, { hue: null, label: isKo ? '스캔 안 함' : 'Not scanned' }]
+        : [{ hue: HUE, label: isKo ? '범위 내 리프/블록' : 'In-range leaf/blocks' }, { hue: null, label: isKo ? '범위 외' : 'Out of range' }]
 
   const title =
     mode === 'fts'
@@ -52,7 +54,7 @@ export function AccessPathDiagram({ mode, lang }: { mode: AccessMode; lang: 'ko'
         <svg viewBox={`0 0 ${SVG_W} ${SVG_H}`} width={SVG_W} height={SVG_H} className="mx-auto block" style={{ maxWidth: '100%' }}>
           <defs>
             <marker id="ap-arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
-              <polygon points="0 0, 7 3.5, 0 7" fill="var(--color-blue)" />
+              <polygon points="0 0, 7 3.5, 0 7" fill={mode === 'fts' ? 'var(--color-green)' : 'var(--color-blue)'} />
             </marker>
           </defs>
 
@@ -69,8 +71,8 @@ export function AccessPathDiagram({ mode, lang }: { mode: AccessMode; lang: 'ko'
                 return (
                   <g key={li}>
                     <line x1={rootCx} y1={IDX_Y + 66} x2={cx} y2={LEAF_Y} stroke="var(--color-blue)" strokeWidth={1} strokeDasharray="3 2" />
-                    <rect x={lx} y={LEAF_Y} width={LEAF_W} height={LEAF_H} rx={4} fill={leafFills[li]} stroke="var(--color-blue)" strokeWidth={1.5} />
-                    <text x={cx} y={LEAF_Y + 18} textAnchor="middle" fontSize={9} fontWeight="600" fill="var(--color-blue)">L{li + 1}</text>
+                    <rect x={lx} y={LEAF_Y} width={LEAF_W} height={LEAF_H} rx={4} fill={leafHues[li] ? tint(leafHues[li]) : 'var(--color-rail)'} stroke={leafHues[li] ?? 'var(--color-blue)'} strokeWidth={1.5} />
+                    <text x={cx} y={LEAF_Y + 18} textAnchor="middle" fontSize={9} fontWeight="600" fill={leafHues[li] ?? 'var(--color-blue)'}>L{li + 1}</text>
                   </g>
                 )
               })}
@@ -105,15 +107,15 @@ export function AccessPathDiagram({ mode, lang }: { mode: AccessMode; lang: 'ko'
             const by = TBL_Y + bi * (BLOCK_H + BLOCK_GAP)
             return (
               <g key={bi}>
-                <rect x={TBL_X} y={by} width={TBL_W} height={BLOCK_H} rx={4} fill={blockFills[bi]} stroke="var(--color-line)" strokeWidth={1} />
-                <text x={TBL_X + 10} y={by + 18} fontSize={9} fill="var(--color-ink-2)">Block #{bi + 1}</text>
+                <rect x={TBL_X} y={by} width={TBL_W} height={BLOCK_H} rx={4} fill={blockHues[bi] ? tint(blockHues[bi]) : 'var(--color-rail)'} stroke={blockHues[bi] ?? 'var(--color-line)'} strokeWidth={1} />
+                <text x={TBL_X + 10} y={by + 18} fontSize={9} fontWeight={blockHues[bi] ? 600 : 400} fill={blockHues[bi] ? 'var(--color-ink)' : 'var(--color-ink-2)'}>Block #{bi + 1}</text>
               </g>
             )
           })}
 
           {legendItems.map((item, li) => (
             <g key={li}>
-              <rect x={10} y={SVG_H - 30 + li * 16} width={12} height={12} rx={2} fill={item.color} stroke="var(--color-ink-3)" strokeWidth={1} />
+              <rect x={10} y={SVG_H - 30 + li * 16} width={12} height={12} rx={2} fill={item.hue ? tint(item.hue) : 'var(--color-rail)'} stroke={item.hue ?? 'var(--color-ink-3)'} strokeWidth={1} />
               <text x={26} y={SVG_H - 20 + li * 16} fontSize={9} fill="var(--color-ink-2)">{item.label}</text>
             </g>
           ))}

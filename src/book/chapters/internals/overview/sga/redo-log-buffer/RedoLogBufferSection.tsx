@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useLangStore } from '@/store/simulationStore'
-import { ChapterTitle, SectionTitle, SubTitle, Prose, InfoBox, Divider } from '../../../../shared'
+import { ChapterTitle, SectionTitle, SubTitle, Prose, InfoBox, Divider, StepList } from '../../../../shared'
 import { cn } from '@/lib/utils'
 import { OracleArchitectureDiagram } from '../../../shared/OracleArchitectureDiagram'
 
@@ -233,26 +233,12 @@ function WalSection({ lang }: { lang: 'ko' | 'en' }) {
       </div>
       <div className="space-y-2">
         <p className="text-sm leading-relaxed text-ink-2">{t.walDesc}</p>
-        <ol className="list-none space-y-1.5">
-          <li className="flex items-start gap-2 text-sm text-ink-2">
-            <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-amber text-[10px] font-bold text-paper">
-              1
-            </span>
-            <span>
-              <strong className="font-semibold text-ink">{t.walStep1}</strong>{' '}
-              — {t.walStep1Desc}
-            </span>
-          </li>
-          <li className="flex items-start gap-2 text-sm text-ink-2">
-            <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-blue text-[10px] font-bold text-paper">
-              2
-            </span>
-            <span>
-              <strong className="font-semibold text-ink">{t.walStep2}</strong>{' '}
-              — {t.walStep2Desc}
-            </span>
-          </li>
-        </ol>
+        <StepList
+          steps={[
+            { title: t.walStep1, desc: t.walStep1Desc },
+            { title: t.walStep2, desc: t.walStep2Desc },
+          ]}
+        />
         <p className="text-sm leading-relaxed text-ink-2">
           <strong className="font-semibold text-ink">{t.walConclusion}</strong>
         </p>

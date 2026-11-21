@@ -11,6 +11,8 @@ import {
   InfoBox,
   Table,
   Divider,
+  ResultTable,
+  StepList,
 } from '../../shared'
 import { ExecutionPlanViewer } from '@/components/ExecutionPlanViewer'
 import type { PlanNode, PlanStats } from '@/components/ExecutionPlanViewer'
@@ -587,34 +589,24 @@ export function BitmapSection() {
             <div className="mb-2 font-mono text-[10px] font-bold text-red">
               {lang === 'ko' ? '인덱스 없을 때' : 'Without index'}
             </div>
-            <ol className="space-y-1.5">
-              {(lang === 'ko'
+            <StepList
+              steps={(lang === 'ko'
                 ? ['JOBS 테이블에서 Accountant 행 찾기', 'EMPLOYEES와 job_id로 조인', '조인된 결과에서 집계']
                 : ['Scan JOBS for Accountant rows', 'Join to EMPLOYEES via job_id', 'Aggregate the joined result']
-              ).map((s, i) => (
-                <li key={i} className="flex items-start gap-2 text-[11px] text-ink-2">
-                  <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-red/15 font-mono text-[9px] font-bold text-red">{i + 1}</span>
-                  {s}
-                </li>
-              ))}
-            </ol>
+              ).map((s) => ({ title: s }))}
+            />
           </div>
           {/* With index */}
           <div className="rounded-card border border-green/30 bg-green/5 p-4">
             <div className="mb-2 font-mono text-[10px] font-bold text-green">
               {lang === 'ko' ? 'Bitmap Join Index 있을 때' : 'With Bitmap Join Index'}
             </div>
-            <ol className="space-y-1.5">
-              {(lang === 'ko'
+            <StepList
+              steps={(lang === 'ko'
                 ? ['인덱스에서 job_title = Accountant 비트맵 조회', 'ROWID(행 주소)를 바로 테이블에 적용', '조인 단계 건너뜀']
                 : ['Look up job_title = Accountant bitmap in index', 'Apply rowids directly to EMPLOYEES', 'Join step skipped entirely']
-              ).map((s, i) => (
-                <li key={i} className="flex items-start gap-2 text-[11px] text-ink-2">
-                  <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-green/15 font-mono text-[9px] font-bold text-green">{i + 1}</span>
-                  {s}
-                </li>
-              ))}
-            </ol>
+              ).map((s) => ({ title: s }))}
+            />
           </div>
         </div>
       </div>
@@ -634,35 +626,27 @@ export function BitmapSection() {
         <p className="mb-3 font-mono text-[10px] font-bold uppercase tracking-widest text-ink-2">
           {t.bitmapJoinStructDesc.split('\n')[0]}
         </p>
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse font-mono text-[10px]">
-            <thead>
-              <tr className="border-b">
-                <th className="px-3 py-1.5 text-left text-ink-2">jobs.job_title</th>
-                <th className="px-3 py-1.5 text-left text-ink-2">low rowid</th>
-                <th className="px-3 py-1.5 text-left text-ink-2">high rowid</th>
-                <th className="px-3 py-1.5 text-left text-ink-2">bitmap</th>
-              </tr>
-            </thead>
-            <tbody>
-              {[
-                ['Accountant',           'AAAQNK…ABSAAj', 'AAAQNK…ABSAAp', '10110010'],
-                ['Accountant',           'AAAQNK…ABSAAq', 'AAAQNK…ABSAAz', '01001100'],
-                ['Accounting Manager',   'AAAQNK…ABTAAa', 'AAAQNK…ABTAAh', '10000001'],
-                ['Administration Asst.', 'AAAQNK…ABTAAi', 'AAAQNK…ABTAAp', '00100000'],
-              ].map(([key, lo, hi, bm], i) => (
-                <tr key={i} className="border-b last:border-0">
-                  <td className="px-3 py-1.5 font-bold text-blue">{key}</td>
-                  <td className="px-3 py-1.5 text-ink-2">{lo}</td>
-                  <td className="px-3 py-1.5 text-ink-2">{hi}</td>
-                  <td className="px-3 py-1.5">
-                    <span className="rounded bg-rail px-1.5 py-0.5">{bm}</span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <ResultTable
+          dense
+          numbered={false}
+          columns={[
+            { label: 'jobs.job_title' },
+            { label: 'low rowid' },
+            { label: 'high rowid' },
+            { label: 'bitmap' },
+          ]}
+          rows={[
+            ['Accountant', 'AAAQNK…ABSAAj', 'AAAQNK…ABSAAp', '10110010'],
+            ['Accountant', 'AAAQNK…ABSAAq', 'AAAQNK…ABSAAz', '01001100'],
+            ['Accounting Manager', 'AAAQNK…ABTAAa', 'AAAQNK…ABTAAh', '10000001'],
+            ['Administration Asst.', 'AAAQNK…ABTAAi', 'AAAQNK…ABTAAp', '00100000'],
+          ].map(([key, lo, hi, bm]) => [
+            { v: key, tone: 'blue' as const, strong: true },
+            lo,
+            hi,
+            { v: bm, align: 'left' as const },
+          ])}
+        />
       </div>
 
       {/* vs Materialized View + When to use */}

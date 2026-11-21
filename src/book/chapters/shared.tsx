@@ -200,12 +200,20 @@ const cellTone = (s: string) => CELL_TONE[s.trim()] ?? ''
 export function Table({
   headers,
   rows,
+  dense = false,
 }: {
   headers: string[]
   rows: string[][]
+  /** 패널·격자 안에 넣을 때: 아래 여백을 없앤다. */
+  dense?: boolean
 }) {
   return (
-    <div className="rounded-card border-line mb-6 overflow-x-auto border">
+    <div
+      className={cn(
+        'rounded-card border-line overflow-x-auto border',
+        !dense && 'mb-6'
+      )}
+    >
       <table className="w-full border-collapse">
         <thead>
           <tr className="border-line bg-rail border-b">
@@ -226,7 +234,7 @@ export function Table({
                 <td
                   key={ci}
                   className={cn(
-                    'px-3.5 py-2.5 align-top font-sans leading-relaxed',
+                    'px-3.5 py-2.5 align-top font-sans leading-relaxed whitespace-pre-line',
                     ci === 0
                       ? 'text-ink text-[12px] font-medium'
                       : 'text-ink text-[12.5px]',
@@ -277,30 +285,56 @@ const RESULT_TONE: Record<ResultTone, string> = {
   purple: 'text-purple',
 }
 
+const ROW_TONE_BG: Record<ResultTone, string> = {
+  green: 'bg-green/[0.07]',
+  amber: 'bg-amber/[0.08]',
+  red: 'bg-red/[0.07]',
+  blue: 'bg-blue/[0.06]',
+  purple: 'bg-purple/[0.07]',
+}
+
 const looksNumeric = (s: string) => /^-?[\d,]+(\.\d+)?%?$/.test(s.trim())
 
 export function ResultTable({
   title,
   meta = [],
-  columns,
+  columns: columnsProp,
   rows,
   selectedRow,
   footer = [],
   numbered = true,
+  rowTones,
+  dimRows,
+  dense = false,
 }: {
   title?: string
   meta?: string[]
-  columns: ResultColumn[]
+  /** 문자열만 넘기면 라벨만 있는 컬럼으로 취급한다. */
+  columns: (ResultColumn | string)[]
   rows: ResultCell[][]
   selectedRow?: number
   footer?: string[]
   numbered?: boolean
+  /** 행별 배경 강조색 (예: MERGE 결과의 updated/inserted 행). 인덱스 = 행 번호. */
+  rowTones?: (ResultTone | undefined)[]
+  /** 흐리게 표시할 행 번호 (결과에서 빠진 행 등). */
+  dimRows?: number[]
+  /** 패널·격자 안에 넣을 때: 아래 여백과 최소 너비를 없앤다. */
+  dense?: boolean
 }) {
+  const columns: ResultColumn[] = columnsProp.map((c) =>
+    typeof c === 'string' ? { label: c } : c
+  )
   const hasToolbar = !!title || meta.length > 0
   const hasTypeRow = columns.some((c) => c.type)
 
   return (
-    <div className="rounded-card border-line-2 mb-6 overflow-hidden border">
+    <div
+      className={cn(
+        'rounded-card border-line-2 overflow-hidden border',
+        !dense && 'mb-6'
+      )}
+    >
       {hasToolbar && (
         <div className="border-line-2 bg-rail text-ink-2 flex items-center overflow-x-auto border-b font-mono text-[10.5px] whitespace-nowrap">
           {title && (
@@ -321,7 +355,9 @@ export function ResultTable({
       )}
 
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[480px] border-collapse">
+        <table
+          className={cn('w-full border-collapse', !dense && 'min-w-[480px]')}
+        >
           <thead>
             <tr className="bg-rail">
               {numbered && (
@@ -370,12 +406,18 @@ export function ResultTable({
           <tbody>
             {rows.map((row, ri) => {
               const isSel = selectedRow === ri
+              const rowTone = rowTones?.[ri]
               return (
                 <tr
                   key={ri}
                   className={cn(
                     'border-line border-b last:border-0',
-                    isSel ? 'bg-blue/[0.06]' : 'hover:bg-ink/[0.03]'
+                    isSel
+                      ? 'bg-blue/[0.06]'
+                      : rowTone
+                        ? ROW_TONE_BG[rowTone]
+                        : 'hover:bg-ink/[0.03]',
+                    dimRows?.includes(ri) && 'opacity-40'
                   )}
                 >
                   {numbered && (
@@ -481,7 +523,7 @@ export function StepList({
   activeIndex,
   onStepClick,
 }: {
-  steps: { title: string; desc: string }[]
+  steps: { title?: string; desc?: string }[]
   activeIndex?: number
   onStepClick?: (i: number) => void
 }) {
@@ -517,17 +559,26 @@ export function StepList({
                       (interactive ? ' hover:border-line-2' : '')
               )}
             >
-              <p
-                className={cn(
-                  'font-sans text-[12px] font-semibold',
-                  isActive ? 'text-blue' : 'text-ink'
-                )}
-              >
-                {s.title}
-              </p>
-              <p className="font-read text-ink-2 mt-0.5 text-[11px] leading-relaxed">
-                {s.desc}
-              </p>
+              {s.title && (
+                <p
+                  className={cn(
+                    'font-sans text-[12px] font-semibold',
+                    isActive ? 'text-blue' : 'text-ink'
+                  )}
+                >
+                  {s.title}
+                </p>
+              )}
+              {s.desc && (
+                <p
+                  className={cn(
+                    'font-read text-ink-2 text-[11px] leading-relaxed',
+                    s.title && 'mt-0.5'
+                  )}
+                >
+                  {s.desc}
+                </p>
+              )}
             </div>
           </div>
         )

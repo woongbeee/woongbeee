@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
-import { PageContainer, ChapterTitle, SectionTitle, Prose } from '../../shared'
+import { PageContainer, ChapterTitle, SectionTitle, Prose, ResultTable } from '../../shared'
+import type { ResultCell } from '../../shared'
 import { useLangStore } from '@/store/simulationStore'
 import { IconPlayerPlay } from '@tabler/icons-react'
 import { EMPLOYEES, EMPLOYEE_COLUMNS } from '@/data'
@@ -55,7 +56,7 @@ const T = {
 
 // ── Result table ────────────────────────────────────────────────────────────
 
-function ResultTable({
+function QueryResult({
   parsed,
   overrideResult,
 }: {
@@ -75,100 +76,36 @@ function ResultTable({
         ? `${rows.length}개 행`
         : `${rows.length} rows`
     return (
-      <div>
-        <div className="text-ink-2 mb-1.5 font-mono text-[10px] font-bold tracking-widest uppercase">
-          {t.resultTitle} — <span className="text-green">{summaryText}</span>
-        </div>
-        <div className="rounded-card inline-block border">
-          <table className="text-xs">
-            <thead>
-              <tr className="bg-rail border-b">
-                {columns.map((h) => (
-                  <th
-                    key={h}
-                    className="text-ink-2 px-3 py-2 text-left font-mono font-bold whitespace-nowrap"
-                  >
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((row, i) => (
-                <tr
-                  key={i}
-                  className={cn(
-                    'border-b last:border-0',
-                    i % 2 === 0 ? 'bg-paper' : 'bg-rail'
-                  )}
-                >
-                  {columns.map((c) => (
-                    <td
-                      key={c}
-                      className="text-ink/80 px-3 py-1.5 font-mono text-[11px] whitespace-nowrap"
-                    >
-                      {row[c] == null ? (
-                        <span className="text-ink-2/50 italic">NULL</span>
-                      ) : (
-                        String(row[c])
-                      )}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      <ResultTable
+        dense
+        title={t.resultTitle}
+        meta={[summaryText]}
+        columns={columns}
+        rows={rows.map((row) =>
+          columns.map((c) => {
+            const v = row[c]
+            return v == null ? null : String(v)
+          })
+        )}
+      />
     )
   }
 
   if (parsed.type === 'GROUPBY' && parsed.groupRows) {
     const cols = parsed.groupCols ?? ['dept_id']
     return (
-      <div>
-        <div className="text-ink-2 mb-1.5 font-mono text-[10px] font-bold tracking-widest uppercase">
-          {t.groupResultTitle} — {t.groupRows(parsed.groupRows.length)}
-        </div>
-        <div className="rounded-card inline-block border">
-          <table className="text-xs">
-            <thead>
-              <tr className="bg-rail border-b">
-                {cols.map((h) => (
-                  <th
-                    key={h}
-                    className="text-ink-2 px-3 py-2 text-left font-mono font-bold whitespace-nowrap"
-                  >
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {parsed.groupRows.map((row, i) => (
-                <tr
-                  key={i}
-                  className={cn(
-                    'border-b last:border-0',
-                    i % 2 === 0 ? 'bg-paper' : 'bg-rail'
-                  )}
-                >
-                  {cols.map((c) => (
-                    <td
-                      key={c}
-                      className="text-ink/80 px-3 py-1.5 font-mono text-[11px] whitespace-nowrap"
-                    >
-                      {String(
-                        (row as unknown as Record<string, unknown>)[c] ?? 'NULL'
-                      )}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      <ResultTable
+        dense
+        title={t.groupResultTitle}
+        meta={[t.groupRows(parsed.groupRows.length)]}
+        columns={cols}
+        rows={parsed.groupRows.map((row) =>
+          cols.map((c) => {
+            const v = (row as unknown as Record<string, unknown>)[c]
+            return v == null ? null : String(v)
+          })
+        )}
+      />
     )
   }
 
@@ -179,47 +116,13 @@ function ResultTable({
         : [...ALL_COLUMNS]
     const summaryText = t.rowsMatched(parsed.resultRows.length)
     return (
-      <div>
-        <div className="text-ink-2 mb-1.5 font-mono text-[10px] font-bold tracking-widest uppercase">
-          {t.resultTitle} — <span className="text-green">{summaryText}</span>
-        </div>
-        <div className="rounded-card inline-block border">
-          <table className="text-xs">
-            <thead>
-              <tr className="bg-rail border-b">
-                {headers.map((h) => (
-                  <th
-                    key={h}
-                    className="text-ink-2 px-3 py-2 text-left font-mono font-bold whitespace-nowrap"
-                  >
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {parsed.resultRows.map((row, i) => (
-                <tr
-                  key={i}
-                  className={cn(
-                    'border-b last:border-0',
-                    i % 2 === 0 ? 'bg-paper' : 'bg-rail'
-                  )}
-                >
-                  {headers.map((c) => (
-                    <td
-                      key={c}
-                      className="text-ink/80 px-3 py-1.5 font-mono text-[11px] whitespace-nowrap"
-                    >
-                      {String(row[c] ?? 'NULL')}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      <ResultTable
+        dense
+        title={t.resultTitle}
+        meta={[summaryText]}
+        columns={headers}
+        rows={parsed.resultRows.map((row) => headers.map((c) => row[c] ?? null))}
+      />
     )
   }
 
@@ -328,54 +231,21 @@ function SimpleTable({
   joinKey: string
 }) {
   return (
-    <div className="rounded-card inline-block overflow-hidden border">
-      <table className="text-xs">
-        <thead>
-          <tr className="bg-rail border-b">
-            {MERGE_COLS.map((h) => (
-              <th
-                key={h}
-                className="text-ink-2 px-3 py-2 text-left font-mono font-bold whitespace-nowrap"
-              >
-                {h}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row, i) => {
-            const id = row[joinKey]
-            const isHighlighted = highlightIds?.includes(id)
-            const isStruck = strikeIds?.includes(id)
-            return (
-              <tr
-                key={i}
-                className={cn(
-                  'border-b last:border-0',
-                  isHighlighted
-                    ? 'bg-blue/10'
-                    : i % 2 === 0
-                      ? 'bg-paper'
-                      : 'bg-rail'
-                )}
-              >
-                {MERGE_COLS.map((c) => (
-                  <td
-                    key={c}
-                    className={cn(
-                      'px-3 py-1.5 font-mono text-[11px] whitespace-nowrap',
-                      isStruck ? 'text-ink-2/50 line-through' : 'text-ink/80'
-                    )}
-                  >
-                    {String(row[c] ?? 'NULL')}
-                  </td>
-                ))}
-              </tr>
-            )
-          })}
-        </tbody>
-      </table>
-    </div>
+    <ResultTable
+      dense
+      numbered={false}
+      columns={MERGE_COLS}
+      rows={rows.map((row) => {
+        const struck = strikeIds?.includes(row[joinKey])
+        return MERGE_COLS.map((c): ResultCell => {
+          const v = row[c] == null ? null : String(row[c])
+          return struck && v !== null ? { v: <s>{v}</s> } : v
+        })
+      })}
+      rowTones={rows.map((row) =>
+        highlightIds?.includes(row[joinKey]) ? ('blue' as const) : undefined
+      )}
+    />
   )
 }
 
@@ -386,16 +256,6 @@ function MergePanel({
 }) {
   const lang = useLangStore((s) => s.lang)
   const t = T[lang]
-  const statusStyle: Record<string, string> = {
-    updated: 'bg-amber/10 border-amber/30',
-    inserted: 'bg-green/10 border-green/30',
-    unchanged: '',
-  }
-  const statusBadge: Record<string, { cls: string; label: string }> = {
-    updated: { cls: 'bg-amber/15 text-amber', label: 'UPDATED' },
-    inserted: { cls: 'bg-green/15 text-green', label: 'INSERTED' },
-    unchanged: { cls: 'bg-rail text-ink-2', label: '—' },
-  }
 
   return (
     <div className="flex flex-col gap-5">
@@ -435,79 +295,54 @@ function MergePanel({
             {mergeData.insertedIds.length}개 Inserted
           </span>
         </div>
-        <div className="rounded-card inline-block overflow-hidden border">
-          <table className="text-xs">
-            <thead>
-              <tr className="bg-rail border-b">
-                {MERGE_COLS.map((h) => (
-                  <th
-                    key={h}
-                    className="text-ink-2 px-3 py-2 text-left font-mono font-bold whitespace-nowrap"
-                  >
-                    {h}
-                  </th>
-                ))}
-                <th className="text-ink-2 px-3 py-2 text-left font-mono font-bold whitespace-nowrap">
-                  status
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {mergeData.resultRows.map((row, i) => {
-                const status = String(row['_status'] ?? 'unchanged')
-                const orig = mergeData.targetRows.find(
-                  (r) => r[mergeData.joinKey] === row[mergeData.joinKey]
-                )
-                return (
-                  <tr
-                    key={i}
-                    className={cn(
-                      'border-b transition-colors last:border-0',
-                      statusStyle[status] ??
-                        (i % 2 === 0 ? 'bg-paper' : 'bg-rail')
-                    )}
-                  >
-                    {MERGE_COLS.map((c) => {
-                      const isChangedSalary =
-                        c === 'salary' &&
-                        status === 'updated' &&
-                        orig &&
-                        orig[c] !== row[c]
-                      return (
-                        <td
-                          key={c}
-                          className={cn(
-                            'px-3 py-1.5 font-mono text-[11px] whitespace-nowrap',
-                            isChangedSalary
-                              ? 'text-amber font-bold'
-                              : 'text-ink/80'
-                          )}
-                        >
-                          {String(row[c] ?? 'NULL')}
-                          {isChangedSalary && (
-                            <span className="text-ink-2/60 ml-1.5 text-[10px] font-normal line-through">
-                              {String(orig[c])}
-                            </span>
-                          )}
-                        </td>
-                      )
-                    })}
-                    <td className="px-3 py-1.5 font-mono text-[11px] whitespace-nowrap">
-                      <span
-                        className={cn(
-                          'rounded px-1.5 py-0.5 text-[10px] font-bold',
-                          statusBadge[status]?.cls
-                        )}
-                      >
-                        {statusBadge[status]?.label}
-                      </span>
-                    </td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
-        </div>
+        <ResultTable
+          dense
+          numbered={false}
+          columns={[...MERGE_COLS, 'status']}
+          rows={mergeData.resultRows.map((row): ResultCell[] => {
+            const status = String(row['_status'] ?? 'unchanged')
+            const orig = mergeData.targetRows.find(
+              (r) => r[mergeData.joinKey] === row[mergeData.joinKey]
+            )
+            return [
+              ...MERGE_COLS.map((c): ResultCell => {
+                const v = row[c] == null ? null : String(row[c])
+                const changed =
+                  c === 'salary' &&
+                  status === 'updated' &&
+                  orig &&
+                  orig[c] !== row[c]
+                return changed
+                  ? {
+                      v: (
+                        <>
+                          {v}
+                          <s className="text-ink-3 ml-1.5 text-[10px] font-normal">
+                            {String(orig[c])}
+                          </s>
+                        </>
+                      ),
+                      tone: 'amber',
+                      strong: true,
+                    }
+                  : v
+              }),
+              status === 'updated'
+                ? { v: 'UPDATED', tone: 'amber', strong: true }
+                : status === 'inserted'
+                  ? { v: 'INSERTED', tone: 'green', strong: true }
+                  : '—',
+            ]
+          })}
+          rowTones={mergeData.resultRows.map((row) => {
+            const status = String(row['_status'] ?? 'unchanged')
+            return status === 'updated'
+              ? ('amber' as const)
+              : status === 'inserted'
+                ? ('green' as const)
+                : undefined
+          })}
+        />
       </div>
     </div>
   )
@@ -676,7 +511,7 @@ export function ExecutionSimulator() {
                   </table>
                 </div>
               </div>
-              <ResultTable
+              <QueryResult
                 parsed={parsed}
                 overrideResult={selectedQuery.overrideResult}
               />

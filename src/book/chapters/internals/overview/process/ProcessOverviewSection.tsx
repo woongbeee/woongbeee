@@ -1,5 +1,5 @@
 import { useLangStore } from '@/store/simulationStore'
-import { ChapterTitle, SectionTitle, Prose, InfoBox, Divider } from '../../../shared'
+import { ChapterTitle, SectionTitle, Prose, InfoBox, Divider, Table } from '../../../shared'
 import { IconCpu } from '@tabler/icons-react'
 
 const T = {
@@ -426,32 +426,10 @@ export function ProcessOverviewSection() {
       {/* Background processes overview table */}
       <section>
         <SectionTitle>{t.bgOverviewTitle}</SectionTitle>
-        <div className="mt-3 overflow-hidden rounded-panel border border-line">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-paper-sunk">
-                <th className="w-24 px-4 py-2 text-left font-semibold text-ink">
-                  {isKo ? '약자' : 'Abbr'}
-                </th>
-                <th className="w-40 px-4 py-2 text-left font-semibold text-ink">
-                  {isKo ? '이름' : 'Name'}
-                </th>
-                <th className="px-4 py-2 text-left font-semibold text-ink">
-                  {isKo ? '역할' : 'Role'}
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {t.bgProcesses.map((p, i) => (
-                <tr key={p.abbr} className={i % 2 === 0 ? 'bg-paper' : 'bg-paper-sunk'}>
-                  <td className="px-4 py-2 font-mono text-xs font-semibold text-green">{p.abbr}</td>
-                  <td className="px-4 py-2 text-xs text-ink">{p.name}</td>
-                  <td className="px-4 py-2 text-xs text-ink">{p.desc}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <Table
+          headers={isKo ? ['약자', '이름', '역할'] : ['Abbr', 'Name', 'Role']}
+          rows={t.bgProcesses.map((p) => [p.abbr, p.name, p.desc])}
+        />
       </section>
 
       <Divider />

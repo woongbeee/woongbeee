@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
-import { PageContainer, ChapterTitle, Prose, InfoBox } from '../../shared'
+import { PageContainer, ChapterTitle, Prose, InfoBox, Table, ResultTable } from '../../shared'
 import { IconSitemap } from '@tabler/icons-react'
 import { SqlHighlight } from '../../SqlHighlight'
 import { useLangStore } from '@/store/simulationStore'
@@ -208,32 +208,11 @@ export function HierarchySection() {
         <p className="text-ink-2 mb-2 font-mono text-[10px] font-bold tracking-wide uppercase">
           {lang === 'ko' ? '주요 키워드' : 'Key Keywords'}
         </p>
-        <div className="rounded-panel bg-paper overflow-x-auto border">
-          <table className="w-full text-xs">
-            <thead>
-              <tr className="bg-rail border-b">
-                <th className="text-green px-3 py-2 text-left font-mono text-[10px] font-bold whitespace-nowrap">
-                  Keyword
-                </th>
-                <th className="text-ink-2 px-3 py-2 text-left font-mono text-[10px] font-bold">
-                  {lang === 'ko' ? '설명' : 'Description'}
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {t.hierClauses.map((row, i) => (
-                <tr key={i} className="hover:bg-rail border-b last:border-0">
-                  <td className="text-green px-3 py-2 font-mono text-[11px] font-bold whitespace-nowrap">
-                    {row.clause}
-                  </td>
-                  <td className="text-ink/80 px-3 py-2 font-mono text-[11px] leading-relaxed">
-                    {row.desc}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <Table
+          dense
+          headers={['Keyword', lang === 'ko' ? '설명' : 'Description']}
+          rows={t.hierClauses.map((row) => [row.clause, row.desc])}
+        />
       </div>
 
       {/* Tabs */}
@@ -289,127 +268,51 @@ export function HierarchySection() {
             </div>
 
             {/* Query result table */}
-            <div className="rounded-card bg-paper overflow-x-auto border text-xs">
-              <div className="bg-rail text-ink-2 border-b px-3 py-1.5 font-mono text-[10px] font-bold">
-                {lang === 'ko' ? '쿼리 결과' : 'Query Result'}
-              </div>
-              <table className="w-full">
-                <thead>
-                  <tr className="bg-rail border-b">
-                    {hierTab === 'basic'
-                      ? [
-                          'emp_id',
-                          'name (LPAD)',
-                          'manager_id',
-                          t.hierLevelLabel,
-                        ].map((h) => (
-                          <th
-                            key={h}
-                            className="text-ink-2 px-3 py-1.5 text-left font-mono text-[10px] font-bold whitespace-nowrap"
-                          >
-                            {h}
-                          </th>
-                        ))
-                      : [
-                          'emp_id',
-                          'name (LPAD)',
-                          t.hierLevelLabel,
-                          t.hierPathLabel,
-                        ].map((h) => (
-                          <th
-                            key={h}
-                            className="text-ink-2 px-3 py-1.5 text-left font-mono text-[10px] font-bold whitespace-nowrap"
-                          >
-                            {h}
-                          </th>
-                        ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {hierNodes.map((node) => (
-                    <tr
-                      key={node.emp_id}
-                      className="hover:bg-rail border-b last:border-0"
-                    >
-                      <td className="text-blue px-3 py-1.5 font-mono text-[11px] font-bold">
-                        {node.emp_id}
-                      </td>
-                      <td className="py-1.5 pr-4 pl-3 font-mono text-[11px] whitespace-pre">
-                        <span className="text-green">
-                          {' '.repeat((node.level - 1) * 4)}
-                        </span>
-                        <span className="text-ink/90 font-bold">
-                          {node.first_name}
-                        </span>
-                      </td>
-                      {hierTab === 'basic' ? (
-                        <>
-                          <td className="text-ink/60 px-3 py-1.5 font-mono text-[11px]">
-                            {node.manager_id ?? 'NULL'}
-                          </td>
-                          <td className="text-green px-3 py-1.5 font-mono text-[11px] font-bold">
-                            {node.level}
-                          </td>
-                        </>
-                      ) : (
-                        <>
-                          <td className="text-green px-3 py-1.5 font-mono text-[11px] font-bold">
-                            {node.level}
-                          </td>
-                          <td className="text-ink/60 px-3 py-1.5 font-mono text-[11px]">
-                            /{node.path}
-                          </td>
-                        </>
-                      )}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <ResultTable
+              dense
+              numbered={false}
+              title={lang === 'ko' ? '쿼리 결과' : 'Query Result'}
+              columns={
+                hierTab === 'basic'
+                  ? ['emp_id', 'name (LPAD)', 'manager_id', t.hierLevelLabel]
+                  : ['emp_id', 'name (LPAD)', t.hierLevelLabel, t.hierPathLabel]
+              }
+              rows={hierNodes.map((node) => {
+                const id = { v: node.emp_id, tone: 'blue' as const, align: 'left' as const }
+                const name = {
+                  v: (
+                    <span className="whitespace-pre">
+                      {' '.repeat((node.level - 1) * 4)}
+                      {node.first_name}
+                    </span>
+                  ),
+                  strong: true,
+                }
+                const level = { v: node.level, tone: 'green' as const, align: 'left' as const }
+                return hierTab === 'basic'
+                  ? [id, name, node.manager_id, level]
+                  : [id, name, level, `/${node.path}`]
+              })}
+            />
 
             {/* Source table */}
-            <div className="rounded-card bg-paper overflow-x-auto border text-xs">
-              <div className="bg-rail text-ink-2 border-b px-3 py-1.5 font-mono text-[10px] font-bold">
-                employees
-              </div>
-              <table className="w-full">
-                <thead>
-                  <tr className="bg-rail border-b">
-                    {['name', 'emp_id', 'manager_id'].map((h) => (
-                      <th
-                        key={h}
-                        className="text-ink-2 px-3 py-1.5 text-left font-mono text-[10px] font-bold whitespace-nowrap"
-                      >
-                        {h}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {EMP_ORG.map((emp) => (
-                    <tr
-                      key={emp.emp_id}
-                      className={cn(
-                        'border-b last:border-0',
-                        resultIds.has(emp.emp_id)
-                          ? 'bg-green/5'
-                          : 'opacity-40'
-                      )}
-                    >
-                      <td className="text-ink/90 px-3 py-1.5 font-mono text-[11px] font-bold">
-                        {emp.first_name}
-                      </td>
-                      <td className="text-blue px-3 py-1.5 font-mono text-[11px] font-bold">
-                        {emp.emp_id}
-                      </td>
-                      <td className="text-ink/60 px-3 py-1.5 font-mono text-[11px]">
-                        {emp.manager_id ?? 'NULL'}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <ResultTable
+              dense
+              numbered={false}
+              title="employees"
+              columns={['name', 'emp_id', 'manager_id']}
+              rows={EMP_ORG.map((emp) => [
+                { v: emp.first_name, strong: true },
+                { v: emp.emp_id, tone: 'blue' as const, align: 'left' as const },
+                emp.manager_id,
+              ])}
+              rowTones={EMP_ORG.map((emp) =>
+                resultIds.has(emp.emp_id) ? ('green' as const) : undefined
+              )}
+              dimRows={EMP_ORG.flatMap((emp, i) =>
+                resultIds.has(emp.emp_id) ? [] : [i]
+              )}
+            />
           </div>
         </div>
       </div>

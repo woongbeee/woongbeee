@@ -320,7 +320,7 @@ function BufferCacheAnatomyDiagram({ isKo }: { isKo: boolean }) {
 
   // 클릭 영역별 하이라이트 색
   function hl(key: AnatomyKey) {
-    return active === key ? 'var(--color-amber)' : 'transparent'
+    return active === key ? AMBER_TINT_STRONG : 'transparent'
   }
   function hlStroke(key: AnatomyKey) {
     return active === key ? 'var(--color-amber)' : 'transparent'
@@ -361,7 +361,7 @@ function BufferCacheAnatomyDiagram({ isKo }: { isKo: boolean }) {
         {/* ── Buffer Cache 외곽 박스 */}
         <rect
           x={BC_X} y={BC_Y} width={BC_W} height={BC_H}
-          fill={active === 'bufferCache' ? 'var(--color-amber)' : 'var(--color-paper-sunk)'}
+          fill={active === 'bufferCache' ? AMBER_TINT_STRONG : 'var(--color-paper-sunk)'}
           stroke={active === 'bufferCache' ? 'var(--color-amber)' : 'var(--color-line)'}
           strokeWidth={active === 'bufferCache' ? 2 : 1.5}
           rx={10}
@@ -384,7 +384,7 @@ function BufferCacheAnatomyDiagram({ isKo }: { isKo: boolean }) {
         <rect
           x={BB_X - 6} y={BB_Y - 4}
           width={BB_COLS * BB_CW + 12} height={BB_ROWS * BB_CH + 8}
-          fill={active === 'bufferBlock' ? 'var(--color-amber)' : 'var(--color-rail)'}
+          fill={active === 'bufferBlock' ? AMBER_TINT_STRONG : 'var(--color-rail)'}
           stroke={active === 'bufferBlock' ? 'var(--color-amber)' : 'var(--color-rail)'}
           strokeWidth={active === 'bufferBlock' ? 2 : 1}
           rx={6}
@@ -475,7 +475,7 @@ function BufferCacheAnatomyDiagram({ isKo }: { isKo: boolean }) {
                       <g style={{ cursor: 'pointer' }} onClick={() => toggle('bufferHandle')}>
                         <rect
                           x={bx + BH_W / 2 - 22} y={bhY - 22} width={44} height={16}
-                          fill={active === 'bufferHandle' ? 'var(--color-amber)' : 'var(--color-rail)'}
+                          fill={active === 'bufferHandle' ? AMBER_TINT_STRONG : 'var(--color-rail)'}
                           stroke={active === 'bufferHandle' ? 'var(--color-amber)' : 'var(--color-green)'}
                           strokeWidth={active === 'bufferHandle' ? 2 : 1} rx={4}
                         />
@@ -494,7 +494,7 @@ function BufferCacheAnatomyDiagram({ isKo }: { isKo: boolean }) {
                     {/* BH rect */}
                     <rect
                       x={bx} y={bhY} width={BH_W} height={BH_H}
-                      fill={isHlHandle ? 'var(--color-amber)' : isHlBH ? hl('bufferHeader') : isPinned ? 'var(--color-rail)' : 'var(--color-paper-sunk)'}
+                      fill={isHlHandle ? AMBER_TINT_STRONG : isHlBH ? hl('bufferHeader') : isPinned ? 'var(--color-rail)' : 'var(--color-paper-sunk)'}
                       stroke={isHlHandle ? 'var(--color-amber)' : isHlBH ? hlStroke('bufferHeader') : isPinned ? 'var(--color-green)' : 'var(--color-line)'}
                       strokeWidth={isHlBH || isHlHandle ? 2 : 1} rx={4}
                       style={{ cursor: 'pointer' }}
@@ -543,7 +543,7 @@ function BufferCacheAnatomyDiagram({ isKo }: { isKo: boolean }) {
               />
               <rect
                 x={LATCH_X} y={LATCH_Y} width={LATCH_W} height={LATCH_H}
-                fill={isHlLatch ? 'var(--color-amber)' : 'var(--color-rail)'}
+                fill={isHlLatch ? AMBER_TINT_STRONG : 'var(--color-rail)'}
                 stroke={'var(--color-amber)'}
                 strokeWidth={isHlLatch ? 2 : 1} rx={4}
               />
@@ -682,9 +682,13 @@ const BH_GAP = 10
 const BUCKET_R = 14
 const BUCKET_X = 20
 
+// 주황 글자·선이 올라가는 배경은 진한 주황이 아니라 연한 틴트로 (같은 색 위에 놓이면 안 보여요)
+const AMBER_TINT = 'color-mix(in srgb, var(--color-amber) 14%, transparent)'
+const AMBER_TINT_STRONG = 'color-mix(in srgb, var(--color-amber) 28%, transparent)'
+
 function cellFill(style: CellStyle) {
   if (style === 'target') return 'var(--color-line)'   // emerald-100
-  if (style === 'dirty')  return 'var(--color-amber)'   // amber-100
+  if (style === 'dirty')  return AMBER_TINT_STRONG
   if (style === 'used')   return 'var(--color-rail)'   // indigo-100
   return 'var(--color-paper-sunk)'                            // slate-50
 }
@@ -830,7 +834,7 @@ function BufferCacheDiagram({ isKo, activeStep }: { isKo: boolean; activeStep: n
                 {/* Bucket circle */}
                 <circle
                   cx={BUCKET_X + BUCKET_R} cy={cy} r={BUCKET_R}
-                  fill={bucketGlow ? 'var(--color-amber)' : isTarget ? 'var(--color-amber)' : 'var(--color-rail)'}
+                  fill={bucketGlow ? AMBER_TINT_STRONG : isTarget ? AMBER_TINT : 'var(--color-rail)'}
                   stroke={bucketGlow ? 'var(--color-amber)' : isTarget ? 'var(--color-amber)' : 'var(--color-ink-3)'}
                   strokeWidth={bucketGlow ? 2 : isTarget ? 1.5 : 1}
                 />
@@ -867,7 +871,7 @@ function BufferCacheDiagram({ isKo, activeStep }: { isKo: boolean; activeStep: n
                         x={x} y={y} width={BH_W} height={BH_H}
                         fill={
                           isPinned ? 'var(--color-line)'
-                          : isScanning ? 'var(--color-amber)'
+                          : isScanning ? AMBER_TINT_STRONG
                           : isHit ? 'var(--color-line)'
                           : isTarget ? 'var(--color-rail)'
                           : 'var(--color-paper-sunk)'
@@ -968,7 +972,7 @@ function BufferCacheDiagram({ isKo, activeStep }: { isKo: boolean; activeStep: n
       <div className="mt-2 flex flex-wrap gap-3">
         {[
           { color: 'var(--color-rail)', stroke: 'var(--color-blue)', label: 'Clean' },
-          { color: 'var(--color-amber)', stroke: 'var(--color-amber)', label: 'Dirty' },
+          { color: AMBER_TINT_STRONG, stroke: 'var(--color-amber)', label: 'Dirty' },
           { color: 'var(--color-line)', stroke: 'var(--color-green)', label: 'Target (Hit)' },
           { color: 'var(--color-paper-sunk)', stroke: 'var(--color-rail)', label: 'Free' },
         ].map((item) => (
@@ -1000,14 +1004,14 @@ const NODE_BASE_COLORS = [
   { bg: 'var(--color-rail)', border: 'var(--color-purple)', dot: 'var(--color-purple)', text: 'var(--color-purple)', ring: 'var(--color-purple)' }, // 0 ROWID
   { bg: 'var(--color-rail)', border: 'var(--color-purple)', dot: 'var(--color-purple)', text: 'var(--color-purple)', ring: 'var(--color-purple)' }, // 1 DBA
   { bg: 'var(--color-rail)', border: 'var(--color-blue)', dot: 'var(--color-blue)', text: 'var(--color-blue)', ring: 'var(--color-blue)' }, // 2 Hash
-  { bg: 'var(--color-amber)', border: 'var(--color-amber)', dot: 'var(--color-amber)', text: 'var(--color-amber)', ring: 'var(--color-amber)' }, // 3 Latch
-  { bg: 'var(--color-amber)', border: 'var(--color-amber)', dot: 'var(--color-amber)', text: 'var(--color-amber)', ring: 'var(--color-amber)' }, // 4 Chain
-  { bg: 'var(--color-amber)', border: 'var(--color-amber)', dot: 'var(--color-amber)', text: 'var(--color-amber)', ring: 'var(--color-amber)' }, // 5 Pin
+  { bg: AMBER_TINT, border: 'var(--color-amber)', dot: 'var(--color-amber)', text: 'var(--color-amber)', ring: 'var(--color-amber)' }, // 3 Latch
+  { bg: AMBER_TINT, border: 'var(--color-amber)', dot: 'var(--color-amber)', text: 'var(--color-amber)', ring: 'var(--color-amber)' }, // 4 Chain
+  { bg: AMBER_TINT, border: 'var(--color-amber)', dot: 'var(--color-amber)', text: 'var(--color-amber)', ring: 'var(--color-amber)' }, // 5 Pin
   { bg: 'var(--color-line)', border: 'var(--color-green)', dot: 'var(--color-green)', text: 'var(--color-green)', ring: 'var(--color-green)' }, // 6 Latch Rel
   { bg: 'var(--color-rail)', border: 'var(--color-line)', dot: 'var(--color-ink-2)', text: 'var(--color-ink)', ring: 'var(--color-line)' }, // 7 Row Data
 ]
 
-const NODE_ACTIVE = { bg: 'var(--color-amber)', border: 'var(--color-amber)', dot: 'var(--color-amber)', ring: 'var(--color-amber)' }
+const NODE_ACTIVE = { bg: AMBER_TINT_STRONG, border: 'var(--color-amber)', dot: 'var(--color-amber)', ring: 'var(--color-amber)' }
 
 function FlowDiagram({
   isKo,

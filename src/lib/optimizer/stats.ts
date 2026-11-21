@@ -8,7 +8,7 @@
 
 import { SCHEMAS } from '@/data/index'
 import type { SchemaTable, RowData } from '@/data/types'
-import type { ColumnStats, IndexStats, TableStats } from './types'
+import type { ColumnStats, IndexStats, Partitioning, TableStats } from './types'
 
 export const ROWS_PER_BLOCK = 4
 export const KEYS_PER_LEAF = 8
@@ -23,6 +23,19 @@ const ABBR: Record<string, string> = {
 const EXTRA_INDEXES: Record<string, { column: string; unique: boolean }[]> = {
   EMPLOYEES: [{ column: 'LAST_NAME', unique: false }, { column: 'EMAIL', unique: true }],
   CUSTOMERS: [{ column: 'EMAIL_ADDRESS', unique: true }],
+}
+
+// 파티션 테이블 (CREATE TABLE … PARTITION BY RANGE). 샘플 데이터는 그대로 두고, 물리 설계만 여기서 정한다.
+//   ORDERS: 주문 일시(ORDER_TMS) 기준 월별 Range 파티션 — 상한은 "그 값 미만"
+const PARTITIONED: Record<string, { column: string; parts: { name: string; lessThan: string }[] }> = {
+  ORDERS: {
+    column: 'ORDER_TMS',
+    parts: [
+      { name: 'P_2021_02', lessThan: '2021-03-01' },
+      { name: 'P_2021_03', lessThan: '2021-04-01' },
+      { name: 'P_2021_04', lessThan: '2021-05-01' },
+    ],
+  },
 }
 
 const ALL_TABLES: SchemaTable[] = SCHEMAS.flatMap((s) => s.tables)
@@ -59,6 +72,23 @@ function buildIndex(table: SchemaTable, abbr: string, columns: string[], unique:
   }
 }
 
+function buildPartitioning(table: SchemaTable): Partitioning | undefined {
+  const spec = PARTITIONED[table.name]
+  if (!spec) return undefined
+  const partitions = spec.parts.map((p, i) => {
+    const lower = i === 0 ? '' : spec.parts[i - 1].lessThan
+    const rowIdx = table.rows
+      .map((r, idx) => ({ idx, v: String(r[spec.column] ?? '') }))
+      .filter((e) => e.v >= lower && e.v < p.lessThan)
+      .map((e) => e.idx)
+    return {
+      name: p.name, position: i + 1, highValue: p.lessThan, rowIdx,
+      numRows: rowIdx.length, numBlocks: Math.max(1, Math.ceil(rowIdx.length / ROWS_PER_BLOCK)),
+    }
+  })
+  return { method: 'RANGE', column: spec.column, partitions }
+}
+
 function buildStats(table: SchemaTable): TableStats {
   const abbr = ABBR[table.name] ?? table.name.slice(0, 5)
   const indexes: IndexStats[] = []
@@ -70,14 +100,19 @@ function buildStats(table: SchemaTable): TableStats {
   for (const extra of EXTRA_INDEXES[table.name] ?? []) {
     indexes.push(buildIndex(table, abbr, [extra.column], extra.unique, false))
   }
+  const partitioning = buildPartitioning(table)
   return {
     tableName: table.name,
     abbr,
     numRows: table.rows.length,
-    numBlocks: Math.max(1, Math.ceil(table.rows.length / ROWS_PER_BLOCK)),
+    // 파티션 테이블은 파티션마다 세그먼트가 따로 있다 → 블록 수는 파티션들의 합
+    numBlocks: partitioning
+      ? partitioning.partitions.reduce((n, p) => n + p.numBlocks, 0)
+      : Math.max(1, Math.ceil(table.rows.length / ROWS_PER_BLOCK)),
     avgRowLen: 60,
     columns: table.columns.map((c) => columnStats(table, c.name)),
     indexes,
+    partitioning,
   }
 }
 

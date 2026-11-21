@@ -47,6 +47,33 @@ export interface IndexStats {
   clusteringFactor: number
 }
 
+/** 파티션 하나의 통계 (USER_TAB_PARTITIONS 한 줄) */
+export interface PartitionStats {
+  name: string              // 'P_2021_03'
+  position: number          // 1 부터 — Pstart / Pstop 에 찍히는 번호
+  highValue: string         // VALUES LESS THAN (…) — 이 값 "미만"까지 담는다
+  numRows: number
+  numBlocks: number
+  rowIdx: number[]          // 이 파티션에 들어 있는 샘플 행 번호
+}
+
+export interface Partitioning {
+  method: 'RANGE'
+  column: string            // Partition Key
+  partitions: PartitionStats[]
+}
+
+/** Partition Pruning 결과 — 실행 계획의 Pstart / Pstop */
+export interface PartitionAccess {
+  kind: 'SINGLE' | 'ITERATOR' | 'ALL'
+  pstart: string            // 파티션 번호, 또는 실행할 때 정해지면 'KEY'
+  pstop: string
+  positions: number[]       // 읽게 되는 파티션 번호들
+  names: string[]
+  total: number             // 전체 파티션 수
+  byKey: string | null      // Pruning 에 쓰인 조건 (없으면 전부 읽는다)
+}
+
 export interface TableStats {
   tableName: string
   abbr: string              // 버퍼 라벨용 짧은 이름
@@ -55,6 +82,7 @@ export interface TableStats {
   avgRowLen: number
   columns: ColumnStats[]
   indexes: IndexStats[]
+  partitioning?: Partitioning
 }
 
 // ── Parsed statement ──────────────────────────────────────────────────────
@@ -112,6 +140,8 @@ export interface ParsedQuery {
   limitKind: 'fetch' | 'rownum' | null
   /** 조건 일부를 흉내 내지 못해 실제 행 수를 정확히 셀 수 없음 (비등가 조인 등) */
   inexact: boolean
+  /** PARALLEL 힌트로 요청한 병렬도(DOP). 힌트가 없으면 null */
+  parallel: number | null
   setColumns: string[]       // UPDATE … SET 대상
   bindNames: string[]
   tokenCount: number
@@ -139,6 +169,7 @@ export interface AccessPath {
   cpuCost: number
   chosen: boolean
   accessPredicate?: Predicate   // 인덱스를 타는 데 쓴 조건
+  partitions?: PartitionAccess  // 파티션 테이블을 Full Scan 할 때 읽는 파티션
   reason: L
 }
 
@@ -180,7 +211,7 @@ export interface JoinOrderCandidate {
   chosen: boolean
 }
 
-export type PlanNodeKind = 'statement' | 'dml' | 'join' | 'table' | 'index' | 'sort' | 'hash' | 'view' | 'stopkey'
+export type PlanNodeKind = 'statement' | 'dml' | 'join' | 'table' | 'index' | 'sort' | 'hash' | 'view' | 'stopkey' | 'partition' | 'px'
 
 /** Row Source Tree 의 한 줄 — DBMS_XPLAN 출력 한 행에 해당 */
 export interface PlanNode {
@@ -194,6 +225,11 @@ export interface PlanNode {
   alias?: string
   access?: string             // Predicate Information: access(...)
   filter?: string             // Predicate Information: filter(...)
+  pstart?: string             // 파티션 테이블: 읽기 시작하는 파티션
+  pstop?: string
+  tq?: string                 // 병렬 실행: Table Queue 이름 (Q1,00)
+  inOut?: string              // 병렬 실행: IN-OUT (PCWP · P->P · P->S …)
+  distrib?: string            // 병렬 실행: PQ Distrib (HASH · RANGE · QC (RAND) …)
   children: number[]          // 자식 노드 id
 }
 
@@ -210,4 +246,6 @@ export interface OptimizerResult {
   totalCost: number
   estimatedRows: number
   warnings: L[]
+  /** 병렬 실행 계획일 때만: 병렬도와 PX 서버 집합 수 */
+  parallel?: { dop: number; serverSets: 1 | 2 }
 }

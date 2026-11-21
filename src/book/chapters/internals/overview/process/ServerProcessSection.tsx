@@ -1,5 +1,5 @@
 import { useLangStore } from '@/store/simulationStore'
-import { ChapterTitle, SectionTitle, Prose, InfoBox, Divider } from '../../../shared'
+import { ChapterTitle, SectionTitle, Prose, InfoBox, Divider, Table } from '../../../shared'
 import { IconServer } from '@tabler/icons-react'
 
 const T = {
@@ -556,28 +556,10 @@ export function ServerProcessSection() {
       <section>
         <SectionTitle>{t.compTitle}</SectionTitle>
 
-        <div className="mt-3 overflow-hidden rounded-panel border border-line">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-paper-sunk">
-                <th className="px-4 py-2 text-left font-semibold text-ink">
-                  {isKo ? '항목' : 'Aspect'}
-                </th>
-                <th className="px-4 py-2 text-left font-semibold text-purple">Dedicated</th>
-                <th className="px-4 py-2 text-left font-semibold text-green">Shared</th>
-              </tr>
-            </thead>
-            <tbody>
-              {t.compRows.map((row, i) => (
-                <tr key={row.aspect} className={i % 2 === 0 ? 'bg-paper' : 'bg-paper-sunk'}>
-                  <td className="px-4 py-2 text-xs font-semibold text-ink">{row.aspect}</td>
-                  <td className="px-4 py-2 text-xs text-ink">{row.dedicated}</td>
-                  <td className="px-4 py-2 text-xs text-ink">{row.shared}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <Table
+          headers={[isKo ? '항목' : 'Aspect', 'Dedicated', 'Shared']}
+          rows={t.compRows.map((row) => [row.aspect, row.dedicated, row.shared])}
+        />
       </section>
 
       <Divider />

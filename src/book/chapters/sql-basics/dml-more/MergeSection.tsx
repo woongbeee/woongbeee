@@ -7,7 +7,9 @@ import {
   Prose,
   InfoBox,
   Divider,
+  ResultTable,
 } from '../../shared'
+import type { ResultCell } from '../../shared'
 import {
   IconGitMerge,
   IconRefresh,
@@ -280,32 +282,25 @@ const EX2_RESULT: (Ex2TargetRow & { state: Ex2RowState })[] = [
 
 const MERGE_TABLE_COLS = ['emp_id', 'first_name', 'dept_id', 'salary'] as const
 
-function MergeTableHeader({
-  cols = MERGE_TABLE_COLS as readonly string[],
-  extraCol,
-}: {
-  cols?: readonly string[]
-  extraCol?: string
-}) {
-  return (
-    <thead>
-      <tr className="bg-rail border-b">
-        {cols.map((h) => (
-          <th
-            key={h}
-            className="text-ink-2 px-3 py-2 text-left font-mono text-[10px] font-bold whitespace-nowrap"
-          >
-            {h}
-          </th>
-        ))}
-        {extraCol && (
-          <th className="text-ink-2 px-3 py-2 text-left font-mono text-[10px] font-bold whitespace-nowrap">
-            {extraCol}
-          </th>
-        )}
-      </tr>
-    </thead>
-  )
+// 값이 바뀐 셀: 옛 값(취소선) + 새 값
+function changedCell(
+  before: number,
+  after: number,
+  tone: 'amber' | 'red'
+): ResultCell {
+  return {
+    v: (
+      <>
+        <s className="text-ink-3 mr-1.5 text-[10px] font-normal">
+          {before.toLocaleString()}
+        </s>
+        {after.toLocaleString()}
+      </>
+    ),
+    tone,
+    strong: true,
+    align: 'right',
+  }
 }
 
 type RowState = 'updated' | 'inserted'
@@ -353,38 +348,22 @@ function MergeTables({ t }: { t: (typeof T)['ko'] }) {
               {t.targetLabel}
             </span>
           </div>
-          <div className="rounded-card border-amber/30 overflow-x-auto border-2">
-            <table className="w-full text-xs">
-              <MergeTableHeader />
-              <tbody>
-                {INITIAL_TARGET.map((row) => {
-                  const state = MERGE_ROW_STATES[row.emp_id]
-                  return (
-                    <tr
-                      key={row.emp_id}
-                      className={cn(
-                        'border-b last:border-0',
-                        state === 'updated' ? 'bg-amber/10' : ''
-                      )}
-                    >
-                      <td className="text-ink/80 px-3 py-1.5 font-mono text-[11px] whitespace-nowrap">
-                        {row.emp_id}
-                      </td>
-                      <td className="text-ink/80 px-3 py-1.5 font-mono text-[11px] whitespace-nowrap">
-                        {row.first_name}
-                      </td>
-                      <td className="text-ink/80 px-3 py-1.5 font-mono text-[11px] whitespace-nowrap">
-                        {row.dept_id}
-                      </td>
-                      <td className="text-ink/80 px-3 py-1.5 font-mono text-[11px] whitespace-nowrap">
-                        {row.salary.toLocaleString()}
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
+          <ResultTable
+            dense
+            numbered={false}
+            columns={[...MERGE_TABLE_COLS]}
+            rows={INITIAL_TARGET.map((row) => [
+              row.emp_id,
+              row.first_name,
+              row.dept_id,
+              row.salary.toLocaleString(),
+            ])}
+            rowTones={INITIAL_TARGET.map((row) =>
+              MERGE_ROW_STATES[row.emp_id] === 'updated'
+                ? ('amber' as const)
+                : undefined
+            )}
+          />
         </div>
 
         {/* SOURCE */}
@@ -392,38 +371,22 @@ function MergeTables({ t }: { t: (typeof T)['ko'] }) {
           <div className="text-ink-2 mb-2 font-mono text-[10px] font-bold tracking-widest uppercase">
             {t.sourceTable}
           </div>
-          <div className="rounded-card overflow-x-auto border">
-            <table className="w-full text-xs">
-              <MergeTableHeader />
-              <tbody>
-                {SOURCE_ROWS.map((src) => {
-                  const state = MERGE_ROW_STATES[src.emp_id]
-                  return (
-                    <tr
-                      key={src.emp_id}
-                      className={cn(
-                        'border-b last:border-0',
-                        state === 'updated' ? 'bg-amber/10' : 'bg-green/10'
-                      )}
-                    >
-                      <td className="text-ink/80 px-3 py-1.5 font-mono text-[11px] whitespace-nowrap">
-                        {src.emp_id}
-                      </td>
-                      <td className="text-ink/80 px-3 py-1.5 font-mono text-[11px] whitespace-nowrap">
-                        {src.first_name}
-                      </td>
-                      <td className="text-ink/80 px-3 py-1.5 font-mono text-[11px] whitespace-nowrap">
-                        {src.dept_id}
-                      </td>
-                      <td className="text-ink/80 px-3 py-1.5 font-mono text-[11px] whitespace-nowrap">
-                        {src.salary.toLocaleString()}
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
+          <ResultTable
+            dense
+            numbered={false}
+            columns={[...MERGE_TABLE_COLS]}
+            rows={SOURCE_ROWS.map((src) => [
+              src.emp_id,
+              src.first_name,
+              src.dept_id,
+              src.salary.toLocaleString(),
+            ])}
+            rowTones={SOURCE_ROWS.map((src) =>
+              MERGE_ROW_STATES[src.emp_id] === 'updated'
+                ? ('amber' as const)
+                : ('green' as const)
+            )}
+          />
         </div>
 
         {/* RESULT */}
@@ -431,73 +394,36 @@ function MergeTables({ t }: { t: (typeof T)['ko'] }) {
           <div className="mb-2 flex items-center gap-1.5 font-mono text-[10px] font-bold tracking-widest uppercase">
             <span className="text-ink/70">{t.resultTable}</span>
           </div>
-          <div className="rounded-card border-amber/30 overflow-x-auto border-2">
-            <table className="w-full text-xs">
-              <MergeTableHeader extraCol="status" />
-              <tbody>
-                {RESULT_ROWS.map((row) => {
-                  const state = MERGE_ROW_STATES[row.emp_id]
-                  const orig = INITIAL_TARGET.find(
-                    (r) => r.emp_id === row.emp_id
-                  )
-                  return (
-                    <tr
-                      key={row.emp_id}
-                      className={cn(
-                        'border-b last:border-0',
-                        state === 'updated'
-                          ? 'bg-amber/10'
-                          : state === 'inserted'
-                            ? 'bg-green/10'
-                            : ''
-                      )}
-                    >
-                      <td className="text-ink/80 px-3 py-1.5 font-mono text-[11px] whitespace-nowrap">
-                        {row.emp_id}
-                      </td>
-                      <td className="text-ink/80 px-3 py-1.5 font-mono text-[11px] whitespace-nowrap">
-                        {row.first_name}
-                      </td>
-                      <td className="text-ink/80 px-3 py-1.5 font-mono text-[11px] whitespace-nowrap">
-                        {row.dept_id}
-                      </td>
-                      <td className="px-3 py-1.5 font-mono text-[11px] whitespace-nowrap">
-                        {state === 'updated' &&
-                        orig &&
-                        orig.salary !== row.salary ? (
-                          <span>
-                            <span className="text-red mr-1 text-[10px] line-through">
-                              {orig.salary.toLocaleString()}
-                            </span>
-                            <span className="text-amber font-bold">
-                              {row.salary.toLocaleString()}
-                            </span>
-                          </span>
-                        ) : (
-                          <span className="text-ink/80">
-                            {row.salary.toLocaleString()}
-                          </span>
-                        )}
-                      </td>
-                      <td className="px-3 py-1.5 font-mono text-[11px] whitespace-nowrap">
-                        {state === 'updated' && (
-                          <span className="bg-amber/20 text-amber rounded px-1.5 py-0.5 text-[10px] font-bold">
-                            UPDATED
-                          </span>
-                        )}
-                        {state === 'inserted' && (
-                          <span className="bg-green/20 text-green rounded px-1.5 py-0.5 text-[10px] font-bold">
-                            INSERTED
-                          </span>
-                        )}
-                        {!state && <span className="text-ink-2/40">—</span>}
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
+          <ResultTable
+            dense
+            numbered={false}
+            columns={[...MERGE_TABLE_COLS, 'status']}
+            rows={RESULT_ROWS.map((row): ResultCell[] => {
+              const state = MERGE_ROW_STATES[row.emp_id]
+              const orig = INITIAL_TARGET.find((r) => r.emp_id === row.emp_id)
+              return [
+                row.emp_id,
+                row.first_name,
+                row.dept_id,
+                state === 'updated' && orig && orig.salary !== row.salary
+                  ? changedCell(orig.salary, row.salary, 'amber')
+                  : row.salary.toLocaleString(),
+                state === 'updated'
+                  ? { v: 'UPDATED', tone: 'amber', strong: true }
+                  : state === 'inserted'
+                    ? { v: 'INSERTED', tone: 'green', strong: true }
+                    : '—',
+              ]
+            })}
+            rowTones={RESULT_ROWS.map((row) => {
+              const state = MERGE_ROW_STATES[row.emp_id]
+              return state === 'updated'
+                ? ('amber' as const)
+                : state === 'inserted'
+                  ? ('green' as const)
+                  : undefined
+            })}
+          />
         </div>
       </div>
     </div>
@@ -540,44 +466,22 @@ function MergeTables2({ t }: { t: (typeof T)['ko'] }) {
               {t.targetLabel}
             </span>
           </div>
-          <div className="rounded-card border-amber/30 overflow-x-auto border-2">
-            <table className="w-full text-xs">
-              <MergeTableHeader />
-              <tbody>
-                {EX2_TARGET.map((row) => {
-                  const src = EX2_SOURCE.find((s) => s.emp_id === row.emp_id)
-                  const willDelete = src?.dept_id === 99
-                  const willUpdate = !!src && !willDelete
-                  return (
-                    <tr
-                      key={row.emp_id}
-                      className={cn(
-                        'border-b last:border-0',
-                        willDelete
-                          ? 'bg-red/10'
-                          : willUpdate
-                            ? 'bg-amber/10'
-                            : ''
-                      )}
-                    >
-                      <td className="text-ink/80 px-3 py-1.5 font-mono text-[11px] whitespace-nowrap">
-                        {row.emp_id}
-                      </td>
-                      <td className="text-ink/80 px-3 py-1.5 font-mono text-[11px] whitespace-nowrap">
-                        {row.first_name}
-                      </td>
-                      <td className="text-ink/80 px-3 py-1.5 font-mono text-[11px] whitespace-nowrap">
-                        {row.dept_id}
-                      </td>
-                      <td className="text-ink/80 px-3 py-1.5 font-mono text-[11px] whitespace-nowrap">
-                        {row.salary.toLocaleString()}
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
+          <ResultTable
+            dense
+            numbered={false}
+            columns={[...MERGE_TABLE_COLS]}
+            rows={EX2_TARGET.map((row) => [
+              row.emp_id,
+              row.first_name,
+              row.dept_id,
+              row.salary.toLocaleString(),
+            ])}
+            rowTones={EX2_TARGET.map((row) => {
+              const src = EX2_SOURCE.find((s) => s.emp_id === row.emp_id)
+              if (!src) return undefined
+              return src.dept_id === 99 ? ('red' as const) : ('amber' as const)
+            })}
+          />
         </div>
 
         {/* SOURCE */}
@@ -585,35 +489,19 @@ function MergeTables2({ t }: { t: (typeof T)['ko'] }) {
           <div className="text-ink-2 mb-2 font-mono text-[10px] font-bold tracking-widest uppercase">
             {t.sourceTable}
           </div>
-          <div className="rounded-card overflow-x-auto border">
-            <table className="w-full text-xs">
-              <MergeTableHeader cols={EX2_SOURCE_COLS} />
-              <tbody>
-                {EX2_SOURCE.map((src) => {
-                  const willDelete = src.dept_id === 99
-                  return (
-                    <tr
-                      key={src.emp_id}
-                      className={cn(
-                        'border-b last:border-0',
-                        willDelete ? 'bg-red/10' : 'bg-amber/10'
-                      )}
-                    >
-                      <td className="text-ink/80 px-3 py-1.5 font-mono text-[11px] whitespace-nowrap">
-                        {src.emp_id}
-                      </td>
-                      <td className="text-ink/80 px-3 py-1.5 font-mono text-[11px] whitespace-nowrap">
-                        {src.dept_id}
-                      </td>
-                      <td className="text-ink/80 px-3 py-1.5 font-mono text-[11px] whitespace-nowrap">
-                        {src.salary.toLocaleString()}
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
+          <ResultTable
+            dense
+            numbered={false}
+            columns={[...EX2_SOURCE_COLS]}
+            rows={EX2_SOURCE.map((src) => [
+              src.emp_id,
+              src.dept_id,
+              src.salary.toLocaleString(),
+            ])}
+            rowTones={EX2_SOURCE.map((src) =>
+              src.dept_id === 99 ? ('red' as const) : ('amber' as const)
+            )}
+          />
         </div>
 
         {/* RESULT */}
@@ -621,93 +509,41 @@ function MergeTables2({ t }: { t: (typeof T)['ko'] }) {
           <div className="text-ink/70 mb-2 font-mono text-[10px] font-bold tracking-widest uppercase">
             {t.resultTable}
           </div>
-          <div className="rounded-card border-amber/30 overflow-x-auto border-2">
-            <table className="w-full text-xs">
-              <MergeTableHeader extraCol="status" />
-              <tbody>
-                {/* deleted row with strikethrough */}
-                <tr className="bg-red/10 border-b opacity-60">
-                  <td className="text-ink/50 px-3 py-1.5 font-mono text-[11px] whitespace-nowrap line-through">
-                    {deletedRow.emp_id}
-                  </td>
-                  <td className="text-ink/50 px-3 py-1.5 font-mono text-[11px] whitespace-nowrap line-through">
-                    {deletedRow.first_name}
-                  </td>
-                  <td className="px-3 py-1.5 font-mono text-[11px] whitespace-nowrap">
-                    <span className="text-ink/50 mr-1 text-[10px] line-through">
-                      {deletedRow.dept_id}
-                    </span>
-                    <span className="text-red font-bold">
-                      {deletedSrc.dept_id}
-                    </span>
-                  </td>
-                  <td className="px-3 py-1.5 font-mono text-[11px] whitespace-nowrap">
-                    <span className="text-ink/50 mr-1 text-[10px] line-through">
-                      {deletedRow.salary.toLocaleString()}
-                    </span>
-                    <span className="text-red font-bold">
-                      {deletedSrc.salary.toLocaleString()}
-                    </span>
-                  </td>
-                  <td className="px-3 py-1.5 font-mono text-[11px] whitespace-nowrap">
-                    <span className="bg-red/20 text-red rounded px-1.5 py-0.5 text-[10px] font-bold">
-                      DELETED
-                    </span>
-                  </td>
-                </tr>
-                {EX2_RESULT.map((row) => {
-                  const orig = EX2_TARGET.find((r) => r.emp_id === row.emp_id)
-                  return (
-                    <tr
-                      key={row.emp_id}
-                      className={cn(
-                        'border-b last:border-0',
-                        row.state === 'updated' ? 'bg-amber/10' : ''
-                      )}
-                    >
-                      <td className="text-ink/80 px-3 py-1.5 font-mono text-[11px] whitespace-nowrap">
-                        {row.emp_id}
-                      </td>
-                      <td className="text-ink/80 px-3 py-1.5 font-mono text-[11px] whitespace-nowrap">
-                        {row.first_name}
-                      </td>
-                      <td className="text-ink/80 px-3 py-1.5 font-mono text-[11px] whitespace-nowrap">
-                        {row.dept_id}
-                      </td>
-                      <td className="px-3 py-1.5 font-mono text-[11px] whitespace-nowrap">
-                        {row.state === 'updated' &&
-                        orig &&
-                        orig.salary !== row.salary ? (
-                          <span>
-                            <span className="text-red mr-1 text-[10px] line-through">
-                              {orig.salary.toLocaleString()}
-                            </span>
-                            <span className="text-amber font-bold">
-                              {row.salary.toLocaleString()}
-                            </span>
-                          </span>
-                        ) : (
-                          <span className="text-ink/80">
-                            {row.salary.toLocaleString()}
-                          </span>
-                        )}
-                      </td>
-                      <td className="px-3 py-1.5 font-mono text-[11px] whitespace-nowrap">
-                        {row.state === 'updated' && (
-                          <span className="bg-amber/20 text-amber rounded px-1.5 py-0.5 text-[10px] font-bold">
-                            UPDATED
-                          </span>
-                        )}
-                        {row.state === 'unchanged' && (
-                          <span className="text-ink-2/40">—</span>
-                        )}
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
+          <ResultTable
+            dense
+            numbered={false}
+            columns={[...MERGE_TABLE_COLS, 'status']}
+            rows={[
+              [
+                { v: <s>{deletedRow.emp_id}</s> },
+                { v: <s>{deletedRow.first_name}</s> },
+                changedCell(deletedRow.dept_id, deletedSrc.dept_id, 'red'),
+                changedCell(deletedRow.salary, deletedSrc.salary, 'red'),
+                { v: 'DELETED', tone: 'red', strong: true },
+              ],
+              ...EX2_RESULT.map((row): ResultCell[] => {
+                const orig = EX2_TARGET.find((r) => r.emp_id === row.emp_id)
+                return [
+                  row.emp_id,
+                  row.first_name,
+                  row.dept_id,
+                  row.state === 'updated' && orig && orig.salary !== row.salary
+                    ? changedCell(orig.salary, row.salary, 'amber')
+                    : row.salary.toLocaleString(),
+                  row.state === 'updated'
+                    ? { v: 'UPDATED', tone: 'amber', strong: true }
+                    : '—',
+                ]
+              }),
+            ]}
+            rowTones={[
+              'red',
+              ...EX2_RESULT.map((row) =>
+                row.state === 'updated' ? ('amber' as const) : undefined
+              ),
+            ]}
+            dimRows={[0]}
+          />
         </div>
       </div>
     </div>

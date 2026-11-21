@@ -8,6 +8,8 @@ import {
   InfoBox,
   TermPopup,
   IndexedContent,
+  Table,
+  ResultTable,
 } from '../../shared'
 import { IconCalendarEvent } from '@tabler/icons-react'
 import { SqlHighlight } from '../../SqlHighlight'
@@ -658,49 +660,6 @@ const FUNC_ITEMS: FuncItem[] = [
   },
 ]
 
-// ── ResultTable ──────────────────────────────────────────────────────────────
-
-function ResultTable({
-  headers,
-  rows,
-}: {
-  headers: string[]
-  rows: string[][]
-}) {
-  return (
-    <div className="rounded-card overflow-x-auto border text-xs">
-      <table className="w-max min-w-full">
-        <thead>
-          <tr className="bg-rail border-b">
-            {headers.map((h) => (
-              <th
-                key={h}
-                className="text-ink-2 px-2.5 py-1.5 text-left font-mono text-[10px] font-bold whitespace-nowrap"
-              >
-                {h}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row, ri) => (
-            <tr key={ri} className="border-b last:border-0">
-              {row.map((cell, ci) => (
-                <td
-                  key={ci}
-                  className="text-ink/80 px-2.5 py-1 font-mono text-[11px] whitespace-nowrap"
-                >
-                  {cell}
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  )
-}
-
 // ── FormatMaskTable ──────────────────────────────────────────────────────────
 
 function FormatMaskTable({
@@ -717,38 +676,13 @@ function FormatMaskTable({
       <p className="text-ink-2 mb-1.5 font-mono text-[11px] font-bold tracking-wider uppercase">
         {title[lang]}
       </p>
-      <div className="rounded-card overflow-x-auto border text-xs">
-        <table className="w-auto">
-          <thead>
-            <tr className="bg-rail border-b">
-              <th className="text-ink-2 px-2.5 py-1.5 text-left font-mono text-[10px] font-bold whitespace-nowrap">
-                {lang === 'ko' ? '마스크' : 'Mask'}
-              </th>
-              <th className="text-ink-2 px-2.5 py-1.5 text-left font-mono text-[10px] font-bold whitespace-nowrap">
-                {lang === 'ko' ? '출력 예' : 'Output'}
-              </th>
-              <th className="text-ink-2 px-2.5 py-1.5 text-left font-mono text-[10px] font-bold whitespace-nowrap">
-                {lang === 'ko' ? '설명' : 'Note'}
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((r) => (
-              <tr key={r.mask} className="border-b last:border-0">
-                <td className="text-blue px-2.5 py-1 font-mono text-[11px] font-bold whitespace-nowrap">
-                  {r.mask}
-                </td>
-                <td className="text-ink/80 px-2.5 py-1 font-mono text-[11px] whitespace-nowrap">
-                  {r.example}
-                </td>
-                <td className="text-ink/70 px-2.5 py-1 font-mono text-[11px] whitespace-nowrap">
-                  {r.desc[lang]}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <Table
+        dense
+        headers={
+          lang === 'ko' ? ['마스크', '출력 예', '설명'] : ['Mask', 'Output', 'Note']
+        }
+        rows={rows.map((r) => [r.mask, r.example, r.desc[lang]])}
+      />
     </div>
   )
 }
@@ -769,38 +703,13 @@ function ArithTable({
       <p className="text-ink-2 mb-1.5 font-mono text-[11px] font-bold tracking-wider uppercase">
         {title[lang]}
       </p>
-      <div className="rounded-card overflow-x-auto border text-xs">
-        <table className="w-auto">
-          <thead>
-            <tr className="bg-rail border-b">
-              <th className="text-ink-2 px-2.5 py-1.5 text-left font-mono text-[10px] font-bold whitespace-nowrap">
-                식
-              </th>
-              <th className="text-ink-2 px-2.5 py-1.5 text-left font-mono text-[10px] font-bold whitespace-nowrap">
-                {lang === 'ko' ? '결과' : 'Result'}
-              </th>
-              <th className="text-ink-2 px-2.5 py-1.5 text-left font-mono text-[10px] font-bold whitespace-nowrap">
-                {lang === 'ko' ? '설명' : 'Note'}
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((r) => (
-              <tr key={r.expr} className="border-b last:border-0">
-                <td className="text-blue px-2.5 py-1 font-mono text-[11px] whitespace-nowrap">
-                  {r.expr}
-                </td>
-                <td className="text-ink/80 px-2.5 py-1 font-mono text-[11px] whitespace-nowrap">
-                  {r.result}
-                </td>
-                <td className="text-ink/70 px-2.5 py-1 font-mono text-[11px] whitespace-nowrap">
-                  {r.desc[lang]}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <Table
+        dense
+        headers={
+          lang === 'ko' ? ['식', '결과', '설명'] : ['Expression', 'Result', 'Note']
+        }
+        rows={rows.map((r) => [r.expr, r.result, r.desc[lang]])}
+      />
     </div>
   )
 }
@@ -905,7 +814,7 @@ function FuncContent({
         <p className="text-ink-2 mb-2 font-mono text-[11px] font-bold tracking-wider uppercase">
           {t.result}
         </p>
-        <ResultTable headers={item.resultHeaders} rows={item.resultRows} />
+        <ResultTable dense columns={item.resultHeaders} rows={item.resultRows} />
       </div>
 
       {/* SYSDATE ↔ TIMESTAMP 변환 예시 */}
@@ -918,7 +827,8 @@ function FuncContent({
           </p>
           <SqlHighlight sql={item.castExample.sql} className="mb-3" />
           <ResultTable
-            headers={item.castExample.headers}
+            dense
+            columns={item.castExample.headers}
             rows={item.castExample.rows}
           />
         </div>
@@ -966,7 +876,8 @@ function FuncContent({
             </div>
             <SqlHighlight sql={item.tzConvert.example} className="mb-3" />
             <ResultTable
-              headers={item.tzConvert.resultHeaders}
+              dense
+              columns={item.tzConvert.resultHeaders}
               rows={item.tzConvert.resultRows}
             />
           </div>
@@ -976,24 +887,15 @@ function FuncContent({
               <p className="text-ink-2 mb-1.5 font-mono text-[11px] font-bold tracking-wider uppercase">
                 {block.title[lang]}
               </p>
-              <div className="rounded-panel bg-rail overflow-x-auto border px-4 py-3">
-                <table className="w-full text-xs">
-                  <tbody>
-                    {block.lines.map((line, i) => (
-                      <tr key={i}>
-                        <td className="text-blue py-0.5 pr-4 font-mono text-[11px] whitespace-nowrap">
-                          {line.code}
-                        </td>
-                        {line.comment[lang] && (
-                          <td className="text-ink-2 py-0.5 font-mono text-[11px]">
-                            {`-- ${line.comment[lang]}`}
-                          </td>
-                        )}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+              <SqlHighlight
+                sql={block.lines
+                  .map((line) =>
+                    line.comment[lang]
+                      ? `${line.code}  -- ${line.comment[lang]}`
+                      : line.code
+                  )
+                  .join('\n')}
+              />
             </div>
           ))}
         </>

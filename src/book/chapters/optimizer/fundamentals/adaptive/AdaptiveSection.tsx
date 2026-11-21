@@ -10,6 +10,7 @@ import {
   Divider,
   SqlBlock,
   AccordionSection,
+  StepList,
 } from '../../../shared'
 
 const T = {
@@ -256,13 +257,7 @@ export function AdaptiveSection() {
 
       <SectionTitle>{t.adaptivePlanWorkTitle}</SectionTitle>
       <Prose>{t.adaptivePlanWorkDesc}</Prose>
-      <ol className="mt-3 mb-4 space-y-2 pl-4">
-        {t.adaptivePlanSteps.map((step, i) => (
-          <li key={i} className="text-sm leading-relaxed text-ink/80">
-            <span className="font-bold text-amber mr-2">{i + 1}.</span>{step}
-          </li>
-        ))}
-      </ol>
+      <StepList steps={t.adaptivePlanSteps.map((step) => ({ desc: step }))} />
       <InfoBox variant="note">{t.adaptivePlanNote}</InfoBox>
 
       <Divider />
@@ -316,13 +311,7 @@ export function AdaptiveSection() {
 
       <AccordionSection title={t.statsFeedbackTitle}>
         <Prose>{t.statsFeedbackDesc}</Prose>
-        <ol className="mt-3 mb-4 space-y-2 pl-4">
-          {t.statsFeedbackSteps.map((step, i) => (
-            <li key={i} className="text-sm leading-relaxed text-ink/80">
-              <span className="font-bold text-amber mr-2">{i + 1}.</span>{step}
-            </li>
-          ))}
-        </ol>
+        <StepList steps={t.statsFeedbackSteps.map((step) => ({ desc: step }))} />
       </AccordionSection>
 
       <AccordionSection title={t.perfFeedbackTitle}>

@@ -19,7 +19,22 @@ export interface PlanRow {
   pw?: number            // Physical Writes
   elapsed?: string       // 경과 시간
   note?: string          // 행 설명 (ko/en 분리 필요 시 상위에서 처리)
+  // 파티션 · 병렬 실행 컬럼 (DBMS_XPLAN 이 해당 계획일 때만 덧붙이는 컬럼)
+  pstart?: string        // Pstart — 읽기 시작하는 파티션 (번호 · KEY · ROWID)
+  pstop?: string         // Pstop
+  tq?: string            // TQ — 병렬 DFO (Q1,00 …)
+  inOut?: string         // IN-OUT — PCWP · PCWC · P->P · P->S
+  distrib?: string       // PQ Distrib — HASH · RANGE · BROADCAST · QC (RAND) …
 }
+
+type ExtraKey = 'pstart' | 'pstop' | 'tq' | 'inOut' | 'distrib'
+const EXTRA_COLS: { key: ExtraKey; hdr: string }[] = [
+  { key: 'pstart', hdr: 'Pstart' },
+  { key: 'pstop', hdr: 'Pstop' },
+  { key: 'tq', hdr: 'TQ' },
+  { key: 'inOut', hdr: 'IN-OUT' },
+  { key: 'distrib', hdr: 'PQ Distrib' },
+]
 
 // pad a string to fixed width (right-pad with spaces)
 function rpad(s: string, n: number) { return s.padEnd(n) }
@@ -51,9 +66,16 @@ export function ExplainPlanTable({
     { key: 'elapsed'    as const, hdr: 'A-Time', w: 12 },
   ] : []
 
+  // 값이 있는 행이 하나라도 있을 때만 그 컬럼을 보인다 (Pstart·Pstop 은 늘 함께)
+  const hasPartCols = rows.some(r => r.pstart !== undefined || r.pstop !== undefined)
+  const extraCols = EXTRA_COLS
+    .filter(c => (c.key === 'pstart' || c.key === 'pstop') ? hasPartCols : rows.some(r => r[c.key] !== undefined))
+    .map(c => ({ ...c, w: Math.max(c.hdr.length, ...rows.map(r => (r[c.key] ?? '').length)) }))
+
   // ── 구분선 너비 ─────────────────────────────────────────────────
   const statW  = statCols.reduce((s, c) => s + c.w + 3, 0)
-  const totalW = 4 + 3 + opW + 3 + nameW + 3 + rowsW + 3 + costW + 3 + timeW + statW + 1
+  const extraW = extraCols.reduce((s, c) => s + c.w + 3, 0)
+  const totalW = 4 + 3 + opW + 3 + nameW + 3 + rowsW + 3 + costW + 3 + timeW + extraW + statW + 1
   const sep    = '-'.repeat(totalW)
 
   // ── 헤더 행 ────────────────────────────────────────────────────
@@ -64,7 +86,8 @@ export function ExplainPlanTable({
   const hdrCost  = lpad('Cost',      costW)
   const hdrTime  = rpad('Time',      timeW)
   const hdrStats = statCols.map(c => lpad(c.hdr, c.w)).join(' | ')
-  const headerLine = `| ${hdrId} | ${hdrOp} | ${hdrName} | ${hdrRows} | ${hdrCost} | ${hdrTime}${statCols.length ? ' | ' + hdrStats : ''} |`
+  const hdrExtra = extraCols.map(c => rpad(c.hdr, c.w)).join(' | ')
+  const headerLine = `| ${hdrId} | ${hdrOp} | ${hdrName} | ${hdrRows} | ${hdrCost} | ${hdrTime}${extraCols.length ? ' | ' + hdrExtra : ''}${statCols.length ? ' | ' + hdrStats : ''} |`
 
   // ── 텍스트 색상 (밝은 배경 기준) ────────────────────────────────
   const C = {
@@ -79,6 +102,7 @@ export function ExplainPlanTable({
     cost:    'var(--color-ink)',
     time:    'var(--color-ink-2)',
     stat:    'var(--color-ink)',
+    extra:   'var(--color-ink-2)',
   }
 
   // ── 데이터 행 렌더링 ────────────────────────────────────────────
@@ -108,6 +132,12 @@ export function ExplainPlanTable({
         <span style={{ color: C.cost }}>{costStr}</span>
         <span style={{ color: C.pipe }}> | </span>
         <span style={{ color: C.time }}>{timeStr}</span>
+        {extraCols.map((c) => (
+          <span key={c.key}>
+            <span style={{ color: C.pipe }}> | </span>
+            <span style={{ color: C.extra }}>{rpad(row[c.key] ?? '', c.w)}</span>
+          </span>
+        ))}
         {statCols.length > 0 && statCols.map((c) => {
           const val = row[c.key]
           const s = lpad(val !== undefined && val !== null ? String(val) : '', c.w)

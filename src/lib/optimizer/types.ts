@@ -65,13 +65,15 @@ export interface Partitioning {
 
 /** Partition Pruning 결과 — 실행 계획의 Pstart / Pstop */
 export interface PartitionAccess {
-  kind: 'SINGLE' | 'ITERATOR' | 'ALL'
+  kind: 'SINGLE' | 'ITERATOR' | 'ALL' | 'EMPTY'
   pstart: string            // 파티션 번호, 또는 실행할 때 정해지면 'KEY'
   pstop: string
   positions: number[]       // 읽게 되는 파티션 번호들
   names: string[]
   total: number             // 전체 파티션 수
   byKey: string | null      // Pruning 에 쓰인 조건 (없으면 전부 읽는다)
+  /** Pruning 하지 못한 이유 (Partition Key 를 가공했거나, 조건이 없거나) */
+  why: L | null
 }
 
 export interface TableStats {
@@ -142,6 +144,10 @@ export interface ParsedQuery {
   inexact: boolean
   /** PARALLEL 힌트로 요청한 병렬도(DOP). 힌트가 없으면 null */
   parallel: number | null
+  /** PARALLEL 힌트에 숫자가 없어 기본 DOP 를 쓴 경우 */
+  parallelDefaulted: boolean
+  /** 힌트를 읽다가 생긴 안내 (자리가 틀려 무시된 힌트 등) */
+  hintNotes: L[]
   setColumns: string[]       // UPDATE … SET 대상
   bindNames: string[]
   tokenCount: number
@@ -247,5 +253,14 @@ export interface OptimizerResult {
   estimatedRows: number
   warnings: L[]
   /** 병렬 실행 계획일 때만: 병렬도와 PX 서버 집합 수 */
-  parallel?: { dop: number; serverSets: 1 | 2 }
+  parallel?: ParallelPlan
+}
+
+export interface ParallelPlan {
+  requested: number          // 힌트로 요청한 DOP
+  dop: number                // 실제로 쓰는 DOP (PX 서버가 모자라면 줄어든다 — DOP Downgrade)
+  serverSets: 1 | 2          // 생산자·소비자 두 집합이 필요한지
+  queues: number             // Table Queue 개수 (:TQ10000 …)
+  dfos: number               // DFO 개수
+  note: L                    // Plan Generator 가 병렬 계획을 짠 방식
 }

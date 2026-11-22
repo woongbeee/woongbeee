@@ -63,6 +63,13 @@ export interface SessionStats {
   sorts: number
 }
 
+/** PX 서버(P000 …) 하나. set 0 = 풀에서 쉬는 중, 1·2 = 지금 이 문장의 생산자/소비자 집합 */
+export interface PxServer {
+  name: string
+  set: 0 | 1 | 2
+  job: string | null      // 지금 하는 일 ('blocks 1–3' · 'HASH GROUP BY' …)
+}
+
 export interface InstanceState {
   tick: number
   scn: number
@@ -75,6 +82,8 @@ export interface InstanceState {
   archivedLogs: number
   txn: Transaction | null
   pga: { cursor: string | null; binds: string[]; workArea: string | null; phase: string | null }
+  /** 병렬 실행 서버 풀 (PARALLEL_MAX_SERVERS 개). 문장이 끝나면 모두 풀로 돌아간다 */
+  px: PxServer[]
   stats: SessionStats
 }
 
@@ -86,6 +95,7 @@ export type StepResult = 'info' | 'ok' | 'hit' | 'miss' | 'error'
 export type DocKey =
   | 'sql-processing' | 'memory' | 'process' | 'transactions' | 'consistency' | 'storage'
   | 'optimizer' | 'transformations' | 'access-paths' | 'joins' | 'cursor-sharing'
+  | 'partitioning' | 'parallel'
 
 export interface SimStep {
   key: string

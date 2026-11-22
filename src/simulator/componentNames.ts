@@ -9,6 +9,8 @@ export const COMPONENT_NAME: Record<string, string> = {
   'dict-cache': 'Data Dictionary Cache',
   'buffer-cache': 'Database Buffer Cache',
   'redo-buffer': 'Redo Log Buffer',
+  'large-pool': 'Large Pool',
+  'px-servers': 'PX Servers',
   dbw: 'DBW',
   lgwr: 'LGWR',
   ckpt: 'CKPT',

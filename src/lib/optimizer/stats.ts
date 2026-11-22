@@ -34,6 +34,8 @@ const PARTITIONED: Record<string, { column: string; parts: { name: string; lessT
       { name: 'P_2021_02', lessThan: '2021-03-01' },
       { name: 'P_2021_03', lessThan: '2021-04-01' },
       { name: 'P_2021_04', lessThan: '2021-05-01' },
+      { name: 'P_2021_05', lessThan: '2021-06-01' },
+      { name: 'P_2021_06', lessThan: '2021-07-01' },
     ],
   },
 }

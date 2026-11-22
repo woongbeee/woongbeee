@@ -163,7 +163,10 @@ function JoinCard({ step, lang }: { step: JoinStep; lang: Lang }) {
 }
 
 function toPlanRows(result: OptimizerResult): PlanRow[] {
-  return result.planNodes.map((n) => ({ id: n.id, depth: n.depth, operation: n.operation, name: n.name, rows: n.rows || undefined, cost: n.cost }))
+  return result.planNodes.map((n) => ({
+    id: n.id, depth: n.depth, operation: n.operation, name: n.name, rows: n.rows || undefined, cost: n.cost,
+    pstart: n.pstart, pstop: n.pstop, tq: n.tq, inOut: n.inOut, distrib: n.distrib,
+  }))
 }
 
 export function OptimizerPanel({ result, hasTrace, level, reused, runningNodeId, lang }: {

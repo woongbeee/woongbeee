@@ -13,10 +13,11 @@
 import { optimize, parseSQL } from '@/lib/optimizer'
 import type { L, OptimizerResult, PlanNode } from '@/lib/optimizer/types'
 import { getSchemaOf, getTableRows, getTableStats } from '@/lib/optimizer/stats'
+import { PX_MAX_SERVERS } from '@/lib/optimizer/planGenerator'
 import { accessBlocks, actualRowCount, dmlBlocks, keyRows, matchRows, undoBlock } from './execution'
 import type { RowMatch } from './execution'
 import type {
-  BlockRef, CursorEntry, DocKey, InstanceCommand, InstanceState, SessionStats, SimStep, StageId, StepResult, StepStage, Trace,
+  BlockRef, CursorEntry, DocKey, InstanceCommand, InstanceState, PxServer, SessionStats, SimStep, StageId, StepResult, StepStage, Trace,
 } from './types'
 
 const BUFFER_COUNT = 24
@@ -41,6 +42,8 @@ export const DOCS: Record<DocKey, { label: string; url: string }> = {
   'access-paths': { label: 'SQL Tuning Guide — Optimizer Access Paths', url: `${DOC_BASE}/tgsql/optimizer-access-paths.html` },
   joins: { label: 'SQL Tuning Guide — Joins', url: `${DOC_BASE}/tgsql/joins.html` },
   'cursor-sharing': { label: 'SQL Tuning Guide — Cursor Sharing', url: `${DOC_BASE}/tgsql/improving-rwp-cursor-sharing.html` },
+  partitioning: { label: 'VLDB and Partitioning Guide — Partition Pruning', url: `${DOC_BASE}/vldbg/partition-pruning.html` },
+  parallel: { label: 'VLDB and Partitioning Guide — Using Parallel Execution', url: `${DOC_BASE}/vldbg/parallel-exec-intro.html` },
 }
 
 const t = (ko: string, en: string): L => ({ ko, en })
@@ -70,8 +73,14 @@ export function createInstance(): InstanceState {
     archivedLogs: 0,
     txn: null,
     pga: { cursor: null, binds: [], workArea: null, phase: null },
+    px: idlePx(),
     stats: { ...ZERO_STATS },
   }
+}
+
+/** PX 서버 풀 — 모두 쉬는 상태 */
+function idlePx(): PxServer[] {
+  return Array.from({ length: PX_MAX_SERVERS }, (_, i) => ({ name: `P${String(i).padStart(3, '0')}`, set: 0 as const, job: null }))
 }
 
 // ── SQL ID ────────────────────────────────────────────────────────────────
@@ -129,6 +138,7 @@ class Run {
   constructor(state: InstanceState) {
     this.s = clone(state)
     this.s.pga = { cursor: null, binds: [], workArea: null, phase: null }
+    this.s.px = idlePx()
     this.before = { ...this.s.stats }
   }
 
@@ -612,7 +622,8 @@ function runOptimization(run: Run, opt: OptimizerResult) {
 
   run.optLevel = 3
   run.step({
-    key: 'plan', stage: 'optimize', doc: opt.joinSteps.length > 0 ? 'joins' : 'access-paths', result: 'ok',
+    key: 'plan', stage: 'optimize', result: 'ok',
+    doc: opt.parallel ? 'parallel' : opt.tableAccessPlans.some((ap) => ap.chosen.partitions) ? 'partitioning' : opt.joinSteps.length > 0 ? 'joins' : 'access-paths',
     title: t('Optimization ③ Plan Generator', 'Optimization ③ Plan generator'),
     body: t(
       'Plan Generator 가 가능한 Access Path · 조인 방법 · 조인 순서를 이리저리 조합해 보고, Estimator 가 매긴 비용이 가장 낮은 계획 하나를 골라요.',
@@ -630,6 +641,26 @@ function runOptimization(run: Run, opt: OptimizerResult) {
           `${j.leftLabel} ⋈ ${j.rightTable}: ${j.method.replace(/_/g, ' ')} — ${j.reason.ko}`,
           `${j.leftLabel} ⋈ ${j.rightTable}: ${j.method.replace(/_/g, ' ')} — ${j.reason.en}`,
         ),
+      ),
+      ...opt.tableAccessPlans.flatMap((ap) => {
+        const pa = ap.chosen.partitions
+        if (!pa) return []
+        const head = pa.kind === 'ALL'
+          ? t(`${ap.tableName}: 파티션 ${pa.total}개를 전부 읽어요 (PARTITION RANGE ALL).`, `${ap.tableName}: all ${pa.total} partitions are read (PARTITION RANGE ALL).`)
+          : pa.kind === 'EMPTY'
+            ? t(`${ap.tableName}: ${pa.byKey} 를 만족하는 파티션이 하나도 없어요 (PARTITION RANGE EMPTY). 블록을 하나도 안 읽고 끝나요.`, `${ap.tableName}: no partition can satisfy ${pa.byKey} (PARTITION RANGE EMPTY) — not a single block is read.`)
+            : pa.pstart === 'KEY'
+              ? t(`${ap.tableName}: Partition Pruning — ${pa.byKey}. 파티션은 실행할 때 정해져요 (Pstart/Pstop = KEY).`, `${ap.tableName}: partition pruning on ${pa.byKey}; the partitions are fixed at execution time (Pstart/Pstop = KEY).`)
+              : t(
+                  `${ap.tableName}: Partition Pruning — ${pa.byKey} 조건으로 파티션 ${pa.total}개 중 ${pa.names.join(', ')} 만 남겼어요 (Pstart ${pa.pstart} · Pstop ${pa.pstop}). 나머지 파티션은 아예 열어 보지도 않아요.`,
+                  `${ap.tableName}: partition pruning — ${pa.byKey} leaves only ${pa.names.join(', ')} of ${pa.total} partitions (Pstart ${pa.pstart} · Pstop ${pa.pstop}). The other partitions are never opened.`,
+                )
+        return [head, ...(pa.why ? [pa.why] : [])]
+      }),
+      opt.parallel && opt.parallel.note,
+      opt.query.parallel !== null && !opt.parallel && opt.query.type === 'SELECT' && t(
+        `PARALLEL 힌트(DOP ${opt.query.parallel})가 있지만, 인덱스로 몇 행만 콕 집어 읽는 직렬 계획을 골랐어요. 병렬 실행은 Full Scan 에서 시작하거든요.`,
+        `There is a PARALLEL hint (DOP ${opt.query.parallel}), but a serial plan reading a few rows through an index was chosen — parallel execution starts from a full scan.`,
       ),
       opt.joinOrders.length > 1 && t(
         `조인 순서 후보 중 "${opt.joinOrders.find((o) => o.chosen)?.order.join(' → ')}" 가 가장 쌌어요.`,
@@ -655,6 +686,32 @@ function runExecution(run: Run, opt: OptimizerResult): number {
   for (const e of opt.estimates) {
     matches[e.alias] = matchRows(q.tables.find((r) => r.alias === e.alias)!, q.predicates, e.cardinality)
   }
+  const parentOf: number[] = []
+  nodes.forEach((n) => n.children.forEach((c) => { parentOf[c] = n.id }))
+
+  // ── 병렬 실행: DFO(Q1,00 …)마다 어느 PX 서버 집합이 맡는지 ──
+  // 맨 위 DFO 가 집합 1, PX RECEIVE ← PX SEND 를 건널 때마다 반대 집합 (생산자 ↔ 소비자)
+  const par = opt.parallel
+  const setOf = new Map<string, 1 | 2>()
+  if (par) {
+    const walk = (id: number, set: 1 | 2) => {
+      const n = nodes[id]
+      if (n.tq && !setOf.has(n.tq)) setOf.set(n.tq, set)
+      for (const c of n.children) {
+        const flip = n.operation === 'PX RECEIVE' && nodes[c].tq !== n.tq
+        walk(c, flip ? (set === 1 ? 2 : 1) : set)
+      }
+    }
+    walk(0, 1)
+  }
+  const crew = (node: PlanNode): PxServer[] => (node.tq ? s.px.filter((p) => p.set === (setOf.get(node.tq!) ?? 1)) : [])
+  const crewName = (servers: PxServer[]) => (servers.length === 0 ? 'PX' : servers.length === 1 ? servers[0].name : `${servers[0].name}–${servers[servers.length - 1].name}`)
+  const assign = (servers: PxServer[], job: string) => servers.forEach((p) => { p.job = job })
+  /** PX 서버가 하는 일이면 다이어그램에서 Server Process 대신 PX 서버에 불을 켠다 */
+  const asPx = (node: PlanNode, x: { active: string[]; flows: [string, string][] }) =>
+    node.tq
+      ? { active: x.active.map((a) => (a === 'server-process' ? 'px-servers' : a)), flows: x.flows.map(([a, b]) => [a === 'server-process' ? 'px-servers' : a, b === 'server-process' ? 'px-servers' : b] as [string, string]) }
+      : x
 
   s.stats.executions++
   s.pga.phase = 'EXECUTE'
@@ -692,8 +749,45 @@ function runExecution(run: Run, opt: OptimizerResult): number {
   const pathOf = (alias: string) =>
     opt.joinSteps.find((j) => j.rightAlias === alias)?.inner ?? opt.tableAccessPlans.find((p) => p.alias === alias)!.chosen
 
+  // 병렬 Full Scan 은 Buffer Cache 를 거치지 않고 Data File → PX 서버의 PGA 로 바로 읽는다 (Direct Path Read)
+  const directRead = (node: PlanNode, blocks: BlockRef[], filter: L | '' | undefined, est: L | false | null) => {
+    // 읽기 전에 그 세그먼트의 Dirty 버퍼를 먼저 디스크에 써 둬야 최신 내용을 읽는다 (Object Checkpoint)
+    const objects = new Set(blocks.map((b) => b.object))
+    const dirty = s.buffers.filter((b) => b.state === 'dirty' && b.block && objects.has(b.block.object)).map((b) => b.slot)
+    let lgwr = 0
+    if (dirty.length > 0) {
+      lgwr = run.lgwrFlush()
+      run.dbwWrite(dirty)
+    }
+    s.stats.physicalReads += blocks.length
+    const servers = crew(node)
+    run.step({
+      key: 'direct-read', stage: 'execute', doc: 'parallel', result: 'miss',
+      title: t(`${node.operation} — ${node.name} (Direct Path Read)`, `${node.operation} — ${node.name} (direct path read)`),
+      body: t(
+        `PX 서버 ${crewName(servers)} 가 자기가 맡은 Granule 의 블록을 Data File 에서 읽어요. 이때 Buffer Cache 를 거치지 않고 각자의 PGA 로 바로 가져와요(Direct Path Read). 큰 테이블을 한 번 훑고 말 거라서, 모두가 함께 쓰는 Buffer Cache 를 어지럽히지 않는 편이 낫거든요. 그래서 Buffer Cache 칸은 그대로예요.`,
+        `PX servers ${crewName(servers)} read the blocks of their granules from the data files — straight into their own PGA, bypassing the buffer cache (direct path read). A big scan touched only once should not flood the cache everyone shares, so the buffer cache cells stay as they were.`,
+      ),
+      facts: [
+        t(`physical reads +${blocks.length} (direct) · consistent gets +0 — 블록 ${blocks.length}개를 PX 서버 ${servers.length}개가 나눠 읽었어요.`, `physical reads +${blocks.length} (direct) · consistent gets +0 — ${servers.length} PX servers shared ${blocks.length} blocks.`),
+        dirty.length > 0
+          ? t(
+              `읽기 전에 Object Checkpoint 가 먼저 일어났어요: 이 세그먼트의 Dirty 버퍼 ${dirty.length}개를 DBW 가 Data File 에 썼어요(그 전에 LGWR 가 Redo ${lgwr.toLocaleString()} bytes 를 먼저). 디스크에서 바로 읽으니까, 메모리에만 있는 최신 변경을 먼저 내려 둬야 하거든요.`,
+              `An object checkpoint came first: DBW wrote this segment's ${dirty.length} dirty buffers to the data files (after LGWR wrote ${lgwr.toLocaleString()} bytes of redo). Reading straight from disk means changes that live only in memory must be written down first.`,
+            )
+          : t('이 세그먼트의 Dirty 버퍼가 없어서 Object Checkpoint 없이 바로 읽었어요.', 'This segment had no dirty buffers, so no object checkpoint was needed before reading.'),
+        t('Buffer Cache 를 안 쓰니, 같은 병렬 질의를 다시 돌려도 Cache Hit 은 생기지 않아요. 매번 디스크에서 읽어요.', 'Because the buffer cache is bypassed, running the same parallel query again gives no cache hits — it reads from disk every time.'),
+        filter,
+        est,
+      ],
+      active: ['px-servers', 'df-users', ...(dirty.length > 0 ? ['buffer-cache', 'lgwr', 'dbw'] : [])],
+      flows: [['df-users', 'px-servers'], ...(dirty.length > 0 ? ([['buffer-cache', 'df-users']] as [string, string][]) : [])],
+      touched: dirty, planNodeId: node.id,
+    })
+  }
+
   // 테이블(또는 인덱스+테이블) 하나를 읽는 단위
-  const access = (node: PlanNode, nestedLoop: boolean) => {
+  const access = (node: PlanNode, nestedLoop: boolean, parallel = false) => {
     const alias = node.alias!
     const path = pathOf(alias)
     const viaJoinIndex = nestedLoop && path.index !== undefined && path.accessPredicate === undefined && path.type !== 'INDEX_FAST_FULL_SCAN'
@@ -726,10 +820,15 @@ function runExecution(run: Run, opt: OptimizerResult): number {
         `Optimizer estimate ${est} rows → actual ${actual} rows.${Math.abs(est - actual) > Math.max(1, actual * 0.5) ? ' Quite a gap: the estimate assumed evenly distributed values. A real database builds a histogram on such a column to learn about the skew.' : ''}`,
       )
 
+    if (parallel && full) {
+      directRead(node, [...blocks.index, ...blocks.table], filterFact(node.filter), estFact(node.rows))
+      return
+    }
+
     // ① 인덱스 블록
     if (indexNode && blocks.index.length > 0) {
       const res = run.get(blocks.index, 'cr')
-      const { active, flows } = bufferActive(res)
+      const { active, flows } = asPx(node, bufferActive(res))
       const ix = path.index!
       const lookup = nestedLoop ? t('바깥(Outer) 집합에서 행이 하나 올라올 때마다, 그 조인 키로 ', 'For every row arriving from the outer set, its join key is used to search ') : t('', '')
       const body = path.type === 'INDEX_FAST_FULL_SCAN'
@@ -760,7 +859,7 @@ function runExecution(run: Run, opt: OptimizerResult): number {
     // ② 테이블 블록
     if (blocks.table.length > 0) {
       const res = run.get(blocks.table, 'cr')
-      const { active, flows } = bufferActive(res)
+      const { active, flows } = asPx(node, bufferActive(res))
       const batched = node.operation.includes('BATCHED')
       const body = path.type === 'FULL_TABLE_SCAN' || !path.index
         ? t(
@@ -783,6 +882,23 @@ function runExecution(run: Run, opt: OptimizerResult): number {
   }
 
   const workArea = (node: PlanNode, area: 'Sort Area' | 'Hash Area', title: L, body: L, facts: L[] = []) => {
+    if (node.tq) {
+      // 병렬: 일은 PX 서버들이 각자 자기 PGA 에서 한다 — QC(이 세션의 Server Process)의 Work Area 는 비어 있다
+      const servers = crew(node)
+      assign(servers, node.operation)
+      run.step({
+        key: 'work-area', stage: 'execute', doc: 'parallel', result: 'ok', title, body,
+        facts: [
+          ...facts,
+          t(
+            `${node.tq} 을 맡은 PX 서버 ${crewName(servers)} 가 각자 자기 몫의 행만 받아서, 자기 PGA 의 ${area} 에서 따로따로 처리해요. ${servers.length}개가 동시에 일하니 한 프로세스가 혼자 할 때보다 빨리 끝나요.`,
+            `PX servers ${crewName(servers)} running ${node.tq} each take only their share of rows and process it in the ${area.toLowerCase()} of their own PGA. With ${servers.length} working at once, it finishes sooner than one process alone.`,
+          ),
+        ],
+        active: ['px-servers'], planNodeId: node.id,
+      })
+      return
+    }
     s.pga.workArea = `${area} — ${node.operation}`
     run.step({
       key: 'work-area', stage: 'execute', doc: 'memory', result: 'ok', title, body,
@@ -797,9 +913,11 @@ function runExecution(run: Run, opt: OptimizerResult): number {
     })
   }
 
-  const exec = (id: number, nestedLoop = false) => {
+  const exec = (id: number, nestedLoop = false, parallel = false) => {
     const node = nodes[id]
-    if (node.kind === 'table' || node.kind === 'index') return access(node, nestedLoop)
+    if (node.kind === 'table' || node.kind === 'index') return access(node, nestedLoop, parallel)
+    if (node.kind === 'partition') return partitionRange(node)
+    if (node.kind === 'px') return pxStep(node)
     if (node.kind === 'statement' || node.kind === 'dml' || node.kind === 'view') return node.children.forEach((c) => exec(c))
     if (node.kind === 'join') {
       const [left, right] = node.children
@@ -827,6 +945,12 @@ function runExecution(run: Run, opt: OptimizerResult): number {
             ...(node.access ? [t(`access(${node.access})`, `access(${node.access})`)] : []),
             ...(node.operation.includes('SEMI')
               ? [t('SEMI: 짝을 한 번 찾은 행은 표시해 두고, 같은 값이 또 나와도 다시 내보내지 않아요.', 'SEMI: a row that has found a match is flagged and never returned again, even if the same value turns up once more.')]
+              : []),
+            ...(node.operation.includes('BUFFERED')
+              ? [t(
+                  'BUFFERED: PX 서버 집합은 두 개뿐이에요. 한 집합이 Probe 쪽 행을 보내는 동안 다른 집합은 그 행을 받아야 해서, 조인 결과를 곧바로 다음 단계로 넘길 수가 없어요. 그래서 받은 행을 일단 PGA 에 쌓아 두었다가 조인해요.',
+                  'BUFFERED: there are only two PX server sets. While one set sends the probe rows the other must receive them, so join results cannot flow on to a next step at once — the received rows are buffered in the PGA first.',
+                )]
               : []),
           ])
         return
@@ -889,19 +1013,36 @@ function runExecution(run: Run, opt: OptimizerResult): number {
         ),
         [t('sorts (memory) +1', 'sorts (memory) +1')])
     } else if (node.operation === 'SORT AGGREGATE') {
+      const fromQC = nodes[node.children[0]]?.operation === 'PX COORDINATOR'
       workArea(node, 'Sort Area',
-        t('SORT AGGREGATE — 집계', 'SORT AGGREGATE'),
-        t(
-          `아래에서 올라오는 ${input}행을 받으면서 COUNT·SUM 같은 집계 값을 계속 갱신해요. 이름과 달리 실제로 정렬하지는 않고, 결과는 딱 1행이에요.`,
-          `As the ${input} rows arrive from below, running aggregates such as COUNT and SUM are updated. Despite its name nothing is sorted, and the result is exactly one row.`,
-        ))
+        t(node.tq ? 'SORT AGGREGATE — PX 서버마다 부분 집계' : fromQC ? 'SORT AGGREGATE — QC 의 최종 집계' : 'SORT AGGREGATE — 집계', node.tq ? 'SORT AGGREGATE — partial aggregate per PX server' : fromQC ? 'SORT AGGREGATE — final aggregate in the QC' : 'SORT AGGREGATE'),
+        node.tq
+          ? t(
+              `PX 서버마다 자기가 읽은 행만으로 COUNT·SUM 같은 집계를 먼저 해 둬요. 그러면 QC 에게는 서버당 딱 1행(부분 결과)만 보내면 돼요.`,
+              'Each PX server first aggregates (COUNT, SUM …) only the rows it read itself, so it sends just one row — its partial result — to the QC.',
+            )
+          : fromQC
+            ? t(
+                `PX 서버들이 보낸 부분 집계를 QC 가 한 번 더 합쳐 최종 1행을 만들어요. 예를 들어 COUNT(*) 는 서버별 개수를 더하면 끝이에요.`,
+                'The QC combines the partial aggregates sent by the PX servers into the final single row — for COUNT(*), it simply adds up the per-server counts.',
+              )
+            : t(
+                `아래에서 올라오는 ${input}행을 받으면서 COUNT·SUM 같은 집계 값을 계속 갱신해요. 이름과 달리 실제로 정렬하지는 않고, 결과는 딱 1행이에요.`,
+                `As the ${input} rows arrive from below, running aggregates such as COUNT and SUM are updated. Despite its name nothing is sorted, and the result is exactly one row.`,
+              ))
     } else if (node.kind === 'hash') {
       workArea(node, 'Hash Area',
         t(`${node.operation}`, `${node.operation}`),
         t(
           `${input}행을 해시 테이블에 넣어 값이 같은 것끼리 모아요. ${node.operation === 'HASH UNIQUE' ? '중복을 없애고' : '그룹마다 집계해서'} ${node.rows}행으로 줄여요.`,
           `The ${input} rows are placed into a hash table so equal values meet. ${node.operation === 'HASH UNIQUE' ? 'Duplicates are removed' : 'Each group is aggregated'}, leaving ${node.rows} rows.`,
-        ))
+        ),
+        node.tq && nodes[parentOf[node.id]]?.operation.startsWith('PX SEND')
+          ? [t(
+              `${node.operation === 'HASH UNIQUE' ? 'DISTINCT' : 'GROUP BY'} Pushdown: 행을 다른 서버 집합으로 보내기 전에, 생산자 쪽에서 먼저 한 번 묶어요. 주고받는 행 수가 확 줄어들고, 소비자 쪽이 마지막으로 한 번 더 묶어 완성해요.`,
+              `${node.operation === 'HASH UNIQUE' ? 'DISTINCT' : 'GROUP BY'} pushdown: the producers group their rows once before sending them to the other server set, which slashes the rows exchanged; the consumers group once more to finish.`,
+            )]
+          : [])
     } else {
       s.stats.sorts++
       workArea(node, 'Sort Area',
@@ -913,6 +1054,200 @@ function runExecution(run: Run, opt: OptimizerResult): number {
         [t('sorts (memory) +1', 'sorts (memory) +1')])
     }
   }
+  // ── PARTITION RANGE: 남은 파티션만 하나씩 돌며 그 아래 Full Scan 을 시킨다 ──
+  const partitionRange = (node: PlanNode) => {
+    const scanNode = nodes[node.children[0]]
+    const pa = pathOf(scanNode.alias!).partitions
+    const ts = getTableStats(scanNode.name ?? '')
+    if (pa && ts?.partitioning) {
+      const read = new Set(pa.positions)
+      const body: Record<string, L> = {
+        SINGLE: t(
+          `${ts.tableName} 는 ${ts.partitioning.column} 기준 Range 파티션 테이블이에요. ${pa.pstart === 'KEY' ? '조건 값이 실행할 때 정해져서, 그 값이 들어 있는 파티션 하나만 골라 읽어요.' : `조건(${pa.byKey})을 만족하는 값은 ${pa.names[0]} 파티션에만 있을 수 있어서, 딱 그 파티션 하나만 읽어요.`} 파티션마다 세그먼트가 따로라서, 안 읽는 파티션의 블록은 아예 건드리지 않아요.`,
+          `${ts.tableName} is range-partitioned on ${ts.partitioning.column}. ${pa.pstart === 'KEY' ? 'The value is known only at execution, and the one partition holding it is read.' : `Values satisfying ${pa.byKey} can only be in partition ${pa.names[0]}, so that single partition is read.`} Each partition is its own segment, so the blocks of the other partitions are never touched.`,
+        ),
+        ITERATOR: t(
+          `${ts.tableName} 는 ${ts.partitioning.column} 기준 Range 파티션 테이블이에요. 조건(${pa.byKey})에 걸릴 수 있는 파티션 ${pa.pstart === 'KEY' ? '(실행할 때 정해짐)' : `${pa.pstart}번부터 ${pa.pstop}번까지`}를 차례로 돌면서(ITERATOR) 하나씩 Full Scan 해요. 범위 밖 파티션은 건너뛰어요.`,
+          `${ts.tableName} is range-partitioned on ${ts.partitioning.column}. The partitions that ${pa.byKey} can hit ${pa.pstart === 'KEY' ? '(fixed at execution)' : `— ${pa.pstart} through ${pa.pstop} —`} are visited in turn (ITERATOR), each with a full scan. Partitions outside the range are skipped.`,
+        ),
+        ALL: t(
+          `${ts.tableName} 의 파티션 ${pa.total}개를 처음부터 끝까지 전부 돌아요. 잘라 낼 근거가 없어서, 파티션을 안 나눈 테이블을 통째로 읽는 것과 일의 양이 같아요.`,
+          `All ${pa.total} partitions of ${ts.tableName} are visited. With nothing to prune, it is as much work as scanning an unpartitioned table.`,
+        ),
+        EMPTY: t(
+          `조건(${pa.byKey})을 만족하는 값이 들어갈 수 있는 파티션이 하나도 없어요. 그래서 아무 블록도 읽지 않고 곧바로 0행으로 끝나요.`,
+          `No partition can contain a value satisfying ${pa.byKey}, so no block is read at all and the step ends with zero rows.`,
+        ),
+      }
+      let lower = '—'
+      run.step({
+        key: 'partition', stage: 'execute', doc: 'partitioning', result: pa.kind === 'ALL' ? 'info' : 'ok',
+        title: t(`${node.operation} — Pstart ${node.pstart} · Pstop ${node.pstop}`, `${node.operation} — Pstart ${node.pstart} · Pstop ${node.pstop}`),
+        body: body[pa.kind],
+        facts: [
+          ...ts.partitioning.partitions.map((p) => {
+            const range = `${lower} ≤ ${ts.partitioning!.column} < '${p.highValue}'`
+            lower = `'${p.highValue}'`
+            const hit = read.has(p.position)
+            return t(
+              `${hit ? '▶ 읽음' : '✕ 건너뜀'} · #${p.position} ${p.name} (${range}) — ${p.numRows}행 · ${p.numBlocks}블록`,
+              `${hit ? '▶ read' : '✕ pruned'} · #${p.position} ${p.name} (${range}) — ${p.numRows} rows · ${p.numBlocks} blocks`,
+            )
+          }),
+          pa.why,
+          t('파티션 경계(VALUES LESS THAN)는 Data Dictionary 에 있어요. 그래서 Pruning 은 블록을 읽기 전에, 사전 정보만 보고 끝나요.', 'The partition bounds (VALUES LESS THAN) live in the data dictionary, so pruning is decided from dictionary data alone, before any block is read.'),
+        ],
+        active: ['server-process', 'dict-cache'], planNodeId: node.id,
+      })
+    }
+    node.children.forEach((c) => exec(c))
+  }
+
+  // ── Parallel Execution ──
+  const pxStep = (node: PlanNode) => {
+    const op = node.operation
+    if (op === 'PX COORDINATOR' && par) {
+      const send = nodes[node.children[0]]
+      s.px.slice(0, par.dop).forEach((p) => { p.set = 1; p.job = 'ready' })
+      if (par.serverSets === 2) s.px.slice(par.dop, par.dop * 2).forEach((p) => { p.set = 2; p.job = 'ready' })
+      s.pga.phase = 'EXECUTE (QC)'
+      const total = par.dop * par.serverSets
+      run.step({
+        key: 'px-start', stage: 'execute', doc: 'parallel', result: 'ok', planNodeId: node.id,
+        title: t(`PX COORDINATOR — PX 서버 ${total}개 불러 모으기`, `PX COORDINATOR — gather ${total} PX servers`),
+        body: t(
+          `이 세션의 Server Process 가 Query Coordinator(QC)가 돼요. QC 는 PX 서버 풀에서 일꾼 ${total}개를 데려와(${par.serverSets === 2 ? `생산자 집합 ${par.dop}개 + 소비자 집합 ${par.dop}개` : `서버 집합 1개 × ${par.dop}`}) 일을 나눠 주고, 마지막에 결과를 모아요. 데이터를 읽고 계산하는 일은 거의 다 PX 서버가 해요.`,
+          `This session's server process becomes the query coordinator (QC). It takes ${total} PX servers from the pool (${par.serverSets === 2 ? `a producer set of ${par.dop} + a consumer set of ${par.dop}` : `one set × ${par.dop}`}), hands out the work and collects the results at the end. Almost all reading and computing is done by the PX servers.`,
+        ),
+        facts: [
+          par.dop < par.requested
+            ? t(
+                `DOP ${par.requested} 를 원했지만 PX 서버가 모자라요. 필요한 ${par.requested * par.serverSets}개 중 풀(PARALLEL_MAX_SERVERS = ${PX_MAX_SERVERS})에 있는 만큼만 받아서 DOP 를 ${par.dop} 로 낮췄어요(DOP Downgrade). 실행 계획은 그대로고, 일꾼 수만 줄어요.`,
+                `DOP ${par.requested} was requested, but there are not enough PX servers: of the ${par.requested * par.serverSets} needed, only what the pool (PARALLEL_MAX_SERVERS = ${PX_MAX_SERVERS}) holds was granted, so the DOP was downgraded to ${par.dop}. The plan stays the same; only the number of workers drops.`,
+              )
+            : t(`DOP ${par.dop} — 한 연산을 PX 서버 ${par.dop}개가 나눠 맡아요.`, `DOP ${par.dop} — each operation is shared by ${par.dop} PX servers.`),
+          par.serverSets === 2 && t(
+            '서버 집합이 두 개인 이유: 한 집합(생산자)이 행을 만들어 보내는 동안 다른 집합(소비자)이 받아서 다음 일을 해요. 한 연산을 여럿이 나누는 건 Intra-operation, 두 연산이 동시에 이어 달리는 건 Inter-operation Parallelism 이에요.',
+            'Why two sets: while one set (the producers) generates and sends rows, the other (the consumers) receives them and does the next job. Several servers sharing one operation is intra-operation parallelism; two operations running at once is inter-operation parallelism.',
+          ),
+          t(
+            `계획은 DFO(Data Flow Operation) ${par.dfos}개로 나뉘고, 그 사이를 Table Queue ${par.queues}개(:TQ10000 …)가 이어요. 실행 계획의 TQ 컬럼(Q1,00 …)이 어느 DFO 인지 알려 줘요.`,
+            `The plan is split into ${par.dfos} DFO${par.dfos === 1 ? '' : 's'} (data flow operations) linked by ${par.queues} table queue${par.queues === 1 ? '' : 's'} (:TQ10000 …). The TQ column of the plan (Q1,00 …) says which DFO a line belongs to.`,
+          ),
+          t('PX 서버끼리, 그리고 QC 와 주고받는 메시지 버퍼는 SGA 의 Large Pool 에 잡혀요.', 'The message buffers exchanged between PX servers and with the QC are allocated in the large pool of the SGA.'),
+        ],
+        active: ['server-process', 'px-servers', 'large-pool'],
+        flows: [['server-process', 'px-servers']],
+      })
+      exec(send.children[0])
+      const producers = crew(send)
+      assign(producers, send.operation)
+      const ordered = send.operation.includes('ORDER')
+      run.step({
+        key: 'px-qc', stage: 'execute', doc: 'parallel', result: 'ok', planNodeId: send.id,
+        title: t(`${send.operation} ${send.name} — QC 에게 결과 보내기`, `${send.operation} ${send.name} — results to the QC`),
+        body: ordered
+          ? t(
+              `PX 서버 ${crewName(producers)} 가 자기가 맡은 범위의 정렬된 결과를 QC 에게 보내요. QC 는 범위 순서대로(첫 서버 → 마지막 서버) 이어 받기만 하면 전체가 정렬된 상태가 돼요 — ORDER.`,
+              `PX servers ${crewName(producers)} send the sorted results of their ranges to the QC, which just takes them in range order (first server → last) to get a fully sorted result — ORDER.`,
+            )
+          : t(
+              `PX 서버 ${crewName(producers)} 가 결과 행을 QC 에게 보내요. 순서는 상관없어서 먼저 끝난 서버의 행부터 받아요 — RANDOM.`,
+              `PX servers ${crewName(producers)} send their result rows to the QC. Order does not matter, so rows are taken from whichever server finishes first — RANDOM.`,
+            ),
+        facts: [
+          t(`IN-OUT = P->S: 병렬(Parallel)에서 직렬(Serial)로 모이는 지점이에요. 여기부터 위쪽은 QC 혼자 처리해요.`, 'IN-OUT = P->S: the point where parallel turns serial. Everything above this line is handled by the QC alone.'),
+          t(`보내는 행: ${send.rows}행 (Table Queue ${send.name})`, `Rows sent: ${send.rows} (table queue ${send.name})`),
+        ],
+        active: ['px-servers', 'large-pool', 'server-process'],
+        flows: [['px-servers', 'large-pool'], ['large-pool', 'server-process']],
+      })
+      s.px = idlePx()
+      run.step({
+        key: 'px-end', stage: 'execute', doc: 'parallel', result: 'ok', planNodeId: node.id,
+        title: t('PX 서버를 풀로 돌려보내기', 'PX servers return to the pool'),
+        body: t(
+          '병렬로 할 일이 끝났어요. PX 서버들은 종료되지 않고 풀로 돌아가 다음 병렬 질의를 기다려요(매번 프로세스를 새로 만들면 느리니까요). 남은 일은 QC 가 직렬로 마무리해요.',
+          'The parallel work is finished. The PX servers do not exit — they go back to the pool to wait for the next parallel statement (creating processes each time would be slow). The QC finishes the rest serially.',
+        ),
+        active: ['server-process', 'px-servers'],
+      })
+      s.pga.phase = 'EXECUTE'
+      return
+    }
+    if (op === 'PX RECEIVE') {
+      const send = nodes[node.children[0]]
+      exec(send.children[0])
+      const producers = crew(send)
+      const consumers = crew(node)
+      assign(producers, `${send.operation} ${send.name}`)
+      assign(consumers, 'PX RECEIVE')
+      const how: Record<string, L> = {
+        HASH: t(
+          `키의 해시 값으로 받을 서버를 정해요. 같은 키는 언제나 같은 소비자에게 가니까, 소비자 ${consumers.length}개가 서로 신경 쓰지 않고 각자 조인·그룹 짓기를 끝낼 수 있어요.`,
+          `The receiving server is chosen by the hash of the key. Equal keys always reach the same consumer, so the ${consumers.length} consumers can each finish their join or grouping independently.`,
+        ),
+        RANGE: t(
+          `키 값의 범위로 나눠요 (작은 값 → ${consumers[0]?.name ?? 'P000'}, … 큰 값 → ${consumers[consumers.length - 1]?.name ?? 'P00n'}). 소비자는 자기 범위만 정렬하면 되고, 범위를 순서대로 이어 붙이면 전체가 정렬돼요.`,
+          `Rows are split by key range (small values → ${consumers[0]?.name ?? 'P000'}, … large values → ${consumers[consumers.length - 1]?.name ?? 'P00n'}). Each consumer sorts only its range; concatenating the ranges in order gives the full sort.`,
+        ),
+        BROADCAST: t(
+          `작은 쪽 ${send.rows}행을 소비자 ${consumers.length}개 모두에게 통째로 복사해요(${send.rows * consumers.length}행 전송). 그러면 큰 쪽은 다시 나눠 보낼 필요 없이, 각 소비자가 자기가 읽은 몫과 바로 조인할 수 있어요.`,
+          `The ${send.rows} rows of the small side are copied whole to all ${consumers.length} consumers (${send.rows * consumers.length} rows sent). The big side then needs no redistribution: each consumer joins its own share directly.`,
+        ),
+      }
+      run.step({
+        key: 'px-tq', stage: 'execute', doc: 'parallel', result: 'ok', planNodeId: send.id,
+        title: t(`${send.operation} ${send.name} → PX RECEIVE — 행 다시 나누기`, `${send.operation} ${send.name} → PX RECEIVE — redistribute rows`),
+        body: t(
+          `생산자 PX 서버 ${crewName(producers)} 가 만든 행을 Table Queue ${send.name} 에 실어, 소비자 PX 서버 ${crewName(consumers)} 에게 보내요. ${how[send.distrib ?? 'HASH']?.ko ?? ''}`,
+          `Producer PX servers ${crewName(producers)} put their rows on table queue ${send.name} for consumer PX servers ${crewName(consumers)}. ${how[send.distrib ?? 'HASH']?.en ?? ''}`,
+        ),
+        facts: [
+          t(`PQ Distrib = ${send.distrib} · IN-OUT = P->P (병렬 → 병렬)`, `PQ Distrib = ${send.distrib} · IN-OUT = P->P (parallel to parallel)`),
+          t(`${send.tq} → ${node.tq}: 다른 DFO, 다른 서버 집합이에요.`, `${send.tq} → ${node.tq}: a different DFO run by the other server set.`),
+          t('Table Queue 의 메시지 버퍼는 Large Pool 에 있어요.', 'The message buffers of the table queue live in the large pool.'),
+        ],
+        active: ['px-servers', 'large-pool'],
+        flows: [['px-servers', 'large-pool'], ['large-pool', 'px-servers']],
+      })
+      return
+    }
+    if (op === 'PX BLOCK ITERATOR') {
+      const leaf = nodes[node.children[0]]
+      const b = accessBlocks(pathOf(leaf.alias!), [])
+      const blocks = [...b.index, ...b.table]
+      const servers = crew(node)
+      const size = Math.max(1, Math.ceil(blocks.length / Math.max(1, servers.length * 2)))
+      const granules: BlockRef[][] = []
+      for (let i = 0; i < blocks.length; i += size) granules.push(blocks.slice(i, i + size))
+      const sub = (b: BlockRef) => (b.kind === 'index' ? `ix ${b.sub}` : `#${b.sub}`)
+      const label = (g: BlockRef[]) => (g.length === 1 ? sub(g[0]) : `${sub(g[0])}–${g[g.length - 1].sub}`)
+      servers.forEach((p, k) => {
+        const mine = granules.filter((_, i) => i % servers.length === k)
+        p.job = mine.length > 0 ? mine.map(label).join(', ') : 'idle'
+      })
+      run.step({
+        key: 'px-granule', stage: 'execute', doc: 'parallel', result: 'ok', planNodeId: node.id,
+        title: t(`PX BLOCK ITERATOR — ${leaf.name} 를 Granule 로 쪼개기`, `PX BLOCK ITERATOR — split ${leaf.name} into granules`),
+        body: t(
+          `QC 가 ${leaf.name} 의 블록 ${blocks.length}개를 ${size}블록씩 묶은 Granule ${granules.length}개로 나눠요. PX 서버는 Granule 하나를 다 읽으면 QC 에게 다음 것을 받아 가요. 빨리 끝난 서버가 더 많이 가져가니, 일이 한쪽에 몰리지 않아요.`,
+          `The QC divides the ${blocks.length} blocks of ${leaf.name} into ${granules.length} granules of ${size} block${size === 1 ? '' : 's'}. A PX server that finishes a granule asks the QC for the next one, so faster servers simply take more and the load stays balanced.`,
+        ),
+        facts: [
+          ...servers.map((p) => t(`${p.name}: ${p.job}`, `${p.name}: ${p.job}`)),
+          node.pstart && t(`Pstart ${node.pstart} · Pstop ${node.pstop} — Pruning 하고 남은 파티션 안에서만 Granule 을 만들어요.`, `Pstart ${node.pstart} · Pstop ${node.pstop} — granules are cut only from the partitions left after pruning.`),
+          t('IN-OUT = PCWC: 바로 아래 Full Scan 과 같은 PX 서버가 이어서 처리해요.', 'IN-OUT = PCWC: the same PX servers carry on with the full scan right below.'),
+        ],
+        active: ['server-process', 'px-servers'],
+        flows: [['server-process', 'px-servers']],
+      })
+      exec(leaf.id, false, true)
+      return
+    }
+    node.children.forEach((c) => exec(c))
+  }
+
   exec(0)
 
   if (isSelect) return actualRowCount(opt, matches) ?? opt.estimatedRows

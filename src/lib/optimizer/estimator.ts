@@ -5,6 +5,7 @@
 
 import type { AccessPath, ColumnStats, IndexStats, L, ParsedQuery, Predicate, TableEstimate, TableRef, TableStats } from './types'
 import { getColumnStats, getTableStats, isUniqueLookup } from './stats'
+import { prunePartitions, prunedSize } from './partition'
 
 // Noworkload System Statistics 기본값에서 나온 값들
 const MBRC = 8                  // Multiblock Read Count — Full Scan 이 한 번에 읽는 블록 수
@@ -19,6 +20,8 @@ const round1 = (n: number) => Math.round(n * 10) / 10
 
 // ── Selectivity ─────────────────────────────────────────────────────────
 
+const RANGE_OPS = new Set(['<', '>', '<=', '>=', 'BETWEEN'])
+
 function predicateSelectivity(pred: Predicate, ts: TableStats, cs: ColumnStats | null): { sel: number; note: L } {
   const mk = (sel: number, ko: string, en: string) => ({
     sel: Math.min(1, Math.max(0, sel)),
@@ -30,6 +33,16 @@ function predicateSelectivity(pred: Predicate, ts: TableStats, cs: ColumnStats |
     return mk(DEFAULT_OTHER_SEL, '컬럼을 가공한 조건이라 추측값 5%', 'expression on the column, default guess 5%')
   }
   const v = pred.values[0]
+  // 문자·날짜 Partition Key 의 범위 조건 → 남는 파티션의 통계(USER_TAB_PARTITIONS.NUM_ROWS)로 계산
+  const spec = ts.partitioning
+  if (spec && spec.column === pred.column && !pred.isBind && !cs.numeric && RANGE_OPS.has(pred.operator)) {
+    const pa = prunePartitions(ts, pred.alias, [{ ...pred, orGroup: undefined }])
+    if (pa) {
+      const { rows } = prunedSize(ts, pa)
+      const names = pa.names.length > 0 ? pa.names.join(', ') : '—'
+      return mk(ts.numRows > 0 ? rows / ts.numRows : 0, `파티션 통계: ${names} 의 ${rows}행 / ${ts.numRows}행`, `partition statistics: ${rows} rows in ${names} / ${ts.numRows} rows`)
+    }
+  }
   switch (pred.operator) {
     case '=':
       return mk(notNull / cs.ndv, `1 / NDV(${cs.ndv})`, `1 / NDV(${cs.ndv})`)
@@ -92,7 +105,28 @@ export function estimateTable(ref: TableRef, predicates: Predicate[]): TableEsti
     return { alias: ref.alias, tableName: ref.name, numRows: 0, numBlocks: 0, selectivity: 1, cardinality: 1, notes: [] }
   }
   const mine = predicates.filter((p) => p.alias === ref.alias)
-  const parts = mine.map((p) => ({ ...predicateSelectivity(p, ts, getColumnStats(ref.name, p.column)), orGroup: p.orGroup }))
+  // Partition Key 의 범위 조건이 여럿(>= … AND < …)이면 따로 곱하지 않고 하나의 범위로 묶는다.
+  // 그 범위에 남는 파티션들의 NUM_ROWS 합이 곧 추정치다 (각각 곱하면 같은 범위를 두 번 깎아 크게 틀린다)
+  const spec = ts.partitioning
+  const keyRange = spec && !getColumnStats(ref.name, spec.column)?.numeric
+    ? mine.filter((p) => p.column === spec.column && p.orGroup === undefined && !p.wrapped && !p.isBind && RANGE_OPS.has(p.operator))
+    : []
+  const joint = keyRange.length > 1 ? prunePartitions(ts, ref.alias, keyRange) : undefined
+  const rest = joint ? mine.filter((p) => !keyRange.includes(p)) : mine
+  const parts = rest.map((p) => ({ ...predicateSelectivity(p, ts, getColumnStats(ref.name, p.column)), orGroup: p.orGroup }))
+  if (joint) {
+    const { rows } = prunedSize(ts, joint)
+    const sel = ts.numRows > 0 ? rows / ts.numRows : 0
+    const names = joint.names.length > 0 ? joint.names.join(', ') : '—'
+    const text = keyRange.map((p) => p.text).join(' AND ')
+    parts.unshift({
+      sel, orGroup: undefined,
+      note: {
+        ko: `${text} → 파티션 통계: ${names} 의 ${rows}행 / ${ts.numRows}행 = ${pct(sel)}`,
+        en: `${text} → partition statistics: ${rows} rows in ${names} / ${ts.numRows} rows = ${pct(sel)}`,
+      },
+    })
+  }
   const selectivity = combine(parts)
   return {
     alias: ref.alias,
@@ -107,8 +141,15 @@ export function estimateTable(ref: TableRef, predicates: Predicate[]): TableEsti
 
 // ── Access path costing ──────────────────────────────────────────────────
 
-function fullScanCost(ts: TableStats): { io: number; cpu: number } {
-  return { io: 1 + Math.ceil((ts.numBlocks / MBRC) * MREAD_OVER_SREAD), cpu: ts.numRows * CPU_PER_ROW }
+function fullScanCost(blocks: number, rows: number): { io: number; cpu: number } {
+  return { io: 1 + Math.ceil((blocks / MBRC) * MREAD_OVER_SREAD), cpu: rows * CPU_PER_ROW }
+}
+
+/** 병렬 Full Scan: 일을 DOP 개의 PX 서버가 나눠 맡는다. 서버끼리 주고받는 부담이 있어 딱 1/DOP 까지는 줄지 않는다(×0.9) */
+export const PX_EFFICIENCY = 0.9
+function parallelize(c: { io: number; cpu: number }, dop: number | null): { io: number; cpu: number } {
+  if (!dop) return c
+  return { io: round1(c.io / (dop * PX_EFFICIENCY)), cpu: c.cpu / dop }
 }
 
 /** 인덱스로 key 선택도 `sel` 만큼 읽을 때의 비용. tableAccess=false 면 인덱스만 읽는다. */
@@ -142,14 +183,26 @@ export function generateAccessPaths(ref: TableRef, query: ParsedQuery, estimate:
   const paths: AccessPath[] = []
   const base = { alias: ref.alias, tableName: ref.name, chosen: false }
 
-  // ── Full Table Scan ──
-  const fts = fullScanCost(ts)
+  // ── Full Table Scan (파티션 테이블이면 Pruning 하고 남은 파티션만) ──
+  const dop = query.type === 'SELECT' ? query.parallel : null
+  const partitions = prunePartitions(ts, ref.alias, preds)
+  const scan = partitions ? prunedSize(ts, partitions) : { rows: ts.numRows, blocks: ts.numBlocks }
+  const fts = parallelize(fullScanCost(scan.blocks, scan.rows), dop)
+  const pxNote = (dop: number): L => ({
+    ko: ` PARALLEL 힌트(DOP ${dop}): PX 서버 ${dop}개가 블록을 나눠 읽으니 비용을 약 ${dop}×${PX_EFFICIENCY} 로 나눠요.`,
+    en: ` PARALLEL hint (DOP ${dop}): ${dop} PX servers share the blocks, so the cost is divided by about ${dop}×${PX_EFFICIENCY}.`,
+  })
+  const partNote: L = !partitions
+    ? { ko: '', en: '' }
+    : partitions.kind === 'ALL'
+      ? { ko: ` 파티션 ${partitions.total}개 전부.`, en: ` All ${partitions.total} partitions.` }
+      : { ko: ` Partition Pruning 으로 ${partitions.total}개 중 ${partitions.positions.length}개 파티션(${partitions.names.join(', ') || '없음'})만.`, en: ` Partition pruning leaves ${partitions.positions.length} of ${partitions.total} partitions (${partitions.names.join(', ') || 'none'}).` }
   paths.push({
     ...base, type: 'FULL_TABLE_SCAN', indexOnly: false, selectivity, cardinality,
-    ioCost: fts.io, cpuCost: round1(fts.cpu), cost: round1(fts.io + fts.cpu),
+    ioCost: fts.io, cpuCost: round1(fts.cpu), cost: round1(fts.io + fts.cpu), partitions,
     reason: {
-      ko: `High Water Mark 아래 ${ts.numBlocks}개 블록을 Multiblock Read(한 번에 최대 ${MBRC}블록)로 전부 읽고, ${ts.numRows}행에 조건을 적용해요.`,
-      en: `Reads all ${ts.numBlocks} blocks below the high water mark with multiblock reads (up to ${MBRC} blocks per call) and filters ${ts.numRows} rows.`,
+      ko: `High Water Mark 아래 ${scan.blocks}개 블록을 Multiblock Read(한 번에 최대 ${MBRC}블록)로 전부 읽고, ${scan.rows}행에 조건을 적용해요.${partNote.ko}${dop ? pxNote(dop).ko : ''}`,
+      en: `Reads all ${scan.blocks} blocks below the high water mark with multiblock reads (up to ${MBRC} blocks per call) and filters ${scan.rows} rows.${partNote.en}${dop ? pxNote(dop).en : ''}`,
     },
   })
 
@@ -192,8 +245,7 @@ export function generateAccessPaths(ref: TableRef, query: ParsedQuery, estimate:
       const noNulls = index.columns.some((c) => getColumnStats(ref.name, c)?.nullCount === 0)
       if (!covers || !noNulls || paths.some((p) => p.index === index && p.indexOnly)) continue
       const blocks = index.leafBlocks + 1
-      const io = 1 + Math.ceil((blocks / MBRC) * MREAD_OVER_SREAD)
-      const cpu = ts.numRows * CPU_PER_ROW * 0.5
+      const { io, cpu } = parallelize({ io: 1 + Math.ceil((blocks / MBRC) * MREAD_OVER_SREAD), cpu: ts.numRows * CPU_PER_ROW * 0.5 }, dop)
       paths.push({
         ...base, type: 'INDEX_FAST_FULL_SCAN', index, indexOnly: true, selectivity, cardinality,
         ioCost: io, cpuCost: round1(cpu), cost: round1(io + cpu),
@@ -209,9 +261,12 @@ export function generateAccessPaths(ref: TableRef, query: ParsedQuery, estimate:
   const ffs = paths.filter((p) => p.type === 'INDEX_FAST_FULL_SCAN').sort((a, b) => a.cost - b.cost)
   for (const extra of ffs.slice(1)) paths.splice(paths.indexOf(extra), 1)
 
-  // 가장 싼 경로 선택 (동률이면 먼저 만든 쪽 = Full Scan)
-  let best = paths[0]
-  for (const p of paths) if (p.cost < best.cost) best = p
+  // 가장 싼 경로 선택 (동률이면 먼저 만든 쪽 = Full Scan).
+  // 단, Unique 인덱스에 = 조건이면 결과가 많아야 1행이라 비용 비교 없이 그 인덱스를 쓴다
+  // (PARALLEL 힌트로 Full Scan 비용이 DOP 만큼 깎여도 PK 한 건 조회를 병렬 Full Scan 으로 바꾸지 않는다)
+  const unique = paths.find((p) => p.type === 'INDEX_UNIQUE_SCAN')
+  let best = unique ?? paths[0]
+  if (!unique) for (const p of paths) if (p.cost < best.cost) best = p
   best.chosen = true
   return paths.sort((a, b) => a.cost - b.cost)
 }

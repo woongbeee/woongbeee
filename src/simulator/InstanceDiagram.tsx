@@ -9,7 +9,7 @@ import { motion } from 'framer-motion'
 import { selectState, selectStep, useInternalsStore } from '@/store/internalsStore'
 import { useLangStore } from '@/store/simulationStore'
 import { REDO_BUFFER_BYTES, REDO_LOG_BYTES } from '@/lib/simulator/engine'
-import type { Buffer, RedoLogGroup } from '@/lib/simulator/types'
+import type { Buffer, PxServer, RedoLogGroup } from '@/lib/simulator/types'
 import { cn } from '@/lib/utils'
 
 type Hue = 'blue' | 'amber' | 'green' | 'purple' | 'slate'
@@ -68,6 +68,13 @@ const T = {
     descTip: '각 영역의 설명 문구를 펼치거나 숨겨요. 숨기면 마우스를 올렸을 때 말풍선으로 보여요.',
     controlFile: 'DB 구조 · Checkpoint SCN',
     archive: 'Online Redo Log 의 보관본',
+    largePool: '병렬 실행 메시지 버퍼 · 백업 등 큰 메모리',
+    pxIdle: '쉬는 중',
+    pxBuffers: 'PX 메시지 버퍼 사용 중',
+    pxServers: '병렬 실행 일꾼. QC 가 불러 모아 일을 나눠 줘요',
+    pxPool: '풀에서 대기',
+    set1: '서버 집합 1',
+    set2: '서버 집합 2',
   },
   en: {
     client: 'The program that sends SQL and receives results',
@@ -114,6 +121,13 @@ const T = {
     descTip: 'Show or hide the description text of each area. When hidden, hover an area to see it as a tooltip.',
     controlFile: 'DB structure · checkpoint SCN',
     archive: 'Archived copies of the online redo log',
+    largePool: 'Parallel execution message buffers, backups and other large allocations',
+    pxIdle: 'idle',
+    pxBuffers: 'PX message buffers in use',
+    pxServers: 'Parallel execution workers, gathered and directed by the QC',
+    pxPool: 'waiting in the pool',
+    set1: 'server set 1',
+    set2: 'server set 2',
   },
 }
 
@@ -395,6 +409,62 @@ function RedoLogs() {
   )
 }
 
+// ── Large Pool ────────────────────────────────────────────────────────────
+
+function LargePool() {
+  const busy = useInternalsStore((s) => selectState(s).px.some((p) => p.set !== 0))
+  const lang = useLangStore((s) => s.lang)
+  const t = T[lang]
+  return (
+    <Box id="large-pool" label="Large Pool" desc={t.largePool} hue="blue">
+      <Mono className={busy ? 'font-bold text-viz-blue' : 'text-ink-3'}>{busy ? t.pxBuffers : t.pxIdle}</Mono>
+    </Box>
+  )
+}
+
+// ── PX Servers (병렬 실행 서버 풀) ────────────────────────────────────────
+
+const PX_SET_CLS: Record<PxServer['set'], string> = {
+  0: 'border-dashed border-line-2 bg-rail text-ink-3',
+  1: 'border-viz-green bg-viz-green/10 text-viz-green',
+  2: 'border-viz-purple bg-viz-purple/10 text-viz-purple',
+}
+
+function PxServers() {
+  const px = useInternalsStore((s) => selectState(s).px)
+  const lang = useLangStore((s) => s.lang)
+  const t = T[lang]
+  const legend: { set: PxServer['set']; label: string }[] = [
+    { set: 1, label: t.set1 },
+    { set: 2, label: t.set2 },
+    { set: 0, label: t.pxPool },
+  ]
+  return (
+    <Box id="px-servers" label={`PX Servers (P000–P${String(px.length - 1).padStart(3, '0')})`} desc={t.pxServers} hue="amber" className="mt-1.5">
+      <div className="grid grid-cols-8 gap-1">
+        {px.map((p) => (
+          <div
+            key={p.name}
+            title={`${p.name} · ${p.set === 0 ? t.pxPool : p.set === 1 ? t.set1 : t.set2}${p.job ? ` · ${p.job}` : ''}`}
+            className={cn('flex min-w-0 flex-col items-center rounded-chip border px-0.5 py-0.5 font-mono leading-tight transition-colors duration-300', PX_SET_CLS[p.set])}
+          >
+            <span className="text-[8.5px] font-bold">{p.name}</span>
+            <span className="w-full truncate text-center text-[7px] opacity-80">{p.set === 0 ? '·' : p.job ?? ''}</span>
+          </div>
+        ))}
+      </div>
+      <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5">
+        {legend.map((l) => (
+          <span key={l.set} className="flex items-center gap-1">
+            <span className={cn('h-2 w-2 rounded-[2px] border', PX_SET_CLS[l.set])} />
+            <Mono>{l.label}</Mono>
+          </span>
+        ))}
+      </div>
+    </Box>
+  )
+}
+
 // ── PGA ───────────────────────────────────────────────────────────────────
 
 function Pga() {
@@ -505,10 +575,11 @@ export function InstanceDiagram() {
             <div className="flex min-w-0 flex-col gap-2">
               <BufferCache />
               <RedoBuffer />
+              <LargePool />
             </div>
           </div>
           <div className="mt-2 flex flex-wrap items-center gap-1.5" title={t.otherPools}>
-            {['Large Pool', 'Java Pool', 'Streams Pool', 'Fixed SGA', 'In-Memory Area'].map((p) => (
+            {['Java Pool', 'Streams Pool', 'Fixed SGA', 'In-Memory Area'].map((p) => (
               <span key={p} className="rounded-chip border border-dashed border-line-2 px-1.5 py-0.5 font-mono text-[9px] text-ink-3">{p}</span>
             ))}
             <span className="font-sans text-[10px] text-ink-3">— {t.otherPools}</span>
@@ -525,6 +596,7 @@ export function InstanceDiagram() {
             <Process id="mmon" label="MMON" desc={t.mmon} />
             <Process id="arc" label="ARCn" desc={t.arc} />
           </div>
+          <PxServers />
         </Frame>
       </div>
 

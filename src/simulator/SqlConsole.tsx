@@ -8,15 +8,18 @@ import { cn } from '@/lib/utils'
 
 // ── SQL syntax highlighter ────────────────────────────────────────────────
 
-const SQL_KEYWORDS = /\b(SELECT|FROM|WHERE|JOIN|LEFT|RIGHT|INNER|OUTER|FULL|CROSS|ON|AND|OR|NOT|IN|EXISTS|BETWEEN|LIKE|IS|NULL|AS|DISTINCT|ORDER|BY|GROUP|HAVING|FETCH|FIRST|ROWS|ONLY|ROWNUM|INSERT|INTO|VALUES|UPDATE|SET|DELETE|COMMIT|ROLLBACK|ASC|DESC|COUNT|SUM|AVG|MIN|MAX|NVL|UPPER|LOWER)\b/gi
+const SQL_KEYWORDS = /\b(SELECT|FROM|WHERE|JOIN|LEFT|RIGHT|INNER|OUTER|FULL|CROSS|ON|AND|OR|NOT|IN|EXISTS|BETWEEN|LIKE|IS|NULL|AS|DISTINCT|ORDER|BY|GROUP|HAVING|FETCH|FIRST|ROWS|ONLY|ROWNUM|DATE|TO_DATE|TO_CHAR|INSERT|INTO|VALUES|UPDATE|SET|DELETE|COMMIT|ROLLBACK|ASC|DESC|COUNT|SUM|AVG|MIN|MAX|NVL|UPPER|LOWER)\b/gi
 const SQL_NUMBERS = /\b\d+(\.\d+)?\b/g
 const SQL_BINDS = /:[A-Za-z_]\w*/g
 
 function highlightSQL(text: string): string {
   const escaped = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
   return escaped
-    .split(/('[^']*')/g)
+    .split(/(\/\*[\s\S]*?\*\/|'[^']*')/g)
     .map((part, i) => {
+      // 힌트 /*+ … */ 는 눈에 띄게, 일반 주석은 회색으로
+      if (i % 2 === 1 && part.startsWith('/*+')) return `<span class="text-sy-num font-bold">${part}</span>`
+      if (i % 2 === 1 && part.startsWith('/*')) return `<span class="text-sy-com italic">${part}</span>`
       if (i % 2 === 1) return `<span class="text-sy-str">${part}</span>`
       return part
         .replace(SQL_BINDS, (m) => `<span class="text-sy-fn">${m}</span>`)
@@ -40,6 +43,13 @@ const EXAMPLES: { ko: string; en: string; sql: string }[] = [
   { ko: '서브쿼리', en: 'Subquery', sql: 'SELECT last_name FROM employees WHERE department_id IN (SELECT department_id FROM departments WHERE location_id = 1700)' },
   { ko: 'Top-N', en: 'Top-N', sql: 'SELECT last_name, salary FROM employees ORDER BY salary DESC FETCH FIRST 3 ROWS ONLY' },
   { ko: 'ROWNUM', en: 'ROWNUM', sql: 'SELECT * FROM employees WHERE ROWNUM <= 5' },
+  { ko: '파티션 Pruning', en: 'Partition pruning', sql: "SELECT * FROM orders WHERE order_tms >= DATE '2021-03-01' AND order_tms < DATE '2021-04-01'" },
+  { ko: '빈 파티션(4월)', en: 'Empty partition (Apr)', sql: "SELECT * FROM orders WHERE order_tms >= DATE '2021-04-01' AND order_tms < DATE '2021-05-01'" },
+  { ko: '파티션 전부 읽기', en: 'All partitions', sql: "SELECT * FROM orders WHERE TO_CHAR(order_tms, 'YYYY-MM') = '2021-03'" },
+  { ko: '병렬 COUNT(*)', en: 'Parallel COUNT(*)', sql: 'SELECT /*+ PARALLEL(4) */ COUNT(*) FROM employees' },
+  { ko: '병렬 GROUP BY', en: 'Parallel GROUP BY', sql: 'SELECT /*+ PARALLEL(e 4) */ department_id, COUNT(*) FROM employees e GROUP BY department_id' },
+  { ko: '병렬 조인', en: 'Parallel join', sql: 'SELECT /*+ PARALLEL(4) */ e.last_name, d.department_name FROM employees e JOIN departments d ON e.department_id = d.department_id' },
+  { ko: '병렬 + 파티션', en: 'Parallel + partition', sql: "SELECT /*+ PARALLEL(8) */ * FROM orders WHERE order_tms >= DATE '2021-03-01'" },
   { ko: 'UPDATE', en: 'UPDATE', sql: 'UPDATE employees SET salary = salary * 1.1 WHERE department_id = 60' },
   { ko: 'COMMIT', en: 'COMMIT', sql: 'COMMIT' },
   { ko: 'ROLLBACK', en: 'ROLLBACK', sql: 'ROLLBACK' },

@@ -3,7 +3,7 @@
 // Buffer Cache 시뮬레이션이 추정치가 아니라 실제 블록 주소로 움직이게 하려는 것.
 
 import type { RowData } from '@/data/types'
-import type { AccessPath, IndexStats, OptimizerResult, Predicate, TableRef, TableStats } from '@/lib/optimizer/types'
+import type { AccessPath, IndexStats, OptimizerResult, PartitionStats, Predicate, TableRef, TableStats } from '@/lib/optimizer/types'
 import { KEYS_PER_LEAF, ROWS_PER_BLOCK, getTableRows, getTableStats } from '@/lib/optimizer/stats'
 import type { BlockRef } from './types'
 
@@ -22,6 +22,26 @@ export const undoBlock = (n: number): BlockRef => ({
 })
 
 const blockOfRow = (rowIdx: number) => Math.floor(rowIdx / ROWS_PER_BLOCK) + 1
+
+// 파티션 테이블은 파티션마다 세그먼트가 따로 있다 → 블록 번호도 파티션 안에서 1 부터 센다 ('p2.1' = 2번 파티션의 1번 블록)
+const partitionBlock = (ts: TableStats, part: PartitionStats, n: number): BlockRef => ({
+  key: `${ts.tableName}:${part.name}#${n}`, object: `${ts.tableName} PARTITION (${part.name})`, abbr: ts.abbr, sub: `p${part.position}.${n}`, kind: 'table',
+})
+
+/** 행 하나가 들어 있는 테이블 블록 */
+function rowBlock(ts: TableStats, rowIdx: number): BlockRef {
+  const part = ts.partitioning?.partitions.find((p) => p.rowIdx.includes(rowIdx))
+  if (part) return partitionBlock(ts, part, Math.floor(part.rowIdx.indexOf(rowIdx) / ROWS_PER_BLOCK) + 1)
+  return tableBlock(ts, Math.min(ts.numBlocks, blockOfRow(rowIdx)))
+}
+
+/** Full Scan 이 읽는 세그먼트 블록. 파티션 테이블이면 positions 의 파티션만 */
+function segmentBlocks(ts: TableStats, positions?: number[]): BlockRef[] {
+  if (!ts.partitioning) return Array.from({ length: ts.numBlocks }, (_, i) => tableBlock(ts, i + 1))
+  return ts.partitioning.partitions
+    .filter((p) => !positions || positions.includes(p.position))
+    .flatMap((p) => Array.from({ length: p.numBlocks }, (_, i) => partitionBlock(ts, p, i + 1)))
+}
 
 /** 인덱스 키 순서로 정렬했을 때 각 행이 몇 번째 Leaf 블록에 들어가는지 */
 function leafOfRows(ix: IndexStats, rows: RowData[]): Map<number, number> {
@@ -47,7 +67,7 @@ export function accessBlocks(path: AccessPath, keyRows: number[]): { index: Bloc
   const ts = getTableStats(path.tableName)
   if (!ts) return { index: [], table: [] }
   if (path.type === 'FULL_TABLE_SCAN' || !path.index) {
-    return { index: [], table: Array.from({ length: ts.numBlocks }, (_, i) => tableBlock(ts, i + 1)) }
+    return { index: [], table: segmentBlocks(ts, path.partitions?.positions) }
   }
   const ix = path.index
   const root = indexBlock(ix, ts.abbr, 'R')
@@ -58,7 +78,7 @@ export function accessBlocks(path: AccessPath, keyRows: number[]): { index: Bloc
   const index: BlockRef[] = [root]
   for (const r of keyRows) index.push(indexBlock(ix, ts.abbr, `L${leaves.get(r) ?? 1}`))
   if (keyRows.length === 0) index.push(indexBlock(ix, ts.abbr, 'L1')) // 못 찾아도 Leaf 까지는 내려간다
-  const table = path.indexOnly ? [] : keyRows.map((r) => tableBlock(ts, blockOfRow(r)))
+  const table = path.indexOnly ? [] : keyRows.map((r) => rowBlock(ts, r))
   return { index: dedupe(index), table: dedupe(table) }
 }
 
@@ -67,7 +87,7 @@ export function dmlBlocks(tableName: string, rowIdx: number[], changedColumns: s
   const ts = getTableStats(tableName)
   if (!ts) return { table: [], index: [] }
   const rows = getTableRows(tableName)
-  const table = dedupe(rowIdx.map((r) => tableBlock(ts, Math.min(ts.numBlocks, blockOfRow(r)))))
+  const table = dedupe(rowIdx.map((r) => rowBlock(ts, r)))
   const index: BlockRef[] = []
   for (const ix of ts.indexes) {
     // UPDATE 는 값이 바뀐 컬럼의 인덱스만, INSERT·DELETE 는 모든 인덱스를 고친다

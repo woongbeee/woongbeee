@@ -102,6 +102,8 @@ SQL 입력 (SqlConsole)
 - **Buffer Cache 는 실제 블록 주소로 움직인다** — `execution.ts` 가 샘플 행에 조건을 실제로 적용해 "어느 행 → 어느 블록"을 구한다. 인덱스 스캔과 `TABLE ACCESS BY INDEX ROWID` 는 별도 단계.
 - **DML 순서:** Lock(Current Mode Get) → Redo(Redo Log Buffer) → Undo 블록 → 데이터 블록. 샘플 행 자체는 바꾸지 않는다(블록·Lock·Undo·Redo 움직임만 재현).
 - **Online Redo Log 는 3개 그룹** — CURRENT 그룹이 `REDO_LOG_BYTES` 를 넘으면 문장 끝에 Log Switch → ARCn → Checkpoint 단계가 이어진다(`Run.finish()`).
+- **Partition Pruning** — `lib/optimizer/partition.ts`. 파티션 정의는 `stats.ts` 의 `PARTITIONED`(현재 CO `ORDERS` 를 `ORDER_TMS` 월별 Range 5개: 2월 18행 · 3월 2행 · 4월 0행(빈 파티션 예시) · 5월 10행 · 6월 13행). 계획에 `PARTITION RANGE SINGLE|ITERATOR|ALL|EMPTY` + Pstart/Pstop, 블록 주소는 파티션별 세그먼트(`p2.1`). Partition Key 를 가공하면 ALL, 바인드면 KEY.
+- **Parallel Execution** — `/*+ PARALLEL(n) */`·`PARALLEL(alias n)` 힌트(문장 첫 키워드 바로 뒤에서만 인정, SELECT 만 병렬). `planGenerator.ts` 의 `PxComposer` 가 직렬 트리를 DFO·Table Queue(PX BLOCK ITERATOR / SEND HASH·RANGE·BROADCAST / RECEIVE / SEND QC / COORDINATOR)로 바꾸고, 엔진은 `InstanceState.px`(P000~P007, `PX_MAX_SERVERS`)에 생산자·소비자 집합을 배정한다. 병렬 Full Scan 은 Direct Path Read(Buffer Cache 우회, 앞서 Object Checkpoint). Unique 인덱스 `=` 조회는 힌트가 있어도 직렬.
 - 새 다이어그램 컴포넌트 id 를 엔진의 `active`/`flows` 에 쓰면 `simulator/componentNames.ts` 에도 추가한다.
 
 ### 상태 관리 (`src/store/`)

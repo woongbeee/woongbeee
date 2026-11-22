@@ -72,14 +72,21 @@ function unsupported(ko: string, en = ko): never {
 type TokType = 'id' | 'num' | 'str' | 'bind' | 'sym'
 interface Tok { t: TokType; v: string }
 
-const TOKEN_RE = /\s+|--[^\n]*|'(?:[^']|'')*'|'|:[A-Za-z_]\w*|\d+(?:\.\d+)?|"[^"]+"|[A-Za-z_][\w$#]*|<>|!=|\^=|<=|>=|\|\||[(),.*=<>;+\-/]|./gy
+const TOKEN_RE = /\s+|--[^\n]*|\/\*[\s\S]*?\*\/|'(?:[^']|'')*'|'|:[A-Za-z_]\w*|\d+(?:\.\d+)?|"[^"]+"|[A-Za-z_][\w$#]*|<>|!=|\^=|<=|>=|\|\||[(),.*=<>;+\-/]|./gy
 
-function tokenize(sql: string): Tok[] {
+/** 옵티마이저 힌트 주석 `/*+ … *\/` 과, 그 주석이 놓인 자리(앞에 있던 토큰 수) */
+interface Hint { text: string; at: number }
+
+function tokenize(sql: string, hints: Hint[] = []): Tok[] {
   const toks: Tok[] = []
   TOKEN_RE.lastIndex = 0
   let m: RegExpExecArray | null
   while ((m = TOKEN_RE.exec(sql)) !== null) {
     const s = m[0]
+    if (s.startsWith('/*')) {
+      if (s.startsWith('/*+')) hints.push({ text: s.slice(3, -2), at: toks.length })
+      continue
+    }
     if (/^\s/.test(s) || s.startsWith('--')) continue
     if (s === "'") fail('ORA-01756', 'syntax')
     if (s.startsWith("'")) toks.push({ t: 'str', v: s.slice(1, -1).replace(/''/g, "'") })
@@ -102,6 +109,7 @@ const RESERVED = new Set([
   'UNION', 'INTERSECT', 'MINUS', 'OFFSET', 'UPDATE', 'DELETE', 'INSERT', 'ESCAPE', 'ANY', 'ALL', 'SOME',
 ])
 const AGGREGATES = new Set(['COUNT', 'SUM', 'AVG', 'MIN', 'MAX', 'LISTAGG', 'STDDEV', 'VARIANCE', 'MEDIAN'])
+const DATE_FUNCS = new Set(['TO_DATE', 'TO_TIMESTAMP'])
 const SELECT_STOPS = ['WHERE', 'GROUP', 'HAVING', 'ORDER', 'FETCH', 'OFFSET', 'UNION', 'INTERSECT', 'MINUS']
 const JOIN_STARTS = ['JOIN', 'INNER', 'LEFT', 'RIGHT', 'FULL', 'CROSS', 'NATURAL']
 
@@ -166,6 +174,33 @@ interface RawQuery {
   bindNames: string[]
   tokenCount: number
   rawSQL: string
+  parallel: { dop: number; alias: string | null; defaulted: boolean } | null
+  hintNotes: L[]
+}
+
+// ── Hints ─────────────────────────────────────────────────────────────────
+
+/** 병렬도를 적지 않은 PARALLEL 힌트의 기본 DOP (CPU_COUNT 2 × PARALLEL_THREADS_PER_CPU 2 라고 가정) */
+export const DEFAULT_DOP = 4
+
+const PARALLEL_HINT = /(?<![\w$#])PARALLEL\s*(?:\(\s*([A-Za-z_][\w$#]*)?\s*,?\s*(\d+|DEFAULT)?\s*\))?/i
+
+function readHints(hints: Hint[], q: RawQuery) {
+  for (const h of hints) {
+    const m = PARALLEL_HINT.exec(h.text)
+    if (!m) continue
+    // 힌트는 SELECT · UPDATE · DELETE · INSERT 키워드 바로 뒤에 있어야 힌트로 읽힌다. 다른 자리면 그냥 주석이다
+    if (h.at !== 1) {
+      q.hintNotes.push({
+        ko: `/*+ ${h.text.trim()} */ 가 문장 첫 키워드 바로 뒤에 있지 않아서 힌트가 아니라 그냥 주석으로 취급됐어요.`,
+        en: `/*+ ${h.text.trim()} */ does not directly follow the first keyword, so it is treated as a plain comment, not a hint.`,
+      })
+      continue
+    }
+    const alias = m[1] && m[1].toUpperCase() !== 'DEFAULT' ? m[1].toUpperCase() : null
+    const n = m[2] && /^\d+$/.test(m[2]) ? Number(m[2]) : null
+    q.parallel = { dop: n ?? DEFAULT_DOP, alias, defaulted: n === null }
+  }
 }
 
 // ── Syntax check ──────────────────────────────────────────────────────────
@@ -185,7 +220,7 @@ class Parser {
       hasGroupBy: false, hasOrderBy: false, hasDistinct: false, hasAggregate: false, hasCountStar: false,
       hasOr: false, fetchFirst: null, setCols: [], insertCols: null, insertValueCount: 0,
       bindNames: [...new Set(toks.filter((t) => t.t === 'bind').map((t) => t.v))],
-      tokenCount: toks.length, rawSQL: sql,
+      tokenCount: toks.length, rawSQL: sql, parallel: null, hintNotes: [],
     }
   }
 
@@ -324,9 +359,14 @@ class Parser {
   literals(toks: Tok[]): { values: (string | number)[]; isBind: boolean } {
     const values: (string | number)[] = []
     let isBind = false
+    // TO_DATE('2021-03-01', 'YYYY-MM-DD') 의 두 번째 인자(형식 문자열)는 비교 값이 아니다
+    const calls: string[] = []
     toks.forEach((tok, k) => {
-      if (tok.t === 'num') values.push(Number(tok.v) * (isSym(toks[k - 1], '-') ? -1 : 1))
-      else if (tok.t === 'str') values.push(tok.v)
+      if (isSym(tok, '(')) { calls.push(toks[k - 1]?.t === 'id' ? toks[k - 1].v : ''); return }
+      if (isSym(tok, ')')) { calls.pop(); return }
+      const inFormatArg = DATE_FUNCS.has(calls[calls.length - 1] ?? '') && isSym(toks[k - 1], ',')
+      if (tok.t === 'num' && !inFormatArg) values.push(Number(tok.v) * (isSym(toks[k - 1], '-') ? -1 : 1))
+      else if (tok.t === 'str' && !inFormatArg) values.push(tok.v)
       else if (tok.t === 'bind') isBind = true
     })
     return { values, isBind }
@@ -648,9 +688,11 @@ const UNSUPPORTED_STARTS = new Set([
 ])
 
 function parseSyntax(sql: string): RawQuery {
-  const toks = tokenize(sql)
+  const hints: Hint[] = []
+  const toks = tokenize(sql, hints)
   if (toks.length === 0) fail('ORA-00900', 'syntax')
   const p = new Parser(toks, sql)
+  readHints(hints, p.q)
   const first = toks[0]
   if (first.t !== 'id') fail('ORA-00900', 'syntax')
   switch (first.v) {
@@ -761,9 +803,23 @@ function resolveSemantics(raw: RawQuery): ParsedQuery {
     if (!joins.some((j) => j.type === 'SEMI' && j.optionalAlias === alias)) unsupported('바깥 질의와 이어지는 조건이 없는 EXISTS 서브쿼리', 'An EXISTS subquery with no condition linking it to the outer query')
   }
 
+  // PARALLEL(alias n) 의 alias 가 문장에 없으면 Oracle 은 그 힌트를 조용히 무시한다
+  let parallel = raw.parallel
+  const hintNotes = [...raw.hintNotes]
+  if (parallel?.alias && !tables.some((t) => t.alias === parallel!.alias || t.name === parallel!.alias)) {
+    hintNotes.push({
+      ko: `PARALLEL(${parallel.alias} …) 힌트의 ${parallel.alias} 가 FROM 절의 어떤 테이블(별칭)과도 맞지 않아서 힌트가 무시됐어요. 별칭을 쓴 테이블은 힌트에도 별칭을 써야 해요.`,
+      en: `The PARALLEL(${parallel.alias} …) hint names ${parallel.alias}, which matches no table (alias) in the FROM clause, so the hint is ignored. A table with an alias must be named by that alias in hints.`,
+    })
+    parallel = null
+  }
+
   return {
     type: raw.type,
     tables,
+    parallel: parallel && parallel.dop > 1 ? parallel.dop : null,
+    parallelDefaulted: parallel?.defaulted ?? false,
+    hintNotes,
     selectAll: raw.selectAll,
     usedColumns: Object.fromEntries(Object.entries(used).map(([a, s]) => [a, [...s]])),
     predicates,

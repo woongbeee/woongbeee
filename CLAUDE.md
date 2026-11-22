@@ -104,7 +104,8 @@ SQL 입력 (SqlConsole)
 - **Online Redo Log 는 3개 그룹** — CURRENT 그룹이 `REDO_LOG_BYTES` 를 넘으면 문장 끝에 Log Switch → ARCn → Checkpoint 단계가 이어진다(`Run.finish()`).
 - **Partition Pruning** — `lib/optimizer/partition.ts`. 파티션 정의는 `stats.ts` 의 `PARTITIONED`(현재 CO `ORDERS` 를 `ORDER_TMS` 월별 Range 5개: 2월 18행 · 3월 2행 · 4월 0행(빈 파티션 예시) · 5월 10행 · 6월 13행). 계획에 `PARTITION RANGE SINGLE|ITERATOR|ALL|EMPTY` + Pstart/Pstop, 블록 주소는 파티션별 세그먼트(`p2.1`). Partition Key 를 가공하면 ALL, 바인드면 KEY.
 - **Parallel Execution** — `/*+ PARALLEL(n) */`·`PARALLEL(alias n)` 힌트(문장 첫 키워드 바로 뒤에서만 인정, SELECT 만 병렬). `planGenerator.ts` 의 `PxComposer` 가 직렬 트리를 DFO·Table Queue(PX BLOCK ITERATOR / SEND HASH·RANGE·BROADCAST / RECEIVE / SEND QC / COORDINATOR)로 바꾸고, 엔진은 `InstanceState.px`(P000~P007, `PX_MAX_SERVERS`)에 생산자·소비자 집합을 배정한다. 병렬 Full Scan 은 Direct Path Read(Buffer Cache 우회, 앞서 Object Checkpoint). Unique 인덱스 `=` 조회는 힌트가 있어도 직렬.
-- 새 다이어그램 컴포넌트 id 를 엔진의 `active`/`flows` 에 쓰면 `simulator/componentNames.ts` 에도 추가한다.
+- **화면 두 가지 (`internalsStore.view`)** — `overview` = 인스턴스 전체 그림(`InstanceDiagram`, 첫 화면·실행이 끝난 뒤), `slides` = 실행 중 단계마다 `step.active` 영역만 확대해 옆으로 넘기는 슬라이드(`SlideStage.tsx`). 자동 재생이 마지막 단계를 지나면·마지막 슬라이드에서 한 번 더 넘기면·Esc 면 overview 로 돌아온다. `slideMode`(localStorage) 로 끌 수 있다. 슬라이드는 `InstanceDiagram` 의 `ComponentView({ id })` 로 같은 컴포넌트를 재사용한다. **프로세스(주체)와 메모리·파일(장소)을 위아래 층으로 나눈다** — `SlideStage` 의 `ACTORS`(프로세스 + 원래 맡는 장소 `domain`)가 위층 주체 카드, 그 아래 "↓ 여기서 일해요" 연결선, 그 프로세스가 일하는 장소를 `REGIONS`(PGA · Shared Pool · SGA · Files)별로 묶어 `flows` 순서대로. 프로세스가 여럿이면 프로세스별 칸(lane)으로 나뉘고, 장소의 주인은 flows 로 직접 이어진 프로세스 → `domain` → Server Process 순으로 정한다.
+- 새 다이어그램 컴포넌트 id 를 엔진의 `active`/`flows` 에 쓰면 `simulator/componentNames.ts` 에도 추가하고, `InstanceDiagram` 의 `ComponentView` 와 `SlideStage` 의 `ACTORS`(프로세스) 또는 `REGIONS`(메모리·파일)에도 넣는다.
 
 ### 상태 관리 (`src/store/`)
 

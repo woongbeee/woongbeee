@@ -66,6 +66,9 @@ const T = {
     descOn: '설명 표시',
     descOff: '설명 숨김',
     descTip: '각 영역의 설명 문구를 펼치거나 숨겨요. 숨기면 마우스를 올렸을 때 말풍선으로 보여요.',
+    slides: '슬라이드로 보기',
+    slidesTip: 'SQL 을 실행하면 단계마다 그 단계가 쓰는 영역만 크게 확대해서, 발표 슬라이드처럼 한 장씩 넘겨 보여 줘요. 끄면 이 전체 그림에서 불만 켜져요.',
+    replay: '슬라이드 다시 보기',
     controlFile: 'DB 구조 · Checkpoint SCN',
     archive: 'Online Redo Log 의 보관본',
     largePool: '병렬 실행 메시지 버퍼 · 백업 등 큰 메모리',
@@ -119,6 +122,9 @@ const T = {
     descOn: 'Descriptions on',
     descOff: 'Descriptions off',
     descTip: 'Show or hide the description text of each area. When hidden, hover an area to see it as a tooltip.',
+    slides: 'Slides',
+    slidesTip: 'When a statement runs, each step zooms into just the areas it uses and flips like a presentation slide. Turn off to light up this whole diagram instead.',
+    replay: 'Replay as slides',
     controlFile: 'DB structure · checkpoint SCN',
     archive: 'Archived copies of the online redo log',
     largePool: 'Parallel execution message buffers, backups and other large allocations',
@@ -441,7 +447,8 @@ function PxServers() {
   ]
   return (
     <Box id="px-servers" label={`PX Servers (P000–P${String(px.length - 1).padStart(3, '0')})`} desc={t.pxServers} hue="amber" className="mt-1.5">
-      <div className="grid grid-cols-8 gap-1">
+      {/* 폭이 좁으면(슬라이드 화면) 줄을 바꿔 서버 이름이 잘리지 않게 */}
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(56px,1fr))] gap-1">
         {px.map((p) => (
           <div
             key={p.name}
@@ -467,14 +474,11 @@ function PxServers() {
 
 // ── PGA ───────────────────────────────────────────────────────────────────
 
-function Pga() {
+function PgaPrivate() {
   const pga = useInternalsStore((s) => selectState(s).pga)
-  const txn = useInternalsStore((s) => selectState(s).txn)
   const lang = useLangStore((s) => s.lang)
   const t = T[lang]
   return (
-    <Frame kicker="PGA — Program Global Area" hue="purple" className="min-w-0 flex-1">
-      <div className="grid grid-cols-3 gap-1.5">
         <Box id="pga-private" label="Private SQL Area" desc={t.privateSql} hue="purple">
           {pga.cursor ? (
             <div className="space-y-0.5">
@@ -495,9 +499,25 @@ function Pga() {
             <Mono className="text-ink-3">{t.noCursor}</Mono>
           )}
         </Box>
+  )
+}
+
+function PgaWork() {
+  const workArea = useInternalsStore((s) => selectState(s).pga.workArea)
+  const lang = useLangStore((s) => s.lang)
+  const t = T[lang]
+  return (
         <Box id="pga-work" label="SQL Work Area" desc={t.workArea} hue="purple">
-          <Mono className={pga.workArea ? 'font-bold text-viz-purple' : 'text-ink-3'}>{pga.workArea ?? t.idle}</Mono>
+          <Mono className={workArea ? 'font-bold text-viz-purple' : 'text-ink-3'}>{workArea ?? t.idle}</Mono>
         </Box>
+  )
+}
+
+function PgaSession() {
+  const txn = useInternalsStore((s) => selectState(s).txn)
+  const lang = useLangStore((s) => s.lang)
+  const t = T[lang]
+  return (
         <Box id="pga-session" label="Session Memory" desc={t.session} hue="purple">
           {txn ? (
             <div className="space-y-0.5">
@@ -511,12 +531,96 @@ function Pga() {
             <Mono className="text-ink-3">{t.noTxn}</Mono>
           )}
         </Box>
+  )
+}
+
+function Pga() {
+  return (
+    <Frame kicker="PGA — Program Global Area" hue="purple" className="min-w-0 flex-1">
+      <div className="grid grid-cols-3 gap-1.5">
+        <PgaPrivate />
+        <PgaWork />
+        <PgaSession />
       </div>
     </Frame>
   )
 }
 
-// ── Diagram ───────────────────────────────────────────────────────────────
+// ── 파일 · 프로세스 (단독 컴포넌트 — 슬라이드 화면에서도 쓴다) ──────────────
+
+const BG_PROCESSES = ['dbw', 'lgwr', 'ckpt', 'smon', 'pmon', 'mmon', 'arc'] as const
+const BG_LABEL: Record<(typeof BG_PROCESSES)[number], string> = { dbw: 'DBW', lgwr: 'LGWR', ckpt: 'CKPT', smon: 'SMON', pmon: 'PMON', mmon: 'MMON', arc: 'ARCn' }
+const DATA_FILES = { 'df-system': ['SYSTEM', 'system'], 'df-users': ['USERS', 'users'], 'df-undo': ['UNDO', 'undo'], 'df-temp': ['TEMP', 'temp'] } as const
+
+function ControlFile() {
+  const checkpointScn = useInternalsStore((s) => selectState(s).checkpointScn)
+  const t = T[useLangStore((s) => s.lang)]
+  return (
+    <Box id="control-file" label="Control File" desc={t.controlFile} hue="slate" tipUp>
+      <Mono>ckpt SCN {checkpointScn.toLocaleString()}</Mono>
+    </Box>
+  )
+}
+
+function ArchiveLogs() {
+  const archivedLogs = useInternalsStore((s) => selectState(s).archivedLogs)
+  const lang = useLangStore((s) => s.lang)
+  const t = T[lang]
+  return (
+    <Box id="archive-logs" label="Archived Redo Log" desc={t.archive} hue="slate" tipUp>
+      <Mono>{lang === 'ko' ? `${archivedLogs}${t.archived}` : `${archivedLogs} ${t.archived}`}</Mono>
+    </Box>
+  )
+}
+
+/** 다이어그램 컴포넌트 하나를 id 로 그린다 (엔진의 SimStep.active 와 같은 id). 모르는 id 면 null */
+export function ComponentView({ id }: { id: string }) {
+  const lang = useLangStore((s) => s.lang)
+  const t = T[lang]
+  switch (id) {
+    case 'client': return <Box id="client" label="Client Process" desc={t.client} hue="slate" />
+    case 'server-process': return <Box id="server-process" label="Server Process" desc={t.server} hue="green" />
+    case 'pga-private': return <PgaPrivate />
+    case 'pga-work': return <PgaWork />
+    case 'pga-session': return <PgaSession />
+    case 'library-cache': return <LibraryCache />
+    case 'dict-cache': return <DictCache />
+    case 'buffer-cache': return <BufferCache />
+    case 'redo-buffer': return <RedoBuffer />
+    case 'large-pool': return <LargePool />
+    case 'px-servers': return <PxServers />
+    case 'redo-logs': return <RedoLogs />
+    case 'control-file': return <ControlFile />
+    case 'archive-logs': return <ArchiveLogs />
+  }
+  if (id in BG_LABEL) {
+    const k = id as keyof typeof BG_LABEL
+    return <Process id={k} label={BG_LABEL[k]} desc={t[k]} />
+  }
+  if (id in DATA_FILES) {
+    const [label, desc] = DATA_FILES[id as keyof typeof DATA_FILES]
+    return <Box id={id} label={label} desc={t[desc]} hue="slate" />
+  }
+  return null
+}
+
+// ── Diagram ───
+
+function Switch({ on, label, tip, onClick }: { on: boolean; label: string; tip: string; onClick: () => void }) {
+  return (
+    <button
+      onClick={onClick}
+      title={tip}
+      aria-pressed={on}
+      className="flex items-center gap-1.5 rounded-chip border border-line bg-paper px-1.5 py-0.5 font-sans text-[10px] text-ink-2 transition-colors hover:bg-rail hover:text-ink"
+    >
+      <span className={cn('relative h-2.5 w-[18px] rounded-full transition-colors', on ? 'bg-viz-green' : 'bg-line-2')}>
+        <span className={cn('absolute top-px h-2 w-2 rounded-full bg-paper transition-all', on ? 'left-[9px]' : 'left-px')} />
+      </span>
+      {label}
+    </button>
+  )
+}
 
 function Arrow() {
   return <span className="shrink-0 self-center font-mono text-xs text-ink-3">→</span>
@@ -525,19 +629,20 @@ function Arrow() {
 export function InstanceDiagram() {
   const lang = useLangStore((s) => s.lang)
   const scn = useInternalsStore((s) => selectState(s).scn)
-  const checkpointScn = useInternalsStore((s) => selectState(s).checkpointScn)
-  const archivedLogs = useInternalsStore((s) => selectState(s).archivedLogs)
   const showDesc = useInternalsStore((s) => s.showDesc)
   const toggleDesc = useInternalsStore((s) => s.toggleDesc)
+  const slideMode = useInternalsStore((s) => s.slideMode)
+  const hasTrace = useInternalsStore((s) => s.trace !== null)
+  const { toggleSlideMode, goTo } = useInternalsStore.getState()
   const t = T[lang]
 
   return (
     <div className="flex min-h-full flex-col gap-2 bg-paper-sunk p-3">
       {/* Client → Server Process + PGA */}
       <div className="flex items-stretch gap-2">
-        <Box id="client" label="Client Process" desc={t.client} hue="slate" className="w-[150px] shrink-0" />
+        <div className="grid w-[150px] shrink-0"><ComponentView id="client" /></div>
         <Arrow />
-        <Box id="server-process" label="Server Process" desc={t.server} hue="green" className="w-[170px] shrink-0" />
+        <div className="grid w-[170px] shrink-0"><ComponentView id="server-process" /></div>
         <Pga />
       </div>
 
@@ -547,17 +652,16 @@ export function InstanceDiagram() {
           <span className="h-2 w-2 rounded-full bg-viz-green" />
           <span className="font-mono text-[10px] font-bold text-ink">Database Instance</span>
           <Mono className="ml-auto">SCN {scn.toLocaleString()}</Mono>
-          <button
-            onClick={toggleDesc}
-            title={t.descTip}
-            aria-pressed={showDesc}
-            className="flex items-center gap-1.5 rounded-chip border border-line bg-paper px-1.5 py-0.5 font-sans text-[10px] text-ink-2 transition-colors hover:bg-rail hover:text-ink"
-          >
-            <span className={cn('relative h-2.5 w-[18px] rounded-full transition-colors', showDesc ? 'bg-viz-green' : 'bg-line-2')}>
-              <span className={cn('absolute top-px h-2 w-2 rounded-full bg-paper transition-all', showDesc ? 'left-[9px]' : 'left-px')} />
-            </span>
-            {showDesc ? t.descOn : t.descOff}
-          </button>
+          {slideMode && hasTrace && (
+            <button
+              onClick={() => goTo(0)}
+              className="rounded-chip border border-line bg-paper px-1.5 py-0.5 font-sans text-[10px] text-ink-2 transition-colors hover:bg-rail hover:text-ink"
+            >
+              ▶ {t.replay}
+            </button>
+          )}
+          <Switch on={slideMode} label={t.slides} tip={t.slidesTip} onClick={toggleSlideMode} />
+          <Switch on={showDesc} label={showDesc ? t.descOn : t.descOff} tip={t.descTip} onClick={toggleDesc} />
         </div>
 
         <Frame kicker="SGA — System Global Area" hue="blue">
@@ -588,13 +692,7 @@ export function InstanceDiagram() {
 
         <Frame kicker="Background Processes" hue="amber" className="mt-2">
           <div className="grid grid-cols-7 gap-1.5">
-            <Process id="dbw" label="DBW" desc={t.dbw} />
-            <Process id="lgwr" label="LGWR" desc={t.lgwr} />
-            <Process id="ckpt" label="CKPT" desc={t.ckpt} />
-            <Process id="smon" label="SMON" desc={t.smon} />
-            <Process id="pmon" label="PMON" desc={t.pmon} />
-            <Process id="mmon" label="MMON" desc={t.mmon} />
-            <Process id="arc" label="ARCn" desc={t.arc} />
+            {BG_PROCESSES.map((id) => <ComponentView key={id} id={id} />)}
           </div>
           <PxServers />
         </Frame>
@@ -605,19 +703,12 @@ export function InstanceDiagram() {
         <div className="grid grid-cols-[minmax(0,7fr)_minmax(0,3fr)_minmax(0,2fr)_minmax(0,2fr)] gap-2">
           <Frame kicker="Data Files" hue="slate">
             <div className="grid grid-cols-4 gap-1.5">
-              <Box id="df-system" label="SYSTEM" desc={t.system} hue="slate" tipUp />
-              <Box id="df-users" label="USERS" desc={t.users} hue="slate" tipUp />
-              <Box id="df-undo" label="UNDO" desc={t.undo} hue="slate" tipUp />
-              <Box id="df-temp" label="TEMP" desc={t.temp} hue="slate" tipUp />
+              {Object.entries(DATA_FILES).map(([id, [label, desc]]) => <Box key={id} id={id} label={label} desc={t[desc]} hue="slate" tipUp />)}
             </div>
           </Frame>
           <RedoLogs />
-          <Box id="control-file" label="Control File" desc={t.controlFile} hue="slate" tipUp>
-            <Mono>ckpt SCN {checkpointScn.toLocaleString()}</Mono>
-          </Box>
-          <Box id="archive-logs" label="Archived Redo Log" desc={t.archive} hue="slate" tipUp>
-            <Mono>{lang === 'ko' ? `${archivedLogs}${t.archived}` : `${archivedLogs} ${t.archived}`}</Mono>
-          </Box>
+          <ControlFile />
+          <ArchiveLogs />
         </div>
       </Frame>
     </div>

@@ -114,6 +114,7 @@ function Playback({ lang }: { lang: Lang }) {
   const cursor = useInternalsStore((s) => s.cursor)
   const playing = useInternalsStore((s) => s.playing)
   const speed = useInternalsStore((s) => s.speed)
+  const view = useInternalsStore((s) => s.view)
   const { play, pause, next, prev, setSpeed } = useInternalsStore.getState()
   const t = T[lang]
   const total = trace?.steps.length ?? 0
@@ -133,7 +134,7 @@ function Playback({ lang }: { lang: Lang }) {
       >
         {playing ? <IconPlayerPauseFilled size={13} /> : <IconPlayerPlayFilled size={13} />}
       </button>
-      <button onClick={next} disabled={!trace || cursor >= total - 1} title={t.next} aria-label={t.next} className={ICON_BTN}>
+      <button onClick={next} disabled={!trace || (cursor >= total - 1 && view !== 'slides')} title={t.next} aria-label={t.next} className={ICON_BTN}>
         <IconPlayerSkipForwardFilled size={13} />
       </button>
       <span className="ml-1 font-mono text-[11px] tabular-nums text-ink-2">

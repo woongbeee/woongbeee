@@ -1,7 +1,7 @@
 // ─── Internals Simulator — 앱의 메인 화면 ─────────────────────────────────
 //   Header        제목 · 탭 · 학습서 이동 · 언어/테마
 //   PipelineBar   SQL 처리 단계 진행 표시
-//   InstanceDiagram (왼쪽)  +  DetailPanel (오른쪽: 재생 · 단계 해설 · Optimizer · 통계)
+//   SimStage (왼쪽: InstanceDiagram ↔ 단계별 슬라이드)  +  DetailPanel (오른쪽: 재생 · 단계 해설 · Optimizer · 통계)
 //   SqlConsole    SQL 입력 · 예제 · 인스턴스 명령
 
 import { useState, type ReactNode } from 'react'
@@ -11,8 +11,8 @@ import { cn } from '@/lib/utils'
 import { AppFooter } from '@/components/AppFooter'
 import { DetailPanel } from './DetailPanel'
 import { ErdPanel } from './ErdPanel'
-import { InstanceDiagram } from './InstanceDiagram'
 import { PipelineBar } from './PipelineBar'
+import { SimStage } from './SlideStage'
 import { SqlConsole } from './SqlConsole'
 
 const T = {
@@ -109,10 +109,9 @@ export function SimulatorPage({ onOpenBook }: Props) {
           <PipelineBar />
           <div className="flex min-h-0 flex-1 overflow-hidden">
             <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
-              <div className="min-h-0 flex-1 overflow-auto bg-paper-sunk">
-                <div className="min-w-[860px]">
-                  <InstanceDiagram />
-                </div>
+              {/* 평소엔 인스턴스 전체 그림, SQL 을 실행하는 동안엔 단계별 슬라이드 */}
+              <div className="min-h-0 flex-1 overflow-hidden bg-paper-sunk">
+                <SimStage />
               </div>
               <SqlConsole />
             </div>
